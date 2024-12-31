@@ -1,0 +1,4961 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="0. 接口和继承 接口\n定义契约：接口常用于定义不同类之间的公共行为，确保所有实现类都遵守相同的接口契约。\n多态性：允许通过接口引用来操作不同类的对象。\n继承\n代码复用：继承通过重用父类的功能减少代码重复。\n">
+<title>Interview</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/interview/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Interview">
+<meta property='og:description' content="0. 接口和继承 接口\n定义契约：接口常用于定义不同类之间的公共行为，确保所有实现类都遵守相同的接口契约。\n多态性：允许通过接口引用来操作不同类的对象。\n继承\n代码复用：继承通过重用父类的功能减少代码重复。\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/interview/'>
+<meta property='og:site_name' content='mikeLing'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-12-31T18:39:58&#43;08:00'/><meta property='article:modified_time' content='2024-12-31T18:39:58&#43;08:00'/>
+<meta name="twitter:title" content="Interview">
+<meta name="twitter:description" content="0. 接口和继承 接口\n定义契约：接口常用于定义不同类之间的公共行为，确保所有实现类都遵守相同的接口契约。\n多态性：允许通过接口引用来操作不同类的对象。\n继承\n代码复用：继承通过重用父类的功能减少代码重复。\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu13739649187745961479.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">mikeLing</a></h1>
+            <h2 class="site-description">slogen</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="https://mikeLing-qx.github.io/en/" >English</option>
+                                
+                                    <option value="https://mikeLing-qx.github.io/" selected>中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#0-接口和继承">0. 接口和继承</a></li>
+    <li><a href="#1-栈与堆的区别是什么">1. 栈与堆的区别是什么</a></li>
+    <li><a href="#2-this-关键字的作用是什么">2. this 关键字的作用是什么</a></li>
+    <li><a href="#3-什么是多线程">3. 什么是多线程</a></li>
+    <li><a href="#4-synchronized">4. synchronized</a></li>
+    <li><a href="#5-线程有哪些状态">5. 线程有哪些状态</a></li>
+    <li><a href="#6-wait-和-sleep的区别">6. wait 和 sleep的区别</a></li>
+    <li><a href="#7-线程interrupt">7. 线程interrupt()</a></li>
+    <li><a href="#8-说一下线程的优先级">8. 说一下线程的优先级</a></li>
+    <li><a href="#9-线程安全的三大特性">9. 线程安全的三大特性</a></li>
+    <li><a href="#10-java内存">10. java内存</a>
+      <ul>
+        <li><a href="#1-jvm内存结构有哪些">1. JVM内存结构有哪些</a></li>
+        <li><a href="#2-java对象模型">2. java对象模型</a>
+          <ul>
+            <li><a href="#1-堆内存中的实例">1. 堆内存中的实例</a></li>
+          </ul>
+        </li>
+        <li><a href="#3-介绍一下java方法区">3. 介绍一下java方法区</a></li>
+        <li><a href="#4-java内存模型-jmm">4. java内存模型 JMM</a></li>
+      </ul>
+    </li>
+    <li><a href="#11-volatile">11. volatile</a></li>
+    <li><a href="#12-原子性">12. 原子性</a></li>
+    <li><a href="#13-synchronized">13. synchronized</a>
+      <ul>
+        <li><a href="#1-可见性怎么解决的">1. 可见性怎么解决的?</a></li>
+        <li><a href="#2-同步原理">2. 同步原理</a>
+          <ul>
+            <li><a href="#1-markword-什么是">1. markword 什么是?</a></li>
+            <li><a href="#2-monitor-是什么">2. monitor 是什么?</a></li>
+          </ul>
+        </li>
+        <li><a href="#3-锁优化有哪些">3. 锁优化有哪些?</a></li>
+      </ul>
+    </li>
+    <li><a href="#14-cas-是什么">14. CAS 是什么</a></li>
+    <li><a href="#15-native">15. native</a></li>
+    <li><a href="#16-atomic">16. Atomic</a></li>
+    <li><a href="#17-aqs--介绍一下">17. AQS  介绍一下</a>
+      <ul>
+        <li><a href="#1-state--head-tail">1. state , head ,tail</a></li>
+        <li><a href="#2-资源获取方式">2. 资源获取方式</a></li>
+        <li><a href="#3-总结">3. 总结</a></li>
+      </ul>
+    </li>
+    <li><a href="#18-锁的类型有哪些">18. 锁的类型有哪些</a></li>
+    <li><a href="#19-reentrantlock">19. ReentrantLock</a></li>
+    <li><a href="#20-reentrantreadwritelock">20. <strong>ReentrantReadWriteLock</strong></a></li>
+    <li><a href="#21-condition">21. Condition</a></li>
+    <li><a href="#22-cyclicbarrier-同步屏障">22. CyclicBarrier 同步屏障</a></li>
+    <li><a href="#23-countdownlatch">23. CountdownLatch</a></li>
+    <li><a href="#24--semaphore">24.  Semaphore</a></li>
+    <li><a href="#25--clh">25.  CLH</a></li>
+    <li><a href="#26-hashmap">26. HashMap</a></li>
+    <li><a href="#27-concurrentskiplistmap">27. ConcurrentSkipListMap</a></li>
+    <li><a href="#28-juc-队列">28. JUC 队列</a></li>
+    <li><a href="#29-cap理论">29. CAP理论</a></li>
+    <li><a href="#30-线程池">30. 线程池</a>
+      <ul>
+        <li><a href="#1-线程池有哪些状态">1. 线程池有哪些状态</a></li>
+        <li><a href="#2-线程池参数">2. 线程池参数</a></li>
+        <li><a href="#3-excutors-线程池">3. Excutors 线程池</a></li>
+        <li><a href="#4-线程执行出现异常时-线程池会怎么处理">4. 线程执行出现异常时, 线程池会怎么处理</a></li>
+        <li><a href="#5-线程池如何知道线程已经执行完任务">5. 线程池如何知道线程已经执行完任务</a></li>
+      </ul>
+    </li>
+    <li><a href="#31-forkjoin">31. ForkJoin</a></li>
+    <li><a href="#32-jvm-运行参数">32. Jvm 运行参数</a></li>
+    <li><a href="#33--java-堆内存模型">33.  Java 堆内存模型</a>
+      <ul>
+        <li><a href="#1-java7">1. Java7</a></li>
+        <li><a href="#2-java8">2. Java8</a></li>
+        <li><a href="#3-jstat-垃圾回收统计">3. jstat 垃圾回收统计</a></li>
+        <li><a href="#4-jmap">4. jmap</a></li>
+      </ul>
+    </li>
+    <li><a href="#35-jstack">35. jstack</a></li>
+    <li><a href="#34-设计模式-适配器和策略">34. 设计模式-适配器和策略</a></li>
+    <li><a href="#35-垃圾回收">35. 垃圾回收</a>
+      <ul>
+        <li><a href="#0-引用类型">0. 引用类型</a></li>
+        <li><a href="#1垃圾回收算法">1.垃圾回收算法</a></li>
+        <li><a href="#2垃圾收集器">2.垃圾收集器</a></li>
+      </ul>
+    </li>
+    <li><a href="#36-threadlocal">36. ThreadLocal</a></li>
+    <li><a href="#37-fail-safe-和-fail-fast">37. fail-safe 和 fail-fast</a></li>
+    <li><a href="#38-异常类型">38. 异常类型</a></li>
+    <li><a href="#39-代理">39. 代理</a>
+      <ul>
+        <li><a href="#1-为什么只能代理有接口的类">1. 为什么只能代理有接口的类?</a></li>
+        <li><a href="#2-cglib-是怎么实现的">2. cglib 是怎么实现的</a></li>
+      </ul>
+    </li>
+    <li><a href="#40-对象的创建过程">40. 对象的创建过程</a></li>
+    <li><a href="#41--new-stringabc-创建了几个对象">41.  new String(abc) 创建了几个对象</a></li>
+    <li><a href="#42-string--string-buffer-string-builder">42. String , String Buffer, String Builder</a></li>
+    <li><a href="#43-integer-相等判断">43. Integer 相等判断</a></li>
+    <li><a href="#44-深拷贝-浅拷贝">44. 深拷贝, 浅拷贝</a></li>
+    <li><a href="#45-java文件拷贝方式">45. Java文件拷贝方式</a></li>
+    <li><a href="#46-零拷贝">46. 零拷贝</a></li>
+    <li><a href="#47-设计模式">47. 设计模式</a>
+      <ul>
+        <li><a href="#1-单例模式">1. 单例模式</a></li>
+        <li><a href="#2-策略模式">2. 策略模式</a></li>
+        <li><a href="#3-观察者模式">3. 观察者模式</a></li>
+        <li><a href="#4-责任链模式">4. 责任链模式</a></li>
+      </ul>
+    </li>
+    <li><a href="#48-finally-块一定会执行吗">48. finally 块一定会执行吗</a></li>
+    <li><a href="#49--raft-算法">49.  Raft 算法</a>
+      <ul>
+        <li><a href="#1-重要组件">1. 重要组件</a></li>
+        <li><a href="#2-工作流程">2. <strong>工作流程</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#50-spi">50. SPI</a></li>
+    <li><a href="#51--包装类和基础数据类型">51.  包装类和基础数据类型</a></li>
+    <li><a href="#52--equal-hashcode">52.  equal, hashCode</a></li>
+    <li><a href="#53-集合">53. 集合</a>
+      <ul>
+        <li><a href="#0-算法">0. 算法</a></li>
+        <li><a href="#1-set">1. Set</a></li>
+        <li><a href="#2-list">2. List</a></li>
+      </ul>
+    </li>
+    <li><a href="#54-类加载">54. 类加载</a>
+      <ul>
+        <li><a href="#0-层级">0. 层级</a></li>
+        <li><a href="#1-双亲委派">1. 双亲委派</a></li>
+        <li><a href="#2-tomcat-是怎么打破双亲委派的">2. Tomcat 是怎么打破双亲委派的</a></li>
+      </ul>
+    </li>
+    <li><a href="#55--spring-bootspring-mvc-和-spring">55.  Spring Boot、Spring MVC 和 Spring</a></li>
+    <li><a href="#56-cpu-使用率高">56. CPU 使用率高</a></li>
+    <li><a href="#57-mybatis-中的--和--的区别">57. mybatis 中的 #{} 和 ${} 的区别</a></li>
+    <li><a href="#58-mybatis-如何进行分页">58. mybatis 如何进行分页</a></li>
+    <li><a href="#59-mysql索引结构为什么使用b树">59. Mysql索引结构为什么使用B+树</a></li>
+    <li><a href="#60-mysql-事务实现原理">60. Mysql 事务实现原理</a></li>
+    <li><a href="#61-mysql-事务隔离级别">61. Mysql 事务隔离级别</a></li>
+    <li><a href="#62-mvcc">62. MVCC</a>
+      <ul>
+        <li><a href="#1-读取数据的机制">1. 读取数据的机制</a></li>
+        <li><a href="#2-写入数据的机制">2. 写入数据的机制</a></li>
+      </ul>
+    </li>
+    <li><a href="#63-行锁-临键锁-间隙锁">63. 行锁, 临键锁, 间隙锁</a>
+      <ul>
+        <li><a href="#1-行锁-记录锁">1. 行锁 (记录锁)</a></li>
+        <li><a href="#2-临键锁">2. 临键锁</a></li>
+        <li><a href="#3-间隙锁">3. 间隙锁</a></li>
+      </ul>
+    </li>
+    <li><a href="#64-mysql索引失效的情况">64. Mysql索引失效的情况</a>
+      <ul>
+        <li><a href="#1-聚簇索引clustered-index"><strong>1. 聚簇索引（Clustered Index）</strong></a></li>
+        <li><a href="#2-非聚簇索引non-clustered-index"><strong>2. 非聚簇索引（Non-Clustered Index）</strong></a></li>
+        <li><a href="#3-总结-1">3. 总结</a></li>
+      </ul>
+    </li>
+    <li><a href="#65-myisam-和-innodb-引擎的区别">65. MyISAM 和 InnoDB 引擎的区别</a></li>
+    <li><a href="#66-md5-值应该用char-还是varchar">66. MD5 值应该用char 还是varchar</a></li>
+    <li><a href="#67-update-语句用什么锁">67. update 语句用什么锁</a></li>
+    <li><a href="#68-mysql-性能优化">68. Mysql 性能优化</a></li>
+    <li><a href="#69-spring-boot-约定大于配置">69. Spring boot 约定大于配置</a></li>
+    <li><a href="#70-spring-boot-是如何实现自动配置的">70. Spring boot 是如何实现自动配置的</a></li>
+    <li><a href="#71-starter-的作用">71. starter 的作用</a></li>
+    <li><a href="#72-conditional-注解的作用">72. @Conditional 注解的作用</a></li>
+    <li><a href="#73-spring-aop的原理">73. Spring Aop的原理</a>
+      <ul>
+        <li><a href="#1-创建代理目标">1. 创建代理目标</a></li>
+        <li><a href="#2-拦截目标对象">2. 拦截目标对象</a></li>
+        <li><a href="#3-调用代理对象阶段">3. 调用代理对象阶段</a></li>
+      </ul>
+    </li>
+    <li><a href="#74-spring-bean的定义">74. Spring Bean的定义</a></li>
+    <li><a href="#75-spring-bean的生命周期">75. Spring Bean的生命周期</a>
+      <ul>
+        <li><a href="#1-加载配置文件或注解"><strong>1. 加载配置文件或注解</strong></a></li>
+        <li><a href="#2-beandefinition-处理"><strong>2. BeanDefinition 处理</strong></a></li>
+        <li><a href="#3-bean-实例化"><strong>3. Bean 实例化</strong></a></li>
+        <li><a href="#4-属性填充"><strong>4. 属性填充</strong></a></li>
+        <li><a href="#5-设置-aware-接口属性"><strong>5. 设置 Aware 接口属性</strong></a></li>
+        <li><a href="#6-调用-beanpostprocessor-的-postprocessbeforeinitialization"><strong>6. 调用 BeanPostProcessor 的 <code>postProcessBeforeInitialization</code></strong></a></li>
+        <li><a href="#7-bean-初始化"><strong>7. Bean 初始化</strong></a></li>
+        <li><a href="#8-调用-beanpostprocessor-的-postprocessafterinitialization"><strong>8. 调用 BeanPostProcessor 的 <code>postProcessAfterInitialization</code></strong></a></li>
+        <li><a href="#9-bean-完成初始化ready-to-use"><strong>9. Bean 完成初始化（Ready to Use）</strong></a></li>
+        <li><a href="#10-销毁当容器关闭时"><strong>10. 销毁（当容器关闭时）</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#76-spring-里面可以存在id-相同的两个bean吗">76. Spring 里面可以存在Id 相同的两个Bean吗?</a></li>
+    <li><a href="#77-spring-如何解决循环依赖的问题">77. Spring 如何解决循环依赖的问题</a>
+      <ul>
+        <li><a href="#1-为什么必须要三级缓存">1. 为什么必须要三级缓存</a></li>
+      </ul>
+    </li>
+    <li><a href="#78-spring-beanfactory-和-factorybean的区别">78. Spring BeanFactory 和 FactoryBean的区别</a></li>
+    <li><a href="#79-spring-事务">79. Spring 事务</a></li>
+    <li><a href="#80-spring-bean注入ioc容器的方式">80. Spring Bean注入IOC容器的方式</a></li>
+    <li><a href="#81-过滤器和拦截器的区别">81. 过滤器和拦截器的区别</a></li>
+    <li><a href="#82-spring-mvc-执行流程">82. Spring Mvc 执行流程</a></li>
+    <li><a href="#83-spring-ioc-原理">83. Spring IOC 原理</a></li>
+    <li><a href="#84-spring-mvc的理解">84. Spring Mvc的理解</a></li>
+    <li><a href="#85-spring-bean-作用域">85. Spring Bean 作用域</a></li>
+    <li><a href="#86-webapplicationcontext-和-applicationcontext">86. WebApplicationContext 和 ApplicationContext</a></li>
+    <li><a href="#87-seata">87. Seata</a></li>
+    <li><a href="#88-dubbo请求失败重试">88. Dubbo请求失败重试</a></li>
+    <li><a href="#89-redis和mysql-如何保持数据一致">89. redis和mysql 如何保持数据一致</a></li>
+    <li><a href="#90-spring-cloud-理解">90. Spring cloud 理解</a></li>
+    <li><a href="#91-rpc-和-http">91. Rpc 和 Http</a></li>
+    <li><a href="#92-一致性hash算法">92. 一致性Hash算法</a>
+      <ul>
+        <li><a href="#基本原理"><strong>基本原理</strong></a></li>
+        <li><a href="#传统哈希缺点"><strong>传统哈希缺点</strong></a></li>
+        <li><a href="#一致性哈希改进"><strong>一致性哈希改进</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#93-分布式和微服务的理解">93. 分布式和微服务的理解</a></li>
+    <li><a href="#94-nacos-配置更新流程">94. Nacos 配置更新流程</a></li>
+    <li><a href="#95-分布式id设计方案">95. 分布式ID设计方案</a></li>
+    <li><a href="#97-nosql">97. Nosql</a></li>
+    <li><a href="#98-分布式锁">98. 分布式锁</a></li>
+    <li><a href="#99-时间轮算法">99. 时间轮算法</a>
+      <ul>
+        <li><a href="#概念">概念</a></li>
+        <li><a href="#时间轮的工作流程">时间轮的工作流程</a></li>
+      </ul>
+    </li>
+    <li><a href="#100-令牌桶-漏桶">100. 令牌桶, 漏桶</a></li>
+    <li><a href="#101-滑动窗口算法">101. 滑动窗口算法</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/interview/">Interview</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Dec 31, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 110 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="0-接口和继承">0. 接口和继承
+</h1><p>接口</p>
+<p><strong>定义契约</strong>：接口常用于定义不同类之间的公共行为，确保所有实现类都遵守相同的接口契约。</p>
+<p><strong>多态性</strong>：<strong>允许通过接口引用来操作不同类的对象</strong>。</p>
+<p>继承</p>
+<p><strong>代码复用</strong>：继承通过重用父类的功能<strong>减少代码重复</strong>。</p>
+<p><strong>方法扩展</strong>：继承允许子类在父类基础上添加新功能或修改已有功能。</p>
+<h1 id="1-栈与堆的区别是什么">1. 栈与堆的区别是什么
+</h1><p><strong>栈内存（Stack Memory）</strong></p>
+<ul>
+<li><strong>分配与管理</strong>：栈内存由==编译器自动分配和释放==，内存空间在==方法执行时自动分配给每个线程==。每个线程都有自己独立的栈内存。
+<ul>
+<li><strong>自动分配</strong>：Java 栈内存是由 JVM 自动管理的，栈帧的分配和释放由方法调用过程决定。</li>
+<li><strong>可能栈溢出</strong>：在<strong>递归调用过深</strong>或方法调用过多时可能导致栈溢出。</li>
+<li><strong>可调整栈大小</strong>：通过 JVM 参数 <code>-Xss</code> 调整线程栈大小，但仍需要优化代码逻辑以避免不必要的栈占用</li>
+</ul>
+</li>
+<li><strong>存储内容</strong>：栈内存主要存储局部变量、方法参数、方法调用信息（如返回地址）等。在==执行一个方法时，相关的数据会压入栈，当方法执行结束后，栈中的数据会自动弹出释放==。溢出会报 ==StackOverflowError==</li>
+<li><strong>访问速度</strong>：栈内存是==连续的，访问速度很快，但空间相对较小==。</li>
+<li><strong>生命周期</strong>：局部变量的生命周期随着方法调用而开始和结束，方法执行完毕，栈内存会自动回收。</li>
+</ul>
+<p><strong>堆内存（Heap Memory）</strong></p>
+<ul>
+<li><strong>分配与管理</strong>：堆内存是用于动态分配的内存，由==程序员通过代码（如 <code>new</code> 关键字）显式分配，内存管理通常由垃圾回收器负责回收==。堆内存是==全局共享的==，也就是说所有线程可以访问堆中的对象。</li>
+<li><strong>存储内容</strong>：堆内存主要存储对象以及对象内部的属性数据。线程共享堆内存，因此多个线程可以访问和修改堆中的相同对象。</li>
+<li><strong>访问速度</strong>：由于堆内存是动态分配的，而且不像栈那样是连续的，访问速度相对较慢。</li>
+<li><strong>生命周期</strong>：堆内存中的对象生命周期是动态的，它们的内存不会因为方法结束而自动释放，而是依赖垃圾回收机制（如 JVM 中的垃圾回收器）进行回收。</li>
+</ul>
+<p>==区别==</p>
+<ul>
+<li><strong>线程独立性</strong>：==栈是线程私有的==，堆是线程共享的。</li>
+<li><strong>生命周期</strong>：栈内存随着方法的执行自动管理，堆内存的管理依赖程序员和垃圾回收机制。</li>
+<li><strong>存储数据</strong>：栈存储局部变量和方法调用信息，堆存储对象和实例数据。</li>
+<li><strong>速度</strong>：栈的访问速度快，堆的访问速度慢。</li>
+</ul>
+<h1 id="2-this-关键字的作用是什么">2. this 关键字的作用是什么
+</h1><p><code>this</code> 是一个引用变量，==指向当前对象的实例==。</p>
+<ul>
+<li><strong>区分实例变量和局部变量</strong></li>
+<li><strong>调用当前对象的其他方法</strong></li>
+<li><strong>在构造函数中调用另一个构造函数</strong></li>
+<li><strong>返回当前对象的引用，支持链式调用</strong></li>
+<li><strong>作为参数传递当前对象</strong></li>
+</ul>
+<h1 id="3-什么是多线程">3. 什么是多线程
+</h1><p>多线程：通过空间（cpu的时间片的利用）换取响应时间</p>
+<p>线程和进程的概念</p>
+<ul>
+<li>
+<p>进程：程序的一次执行，进程之间内存是独立的，无法共享内存空间，至少有一个线程。</p>
+</li>
+<li>
+<p>线程：进程内部的最小执行单元，线程之间是共享堆内存，栈内存是独立的。</p>
+</li>
+</ul>
+<p>创建线程的方式</p>
+<ul>
+<li>
+<p>继承Thread类，重写run方法</p>
+</li>
+<li>
+<p>实现Runnable接口，实现里面的run方法</p>
+</li>
+<li>
+<p>匿名内部类实现Runnable接口，New Thread(()-&gt;执行内容)</p>
+</li>
+</ul>
+<p>线程的执行：==一定要用Start方法执行线程，如果run方法执行是直接执行类的方法，不会以线程的方式执行==</p>
+<p>用户线程和守护线程：</p>
+<ul>
+<li>
+<p>用户线程：一般是用户创建的，不会随着主线程的终止而终止</p>
+</li>
+<li>
+<p>守护线程：一般是系统创建的，会随着主线的终止而终止，垃圾回收线程就是守护线程，可以使用</p>
+<p>Thread::setDaemon方法将用户线程转化为守护线程</p>
+</li>
+</ul>
+<h1 id="4-synchronized">4. synchronized
+</h1><p>线程安全：当多线程执行同一段程序的时候，如果发生了和预期结果不一致的情况，就是线程不安全</p>
+<p>的，如果和预期结果一致就是线程安全的，可以加锁解决(把并行运行的线程变成串行化执行)。</p>
+<p>同步锁的几种方式(锁对象):</p>
+<ul>
+<li>同步代码块加锁：sync&hellip;.(obj)</li>
+<li>同步方法加锁：等价于sync&hellip;.(this)</li>
+<li>静态同步方法加锁:等价于sync&hellip;.(this.getClass())</li>
+</ul>
+<p>==死锁：线程之间互相等待对方释放锁，就产生了死锁，尽量不要同步中嵌套同步==。</p>
+<p>死锁发生的原因：</p>
+<ol>
+<li><strong>线程 1</strong> 先获取了资源 A 的锁，准备获取资源 B 的锁。</li>
+<li><strong>线程 2</strong> 同时获取了资源 B 的锁，准备获取资源 A 的锁。</li>
+<li><strong>线程 1</strong> 等待 <strong>线程 2</strong> 释放资源 B，而 <strong>线程 2</strong> 正在等待 <strong>线程 1</strong> 释放资源 A。</li>
+<li>由于==两个线程互相等待对方释放资源==，进入了死锁状态，程序无法继续执行。</li>
+</ol>
+<ul>
+<li>互斥条件, 共享资源 X 和Y只能被一个线程占用</li>
+<li>请求和保持,  线程t1 已经获取 资源X, 在等待共享资源Y的时候不释放 X</li>
+<li>不可抢占, 也就是其他线程不能强行占有线程T1 占有的子牙UN</li>
+<li>循环等待, 两个线程相互等待对方释放资源</li>
+</ul>
+<p>预防死锁</p>
+<ul>
+<li>一次性请求所有资源</li>
+<li>如果占用资源的线程申请资源申请不到, 那么可以主动的去释放本身持有的资源</li>
+<li>保持统一的获取锁的顺序, 比如都是先申请A -&gt; B -&gt; C</li>
+</ul>
+<pre><code>伪码
+// 定义两个资源
+resource A
+resource B
+
+// 线程 1 的执行过程
+Thread 1:
+    lock(A)    // 获取资源 A 的锁
+    wait(100)  // 等待一段时间，让线程 2 有机会获取资源 B
+    lock(B)    // 尝试获取资源 B 的锁
+    // 操作资源 A 和 B
+    unlock(B)  // 释放资源 B 的锁
+    unlock(A)  // 释放资源 A 的锁
+
+// 线程 2 的执行过程
+Thread 2:
+    lock(B)    // 获取资源 B 的锁
+    wait(100)  // 等待一段时间，让线程 1 有机会获取资源 A
+    lock(A)    // 尝试获取资源 A 的锁
+    // 操作资源 A 和 B
+    unlock(A)  // 释放资源 A 的锁
+    unlock(B)  // 释放资源 B 的锁
+</code></pre>
+<h1 id="5-线程有哪些状态">5. 线程有哪些状态
+</h1><p>new, run, blocked, wait, time-wait, terminate</p>
+<p>==NEW==(新建)</p>
+<p>线程刚被创建，但是并未启动。</p>
+<p>==RUNNABLE==(可运行)</p>
+<p>线程可以在java虚拟机中运行的状态，可能正在运行自己代码，也可能没有，这取决于操作系统处理器。</p>
+<p>==BLOCKED==(锁阻塞)</p>
+<p>当一个线程试图获取一个对象锁，而==该对象锁被其他的线程持有，则该线程进入Blocked状态==；当该线程持有锁 时，该线程将变成Runnable状态。</p>
+<p>==WAITING==(无限等待)</p>
+<p>一个线程在等待另一个线程执行一个（唤醒）动作时，该线程进入Waiting状态。进入这个状态后是不能自动唤</p>
+<p>醒的，==必须等待另一个线程调用notify或者notifyAll方法才能够唤醒==。</p>
+<p>==TIMED_WAITING==(计时等待)</p>
+<p>同waiting状态，有几个方法有超时参数，调用他们将进入Timed Waiting状态。这一状态将一直保持到超时期</p>
+<p>满或者接收到唤醒通知。带有超时参数的常用方法有Thread.sleep 、Object.wait。</p>
+<p>==TERMINATED==(被终止)</p>
+<p>因为run方法正常退出而死亡，或者因为没有捕获的异常终止了run方法而死亡。</p>
+<p><img src="/p/interview/images/image-20240918160428024.png"
+	width="1271"
+	height="879"
+	
+	loading="lazy"
+	
+		alt="image-20240918160428024"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="144"
+		data-flex-basis="347px"
+	
+></p>
+<h1 id="6-wait-和-sleep的区别">6. wait 和 sleep的区别
+</h1><ul>
+<li>
+<p>sleep()方法，属于Thread类。wait()方法，属于Object类。</p>
+</li>
+<li>
+<p>sleep()方法导致了==程序暂停执行指定的时间，让出cpu调度其他线程==，不会释放锁或监视器资源，==当指定的时间到了又会自动恢复运行状态==。</p>
+</li>
+<li>
+<p>wait()  ==必须在同步代码块或同步方法中调用== , 是把控制权交出去，==线程会释放持有的锁==  直到收到其他线程的通知（==通过同一个对象的== <code>notify()</code> 或 <code>notifyAll()</code> ,  通常用于线程间的协作。</p>
+</li>
+</ul>
+<h1 id="7-线程interrupt">7. 线程interrupt()
+</h1><p><code>interrupt()</code> 方法的作用</p>
+<ul>
+<li><strong>中断标志</strong>：调用 <code>interrupt()</code> 后，线程的中断状态将被设置为 <code>true</code>。这仅仅是发送了一个中断信号，线程并不会立即停止运行。</li>
+<li><strong>配合阻塞操作</strong>：如果线程处于阻塞状态（例如 <code>sleep()</code>、<code>wait()</code> 或 <code>join()</code>），那么线程会立即抛出 <code>InterruptedException</code> 异常，并清除中断状态，这样可以让线程提前结束阻塞操作。</li>
+<li><strong>检查中断状态</strong>：线程可以通过 <code>Thread.interrupted()</code> 或 <code>isInterrupted()</code> 来检查是否有中断请求。</li>
+</ul>
+<p>调用<code>interrupt()</code>方法后，线程不会自动停止，但是它会开始尝试响应中断请求。线程是否停止，以及何时停止，取决于线程如何响应中断信号。正确的做法是，在线程的运行逻辑中，定期检查中断状态，或者在可能长时间运行的操作中使用会抛出<code>InterruptedException</code>的方法，以便能够响应中断请求。</p>
+<h1 id="8-说一下线程的优先级">8. 说一下线程的优先级
+</h1><ol>
+<li>
+<p>设置并理解线程的优先级priority , 优先级越高,获取到cpu的时间片越多</p>
+</li>
+<li>
+<p>理解并掌握join()方法的使用 : thread.Join把指定的线程加入到当前线程，可以==将两个交替执行的线 程合并为顺序执行的线程==。比如在线程B中调用了线程A的Join()方法，直到线程A执行完毕后，才会继续 执行线程B。</p>
+</li>
+<li>
+<p>理解yield()方法的概念 : 暂停当前正在执行的线程，并执行其他线程。（可能没有效果）, 目的是让具有相同优先级的线程之间能够适当的轮换执行</p>
+</li>
+</ol>
+<h1 id="9-线程安全的三大特性">9. 线程安全的三大特性
+</h1><ol>
+<li>有序性: 由jvm指令重排导致的，指令重排的结果对于单线程来说是一致性，没有什么影响（在指令重排的过程中会考虑数据依赖的问题），多线程情况下避免指令重排带来程序执行错误的危害。==有些情 况可以使用volatile，或者使用synchronized==同步块或者同步方法或者同步锁。</li>
+<li>可见性: 和java内存模型有关，==多线程访问共享变量时会创建副本变量，修改后再写回主变量，其他线程副本变量的值没有及时更新==，导致可见性的问题</li>
+<li>原子性: 不可分割，说明这一段程序要么都执行，要么不执行，并且不能被其他线程影响, 可以使用原子类AtomicXXX</li>
+</ol>
+<h1 id="10-java内存">10. java内存
+</h1><p><img src="/p/interview/images/JVM.png"
+	width="4606"
+	height="2590"
+	
+	loading="lazy"
+	
+		alt="JVM"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="177"
+		data-flex-basis="426px"
+	
+></p>
+<p>JVM内存结构、Java对象模型和Java内存模型，这就是三个截然不同的概念</p>
+<h2 id="1-jvm内存结构有哪些">1. JVM内存结构有哪些
+</h2><p><img src="/p/interview/images/image-20240919101322185.png"
+	width="1371"
+	height="709"
+	
+	loading="lazy"
+	
+		alt="image-20240919101322185"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="193"
+		data-flex-basis="464px"
+	
+></p>
+<ul>
+<li>PC寄存器</li>
+<li>java 虚拟机栈</li>
+<li>本地方法栈</li>
+<li>java堆</li>
+<li>方法区 内包含了运行时常量池</li>
+<li>所有线程共享的数据区域</li>
+<li>各个线程独享的数据区域</li>
+<li>运行时常量</li>
+</ul>
+<p>==JVM内存结构，由Java虚拟机规范定义是Java程序执行过程中，由JVM管理的不同数据区 域。各个区域有其特定的功能。==</p>
+<h2 id="2-java对象模型">2. java对象模型
+</h2><p>HotSpot 虚拟机设计了一个OOP-Klass Model,OOP（Ordinary Object Pointer）指的是普通对象指针,  Klass用来 描述对象实例的具体类型</p>
+<ul>
+<li>
+<p><strong>每一个Java类，在被JVM加载的时候，JVM会给这个类创建一个 instanceKlass 对象，保存在方法 区，用来在JVM层表示该Java类</strong>。当我们在Java代码中，</p>
+</li>
+<li>
+<p><strong>使用new创建一个对象的时候，JVM会创建一 个 instanceOopDesc 对象</strong>，这个对象中包含了对象头以及实例数据。</p>
+</li>
+</ul>
+<p><img src="/p/interview/images/image-20240919103410432.png"
+	width="1333"
+	height="586"
+	
+	loading="lazy"
+	
+		alt="image-20240919103410432"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="227"
+		data-flex-basis="545px"
+	
+></p>
+<h3 id="1-堆内存中的实例">1. 堆内存中的实例
+</h3><ol>
+<li><strong>对象头（Object Header）</strong>：
+<ul>
+<li>每个 Java 对象都有一个对象头，用于存储与对象相关的元数据。对象头包含以下信息：
+<ul>
+<li><strong>Mark Word</strong>：==用于存储对象的哈希码、GC 状态、锁状态等信息==。它占用 32 位或 64 位，具体取决于 JVM 和系统架构。</li>
+<li><strong>Class Pointer（类型指针）</strong>：指向对象的类型信息，即该对象所属的类。==这部分告诉 JVM 该对象属于哪个类==，从而可以访问==类的元数据==（如方法表、字段布局等）。</li>
+<li><strong>数组长度</strong>：如果对象是数组，Java 对象头还会包含一个额外的字段，用来记录数组的长度。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>实例数据（Instance Data）</strong>：
+<ul>
+<li>实例数据部分包含==对象的所有实例字段==。不同类型的字段（如 <code>int</code>、<code>long</code>、<code>boolean</code> 等）根据它们的字节大小被排列存储。JVM 可能会对字段进行内存对齐，以提高访问效率。</li>
+<li>引用类型字段==存储的是对象的引用（指针），而非实际的数据对象。引用指向堆内存中的另一个对象==。</li>
+</ul>
+</li>
+<li><strong>对齐填充（Padding）</strong>：
+<ul>
+<li>Java 对象的内存布局通常要求对象的大小是 8 字节的倍数，因此在对象的末尾可能会有额外的填充字节来满足这一要求。这些填充字节不会存储任何有用的数据，只是为了满足内存对齐的要求。</li>
+</ul>
+</li>
+</ol>
+<p>​	 ==伪共享==是指当多个线程在共享内存区域中操作不同的数据时，==这些数据在缓存中恰好落在同一个缓存行中== ,  ==由于多个线程频繁导致缓存行失效，缓存失效带来的内存重新加载会显著降低程序的并发性能==。即使每个线程修改的是不相关的数据，这种不必要的同步机制使 CPU 和内存的性能浪费在无效的缓存操作上。</p>
+<h2 id="3-介绍一下java方法区">3. 介绍一下java方法区
+</h2><p>在Java内存模型中，方法区（Method Area）是JVM规范中定义的一个内存区域，它用于存储以下内容：</p>
+<ol>
+<li><strong>类信息</strong>：==包括类的名称、修饰符、字段、方法、接口等==。</li>
+<li><strong>常量池</strong>：存储编译期生成的各种字面量和符号引用。</li>
+<li><strong>静态变量</strong>：==类级别的静态变量==。</li>
+<li><strong>即时编译器编译后的代码</strong>：==JIT编译器编译后的机器码==。</li>
+<li><strong>其他</strong>：可能还包括JVM内部的一些其他信息，如对类的锁定、同步等。</li>
+</ol>
+<p>方法区是所有线程共享的内存区域，它在JVM启动时创建。在Java 8之前，方法区通常位于永久代（PermGen），但在Java 8及以后的版本中，方法区被移到了元空间（Metaspace），<strong>元空间使用的是本地内存。</strong></p>
+<p>需要注意的是，方法区并不是堆内存的一部分，它与Java堆（Heap）是两个不同的内存区域。堆内存主要用于存储对象实例和数组。</p>
+<h2 id="4-java内存模型-jmm">4. java内存模型 JMM
+</h2><p>Java内存模型就是一种==符合内存模型规范的==，屏蔽了各种硬件和操作系统的访问差异的，保证了Java 程序在各种平台下对内存的访问都能保证效果一致的机制及规范</p>
+<p>==和多线程相关的，他描述了一组规则或规范==，这个规范定义了一个线程对共享变量的 写入时对另一个线程是可见的。</p>
+<p><img src="/p/interview/images/image-20240919105400438.png"
+	width="987"
+	height="808"
+	
+	loading="lazy"
+	
+		alt="image-20240919105400438"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="122"
+		data-flex-basis="293px"
+	
+></p>
+<p>==第一条关于线程与主内存：线程对共享变量的所有操作都必须在自己的工作内存（本地内存）中进行， 不能直接从主内存中读写==</p>
+<p>==第二条关于线程间本地内存：不同线程之间无法直接访问其他线程本地内存中的变量，线程间变量值的 传递需要经过主内存来完成==</p>
+<h1 id="11-volatile">11. volatile
+</h1><p>保证了==可见性和有序性==</p>
+<ol>
+<li>==缓存一致性==: 一个变量如果用volatile修饰, 保证了可见性</li>
+</ol>
+<ul>
+<li>将当前处理器==缓存行的数据会写回到系统内存==。</li>
+<li>这个写回内存的操作会引起在==其他CPU里缓存了该内存地址的数据无效==。</li>
+</ul>
+<ol start="2">
+<li>==内存屏障防止指令重排==（解决指令重排对volatile修饰的变量不会产生影响）</li>
+</ol>
+<p>适用场景</p>
+<p>a. 对变量的写入操作不依赖其当前值</p>
+<p>​    不满足：number++、count=count*5等</p>
+<pre><code>==满足：boolean变量、直接赋值的变量等==
+</code></pre>
+<p>b. 该变量没有包含在具有其他变量的不变式中   不满足：不变式 low&lt;up</p>
+<h1 id="12-原子性">12. 原子性
+</h1><p>count++并不是原子性操作</p>
+<p>count = 5 开始，流程分析：</p>
+<ol>
+<li>
+<p>线程1读取count的值为5 ; 线程2读取count的值为5</p>
+</li>
+<li>
+<p>线程2加1操作</p>
+</li>
+<li>
+<p>线程2最新count的值为6</p>
+</li>
+<li>
+<p>线程2写入值到主内存的最新值为6</p>
+</li>
+<li>
+<p>线程1的count为5，线程2的count为6 如果切换到线程1执行，那么线程1得到的结果是6, 写入到主内存的值还是6</p>
+</li>
+</ol>
+<p>解决方案</p>
+<ol>
+<li>
+<p>使用==synchronized==</p>
+</li>
+<li>
+<p>使用==ReentrantLock==（可重入锁）</p>
+</li>
+<li>
+<p>使用==AtomicInteger==（原子操作）</p>
+</li>
+</ol>
+<pre><code>Java中的原子操作包括：
+1）除long和double之外的基本类型的赋值操作
+2）所有引用reference的赋值操作
+3）java.util.concurrent.Atomic.* 包中所有类的一切操作。
+4）cas操作是原子操作。
+</code></pre>
+<h1 id="13-synchronized">13. synchronized
+</h1><p>同一时刻==只有一个线程执行synchronized声明的 代码块==。还可以保证共享变量的内存可见性。同一时刻只有一个线程执行，这部分代码块的==重排序也不 会影响其执行结果==。也就是说使用了synchronized可以保证并发的原子性，可见性，有序性</p>
+<h2 id="1-可见性怎么解决的">1. 可见性怎么解决的?
+</h2><p>线程加锁时（进入同步代码块时）：将==清空本地内存中共享变量的值==，从而使用共享变量时需要从==主内 存中重新读取最新的值==（加锁与解锁是同一把锁）</p>
+<p>==执行过程==</p>
+<ol>
+<li>
+<p>获得互斥锁（同步获取锁）</p>
+</li>
+<li>
+<p>清空本地内存</p>
+</li>
+<li>
+<p>执行代码</p>
+</li>
+<li>
+<p>将更改后的共享变量的值刷新到主内存</p>
+</li>
+<li>
+<p>释放互斥锁</p>
+</li>
+</ol>
+<h2 id="2-同步原理">2. 同步原理
+</h2><ol>
+<li>
+<p>普通同步方法，==锁是当前实例对象this==</p>
+</li>
+<li>
+<p>静态同步方法，==锁是当前类的class对象==</p>
+</li>
+<li>
+<p>同步方法块，==锁是括号里面的对象==</p>
+</li>
+</ol>
+<p>==同步操作主要是monitorenter和monitorexit这两个jvm指令实现==</p>
+<p>synchronized是通过访问锁对象的monitor和mark word实现同步的</p>
+<h3 id="1-markword-什么是">1. markword 什么是?
+</h3><p>于存储对象自身的运行时数据，==存储对象状态、锁信息等的结构，在同步、垃圾回收等机制中起到重要作用==。</p>
+<p><strong>哈希码（HashCode）</strong>：对象的哈希值，通常通过 <code>hashCode()</code> 方法生成。</p>
+<p><strong>锁状态</strong>：用来支持对象的同步机制。当一个对象被锁住时，Mark Word 中会记录这个锁的状态，比如轻量级锁、重量级锁等。</p>
+<p><strong>垃圾回收标记</strong>：在垃圾回收（GC）过程中，Mark Word 也可以存储一些 GC 相关的信息，比如对象是否已经被标记为可回收。</p>
+<p><strong>偏向锁</strong>：在某些情况下，Mark Word 可以记录对象的偏向线程信息，以优化线程同步性能</p>
+<h3 id="2-monitor-是什么">2. monitor 是什么?
+</h3><p>==每一个对象都有一个隐式的Monitor,  可以使用 <code>synchronized</code> 关键字进行同步的原因==</p>
+<p><strong>互斥锁</strong>：确保同一时刻只有一个线程可以访问被锁定的代码块，避免并发线程之间的冲突。</p>
+<p><strong>线程通信</strong>：通过 <code>wait()</code> 和 <code>notify()</code> 等方法，Monitor 也可以用来管理线程之间的协调与通信。这是因为一个对象的 Monitor 还维护了一个等待队列，线程可以通过 <code>wait()</code> 进入等待队列，然后被其他线程通过 <code>notify()</code> 唤醒。</p>
+<p><img src="/p/interview/images/image-20240919144955923.png"
+	width="241"
+	height="474"
+	
+	loading="lazy"
+	
+		alt="image-20240919144955923"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="50"
+		data-flex-basis="122px"
+	
+></p>
+<ul>
+<li>
+<p>Owner：初始时为NULL表示当前没有任何线程拥有该monitor record，==当线程成功拥有该锁后保 存线程唯一标识==，当锁被释放时又设置为NULL；</p>
+</li>
+<li>
+<p>EntryQ:关联一个系统互斥锁（semaphore），==阻塞所有试图锁住monitor record失败的线程==。</p>
+</li>
+<li>
+<p>RcThis:表示blocked或waiting在该monitor record上的所有线程的个数。</p>
+</li>
+<li>
+<p>Nest:用来实现重入锁的计数。</p>
+</li>
+<li>
+<p>HashCode:保存从对象头拷贝过来的HashCode值（可能还包含GC age）。</p>
+</li>
+<li>
+<p>Candidate:用来避免不必要的阻塞或等待线程唤醒，因为每一次只有一个线程能够成功拥有锁， 如果每次前一个释放锁的线程唤醒所有正在阻塞或等待的线程，会引起不必要的上下文切换（从阻 塞到就绪然后因为竞争锁失败又被阻塞）从而导致性能严重下降。Candidate只有两种可能的值</p>
+<ul>
+<li>==0  表示没有需要唤醒的线程==</li>
+<li>==1 表示要唤醒一个继任线程来竞争锁==。</li>
+</ul>
+</li>
+</ul>
+<h2 id="3-锁优化有哪些">3. 锁优化有哪些?
+</h2><ul>
+<li>
+<p>==偏向锁==: 如果一个线程获得了锁，那么锁就进 入偏向模式，此时Mark Word 的结构也变为偏向锁结构</p>
+</li>
+<li>
+<p>==轻量锁==:</p>
+<ul>
+<li>当线程进入同步代码块时，JVM 会检查当前对象的 Mark Word（对象头中的一部分）。如果Mark Word 处于无锁状态，==JVM 会创建一个用于记录锁状态的<strong>锁记录（Lock Record）</strong>，保存在当前线程的栈中==。</li>
+<li>然后 JVM 尝试使用<strong>CAS（Compare-And-Swap）操作</strong>将对象的 ==Mark Word 拷贝到线程的锁记录中，并将对象的 Mark Word 更新为指向这个锁记录的指针==。此时对象处于轻量级锁定状态。</li>
+</ul>
+</li>
+<li>
+<p>==自旋锁==: 自旋锁，就是让该线程等待一段时间，不会被立即挂起，看持有锁的线程是否会很快释放锁。怎</p>
+<p>么等待呢？==执行一段无意义的循环==即可（自旋）。 自旋等待不能替代阻塞，虽然它可以==避免线程切换带来的开销，但是它占用了处理器的时间==。如果持 有锁的线程很快就释放了锁，那么自旋的效率就非常好，反之，自旋的线程就会白白消耗掉处理的资 源</p>
+</li>
+<li>
+<p>==适应自旋锁==: 它是由==前一次在同一个锁上的自旋时间及锁的拥有者的状态来决定==。它怎么做呢？线程如果自旋成 功了，那么下次自旋的次数会更加多，因为虚拟机认为既然上次成功了，那么此次自旋也很有可能会再</p>
+<p>次成功，那么它就会允许自旋等待持续的次数更多</p>
+</li>
+<li>
+<p>==锁消除==: JVM检测到不可能存在共享数据竞争，这是JVM会对这些同步锁进行锁消除。锁消除的依据是逃逸分析 的数据支持 例如: JDK的内置API时，如StringBuffffer、Vector、HashTable等，这个时 候会存在隐形的加锁操作</p>
+<pre><code>public void test(){
+        Vector&lt;Integer&gt; vector = new Vector&lt;Integer&gt;();
+        for(int i = 0 ; i &lt; 10 ; i++){
+            vector.add(i);
+        }
+        System.out.println(vector);
+    }
+</code></pre>
+<p>在运行这段代码时，JVM可以明显检测到变量vector没有逃逸出方法vectorTest()之外，所以JVM可以</p>
+<p>大胆地将vector内部的加锁操作消除</p>
+</li>
+<li>
+<p>==锁粗化==: 将多个连续的加锁、解锁操作连接在一起，扩展成一个范围更大的锁</p>
+</li>
+<li>
+<p>==重量锁==:  加锁解锁会导致线程从用户态到核心态的切换，消耗比较大的资源。</p>
+</li>
+</ul>
+<h1 id="14-cas-是什么">14. CAS 是什么
+</h1><p>CAS在 <strong>先比较后修改</strong> : <strong>通过三个参数 当前值v 旧的预期值o 要更新的值n，只有v==o的时候才能更新值o</strong></p>
+<p>这个CAS过程中，根本没有获取锁，释放锁的操作，==Unsafe 是CAS的核心类，它提供了硬件级别的原子操作==,</p>
+<p>缺陷</p>
+<ul>
+<li>自旋, 循环时间长, 一直不成功</li>
+<li>只能保证一个共享变量</li>
+<li>ABA 问题, 可以通过加AtomicStampedReference, 版本号进行解决</li>
+</ul>
+<h1 id="15-native">15. native
+</h1><p>==<code>native</code> 关键字用于声明本地方法，使得 Java 程序可以调用用其他语言（如 C/C++）实现的代码==</p>
+<pre><code>   native关键词
+   
+   1. javac生成.class文件，比如javac NativePeer.java 
+   
+   2. javah生成.h文件，比如javah NativePeer 
+   
+   3. 编写c语言文件，在其中include进上一步生成的.h文件，然后实现其中声明而未实现的函数 
+   
+   4. 生成dll共享库，然后Java程序load库，调用即可 
+</code></pre>
+<p>native可以和任何除abstract外的关键字连用，这也说明了这些方法是有实体的，并且能够和其他</p>
+<p>Java方法一样，拥有各种Java的特性。</p>
+<h1 id="16-atomic">16. Atomic
+</h1><p>.atomic包介绍</p>
+<p>里面放了一些原子操作类，我们可以使用这些api对共享变量进行并发操作，底层都是使用的cas，</p>
+<p>性能非常高</p>
+<ol start="2">
+<li>
+<p>基本类型</p>
+<p>ATInteger，ATLong,ATBoolean</p>
+<p>get在前就是获取修改前的值，get在后就是获取修改后的值</p>
+</li>
+<li>
+<p>引用类型</p>
+<p>ATRef&hellip;：对Object的原子操作</p>
+<p>ATS..Ref:给Object加版本号，每次修改都比较版本号和Object，可以有多个版本（int）</p>
+<p>ATmak&hellip;Ref:给Object加版本号，每次修改都比较版本号和Object，只能有两个版本号</p>
+<p>（boolean）</p>
+</li>
+<li>
+<p>数组类型</p>
+<p>ATIntegerArr&hellip;:Integer类型的数组原子类</p>
+<p>ATLongArr..:Long类型的数组原子类</p>
+<p>前两个和基本类型使用方式差不多，多了个参数（下标）</p>
+<p>ATRef&hellip;Arr:Object类型的数组</p>
+<p>和引用类型使用方式差不多，多了个参数（下标）</p>
+</li>
+<li>
+<p>对象的属性修改类型（修改volidate修饰的属性）</p>
+<p>==AtomicIntegerFieldUpdater:原子更新整形字段的更新器==</p>
+<p>==AtomicLongFieldUpdater：原子更新长整形字段的更新器==</p>
+<p>==AtomicReferenceFieldUpdater ：原子更新引用类形字段的更新器==</p>
+<p>通过这些类对要修改的javabean进行包装，能够原子性的修改javabean的属性</p>
+<p>使用修改器要注意的点：</p>
+<blockquote>
+<p>要修改的类和属性不能static，负责拿不到内存地址</p>
+<p>属性必须是外部可直接访问的，public修饰</p>
+<p>属性不能是fifinal类型，因为fifinal不能被修改</p>
+<p>==属性必须被volidate修饰==，因为cas只能保证原子性，要通过volidate保证有序性和可见性，</p>
+<p>才能保证线程安全。</p>
+</blockquote>
+</li>
+<li>
+<p>jdk1.8新增类（LongAddr&hellip;）</p>
+</li>
+</ol>
+<p>对比ATLong性能更高，底层是使用多个变量对同一个变量进行分割，解决了同一个变量操作并发</p>
+<p>大时，等待较长时间消耗系统cpu资源较高的问题</p>
+<h1 id="17-aqs--介绍一下">17. AQS  介绍一下
+</h1><p>==AbstractQueuedSynchronizer== 它只是一个抽象类，但是==JUC中的很多组件都是基于这个抽象类==， 也可以说这个AQS是多数JUC组件的基础</p>
+<ol>
+<li>提供了两种锁的机制
+<ol>
+<li>排他锁 - RenntrantLock</li>
+<li>共享锁 - 读锁, 读写互斥, 写互斥 Countdownlatch, Semaphore</li>
+</ol>
+</li>
+<li>定义了 获取锁 是通过CAS 修改 State, 大于0说明有线程获取到资源, 等于0释放了资源</li>
+<li>未竞争到锁的线程,  会加入到双向链表中</li>
+<li>当资源被释放的时候, 公平锁需要去判断链表中, 是否有等待的线程, 有则需要排队等待</li>
+<li>三个核心问题
+<ol>
+<li>互斥变量设计, 存在竞争的时候如何保证变量更新的安全性</li>
+<li>未竞争到锁资源的线程的等待, 已经竞争到锁资源的线程的唤醒</li>
+<li>锁竞争的公平和非公平</li>
+</ol>
+</li>
+</ol>
+<h2 id="1-state--head-tail">1. state , head ,tail
+</h2><p>state: AQS维护了一个volatile int类型的变量state表示当前同步状态。==当state&gt;0时表示当前已有线程获取 到了资源，当state = 0时表示释放了资源==。</p>
+<p>head:  是队列的第一个节点，==表示当前正在持有锁或资源的线程==</p>
+<p>tail:  队列的最后一个节点，==表示最新添加到队列中的线程==</p>
+<h2 id="2-资源获取方式">2. 资源获取方式
+</h2><p>就是通过cas 去修改state 状态; 改成功就获取到了 资源 ; 没修改成功就没有获取到 资源)</p>
+<ul>
+<li>Exclusive（独占，只有一个线程能执行，如ReentrantLock）</li>
+<li>Share（共享，多个线程可同时执行，如Semaphore/CountDownLatch）</li>
+</ul>
+<p>获取同步状态失败时，AQS则会将==当前线程已经等待状态等信息构造成一个节点==（Node）并将其加入到CLH同步队列，同时会阻塞当前线程，当同步状态释放时，会把首节点唤醒 （公平锁)</p>
+<h2 id="3-总结">3. 总结
+</h2><ul>
+<li>
+<p>知道什么是AQS</p>
+<p>==框架中制定了一个基本流程, 里面的state具体的获取方式 需要它的实现类去实现==，==这些实现类都是不同的锁里面都有一个内部类对应，state表示资源，如 果获取不到资源就将当前线程加入队列，通过自旋的方式重复尝试获取资源==。</p>
+</li>
+<li>
+<p>理解AQS工作原理</p>
+<p>==FIFO双向队列==，先进先出，node对应的是被阻塞的线程，==head，tail，这两个变量的操作包括入列操作都是cas原子操作==。但是==出列并不是cas==，因为==出列过程涉及多个步骤和指针的修改==, 独享方式下只有一个线程获取到了state状态</p>
+</li>
+</ul>
+<h1 id="18-锁的类型有哪些">18. 锁的类型有哪些
+</h1><p>加锁会导致性能下降的原因</p>
+<ol>
+<li>上下文切换
+<ul>
+<li>内存指令的执行</li>
+<li>线程的阻塞和唤醒</li>
+</ul>
+</li>
+<li><strong>并行执行变为了串行执行</strong></li>
+</ol>
+<p>==首先编译器会对我们的代码做优化, 会有锁粗化和锁消除==</p>
+<ul>
+<li>
+<p>互斥锁: 保证在任一时刻，只能有一个线程访问该对象</p>
+</li>
+<li>
+<p>阻塞锁: 可以说是==让线程进入阻塞状态进行等待==，当获得相应的信号（唤醒，时间） 时，才可以进入</p>
+<p>线程的准备就绪状态，准备就绪状态的所有线程，通过竞争，进入运行状态</p>
+</li>
+<li>
+<p>自旋锁: ==为了线程在阻塞之前就能获取到锁==, 自旋锁是采用让当前线程不停地的在循环体内执行实现的，当循环的条件被其他线程改变时，才能进入。</p>
+</li>
+<li>
+<p>读写锁: 读写锁实际是一种<strong>特殊的自旋锁</strong>，它把对共享资源的访问者划分成读者和写者，读者只对共享资源进</p>
+<p>行读访问，写者则需要对共享资源进行写操作。 ==写者是排他性的，一个读写锁同时只能有一个写者或 多个读者（与CPU数相关），但不能同时既有读者又有写者==。</p>
+</li>
+<li>
+<p>公平锁:  ==当一个线程竞争锁的时候，队列中如果有线程按照顺序获取锁==</p>
+</li>
+</ul>
+<p>锁升级的过程</p>
+<p>无锁 -&gt; 偏向锁 -&gt; 轻量级锁(自旋锁)   -&gt; 重量级锁</p>
+<p>偏向锁:  ==没有锁竞争或竞争非常少的场景==, 通过记录第一个获取锁的线程Id, ==假设锁的持有者不会改变==, 后续==同一个线程再次尝试获取锁, 无需进行真正的加锁操作==, 因为 锁偏向该线程, 这减少了锁的获取和释放的开销;</p>
+<h1 id="19-reentrantlock">19. ReentrantLock
+</h1><p>可重入锁，是一种递归无阻塞的同步机制, ==是基于AQS的== 。等同于 synchronized 的使用</p>
+<ul>
+<li>公平锁: 原则就是是否遵循 FIFO 先进先出, 公平锁, ==在获取锁的时候判断队列中是否有线程在当前线程的前面==</li>
+<li>非公平锁</li>
+</ul>
+<p>内部实现原理：通过==尝试修改state从0-1获取锁，修改成功表示当前线程获取到锁了==，修改失败表示没有获取到，同一个线程获取到了锁可以重入，==重入的过程就是累计state的过程==，释放锁就是state减到0的过程，==减到0了就说明锁释放完成了==，唤醒后继节点继续执行。</p>
+<p>lock与synchronized 相比的对比</p>
+<ul>
+<li>
+<p>都是java 用来解决线程安全问题的工具, Lock 是JUC 里的接口, sync 是同步关键字</p>
+</li>
+<li>
+<p>拓展性更强,  代码更加灵活 , 提供了条件Condition ,例如 有 tryLock 非阻塞的获取锁的方式, 已经可以实现公平和非公平锁</p>
+</li>
+<li>
+<p>注意 ==<strong>ReentrantLock 锁的释放一定要在 finally 中进行释放</strong>==</p>
+</li>
+<li>
+<p>性能差不多</p>
+<ul>
+<li>synchronized 锁优化过程 无锁, 偏向, 轻量, 重量</li>
+<li>lock 有自旋锁</li>
+</ul>
+</li>
+</ul>
+<h1 id="20-reentrantreadwritelock">20. <strong>ReentrantReadWriteLock</strong>
+</h1><p>==读操作不互斥，写操作互斥，读和写互斥==</p>
+<ol>
+<li>
+<p>公平性：支持公平性和非公平性。</p>
+</li>
+<li>
+<p>重入性：支持重入。</p>
+</li>
+<li>
+<p>锁降级：==写锁能够降级成为读锁，遵循获取写锁、获取读锁再释放写锁的次序。读锁不能升级为写锁==。  ==避免了释放写锁后立即被其他写线程抢占，让当前线程还能继续持有读锁，允许自己和其他读线程并发读取==</p>
+</li>
+</ol>
+<blockquote>
+<ol>
+<li>获取写锁</li>
+<li>执行写操作</li>
+<li>获取读锁（此时仍然持有写锁）</li>
+<li>释放写锁（降级，保持读锁）</li>
+<li>执行读操作</li>
+<li>释放读锁</li>
+</ol>
+</blockquote>
+<ol>
+<li>
+<p>内部维护了一对锁, 写锁和读锁</p>
+<ul>
+<li>
+<p>写锁之间是互斥的，读锁之间不互斥，读锁和写锁之间是互斥的</p>
+</li>
+<li>
+<p>锁降级：一个线程获取到了同一把锁的写锁之后还能够获取这个对象的读锁。（锁并不是 真的降级了） 锁不能够升级的</p>
+</li>
+</ul>
+</li>
+<li>
+<p>内部原理：</p>
+<ol>
+<li>使用state按位分割，高16位表示读，低16位表示写。</li>
+<li>获取写锁的过程就是修改低16位的过程，也表示写的重入次数</li>
+<li>获取读锁的过程就是修改高16位的过程，也表示所有获取到读锁的线程的重入总数</li>
+<li><strong>每个线程自己的读锁的重入次数保存在ThreadLocal&lt;&gt;里面</strong></li>
+</ol>
+</li>
+<li>
+<p>不管是写锁还是读锁，重入次数不能超过2^16-1</p>
+</li>
+</ol>
+<h1 id="21-condition">21. Condition
+</h1><p><code>Condition</code> 对象是和 <code>ReentrantLock</code> 绑定的 , 相对于 Synchronized 控制同步中 Object的wait()、notify()系列方法, 提供了  await() ,  signal() ,  signalAll()</p>
+<h1 id="22-cyclicbarrier-同步屏障">22. CyclicBarrier 同步屏障
+</h1><p>==就是一道门, 堵住了线程执行的道路，直到所有线程都就位，门才打开，让所有线程一起通过==</p>
+<p>内部使用的是 ReentrantLock 和 Condition</p>
+<p>两个构造方法</p>
+<ul>
+<li>CyclicBarrier(int parties)</li>
+<li>CyclicBarrier(int parties, Runnable barrierAction)  ==并在所有线程到达屏障时执行给定的操作, 由最后一 个进入屏障的线程执行==</li>
+</ul>
+<p>await()方法的逻辑：如果该线程不是到达的最后一个线程，则他会一直处于等待状态，除非发生以下 情况：</p>
+<ol>
+<li>
+<p>最后一个线程到达，即count == 0</p>
+</li>
+<li>
+<p>超出了指定时间（超时等待）</p>
+</li>
+<li>
+<p>其他的某个线程中断当前线程</p>
+</li>
+<li>
+<p>其他的某个线程中断另一个等待的线程</p>
+</li>
+<li>
+<p>其他的某个线程在等待屏障超时</p>
+</li>
+<li>
+<p>其他的某个线程在此屏障调用reset()方法。reset()方法用于将屏障重置为初始状态</p>
+</li>
+</ol>
+<h1 id="23-countdownlatch">23. CountdownLatch
+</h1><p>是基于内部的Sync , 而Sync 集成 AQS</p>
+<p>==一个或者多个线程，等待其他多个线程完成某件事情之后才能执行==, 使用是一次性的, 无法被重置,</p>
+<p>起点运动员应该等其他起点运动员准备好才可以起跑（CyclicBarrier）。</p>
+<p>接力运动员不需要关心其他人，只需和自己有关的起点运动员到接力点即可开跑 (CountDownLatch）。</p>
+<h1 id="24--semaphore">24.  Semaphore
+</h1><p>==控制访问多个共享资源的计数器==,   <code>Semaphore</code> 通过维护一个许可（permit）计数来管理资源的并发访问，通常用于限制能同时访问某个资源的线程数量。</p>
+<p>==Semaphore维护了一个信号量许可集。线程可以获取信号量的许可；当信号量中有可用的许可时， 线程能获取该许可；否则线程必须等待，直到有可用的许可为止。 线程可以释放它所持有的信号量许 可，被释放的许可归还到许可集中，可以被其他线程再次获取==。</p>
+<p><strong>类似于停车场, 有5个车位, 满了只能等,有出去的才能进来新的</strong></p>
+<p>出Semaphore内部包含公平锁（FairSync）和非公平锁（NonfairSync），继承内部类 Sync，其中Sync继承AQS</p>
+<ol>
+<li>
+<p>Semaphore(int permits) ：创建具有==给定的许可数和非公平的 Semaphore==。</p>
+</li>
+<li>
+<p>Semaphore(int permits, boolean fair) ：创建具有给定的许可数和给定的公平设置的 Semaphore</p>
+</li>
+</ol>
+<h1 id="25--clh">25.  CLH
+</h1><p>==自旋锁队列，常用于实现 AQS 中的等待队列==</p>
+<p><strong>队列结构</strong>：</p>
+<ul>
+<li>CLH 队列是一个链表结构，每个节点代表一个线程。队列的头节点表示当前持有锁的线程，尾节点表示最后一个请求锁的线程。</li>
+<li>每个节点都有一个指向前驱节点的引用，这使得后继线程能够了解前驱线程的状态。</li>
+</ul>
+<p><strong>公平性</strong>：</p>
+<ul>
+<li>CLH 队列天然支持公平性，后来的线程会在队列的尾部等待，从而避免了饥饿现象。</li>
+</ul>
+<p><strong>自旋等待</strong>：</p>
+<ul>
+<li>当线程请求锁时，如果锁被占用，线程会在队列中自旋，等待前驱节点释放锁。自旋方式减少了上下文切换的开销。</li>
+</ul>
+<h1 id="26-hashmap">26. HashMap
+</h1><ul>
+<li>
+<p>HashMap</p>
+<ul>
+<li>jdk7
+<ul>
+<li>数据结构：==数组+单项链表==</li>
+<li>构造方法：public HashMap(int initialCapacity, float loadFactor)
+<ul>
+<li>initialCapacity：初始化容量，容量必定是一个2^n,如果initialCapacity不是2^n，找大于initialCapacity的最近的一个2^n</li>
+<li>loadFactor：负载因子，默认0.75</li>
+<li>threshold：阈值 = loadFactor*initialCapacity，当数组中的元素数量超过阈值就会触发扩容，扩容原来的两倍</li>
+</ul>
+</li>
+<li>方法
+<ul>
+<li>
+<p>put过程</p>
+<ul>
+<li>对key键进行hash运算获取结果value</li>
+<li>使用value和数组的长度进行&amp;运算，得到下标位置</li>
+<li>到对应下标位置上查看
+<ul>
+<li>如果为空，就直接转化为Entry插入</li>
+<li>如果不为空，判断key是否一致，如果key一致就覆盖，如果不一致顺着链表往下面找</li>
+<li>如果找到了，就覆盖，如果一直找不到就放到最后一个</li>
+</ul>
+</li>
+<li>当元素个数超过阈值，先扩容再插入（在多线程环境下可能造成死循环）
+<ul>
+<li>==多个线程同时操作链表，进行节点迁移时可能会形成<strong>环形链表</strong>（循环引用==</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>get过程</p>
+<ul>
+<li>对key键进行hash运算获取结果value</li>
+<li>使用value和数组的长度进行&amp;运算，得到下标位置</li>
+<li>到对应下标位置上查看
+<ul>
+<li>如果为空，就返回null</li>
+<li>如果不为空，判断key是否一致，如果key一致就返回对应的value，如果不一致顺着链表往下面找</li>
+<li>如果找到了就返回，如果一直找不到就返回null</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>jdk8
+<ul>
+<li>数据结构：==数组+单向链表+红黑树==</li>
+<li>构造方法和jdk7一样</li>
+<li>方法
+<ul>
+<li>put过程 (先插入再扩容)
+<ul>
+<li>对key键进行hash运算获取结果value</li>
+<li>使用value和数组的长度进行&amp;运算，得到下标位置</li>
+<li>到对应下标位置上查看
+<ul>
+<li>如果为空，就直接转化为Entry插入</li>
+<li>如果不为空，判断key是否一致，如果key一致就覆盖，如果不一致顺着链表往下面找</li>
+<li>如果找到了，就覆盖，如果一直找不到就放到最后一个</li>
+<li>如果链表长度超过8个就转化为红黑树</li>
+<li>如果该节点为树节点
+<ul>
+<li>比较根节点和当前节点的hash值</li>
+<li>==如果当前&lt;根，往左边找，如果&gt;往右边找==</li>
+<li>如果找到对应位置，如果key一样就覆盖</li>
+<li>key不一样就插入</li>
+<li>==如果发生了hash碰撞，key不一样但是hash值一样==
+<ul>
+<li>就通过再hash法，通过其他函数重新hash，==如果小于等于，放左边==</li>
+</ul>
+</li>
+<li>==重新调整树平衡==</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>当元素个数超过阈值，==先插入再扩容==（==避免在多线程环境下可能造成死循环==）</li>
+</ul>
+</li>
+<li>get过程
+<ul>
+<li>对key键进行hash运算获取结果value</li>
+<li>使用value和数组的长度进行&amp;运算，得到下标位置</li>
+<li>到对应下标位置上查看</li>
+<li>如果该节点为树节点
+<ul>
+<li>比较根节点和当前节点的hash值</li>
+<li>如果当前&lt;根，往左边找，如果&gt;往右边找</li>
+<li>如果找到对应位置，如果key一样就返回value</li>
+<li>key不一样就继续找，如果一直找不到就返回null</li>
+</ul>
+</li>
+<li>如果是链表就顺着链表结构往下遍历寻找</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>ConcurrentHashMap</p>
+<ul>
+<li>
+<p>jdk7</p>
+<ul>
+<li>数据结构
+<ul>
+<li>sengment数组+数组+单向链表
+<ul>
+<li>sengment继承Reentrent，具备加锁能力</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>构造方法 public ConcurrentHashMap(int initialCapacity, float loadFactor, int concurrencyLevel)
+<ul>
+<li>initialCapacity
+<ul>
+<li>代表当前map总的容量大小，在初始化的时候分配给segment中的hashEntry</li>
+</ul>
+</li>
+<li>loadFactor
+<ul>
+<li>负载因子，用来对segment中的hashEntry进行扩容</li>
+</ul>
+</li>
+<li>concurrencyLevel
+<ul>
+<li>并发数就是segment数量，初始化之后就不能扩容了。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>jdk8</p>
+<ul>
+<li>
+<p>数据结构</p>
+<ul>
+<li>数组+链表+红黑树</li>
+<li><img src="/p/interview/images/image-20240924085728242.png"
+	width="1552"
+	height="578"
+	
+	loading="lazy"
+	
+		alt="image-20240924085728242"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="268"
+		data-flex-basis="644px"
+	
+></li>
+</ul>
+</li>
+<li>
+<p>保证线程安全</p>
+<ul>
+<li>
+<p>==cas+synchronized==：==在尽可能小的粒度上加锁==，能使用cas就使用cas，不能使用就使用synchronized</p>
+</li>
+<li>
+<p><strong>无锁并发（CAS）</strong>：通过 CAS 操作实现部分无锁的更新操作，减少锁的竞争。</p>
+<p><strong>局部加锁</strong>：在需要加锁时，==仅锁定某个桶bucket==，避免影响其他桶的并发操作。</p>
+<p><strong>红黑树优化</strong>：冲突严重时，将链表转换为红黑树，减少冲突带来的性能影响。</p>
+<p><strong>弱一致性迭代器</strong>：在并发操作中允许遍历继续进行，保证遍历时的安全性。</p>
+<p><strong>渐进式扩容</strong>：避免扩容时的全局锁定，通过多个线程并发扩容，保证扩容过程中的操作效率</p>
+</li>
+</ul>
+</li>
+<li>
+<p>==只对写操作加锁，读操作不加锁==</p>
+</li>
+<li>
+<p><code>ConcurrentHashMap</code> 确保对 Map 本身的操作是线程安全的，但==<strong>复合操作或涉及多步骤的业务逻辑</strong>可能仍然需要加锁来保证原子性==。</p>
+<p>对于单个操作，如 <code>put()</code>, <code>get()</code>, <code>remove()</code> 等，不需要加锁，但如果你的==业务逻辑涉及多个操作的组合，或者需要跨多个共享资源操作时，依然需要加锁来确保线程安全==。</p>
+</li>
+<li>
+<p>可以用  ==map.computeIfAbsent(key, k -&gt; newValue)==;  来避免显示的加锁</p>
+</li>
+</ul>
+</li>
+<li>
+<p>对比HashTable</p>
+<ul>
+<li>ConcurrentHashMap锁粒度更小</li>
+<li>可以一边遍历一边修改map</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>ConcurrentSkipListMap</p>
+<ul>
+<li>数据结构：多层单向链表,   ==因为是顺序的,所以建多个索引, 在索引上再建索引, 可以调表==</li>
+<li><img src="/p/interview/images/image-20240924090156686.png"
+	width="1591"
+	height="545"
+	
+	loading="lazy"
+	
+		alt="image-20240924090156686"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="291"
+		data-flex-basis="700px"
+	
+></li>
+<li>特点：
+<ul>
+<li>上一层的元素是下一层的索引</li>
+<li>上一层的元素，下一层一定有</li>
+<li>上一层的个数比下一层要少</li>
+<li>第一个元素在所有层都存在</li>
+</ul>
+</li>
+<li>put
+<ul>
+<li>抛取随机值
+<ul>
+<li>如果值大于当前层数
+<ul>
+<li>就新创建一层</li>
+<li>将当前元素插入到所有层</li>
+</ul>
+</li>
+<li>如果小于当前层数
+<ul>
+<li>就将当前元素保存到对应层，并且下面依次保存</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>get
+<ul>
+<li>从最上层开始找</li>
+<li>比较大小，如果大于就往右边继续找</li>
+<li>如果小于，就进入下一层往右边找</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="27-concurrentskiplistmap">27. ConcurrentSkipListMap
+</h1><p><strong>线程安全</strong>：所有操作都是线程安全的，多个线程可以同时对 <code>ConcurrentSkipListMap</code> 进行读写操作，而不会导致数据不一致或竞争问题。</p>
+<p><strong>有序性</strong>：与 <code>TreeMap</code> 类似,<code>ConcurrentSkipListMap</code> 会保持键的有序性。它支持键按自然顺序或自定义的比较规则排序。</p>
+<p><strong>无锁机制</strong>：大部分读操作不需要加锁，而是通过 <strong>CAS（Compare-And-Swap）</strong> 操作保证线程安全，这提升了并发性能。</p>
+<p><strong>跳表结构</strong>：使用跳表而非红黑树来管理有序的数据。跳表通过在链表上增加多层 &ldquo;跳跃&rdquo; 指针，提供了接近二分查找的性能。相比树形结构，跳表的实现更简单，也更适合高并发场景</p>
+<h1 id="28-juc-队列">28. JUC 队列
+</h1><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>queue</th>
+          <th>阻塞与否</th>
+          <th>是否有界</th>
+          <th>线程安全保障</th>
+          <th>适用场景</th>
+          <th>注意事项</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>ConcurrentLinkedQueue</td>
+          <td>非阻塞</td>
+          <td>无界</td>
+          <td>CAS</td>
+          <td>对全局的集合进行操作的场景</td>
+          <td>size() 是要遍历一遍集合，慎用</td>
+      </tr>
+      <tr>
+          <td>ArrayBlockingQueue</td>
+          <td>阻塞</td>
+          <td>有界</td>
+          <td>一把全局锁</td>
+          <td>生产消费模型，平衡两边处理速度</td>
+          <td>&ndash;</td>
+      </tr>
+      <tr>
+          <td>LinkedBlockingQueue</td>
+          <td>阻塞</td>
+          <td>可配置</td>
+          <td>存取采用2把锁</td>
+          <td>生产消费模型，平衡两边处理速度</td>
+          <td>无界的时候注意内存溢出问题</td>
+      </tr>
+      <tr>
+          <td>PriorityBlockingQueue</td>
+          <td>阻塞</td>
+          <td>无界</td>
+          <td>一把全局锁</td>
+          <td>支持优先级排序</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>SynchronousQueue</td>
+          <td>阻塞</td>
+          <td>无界</td>
+          <td>CAS</td>
+          <td>不存储元素的阻塞队列</td>
+          <td></td>
+      </tr>
+  </tbody>
+</table></div>
+<ul>
+<li>
+<p>非阻塞队列</p>
+<ul>
+<li>ConcurrentLinkedQueue
+<ul>
+<li>==一个基于链接节点的<strong>无边界的线程安全队列</strong>，遵循队列的<strong>FIFO原则</strong>，队尾入队，队首出队。采用<strong>CAS算法</strong>来实现的==</li>
+<li>数据结构：单向链表</li>
+<li>非阻塞</li>
+<li>线程安全</li>
+<li>特点
+<ul>
+<li>==不会记录元素个数，size方法需要遍历整个队列，非常消耗资源==</li>
+<li>在某些场景下可以代替vector的使用</li>
+</ul>
+</li>
+<li>==业务操作上还是需要自己加锁==, 例如: queue.isEmpty()后再进行队列操作queue.add()是不能保证安全的</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>阻塞队列</p>
+<ul>
+<li>
+<p>blockingQueue接口</p>
+<ul>
+<li>
+<p>提供4组api</p>
+<ul>
+<li>阻塞api
+<ul>
+<li>put：放，==当队列放满了，放不进去线程被阻塞==</li>
+<li>take：取，==当队列为空，取不出来，线程被阻塞==</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>子类</p>
+<ul>
+<li>
+<p>ArrayBlockingQueue</p>
+<ul>
+<li>总结:   ==是一种线程安全的、基于数组的有界阻塞队列。适合生产者-消费者模型==</li>
+<li>有界性：==有界, 固定大小==，必须初始化的时候设置边界</li>
+<li>构造方法 ArrayBlockingQueue(int capacity, boolean fair)
+<ul>
+<li>capacity：初始化容量</li>
+<li>fair：公平策略</li>
+</ul>
+</li>
+<li>==内部使用一把锁, 生产者消费者用的同一个ReetrantLock，两个condition, notFull和notEmpty==
+<ul>
+<li>notFull ：控制生产者线程, 如果满了就阻塞</li>
+<li>notEmpty : 控制消费者线程, 如果是空的就阻塞</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>LinkedBlockingQueue</p>
+<ul>
+<li>数据结构：单向链表</li>
+<li>有界性：可设置
+<ul>
+<li>如果不设置是 Int最大值</li>
+<li>也可以设置边界</li>
+</ul>
+</li>
+<li>公平性：==非公平==</li>
+<li>构造方法 public LinkedBlockingQueue(int capacity)
+<ul>
+<li>capacity：初始化容量，可以不传</li>
+</ul>
+</li>
+<li>==内部使用两把锁,== , ==所以相较于ArrayBlockingQueue, 消费者生产者可以并行==
+<ul>
+<li>==putLock==
+<ul>
+<li>notFull ：控制生产者线程condition</li>
+</ul>
+</li>
+<li>==takeLock==
+<ul>
+<li>notEmpty : 控制消费者线程condition</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>PriorityBlockingQueue</p>
+<ul>
+<li>
+<p>数据结构：==二叉堆数组, 堆顶元素（优先级最高)==</p>
+</li>
+<li>
+<p>有界性：无界</p>
+</li>
+<li>
+<p>公平性：非公平</p>
+</li>
+<li>
+<p>构造方法</p>
+<pre><code class="language-java">public PriorityBlockingQueue(int initialCapacity,Comparator&lt;? super E&gt; comparator)
+</code></pre>
+</li>
+<li>
+<p>initialCapacity:初始化容量</p>
+<pre><code>- comparator：比较器
+</code></pre>
+</li>
+<li>
+<p><strong>插入操作</strong>：新元素插入到堆的末尾，然后根据优先级上浮，调整堆的结构，确保堆的性质不被破坏。</p>
+<p><strong>取出操作</strong>：取出堆顶元素（优先级最高），然后将堆尾的元素移到堆顶，并根据优先级下沉，重新调整堆的结构。</p>
+</li>
+<li>
+<p>特点：</p>
+<ul>
+<li>添加到PriorityBlockingQueue队列中的元素会排序，==取出来的永远是优先级最高的, 不保证同级之间的有序性, 先入的不一定先出==</li>
+<li>元素必须是可比较的
+<ul>
+<li>==元素本身实现Comparable接口==</li>
+<li>==创建PriorityBlockingQueue实例的时候传入Comparator比较器==</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>==SynchronousQueue==</p>
+</li>
+<li>
+<p>数据结构：没有任何元素空间, 内部不存储元素, 确保每次都是立即交付,  <strong>实时性要求高</strong>、<strong>一对一数据交换</strong></p>
+<ul>
+<li>有界性：无意义</li>
+<li>公平性：可设置</li>
+<li>构造方法
+<ul>
+<li>public SynchronousQueue(boolean fair)
+<ul>
+<li>fair：公平性</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>特点：
+<ul>
+<li>内部没有一个元素，维护一组线程，一个take线程必须等待一个put线程，反之亦然</li>
+<li>==就好比将文件直接交给同事，还是将文件放到她的邮箱中并希望她能尽快拿到文件。==</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="29-cap理论">29. CAP理论
+</h1><p>CP 和 AP 是分布式系统理论中的两个重要概念，它们来源于 CAP 定理（CAP Theorem），这是分布式计算领域的一个基本原理。CAP 定理指出，一个分布式系统不可能同时满足以下三个特性：</p>
+<ol>
+<li><strong>一致性（Consistency）</strong> - ==所有节点在同一时间看到的数据是一致的。当一个更新操作完成后，所有后续的读取操作都必须返回最新的值，即在任何时刻，所有节点中的数据都是相同的==。</li>
+<li><strong>可用性（Availability）</strong> - 系统在任何时候都能够响应用户的请求。即使某些节点出现故障，系统仍然能够继续处理请求，而不会出现整个系统不可用的情况。</li>
+<li><strong>分区容错性（Partition tolerance）</strong>==是分布式系统中必然存在== - 系统能够容忍网络分区，即当网络发生故障时，系统仍然能够继续运行。分区容错性是分布式系统必须具备的特性，因为在现实世界中，网络问题是无法完全避免的。</li>
+</ol>
+<p>在 CAP 定理的背景下，CP 和 AP 指的是：</p>
+<ul>
+<li><strong>CP（Consistency and Partition tolerance）</strong> - 系统选择保证一致性和分区容错性，但可能会牺牲可用性。在<strong>网络分区发生时，系统可能会拒绝处理请求</strong>，直到网络恢复，以确保数据的一致性。==典型的 CP 系统例子是分布式数据库，如 MongoDB==。</li>
+<li><strong>AP（Availability and Partition tolerance）</strong> - 系统选择保证可用性和分区容错性，但可能会牺牲一致性。在网络分区发生时，系统会继续处理请求，即使这意味着==不同节点上的数据可能会暂时不一致==。==典型的 AP 系统例子是一些分布式缓存系统，如 Redis==。</li>
+</ul>
+<p>在实际的分布式系统设计中，根据业务需求的不同，可能会倾向于选择 CP 或 AP。例如，对于需要强一致性的场景（如金融交易系统），可能会选择 CP；而对于可以容忍最终一致性的场景（如社交媒体平台），可能会选择 AP。</p>
+<h1 id="30-线程池">30. 线程池
+</h1><ul>
+<li>线程数量的控制</li>
+<li>已经线程创建和销毁的控制</li>
+</ul>
+<h2 id="1-线程池有哪些状态">1. 线程池有哪些状态
+</h2><p>类比电脑关机</p>
+<ol>
+<li>正在运行-run</li>
+<li>点击关机-shutdown, 不接受任务, 处理正在运行的任务</li>
+<li>停止-stop, 不接受任务, 中断任务队列中正在进行的任务</li>
+<li>整理-所有任务已终止</li>
+<li>终止</li>
+</ol>
+<ul>
+<li>RUNNING：处于RUNNING状态的线程池能够接受新任务，以及对新添加的任务进行处理。</li>
+<li>SHUTDOWN(关机)：处于SHUTDOWN状态的线程池不可以接受新任务，但是可以对已添加的任务进行处理。</li>
+<li>STOP(停止)：处于STOP状态的线程池不接收新任务，不处理已添加的任务，并且会中断正在处理的任务。</li>
+<li>TIDYING(整理)：当所有的任务已终止，ctl记录的”任务数量”为0，线程池会变为TIDYING状态。当线程池变为TIDYING状态时，会执行钩子函数terminated()。terminated()在ThreadPoolExecutor类中是空的，若用户想在线程池变为TIDYING时，进行相应的处理；可以通过重载terminated()函数来实现。</li>
+<li>TERMINATED(终止)：线程池彻底终止的状态。</li>
+</ul>
+<p><img src="/p/interview/images/image-20240924113448256.png"
+	width="1317"
+	height="461"
+	
+	loading="lazy"
+	
+		alt="image-20240924113448256"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="285"
+		data-flex-basis="685px"
+	
+></p>
+<h2 id="2-线程池参数">2. 线程池参数
+</h2><ul>
+<li>
+<p>corePoolSize(==核心线程==)</p>
+<p>​	线程池中核心线程的数量（也称为线程池的基本大小）。当提交一个任务时，线程池会新建一个线程来执行任务，直到当前线程数等于corePoolSize。如果调用了线程池的prestartAllCoreThreads()方法，线程池会提前创建并启动所有基本线程。</p>
+</li>
+<li>
+<p>maximumPoolSize(==最大线程数==)</p>
+<p>​	线程池中允许的最大线程数。线程池的阻塞队列满了之后，如果还有任务提交，如果当前的线程数小于maximumPoolSize，则会新建线程来执行任务。注意，如果使用的是无界队列，该参数也就没有什么效果了。</p>
+</li>
+<li>
+<p>keepAliveTime(==空闲的时间==)</p>
+<p>​	线程空闲的时间。线程的创建和销毁是需要代价的。==线程执行完任务后不会立即销毁，而是继续存活一段时间==：keepAliveTime。默认情况下，==该参数只有在线程数大于corePoolSize时才会生效==。</p>
+</li>
+<li>
+<p>unit</p>
+<p>keepAliveTime的单位。TimeUnit</p>
+</li>
+<li>
+<p>workQueue(==工作队列==)</p>
+<p>用来保存等待执行的任务的BlockQueue阻塞队列，等待的任务必须实现Runnable接口。选择如下：</p>
+<blockquote>
+<p>ArrayBlockingQueue：基于数组结构的有界阻塞队列，FIFO。
+LinkedBlockingQueue：基于链表结构的有界阻塞队列，FIFO。
+PriorityBlockingQueue：具有优先级别的阻塞队列。
+SynchronousQueue：不存储元素的阻塞队列，每个插入操作都必须等待一个移出操作。</p>
+</blockquote>
+</li>
+<li>
+<p>threadFactory(==线程的创建工厂==)</p>
+<p>​	用于设置创建线程的工厂。ThreadFactory的作用就是提供创建线程的功能的线程工厂。他是通过==newThread()方法提供创建线程的功能==，newThread()方法创建的线程都是“非守护线程”而且“线程优先级都是默认优先级”。</p>
+</li>
+<li>
+<p>handler(==拒绝策略==)</p>
+<p>​	RejectedExecutionHandler，线程池的拒绝策略。所谓拒绝策略，是指将任务添加到线程池中时，线程池拒绝该任务所采取的相应策略。当向线程池中提交任务时，如果此时线程池中的线程已经饱和了，而且阻塞队列也已经满了，则线程池会选择一种拒绝策略来处理该任务。</p>
+<p>线程池提供了四种拒绝策略：</p>
+<blockquote>
+<p>AbortPolicy：==直接抛出异常，默认策略==；
+CallerRunsPolicy：用调用者所在的线程来执行任务；
+DiscardOldestPolicy：丢弃阻塞队列中靠最前的任务，并执行当前任务；
+DiscardPolicy：直接丢弃任务；
+当然我们也可以实现自己的拒绝策略，例如记录日志等等，实现	接口即可</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="3-excutors-线程池">3. Excutors 线程池
+</h2><ul>
+<li>FixedThreadPool:  复用<strong>固定数量的线程</strong>处理一个**共享的无边界队列LinkedBlockingQueue **</li>
+<li>SingleThreadExecutor: 会使用==单个工作线程==来执行一个无边界的队列, corePool和maximumPoolSize均被设置为1,  workQueue使用的是LinkedBlockingQueue</li>
+<li>CachedThreadPool:  会根据需要，==在线程可用时，重用之前构造好的池中线程==，==否则创建新线程==, 在执行==大量短周期的异步任务时, 性能较好==,   SynchronousQueue, 调用 execute 时，可以重用之前已构造的可用线程，如果不存在可用线程，那么会重新创建一个新的线程并将其加入到线程池中。如果线程超过 60 秒还未被使用，就会被中止并从缓存中移除。因此，线程池在长时间空闲后不会消耗任何资源</li>
+<li>ScheduledThreadPool  ==工作队列是DelayedWorkQueue==:
+<ul>
+<li><strong>定时任务</strong>：可以安排一个任务在一定的延迟之后执行。</li>
+<li><strong>周期性任务</strong>：可以安排一个任务定期执行。</li>
+<li><strong>固定延迟</strong>：在每次==执行完毕后==，等待固定的时间间隔再次执行。</li>
+<li><strong>固定周期</strong>：在每次==执行开始后==，等待固定的时间间隔再次执行。</li>
+<li><strong>线程池管理</strong>：可以控制线程池的大小，以及线程的创建和销毁策略。</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-线程执行出现异常时-线程池会怎么处理">4. 线程执行出现异常时, 线程池会怎么处理
+</h2><blockquote>
+<ol>
+<li>==<strong>当执行方式是execute时,可以看到堆栈异常的输出</strong>==。</li>
+<li>当执行方式是submit时,堆栈异常没有输出。但是调用Future.get()方法时，可以捕获到异常。</li>
+<li>不会影响线程池里面其他线程的正常执行。</li>
+<li>线程池会把这个线程移除掉，并创建一个新的线程放到线程池中。</li>
+</ol>
+</blockquote>
+<h2 id="5-线程池如何知道线程已经执行完任务">5. 线程池如何知道线程已经执行完任务
+</h2><ol>
+<li>is.isTerminated() 方法 但是需要 先用Executors.shutdown 才能拿到, 因为里面有核心线程数</li>
+<li>Executors.submit 后回得到 Future, 用 future.get 是阻塞的获取线程执行结果</li>
+<li>CountdownLatch, 思路主要是阻塞唤醒, 在执行完我们的业务的时候, countDown,  ==在主线程用await等待,当countDown为0时就会被唤醒,说明线程所有的任务已经执行完毕==</li>
+</ol>
+<h1 id="31-forkjoin">31. ForkJoin
+</h1><p>把==大任务分成若干个小任务, 用的是工作窃取算法==</p>
+<p>那么为什么需要使用工作窃取算法呢？</p>
+<ul>
+<li>
+<p>假如我们需要做一个比较大的任务，我们可以把这个任务分割为若干互不依赖的子任务，</p>
+</li>
+<li>
+<p>为了减少线程间的竞争，于是把这些子任务分别放到不同的队列里，并为每个队列创建一个单独的线程来执行队列里的任务，</p>
+</li>
+<li>
+<p>线程和队列一一对应，比如A线程负责处理A队列里的任务。</p>
+</li>
+<li>
+<p>但是有的线程会先把自己队列里的任务干完，而其他线程对应的队列里还有任务等待处理。</p>
+</li>
+<li>
+<p>干完活的线程与其等着，不如去帮其他线程干活，于是它就去其他线程的队列里窃取一个任务来执行。</p>
+</li>
+<li>
+<p>而在这时它们会访问同一个队列，</p>
+</li>
+<li>
+<p>所以为了减少窃取任务线程和被窃取任务线程之间的竞争，</p>
+</li>
+<li>
+<p>通常会使用双端队列，被窃取任务线程永远从双端队列的头部拿任务执行，</p>
+</li>
+<li>
+<p>而==窃取任务的线程永远从双端队列的尾部拿任务执行==。</p>
+</li>
+<li>
+<p>工作窃取算法的优点是充分利用线程进行并行计算，并减少了线程间的竞争，</p>
+</li>
+<li>
+<p>其缺点是在某些情况下还是存在竞争，比如==双端队列里只有一个任务时==。</p>
+</li>
+<li>
+<p>并且消耗了更多的系统资源，==比如创建多个线程和多个双端队列==。</p>
+</li>
+</ul>
+<p>如何使用</p>
+<ul>
+<li><code>ForkJoinTask</code>：我们要使用ForkJoin框架，必须首先创建一个ForkJoin任务。它提供在任务中执行fork()和join()操作的机制，通常情况下我们==不需要直接继承ForkJoinTask类，而只需要继承它的子类==，Fork/Join框架提供了以下两个子类：
+<code>RecursiveAction</code>：用于没有返回结果的任务。
+<code>RecursiveTask</code> ：用于有返回结果的任务。</li>
+<li><code>ForkJoinPool</code> ：ForkJoinTask需要通过ForkJoinPool来执行，任务分割出的子任务会添加到当前工作线程所维护的双端队列中，进入队列的头部。==当一个工作线程的队列里暂时没有任务时，它会随机从其他工作线程的队列的尾部获取一个任务==。</li>
+</ul>
+<h1 id="32-jvm-运行参数">32. Jvm 运行参数
+</h1><ul>
+<li>
+<p><code>-help</code> 输出的都是标准参数</p>
+<ul>
+<li>
+<p>-server与-client参数 , JVM会根据硬件和操作系统自动选择使用Server还是Client类型的JVM</p>
+<ul>
+<li>
+<p>64位操作系统 都模式server</p>
+</li>
+<li>
+<p>server 初始堆空间会大一些，默认使用的是并行垃圾回收器，启动慢运行快</p>
+</li>
+<li>
+<p>Client VM相对来讲会保守一些，初始堆空间会小一些，使用串行的垃圾回收器</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><code>-X</code> 查看非标准参数 <code>java -X</code></p>
+<ul>
+<li>-Xms与-Xmx参数, -Xms与-Xmx分别是设置==jvm的堆内存的初始大小和最大大小==。</li>
+</ul>
+</li>
+<li>
+<p><code>-XX</code>参数也是非标准参数 , 主要用于==jvm的调优和debug操作==</p>
+<ul>
+<li>boolean类型</li>
+</ul>
+<blockquote>
+<p>格式：-XX:[+-]<name> 表示启用或禁用<name>属性</p>
+<p>如：-XX:+DisableExplicitGC 表示禁用手动调用gc操作，也就是说调用System.gc()无效</p>
+</blockquote>
+<ul>
+<li>非boolean类型</li>
+</ul>
+<blockquote>
+<p>格式：-XX:<name>=<value> 表示<name>属性的值为<value></p>
+<p>如：-XX:NewRatio=1 表示新生代和老年代的比值</p>
+</blockquote>
+</li>
+<li>
+<p>查看JVM 运行的参数</p>
+<ul>
+<li>
+<p>运行java命令时打印出运行参数,  加上 <code>-XX:+PrintFlagsFinal</code>就可以,  如: <code>java -XX:+PrintFlagsFinal -version</code></p>
+</li>
+<li>
+<p>查看 运行的java进程</p>
+<blockquote>
+<p>jinfo -flags  &lt;进程id&gt;</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="33--java-堆内存模型">33.  Java 堆内存模型
+</h1><h2 id="1-java7">1. Java7
+</h2><ol>
+<li>
+<p>Young 年轻区（代）</p>
+<blockquote>
+<p>Young区被划分为三部分，==Eden区和两个大小严格相同的Survivor区==，其中，==Survivor区间中，某一时刻只有其中一个是被使用的，另外一个留做垃圾收集时复制对象用==，在Eden区间变满的时 候， GC就会将存活的对象移到空闲的Survivor区间中，根据JVM的策略，==在经过几次垃圾收集后==，任然存活于Survivor的对象将被移动到Tenured区间。</p>
+</blockquote>
+</li>
+<li>
+<p>Tenured 年老区</p>
+<blockquote>
+<p>Tenured区主要保存生命周期长的对象，一般是一些老的对象，当一些对象在Young复制转移一定</p>
+<p>的次数以后，对象就会被转移到Tenured区，一般如果系统中用了application级别的缓存，缓存中</p>
+<p>的对象往往会被转移到这一区间。</p>
+</blockquote>
+</li>
+<li>
+<p>Perm 永久区</p>
+<blockquote>
+<p>主要保存class,method,fifiled对象</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="2-java8">2. Java8
+</h2><ul>
+<li>年轻代: Eden + 2 Survivor</li>
+<li>老年代: OldGen</li>
+<li>永久代: 被替换成了元数据空间MetaSpace , ==用的不是Jvm内存了, 在本机内存空间里面==</li>
+</ul>
+<p>为什么弃用</p>
+<p>==由于永久代内存经常不够用或发生内存泄露，爆出异常java.lang.OutOfMemoryError: PermGen==</p>
+<h2 id="3-jstat-垃圾回收统计">3. jstat 垃圾回收统计
+</h2><ul>
+<li>jstat -gc &lt;进程id&gt; &lt;间隔时间ms&gt; &lt;打印次数&gt;</li>
+</ul>
+<blockquote>
+<p>S0C：第一个Survivor区的大小（KB）</p>
+<p>S1C：第二个Survivor区的大小（KB）</p>
+<p>S0U：第一个Survivor区的使用大小（KB）</p>
+<p>S1U：第二个Survivor区的使用大小（KB）</p>
+<p>EC：Eden区的大小（KB）</p>
+<p>EU：Eden区的使用大小（KB）</p>
+<p>OC：Old区大小（KB）</p>
+<p>OU：Old使用大小（KB）</p>
+<p>MC：方法区大小（KB）</p>
+<p>MU：方法区使用大小（KB）</p>
+<p>CCSC：压缩类空间大小（KB）</p>
+<p>CCSU：压缩类空间使用大小（KB）</p>
+<p>YGC：年轻代垃圾回收次数</p>
+<p>YGCT：年轻代垃圾回收消耗时间</p>
+<p>FGC：老年代垃圾回收次数</p>
+<p>FGCT：老年代垃圾回收消耗时间</p>
+<p>GCT：垃圾回收消耗总时间</p>
+</blockquote>
+<h2 id="4-jmap">4. jmap
+</h2><blockquote>
+<p>可以使用 Arthas的命令来替代, <strong>memory</strong>: 获取当前 Java 虚拟机（JVM）的整体内存使用状态，包括堆内存、非堆内存以及各细分区域的使用详情</p>
+</blockquote>
+<pre><code class="language-properties">jmap -heap &lt;进程id&gt;
+</code></pre>
+<p>可以对内存情况 dump 到文件中, 然后使用jhat 命令配合 OQL 语句进行查询分析</p>
+<h1 id="35-jstack">35. jstack
+</h1><p><code>jstack &lt;pid&gt; </code>的作用是将正在运行的jvm的==线程情况进行快照==，并且打 印出来：==可以用来排查死锁==</p>
+<p>死锁: ==启动2个线程，Thread1拿到了obj1锁，准备去拿obj2锁时，obj2已经被Thread2锁定==</p>
+<h1 id="34-设计模式-适配器和策略">34. 设计模式-适配器和策略
+</h1><p>适配器模式和策略模式的混合使用</p>
+<p>就比如说我们 , ==平台支持多种支付方式==（如信用卡、支付宝、微信支付等）。为了支持这些支付方式，你可以使用==策略模式来定义不同的支付策略==，同时==使用适配器模式来处理不同支付接口的兼容性==。</p>
+<ol>
+<li><strong>支付策略接口</strong>：定义一个支付策略接口 <code>PaymentStrategy</code>，包含一个 <code>pay</code> 方法。</li>
+<li><strong>具体支付策 略</strong>：实现不同的支付策略，如信用卡支付、支付宝支付等  <code> CreditCardPayment</code></li>
+<li><strong>适配器类</strong>：假设你有一个==旧的支付接口，无法直接与新的支付策略兼容==。你可以创建适配器类来适配它。</li>
+<li><strong>上下文类</strong>：创建一个上下文类，==用于调用策略，持有一个策略对象的引用==，并可以==根据需要更换策略==。</li>
+</ol>
+<h1 id="35-垃圾回收">35. 垃圾回收
+</h1><h2 id="0-引用类型">0. 引用类型
+</h2><ul>
+<li>强引用:  当==对象被强引用时，垃圾回收器<strong>永远不会回收</strong>它==，除非显式地将引用设置为<code>null</code>。</li>
+<li>软引用:  JVM在==内存不足时会回收软引用指向的对象==，但在内存充足时不会回收这些对象。</li>
+<li>弱引用:  弱引用对象在垃圾回收时会被<strong>立即回收</strong>。</li>
+<li>虚引用:  虚引用的对象并不会直接被程序使用，主要用于<strong>跟踪对象的垃圾回收</strong>。  适合需要释放资源的场景，例如文件、网络连接等</li>
+</ul>
+<h2 id="1垃圾回收算法">1.垃圾回收算法
+</h2><ul>
+<li>引用计数法
+<ul>
+<li>在对象中存储一个计数器用来记录被引用次数，当产生一个引用关系，计数+1，当一个引用关系失效计数-1，如果减到0，就将当前对象清除</li>
+<li>优点：
+<ul>
+<li>实时</li>
+<li>区域性，不会造成GC停顿</li>
+</ul>
+</li>
+<li>缺点：
+<ul>
+<li>会比较消耗cpu，在不断的计算引用计数和进行gc</li>
+<li>循环引用问题无法解决（<strong>致命缺点</strong>）
+<ul>
+<li>如果两个对象互相引用，如果指针指向null，对象的引用计数仍然不为0，所以不会被移除</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>标记清除法
+<ul>
+<li>从根节点开始标记可达对象，将不可达的对象清空</li>
+<li>分为两个阶段
+<ul>
+<li>标记</li>
+<li>清除</li>
+<li>两个阶段都会造成GC停顿</li>
+</ul>
+</li>
+<li>优点：解决引用计数法循环引用的问题</li>
+<li>缺点：
+<ul>
+<li>会造成比较长的GC停顿时间</li>
+<li>清理之后内存空间是不连续的</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>标记压缩法
+<ul>
+<li>和标记清除法十分类似，在清理阶段不太一样</li>
+<li>一边清理，一边压缩，将存活对象压缩到内存的一端，保证空闲的内存空间是连续的</li>
+<li>优点：解决了标记清除法的碎片化问题</li>
+<li>缺点：由于标记和清除阶段都需要GC停顿，会造成比较长的GC停顿时间</li>
+</ul>
+</li>
+<li>复制算法
+<ul>
+<li>将内存划分为两块完全相等的空间，当gc的时候将一块空间中的存活对象复制转移到另一块空间，保证始终至少有一个空间是空闲的</li>
+<li>在年轻代使用复制算法，年轻代的两个Survivor区命名为form区和to区，每次将form区和Eden区的存活对象复制拷贝到to区，转化from和to的角色。</li>
+<li>当内存中的垃圾对象较多的时候，只需要复制转移少量的对象，适合使用复制算法</li>
+</ul>
+</li>
+<li>分代收集算法
+<ul>
+<li>将内存划分为多个区域，根据对象的特点进行区分，不同的区域使用不同的垃圾回收算法</li>
+<li>年轻代：存储刚被创建的和大概率可回收的对象，适合使用复制算法</li>
+<li>老年代：大概率不可回收对象，适合使用标记清除/标记压缩算法</li>
+</ul>
+</li>
+<li>三色标记算法
+<ul>
+<li>白色: 未被扫描的对象</li>
+<li>黑色: 已扫描且存活对象</li>
+<li>灰色: 已扫描, 自身是存活的, 但器引用对象存活情况发需要进一步扫描</li>
+</ul>
+</li>
+</ul>
+<h2 id="2垃圾收集器">2.垃圾收集器
+</h2><ul>
+<li>串行垃圾收集器
+<ul>
+<li>使用单线程进行垃圾回收</li>
+<li>-XX:+UseSerialGC设置年轻代和老年代都使用串行垃圾收集器</li>
+</ul>
+</li>
+<li>并行垃圾收集器  Parallel GC
+<ul>
+<li>使用多线程进行垃圾回收</li>
+<li>ParNew垃圾收集器
+<ul>
+<li>运行在年轻代的，老年代仍然使用串行垃圾收集器</li>
+<li>通过-XX:+UseParNewGC进行设置</li>
+</ul>
+</li>
+<li>==ParallelGC垃圾收集器（jdk8默认垃圾收集器）==
+<ul>
+<li>通过-XX:+UseParallelGC设置在<strong>年轻代</strong>使用ParallelGC</li>
+<li>通过-XX:+UseParallelOldGC设置在<strong>老年代</strong>使用ParallelGC</li>
+<li>可以通过设置一些参数让jvm自动调整堆空间的分配
+<ul>
+<li>-XX:MaxGCPauseMillis=&gt;示最大允许的GC停顿时间</li>
+<li>-XX:GCTimeRatio=&gt;表示程序占运行时间的百分比默认99，表示程序运行时间占总时间的99%，1%是垃圾回收时间</li>
+<li><strong>-XX:+UseAdaptiveSizePolicy</strong>  设置为true表示开启自适应模式，让jvm自动调整达到gc和程序执行的平衡</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>CMS (==低停顿的==)垃圾收集器</li>
+<li><img src="/p/interview/images/image-20241203183845386.png"
+	width="912"
+	height="519"
+	
+	loading="lazy"
+	
+		alt="image-20241203183845386"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="175"
+		data-flex-basis="421px"
+	
+>
+<ul>
+<li>在老年代使用的垃圾收集器在jdk8默认是关闭的,需要手动开启</li>
+<li>在标记清除法的基础上进行优化
+<ul>
+<li>初始<strong>标记根节点</strong>：造成STW</li>
+<li><strong>并发标记</strong>：在运行的同时标记可达对象</li>
+<li>预处理</li>
+<li><strong>再标记</strong>：造成STW，标记在并行过程中遗漏的对象</li>
+<li><strong>并发清理</strong></li>
+<li>调整堆大小：清除内存碎片</li>
+<li>并发重置状态等待下次CMS的触发</li>
+</ul>
+</li>
+<li>总结：这种方式造成STW只有两个阶段（标记根节点和再标记），消耗的时间小于标记清除法两个阶段的时间，所以造成GC停顿时间比较短，效率比较高，但是没办法清理掉所有垃圾，这种方式是在<strong>清理所有垃圾和响应时间上做出的权衡</strong></li>
+<li>通过参数-XX:+UseConcMarkSweepGC进行设置</li>
+</ul>
+</li>
+<li><strong>G1垃圾收集器（重点）</strong>
+<ul>
+<li>摒弃了传统的堆内存的划分而是使用了若干个大小相同的Region区域，这些区域分为4个
+<ul>
+<li>Eden:保存新创建的对象</li>
+<li>Survivor：保存年轻代GC之后存活的对象</li>
+<li>Old：
+<ul>
+<li>保存多次年轻代GC之后仍然存活的对象</li>
+<li>保存年轻代Surviovr存满之后转移过来的对象</li>
+</ul>
+</li>
+<li>Humongous
+<ul>
+<li>保存超过Region的50%大小的对象==（巨型对象）超过2mb==，如果一个区存不下，寻找连续的Humongous区进行存储，如果找不到进行FULLGC</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>精髓就是它的<strong>所有空间都是浮动的，不是固定的，是一个动态平衡，需要就用，不需要就归还</strong></li>
+<li>记忆集合Remembered Set
+<ul>
+<li>将Region以512kb一个card划分为若干个card</li>
+<li>每一个card都存在一个集合用来保存被引用的card位置</li>
+<li>当GC时需要定位根节点的时候，只需要扫描记忆集合中记录的card的位置就能快速找到根节点，不需要扫描整个内存空间</li>
+</ul>
+</li>
+<li>GC
+<ul>
+<li>YoungGC：年轻代的GC</li>
+<li>MixedGC：年轻代的GC+部分老年代GC
+<ul>
+<li>触发条件：-XX:InitiatingHeapOccupancyPercent=n
+<ul>
+<li>当前老年代占堆空间的n%就触发MixedGC</li>
+</ul>
+</li>
+<li>全局并发标记（和cms标记阶段比较类似）
+<ul>
+<li>标记根节点
+<ul>
+<li>遍历记忆集合中记录的card位置找到根节点进行初始化标记</li>
+</ul>
+</li>
+<li>并发标记老年代中的节点</li>
+<li>并发标记所有堆内存的节点</li>
+<li>重新标记（会导致STW）</li>
+<li>预清理
+<ul>
+<li>并没有真的清理而是在第二个阶段开始清理，主要是检查过程</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>复制转移对象
+<ul>
+<li><strong>全程STW，将标记对象复制转移到另一块Region，并情空当前Region</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>FULLGC：所有内存空间包括Humongous进行GC</li>
+</ul>
+</li>
+<li>使用过程
+<ul>
+<li>开启g1
+<ul>
+<li>-XX:+UseG1GC</li>
+</ul>
+</li>
+<li>设置最大堆内存
+<ul>
+<li>-Xmx</li>
+</ul>
+</li>
+<li>调优参数的设置
+<ul>
+<li>-XX:MaxGCPauseMillis=&gt;所能允许的最大gc停顿时间，需要反复调整达到最佳gc情况</li>
+<li>-XX:G1HeapRegionSize=&gt;Region区域大小，默认是堆内存的1/2000，设置范围是1-32m</li>
+<li>-XX:ParallelGCThreads=n =&gt;工作线程的数量，默认是cpu核数，最大是8</li>
+<li>-XX:ConcGCThreads=n =&gt;并发标记的线程数量，一般是ParallelGCThreads的1/4</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>相比于CMS来说
+<ul>
+<li><strong>标记根节点的时间短了</strong>，因为不需要扫描整个堆空间，只需要<strong>通过记忆集合扫描几个card</strong>就行了，意味着STW时间变短了，程序响应速度变快了</li>
+<li><strong>cms有一个整理碎片的过程，G1不需要整理，因为它是复制算</strong>法，而且使用mixedGC只会每次收集几个老年代，意味着每次mixedGC只需要复制转移少量的对象，所以效率很高。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>垃圾回收器, 不外乎就两个功能</p>
+<ol>
+<li>标记垃圾
+<ol>
+<li>引用计数法</li>
+<li>可达性</li>
+</ol>
+</li>
+<li>清理垃圾
+<ol>
+<li>标记清除</li>
+<li>标记整理</li>
+<li>复制</li>
+<li>分代收集</li>
+</ol>
+</li>
+</ol>
+<h1 id="36-threadlocal">36. ThreadLocal
+</h1><p>允许==每个线程存储和访问独立的变量副本, 适用于线程隔离的场景==</p>
+<p><code>ThreadLocal</code> 变量==通常由线程的生命周期管理==，并存储在 <code>Thread</code> 对象的内部数据结构中，通常是 <code>ThreadLocalMap</code>。每个线程在使用 <code>ThreadLocal</code> 时，都会创建一个专属于该线程的变量副本。</p>
+<p><strong>潜在的内存泄漏风险</strong>出现在以下情况：</p>
+<ul>
+<li>
+<p><code>ThreadLocalMap</code> ==使用弱引用（weak reference）来引用 <code>ThreadLocal</code> 对象本身==，但它对==<code>ThreadLocal</code> 变量值==使用的是<strong>强引用</strong>。</p>
+<ul>
+<li>
+<p><strong><code>key</code></strong>：<code>ThreadLocal</code> 对象本身作为 <code>key</code>，但 <code>ThreadLocalMap</code> 对这个 <code>key</code> 的引用是一个<strong>弱引用（WeakReference）</strong>。这意味着，==如果没有其他强引用指向这个 <code>ThreadLocal</code> 对象，JVM 的垃圾回收器会回收这个 <code>ThreadLocal</code> 对象==。</p>
+<p><strong><code>value</code></strong>：<code>value</code> 是线程使用 <code>ThreadLocal</code> 存储的变量值，<code>ThreadLocalMap</code> 对这些变量值使用的是<strong>强引用</strong>。因此，只要线程不结束，<code>ThreadLocalMap</code> 会继续持有这些值，即使 <code>ThreadLocal</code> 对象本身已经被回收。</p>
+</li>
+</ul>
+</li>
+<li>
+<p>如果一个 <code>ThreadLocal</code> 被手动设置为 <code>null</code> 或者不再被使用，那么这个 <code>ThreadLocal</code> 对象会被垃圾回收。但对应的变量副本（value）可能仍然存在于 <code>ThreadLocalMap</code> 中，且这个副本与线程的生命周期绑定。</p>
+</li>
+<li>
+<p>由于 <code>ThreadLocalMap</code> 持有对这些值的强引用，即使 <code>ThreadLocal</code> 对象被垃圾回收，值仍然不会被回收，导致内存泄漏。</p>
+</li>
+<li>
+<p>如果用了线程池, ThreadLocal会随着线程的回收被销毁, 但是线程一直存活的话, 内存泄漏会随着时间推移越来越严重</p>
+</li>
+</ul>
+<p>==<code>ThreadLocal</code>静态和成员变量的影响==：</p>
+<ul>
+<li><strong><code>static ThreadLocal</code></strong>：因为 <code>static</code> 变量属于类，所以所有线程共享同一个 <code>ThreadLocal</code> 变量，但由于 <code>ThreadLocal</code> 为每个线程维护一个独立的值，这些线程各自有不同的值，而不是共享同一个值。这种方式适合所有对象实例都需要访问相同的线程本地变量。</li>
+<li><strong>成员变量 <code>ThreadLocal</code></strong>：成员变量属于每个实例，所以每个对象实例都有自己的 <code>ThreadLocal</code> 变量和独立的线程本地值。这意味着不同的对象实例彼此独立，线程在操作时不会共享线程本地数据。</li>
+</ul>
+<h1 id="37-fail-safe-和-fail-fast">37. fail-safe 和 fail-fast
+</h1><p>两种迭代器的行为模式，用于描述在并发修改集合时如何处理异常。</p>
+<ol>
+<li>Fail-fast: 当使用迭代器遍历集合时，如果在遍历过程中检测到集合被修改抛出异常ConcurrentModificationException , 非并发安全的集合, hashMap, arrayList</li>
+<li>Fail-safe:  迭代器在遍历集合时不会抛出异常，即使集合被并发修改。 遍历时==使用集合的<strong>副本</strong>==（例如通过 <code>CopyOnWriteArrayList</code> 或 <code>ConcurrentHashMap</code>）来实现的，因此修改不会影响当前的迭代过程。</li>
+</ol>
+<h1 id="38-异常类型">38. 异常类型
+</h1><p>Java的异常类型层次结构是基于继承自 <code>Throwable</code> 类的。<code>Throwable</code> 主要分为两大子类：==<code>Error</code> 和 <code>Exception</code>==，其中 <code>Exception</code> 再分为<strong>受检异常</strong>和<strong>非受检异常</strong>。</p>
+<ol>
+<li>
+<p>受检异常：编译时必须处理的异常，继承自 Exception 类（不包括 RuntimeException）。
+例子：IOException、SQLException 需要显式捕获或通过 throws 声明。</p>
+</li>
+<li>
+<p>非受检异常：编译时不强制处理的异常，继承自 RuntimeException。
+例子：NullPointerException、ArithmeticException由运行时错误或逻辑错误引发，不强制处理。</p>
+</li>
+</ol>
+<h1 id="39-代理">39. 代理
+</h1><ol>
+<li>静态代理实现较简单，只要==代理对象对目标对象进行包装，即可实现增强功能==，但静态代理只能为一个目标对象服务，如果目标对象过多，则会产生很多代理类。</li>
+<li>JDK动态代理需要目标对象实现业务接口，代理类只需实现InvocationHandler接口。</li>
+<li>动态代理生成的类为 lass com.sun.proxy.$Proxy4，cglib代理生成的类为class com.cglib.UserDao$$EnhancerByCGLIB$$552188b6。</li>
+<li>静态代理在编译时产生class字节码文件，可以直接使用，效率高。</li>
+<li>动态代理必须实现InvocationHandler接口，通过反射代理方法，比较消耗系统性能，但可以减少代理类的数量，使用更灵活。</li>
+<li>cglib代理无需实现接口，通过生成类字节码实现代理，比反射稍快，不存在性能问题，但cglib会继承目标对象，需要重写方法，所以目标对象不能为final类。</li>
+</ol>
+<p>动态代理是什么, ==运行时创建代理对象并处理方法调用的一种机制,只是对原始实现的拦截去做功能的增强==</p>
+<p>==JDK的动态代理是通过 java.lang.reflect.Proxy 类和 InvocationHandler 接口来实现的==。Proxy 类负责创建代理对象，InvocationHandler 接口负责定义代理对象中方法调用时的行为。</p>
+<p>Jdk动态代理关键步骤：</p>
+<ol>
+<li>代理对象的创建 ：
+使用 Proxy.newProxyInstance() 方法创建代理对象(==继承Proxy类的==)。这个方法要求代理的类必须实现一个或多个接口，==因为代理对象最终是通过实现接口来代理原始对象的方法调用==。</li>
+<li>方法调用的拦截：
+当调用代理对象的方法时，代理对象会将这个==调用转发给 InvocationHandler.invoke() 方法==。在这个方法里，可以自定义逻辑，拦截并处理实际方法的执行。</li>
+</ol>
+<h2 id="1-为什么只能代理有接口的类">1. 为什么只能代理有接口的类?
+</h2><p>JDK动态代理不能代理没有实现接口的类，==因为代理机制依赖接口==，而不是单继承的限制。</p>
+<p>因为它依赖于接口的存在，==通过代理对象实现接口来拦截方法调用==。</p>
+<h2 id="2-cglib-是怎么实现的">2. cglib 是怎么实现的
+</h2><p>==通过生成目标类的子类来拦截方法调用==。CGLIB（Code Generation Library）是一种==基于字节码的动态代理技术==，广泛用于框架中（如 Spring）来对类进行代理，尤其是当目标类没有实现接口时。</p>
+<p>如 Spring 中的 AOP（面向切面编程）在某些情况下（目标类没有实现接口时）会使用 CGLIB 代理。</p>
+<ul>
+<li>无法代理 <code>final</code> 类和 <code>final</code> 方法</li>
+<li><strong>性能</strong>：CGLIB 的性能通常较好，但因为它==生成代理类时需要进行字节码操作==</li>
+</ul>
+<h1 id="40-对象的创建过程">40. 对象的创建过程
+</h1><ol>
+<li>类加载:  加载目标类（如果尚未加载）
+<ol>
+<li>加载: 通过类加载器将<code>class</code>文件加载到内存中, 生成Class对象</li>
+<li>链接:
+<ol>
+<li>验证: 类文件格式是否正确, 字节码是否符合规范</li>
+<li>准备: 为静态变量分配内存, 初始化默认值</li>
+<li>解析:</li>
+</ol>
+</li>
+<li>初始化: 对静态变量赋初始值, 执行静态代码块</li>
+</ol>
+</li>
+<li>内存分配:  在堆内存中为新对象分配空间</li>
+<li>对象初始化:  执行默认初始化、显式初始化和构造器初始化</li>
+<li>返回引用:  <code>new</code> 返回对象的引用，允许外部访问该对象</li>
+</ol>
+<h1 id="41--new-stringabc-创建了几个对象">41.  new String(abc) 创建了几个对象
+</h1><ol>
+<li>
+<p><strong>直接使用字面量 &ldquo;abc&rdquo;</strong>： 当你使用 <code>&quot;abc&quot;</code> 这种字面量形式时，Java 会将其放入字符串常量池中。如果在代码的其他地方也使用了相同的字面量 <code>&quot;abc&quot;</code>，JVM 会复用同一个字符串对象，而不会创建新的对象。这种方式提高了效率和内存利用率。</p>
+</li>
+<li>
+<p><strong>使用 <code>new String(&quot;abc&quot;)</code></strong>： 当你使用 <code>new String(&quot;abc&quot;)</code> 时，它会显式地创建一个新的 <code>String</code> 对象，且该对象不在字符串常量池中，而是在堆内存中。这意味着即使内容相同，使用 <code>new String(&quot;abc&quot;)</code> 创建的对象与常量池中的字符串是两个不同的对象。</p>
+</li>
+</ol>
+<p>两种可能</p>
+<ol>
+<li>==常量池里已经存在abc, 就只会创建一个, 不存在就会创建 String 实例对象和 &lsquo;abc&rsquo; 常量==</li>
+</ol>
+<h1 id="42-string--string-buffer-string-builder">42. String , String Buffer, String Builder
+</h1><ol>
+<li>可变性: String 不可变, 其余两个都是可变的</li>
+<li>线程安全: String Buffer用了sync,  StringBuilder 不是线程安全的</li>
+<li>性能: String Builder是性能最高的, 字符串拼接编译器会帮我们优化,  String Buffer其次,String 是最低</li>
+<li>存储: String 在常量池, 其他都在堆内存空间</li>
+</ol>
+<h1 id="43-integer-相等判断">43. Integer 相等判断
+</h1><p>包装类型,  因为引入了享元模式, 就是缓存: -127到128 , 如果值在这个区间就会直接从缓存中获取==Integer这样一个实例==, 会出现明明是值相同, 但是== 比较却为false, 因为 比较的是内存地址</p>
+<h1 id="44-深拷贝-浅拷贝">44. 深拷贝, 浅拷贝
+</h1><p>这个是对象复制场景</p>
+<p>深拷贝会在堆内存空间创建一个新的对象, 引用指针指向这个新对象</p>
+<ol>
+<li>要继承Cloneable 接口, 重写clone 方法,</li>
+<li>实现序列化接口, 有很多工具类可以使用来进行深拷贝</li>
+</ol>
+<p>浅拷贝是只拷贝了指针, 都是指向的堆内存里面的同一个内存地址</p>
+<h1 id="45-java文件拷贝方式">45. Java文件拷贝方式
+</h1><ol>
+<li>
+<p>IO包里面的 FileInputStream 和 FileOutputStream</p>
+</li>
+<li>
+<p>nio的 Files 类</p>
+</li>
+<li>
+<p>nio 的<code>transferTo()</code> 和 <code>transferFrom()</code> 方法可以实现<strong>零拷贝</strong>（Zero-Copy） ,  ==避免了将数据在<strong>内核空间</strong>和<strong>用户空间</strong>之间来回拷贝==</p>
+<ol>
+<li>允许直接将文件内容从一个通道传输到另一个通道（如文件到网络或反之），而无需将数据复制到用户空间（Java 应用的内存空间）</li>
+</ol>
+</li>
+</ol>
+<h1 id="46-零拷贝">46. 零拷贝
+</h1><p>零拷贝的工作流程：</p>
+<ol>
+<li>内核空间读取文件的数据块（数据位于内核文件缓存中）。</li>
+<li>直接将数据传输到网络通道或目标文件的内核缓冲区中，无需拷贝到用户空间。</li>
+<li>网络通道或目标文件通道将数据写入目标（如磁盘或网络）。</li>
+</ol>
+<h1 id="47-设计模式">47. 设计模式
+</h1><p><strong>创建型模式</strong>：负责对象的创建，帮助解耦对象的实例化过程，如==单例模式、工厂模式和原型模式==。</p>
+<p><strong>结构型模式</strong>：用于处理类和对象之间的关系，促进代码的可扩展性和模块化，如==装饰器模式、适配器模式和代理模式==。</p>
+<p><strong>行为型模式</strong>：专注于对象之间的交互和职责分配，如==观察者模式、策略模式和命令模式, 责任链==。</p>
+<p>Spring 解决循环依赖主要使用了 <strong>代理模式</strong>（Proxy Pattern）和 <strong>工厂模式</strong>（Factory Pattern）。</p>
+<p>具体实现：</p>
+<ol>
+<li><strong>代理模式</strong>：在 Spring 中，==当检测到循环依赖时，它会创建一个代理对象而不是直接返回原始对象==。这个代理对象可以==在后续需要时引用实际的对象，从而打破循环依赖==。</li>
+<li><strong>工厂模式</strong>：Spring 使用 <code>BeanFactory</code> 来管理 Bean 的生命周期。在创建 Bean 的过程中，如==果遇到循环依赖，Spring 会通过工厂方法先返回一个代理对象，等到真正需要该 Bean 的时候再去注入依赖的实例==。</li>
+</ol>
+<p>工作流程：</p>
+<ul>
+<li>当 Spring 检测到 A 和 B 之间存在循环依赖时，首先创建 A 的代理对象，并将其注入到 B 中。</li>
+<li>然后，Spring 再继续创建 B 的实例并注入 A 的代理对象。</li>
+<li>当真正需要 A 的时候，代理会被替换为实际的 A 实例。</li>
+</ul>
+<p>这种方式使得 Spring 能够有效地处理循环依赖问题，同时保持了松耦合和高内聚的设计原则。</p>
+<h2 id="1-单例模式">1. 单例模式
+</h2><ol>
+<li>私有构造方法</li>
+<li>提供静态方法
+<ol>
+<li>在多线程的时候可以使用静态代码块, 或者饿汉式加载,</li>
+</ol>
+</li>
+<li>或者可以使用枚举来实现</li>
+</ol>
+<h2 id="2-策略模式">2. 策略模式
+</h2><p>==可拓展, 易于维护, 动态选择==</p>
+<ul>
+<li><strong>Context（上下文）</strong>：==持有对某个策略的引用，并负责调用该策略的算法==。</li>
+<li><strong>Strategy（策略接口）</strong>：定义一个统一的接口，用于所有支持的算法。</li>
+<li><strong>ConcreteStrategy（具体策略类）</strong>：实现策略接口，提供具体的算法实现。</li>
+</ul>
+<h2 id="3-观察者模式">3. 观察者模式
+</h2><p>==低耦合, 动态关系, 广播通信==</p>
+<p><strong>Subject（主题）</strong>：被观察者，管理观察者的注册和通知。</p>
+<p><strong>Observer（观察者接口）</strong>：定义一个更新接口，用于接收主题的通知。</p>
+<p><strong>ConcreteObserver（具体观察者类）</strong>：实现观察者接口，并在接收到通知时更新自己。</p>
+<h2 id="4-责任链模式">4. 责任链模式
+</h2><p>==降低耦合性 ,  增强灵活性  简化代码==</p>
+<p><strong>Handler（处理者接口）</strong>：定义一个处理请求的方法，并包含对下一个处理者的引用。</p>
+<p><strong>ConcreteHandler（具体处理者类）</strong>：实现处理者接口，负责处理请求。如果自己无法处理请求，则将其转发给链中的下一个处理者。</p>
+<p><strong>Client（客户端）</strong>：发送请求的对象，通常只与链的起始处理者交互。</p>
+<p>==假设我们有一个审批流程，涉及多个级别的审批（如经理、总监和CEO），每个级别都可以处理不同金额的请求==</p>
+<h1 id="48-finally-块一定会执行吗">48. finally 块一定会执行吗
+</h1><p>不一定</p>
+<ol>
+<li>捕获范围不够大, 没进到try 的代码块里面,就异常退出是不会执行的</li>
+<li>在try catch 里面 用了 System.exit() 也不会执行</li>
+</ol>
+<h1 id="49--raft-算法">49.  Raft 算法
+</h1><p>分布式系统中的一致性算法,  多个节点（或服务器）在面对节点故障或网络分区时，==能够一致地维护一份数据副本==。</p>
+<h2 id="1-重要组件">1. 重要组件
+</h2><ul>
+<li><strong>领导者（Leader）</strong>：Raft 中的节点通过选举形成一个领导者，所有写入操作都通过领导者进行。领导者负责处理客户端的请求并将数据复制到其他节点。</li>
+<li><strong>跟随者（Follower）</strong>：除了领导者，其他节点都是跟随者，==负责响应领导者的请求和转发数据==。</li>
+<li><strong>候选者（Candidate）</strong>：在领导者失效时，节点可以转变为候选者，发起选举以选出新的领导者。</li>
+</ul>
+<h2 id="2-工作流程">2. <strong>工作流程</strong>
+</h2><ul>
+<li><strong>选举过程</strong>：如果一个节点在一定时间内未接收到领导者的心跳信号，它会转变为候选者并开始选举。在选举中，节点通过投票选出新的领导者，确保在集群中始终有一个活跃的领导者。</li>
+<li><strong>日志复制</strong>：==领导者将接收到的客户端请求以日志条目的形式保存==，并将其复制到所有跟随者。如果==大多数节点（多数决）确认接收，领导者会提交这些日志条目==，并通知跟随者更新状态机。</li>
+<li><strong>状态机应用</strong>：所有节点（包括领导者和跟随者）在接收到提交的日志条目后，会将其应用于各自的状态机，从而保证状态的一致性。</li>
+</ul>
+<h1 id="50-spi">50. SPI
+</h1><p>Service provider interface ==基于接口的动态拓展机制==,  广泛应用于 Java 和其他编程语言中 ,  它允许在不修改现有代码的情况下，==动态地加载和使用服务实现==。</p>
+<p><strong>解耦</strong>：SPI 提供了一种方式，让接口和其实现可以分开管理，从而实现灵活的替换和扩展。</p>
+<p><strong>动态加载</strong>：==通过使用反射和配置文件，SPI 允许在运行时动态加载服务的实现==。</p>
+<p><strong>插件式架构</strong>：SPI 支持插件机制，允许开发者在不修改核心代码的情况下，添加新的功能或实现。</p>
+<p>实现步骤</p>
+<p><strong>定义接口</strong>：首先，定义一个服务接口（API），该接口提供了一组功能。</p>
+<p><strong>实现接口</strong>：然后，创建一个或多个实现该接口的类（服务提供者）</p>
+<p><strong>配置文件</strong>：在 <code>META-INF/services/</code> 目录下，创建一个以接口全名命名的文件，文件内容是实现类的全名。JAR 包中的所有实现类都会被列在这个文件中。</p>
+<p><strong>加载实现</strong>：使用 <code>ServiceLoader</code> 类，可以在运行时查找并加载实现类。例如</p>
+<h1 id="51--包装类和基础数据类型">51.  包装类和基础数据类型
+</h1><p>short  int long double float byte char boolean</p>
+<p>==内存==</p>
+<ul>
+<li>基本数据类型：存储在栈内存中，效率高，分配和释放速度快。</li>
+<li>包装类：存储在堆内存中，创建对象需要更多的内存和处理时间。</li>
+</ul>
+<p>==用途==</p>
+<ul>
+<li>基本数据类型：用于处理简单的数值、字符和布尔值，适合对性能要求较高的场景。</li>
+<li>包装类：用于需要对象的场景，如集合（<code>ArrayList</code>、<code>HashMap</code> 等）、泛型等，因为这些集合只能存储对象，而不能存储基本类型。</li>
+</ul>
+<p>==功能==</p>
+<ul>
+<li>基本数据类型：不提供任何方法或功能，简单存储值。</li>
+<li>包装类：提供了一些方法，可以进行类型转换、比较、转换为字符串等。例如：
+<ul>
+<li><code>Integer.parseInt(String s)</code>：将字符串转换为 <code>int</code>。</li>
+<li><code>Integer.valueOf(int i)</code>：将 <code>int</code> 转换为 <code>Integer</code> 对象。</li>
+</ul>
+</li>
+</ul>
+<h1 id="52--equal-hashcode">52.  equal, hashCode
+</h1><pre><code> 在 Java 中，当你重写 `equals()` 方法时，必须同时重写 `hashCode()` 方法，原因主要与==哈希表（如 `HashMap`、`HashSet`）的工作机制==有关 
+</code></pre>
+<p>​	  <code>hashCode()</code> 方法返回对象的哈希码，==它是一个整数，通常是对象的一种唯一标识==。哈希码的计算通常基于对象的属性。</p>
+<p>​	  重写 <code>equals()</code> 方法后重写 <code>hashCode()</code> 方法是==为了确保对象在哈希表中正常工作，维护它们之间的一致性==。这是 Java 的规范，确保了集合框架（如 <code>HashSet</code> 和 <code>HashMap</code>）能正确处理对象的查找和存储。</p>
+<h1 id="53-集合">53. 集合
+</h1><p>时间复杂度:  用于描述算法在执行时所需的时间与输入规模之间的关系</p>
+<p><strong>O(1)</strong>：常数时间复杂度，不受输入规模影响。操作时间固定，例如数组元素访问。</p>
+<p><strong>O(log n)</strong>：对数时间复杂度，通常出现在每次操作都将问题规模减半的算法中，例如二分查找。</p>
+<p><strong>O(n)</strong>：线性时间复杂度，算法的执行时间与输入规模成正比，例如遍历数组。</p>
+<p><strong>O(n log n)</strong>：线性对数时间复杂度，常见于高效的排序算法，如归并排序和快速排序。</p>
+<p><strong>O(n²)</strong>：平方时间复杂度，通常出现在嵌套循环的算法中，例如冒泡排序和选择排序。</p>
+<p><strong>O(2^n)</strong>：指数时间复杂度，算法执行时间随输入规模呈指数增长，例如某些递归算法。</p>
+<p><strong>O(n!)</strong>：阶乘时间复杂度，通常出现在排列组合问题中，如旅行商问题的暴力解法。</p>
+<h2 id="0-算法">0. 算法
+</h2><p>冒泡排序:  比较相邻元素并交换它们的位置，如果它们的顺序错误 , ==每一轮最大的数已经被排到了最后==</p>
+<ol>
+<li>
+<p><strong>为什么不是 <code>size</code> 次？</strong> 当第 <code>size - 1</code> 次循环结束时，数组中已经有 <code>size - 1</code> 个元素被放置到了正确的位置，因此最后一个元素自然也是正确的，无需再进行额外的循环。  对于一个大小为 <code>6</code> 的数组，最多只需要 5 次外循环：</p>
+</li>
+<li>
+<p><strong>为什么是 <code>size - 1 - i</code>？</strong></p>
+<ul>
+<li><code>size - 1</code> 是在数组中进行比较的总次数（因为数组索引从 <code>0</code> 开始，所以是 <code>size - 1</code>）。</li>
+<li>减去 <code>i</code> 是因为经过 <code>i</code> 轮外循环，数组的最后 <code>i</code> 个元素已经排好序了，因此在接下来的循环中无需再比较这些元素。</li>
+<li>例如：
+<ul>
+<li>在第 1 轮（i = 0），你需要遍历整个数组，所以内循环次数是 <code>size - 1</code>；</li>
+<li>在第 2 轮（i = 1），你只需要比较前 <code>size - 2</code> 个元素，因为最后一个元素已经排好序；</li>
+<li>依此类推，直到最后只剩一个元素需要比较。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<pre><code>public class BubbleSort {
+    public static void bubbleSort(int[] arr) {
+        int n = arr.length;
+        for (int i = 0; i &lt; n - 1; i++) {
+            // 标志位，用于检测是否发生了交换
+            boolean swapped = false; 
+            for (int j = 0; j &lt; n - 1 - i; j++) {
+                if (arr[j] &gt; arr[j + 1]) {
+                    // 交换 arr[j] 和 arr[j + 1]
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                    swapped = true;
+                }
+            }
+            // 如果没有发生交换，说明数组已经有序
+            if (!swapped) {
+                break;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {64, 34, 25, 12, 22, 11, 90};
+        bubbleSort(arr);
+        System.out.println(&quot;Sorted array: &quot;);
+        for (int num : arr) {
+            System.out.print(num + &quot; &quot;);
+        }
+    }
+}
+
+</code></pre>
+<p>快速排序</p>
+<pre><code>public class QuickSort {
+    public static void quickSort(int[] arr, int low, int high) {
+        if (low &lt; high) {
+            // 获取划分点
+            int pi = partition(arr, low, high);
+
+            // 递归排序
+            quickSort(arr, low, pi - 1);  // 对左侧进行排序
+            quickSort(arr, pi + 1, high); // 对右侧进行排序
+        }
+    }
+
+    public static int partition(int[] arr, int low, int high) {
+        int pivot = arr[high]; // 选择最后一个元素作为基准
+        int i = (low - 1); // 小于基准的元素索引
+
+        for (int j = low; j &lt; high; j++) {
+            // 如果当前元素小于或等于基准
+            if (arr[j] &lt;= pivot) {
+                i++; // 增加小于基准的元素索引
+                // 交换 arr[i] 和 arr[j]
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+        // 将基准元素放到正确的位置
+        int temp = arr[i + 1];
+        arr[i + 1] = arr[high];
+        arr[high] = temp;
+        return i + 1; // 返回基准元素的索引
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {10, 7, 8, 9, 1, 5};
+        int n = arr.length;
+        quickSort(arr, 0, n - 1);
+        System.out.println(&quot;Sorted array: &quot;);
+        for (int num : arr) {
+            System.out.print(num + &quot; &quot;);
+        }
+    }
+}
+
+
+</code></pre>
+<h2 id="1-set">1. Set
+</h2><p>==HashSet==</p>
+<ul>
+<li>
+<p><strong>数据结构</strong>：基于哈希表（Hash Table）</p>
+</li>
+<li>
+<p>不保证元素的顺序。</p>
+</li>
+<li>
+<p>允许存储 <code>null</code> 元素。</p>
+</li>
+<li>
+<p>基本操作（添加、删除、包含）的平均时间复杂度为 O(1)。</p>
+</li>
+</ul>
+<p>==LinkedHashSet==</p>
+<p><strong>数据结构</strong>：基于==哈希表和双向链表==。</p>
+<ul>
+<li>保持插入顺序（按元素添加的顺序）。</li>
+<li>允许存储 <code>null</code> 元素。</li>
+<li>基本操作（添加、删除、包含）的时间复杂度为 O(1)，但由于维护链表，性能稍逊于 <code>HashSet</code>。</li>
+</ul>
+<p>==TreeSet==</p>
+<ul>
+<li>数据结构：==基于红黑树==（自平衡的二叉搜索树）</li>
+<li>保持元素的自然顺序（或使用提供的比较器进行排序）。</li>
+<li>不允许存储 <code>null</code> 元素（因为无法与其他元素进行比较）。</li>
+<li>基本操作（添加、删除、包含）的时间复杂度为 O(log n)。</li>
+</ul>
+<h2 id="2-list">2. List
+</h2><h1 id="54-类加载">54. 类加载
+</h1><p><strong>安全性</strong>：通过双亲委派模型，核心类库（如 <code>java.lang.String</code>）不会被自定义类加载器篡改。即使应用程序中定义了一个类名为 <code>java.lang.String</code> 的类，类加载器也不会加载它，而是优先加载核心类库的 <code>String</code> 类。</p>
+<p><strong>避免重复加载</strong>：同一个类在 JVM 中只会被加载一次，双亲委派模型可以==防止类的重复加载==。</p>
+<h2 id="0-层级">0. 层级
+</h2><p><strong>Bootstrap ClassLoader</strong>（==启动类加载器==）：==负责加载 Java 核心类库==，如 <code>rt.jar</code>。这是 ==JVM 自带的类加载器==，用 C/C++ 编写，==无法直接获取引用==。</p>
+<p><strong>Extension ClassLoader</strong>（==扩展类加载器==）：负责加载扩展类库 <code>ext</code> 目录下的类。</p>
+<p><strong>Application ClassLoader</strong>（==应用类加载器==）：负责加载应用程序的类路径下的类，通常是我们开发者编写的 Java 类。</p>
+<p>其他类加载器</p>
+<p><strong>Web ClassLoader / Servlet ClassLoader</strong>：  Web 应用中，应用服务器（如 Tomcat）会==使用特定的类加载器来加载 Web 应用的类。每个 Web 应用都有自己的类加载器==，用于加载 <code>WEB-INF/lib</code> 和 <code>WEB-INF/classes</code> 下的类 , ==隔离不同应用之间的类加载，避免类冲突==</p>
+<p><strong>Thread Context ClassLoader</strong>（线程上下文类加载器）==可以破坏双亲委派==：</p>
+<ul>
+<li><strong>作用</strong>：==允许线程使用自定义类加载器==，通常用于实现与应用服务器、框架集成的场景。可以通过 <code>Thread.currentThread().getContextClassLoader()</code> 设置和获取当前线程的上下文类加载器。</li>
+<li><strong>使用场景</strong>：==常用于 Java EE 服务器中的线程池或多线程应用==，以便不同线程使用不同的类加载器加载类。</li>
+</ul>
+<p>==可以通过继承ClassLoder 这个类来自定义类加载器, 重写方法可以实现打破双亲委派==,  打破双亲委派就是 类加载器可以加载不属于当前作用范围的类</p>
+<h2 id="1-双亲委派">1. 双亲委派
+</h2><p><strong>双亲委派模型</strong>（Parent Delegation Model）是 ==Java 类加载机制中的一种设计模式==</p>
+<p>其核心思想是：==一个类加载器在加载一个类时，首先将这个任务委派给它的父类加载器，如果父类加载器无法完成这个加载任务，再由当前加载器来尝试加载。==</p>
+<p><strong>检查缓存</strong>：JVM 首先会检查类是否已经被加载（通常通过缓存）。</p>
+<p><strong>委派父类加载器</strong>：==如果缓存中没有找到该类，当前类加载器不会立即尝试自己加载，而是先委托父类加载器去加载==。</p>
+<p><strong>逐级向上委派</strong>：==每个类加载器都会向它的父类加载器委派==，直到最顶层的根类加载器（Bootstrap ClassLoader）。如果父类加载器能够成功加载类，就返回这个类。</p>
+<p><strong>当前类加载器加载</strong>：如果父类加载器无法加载这个类（即类不在父类加载器的加载范围内），则由当前类加载器尝试加载该类。</p>
+<p><strong>报错</strong>：如果当前类加载器也无法加载，==抛出 <code>ClassNotFoundException</code> 异常==。</p>
+<h2 id="2-tomcat-是怎么打破双亲委派的">2. Tomcat 是怎么打破双亲委派的
+</h2><p>==Tomcat 通过自定义的类加载器打破了传统的双亲委派模型==，以解决 Web 应用的==类隔离、类冲突、热部署等问题==。这种设计使得 Web 应用的类加载更加灵活，同时能够满足多个 Web 应用同时运行且互不干扰的需求。</p>
+<p>Tomcat 的类加载器体系如下：</p>
+<ol>
+<li><strong>Bootstrap ClassLoader</strong>：加载 JRE 核心类。</li>
+<li><strong>System ClassLoader</strong>：==加载 <code>lib/</code> 目录下的核心库（如 Servlet API）==。</li>
+<li><strong>WebApp ClassLoader</strong>：==每个 Web 应用都有自己独立的类加载器==，负责加载应用的 <code>WEB-INF/classes</code> 和 <code>WEB-INF/lib</code> 下的类。</li>
+</ol>
+<p><strong>Tomcat 打破双亲委派的原因</strong></p>
+<ol>
+<li>
+<p><strong>类隔离</strong>：</p>
+<ul>
+<li>在 Web 服务器中，每个应用都需要各自独立的类加载空间，防止不同应用之间的类发生冲突。例如，两个不同的 Web 应用可能依赖不同版本的相同库，Tomcat 通过自定义类加载器，确保每个 Web 应用有自己独立的类加载空间，避免应用 A 加载到应用 B 的类。</li>
+</ul>
+</li>
+<li>
+<p><strong>热部署和类重新加载</strong>：</p>
+<ul>
+<li>Web 应用通常需要支持热部署，即在运行时重新加载类或更新应用。==这意味着某些类在运行过程中需要被卸载并重新加载。Tomcat 通过自定义类加载器，使得某些类可以被动态地重新加载，而不必依赖 JVM 的默认加载机制==。</li>
+</ul>
+</li>
+<li>
+<p><strong>Servlet API 与 Web 应用类的冲突避免</strong>：</p>
+<p>Tomcat 的类加载机制需要区分两种类：</p>
+<ol>
+<li><strong>服务器级别的类</strong>：如 Servlet API 等，由 Tomcat 的类加载器（通常是父类加载器）加载。</li>
+<li><strong>应用级别的类</strong>：包括 Web 应用的类和第三方依赖库。这些类应由 Web 应用自己的类加载器加载，不能与服务器类产生冲突。</li>
+</ol>
+</li>
+</ol>
+<p><strong>具体实现</strong></p>
+<pre><code>在 Tomcat 中，==**WebAppClassLoader** 是自定义的类加载器，它会首先尝试加载 Web 应用自身的类，而不是直接委托父类加载器（如 Application ClassLoader 或 Extension ClassLoader）==。这种方式允许 Web 应用自定义实现某些核心类库，甚至覆盖父类加载器加载的某些类。 
+</code></pre>
+<h1 id="55--spring-bootspring-mvc-和-spring">55.  Spring Boot、Spring MVC 和 Spring
+</h1><ol>
+<li><strong>Spring Framework（Spring）</strong>：
+<ul>
+<li>是一个开源的Java平台，用于==简化企业级应用程序的开发==。它提供了一系列的功能，比如依赖注入（DI）、面向切面编程（AOP）、数据访问、消息传递、测试支持等。</li>
+<li>Spring框架的==核心是控制反转（IoC）容器，它负责管理对象的创建、生命周期、配置和其他对象之间的依赖关系==。</li>
+<li>它是一个全面的企业级服务框架，==提供了广泛的功能，但不包括Web框架的功能==。</li>
+</ul>
+</li>
+<li><strong>Spring MVC</strong>：
+<ul>
+<li>是Spring框架的一个模块，==专门用于构建Web应用程序==。</li>
+<li>它实现了MVC（Model-View-Controller）设计模式，帮助开发者将应用程序分为模型（Model）、视图（View）和控制器（Controller）三个部分，以实现关注点分离。</li>
+<li>Spring MVC==提供了一个灵活的、易于使用的Web框架，支持RESTful Web服务==，并集成了Spring的其他模块，如数据访问、安全性等。</li>
+</ul>
+</li>
+<li><strong>Spring Boot</strong>：
+<ul>
+<li>是基于Spring框架的一个项目，旨在==简化Spring应用程序的创建和部署==。</li>
+<li>它通过提供一系列的“Starters”（启动器），自动配置Spring和第三方库，使得开发者可以快速启动和运行Spring应用程序。</li>
+<li>==Spring Boot消除了传统Spring应用程序中繁琐的配置工作，支持自动配置、嵌入式服务器（如Tomcat、Jetty等）、独立运行等特性==。</li>
+<li>它非常适合微服务架构，因为它可以快速启动和部署，并且易于与其他微服务集成。</li>
+</ul>
+</li>
+</ol>
+<h1 id="56-cpu-使用率高">56. CPU 使用率高
+</h1><ol>
+<li>
+<p>有没有频繁的上下问切换, 上下文切换做了两件事, 需要执行CPU内核相关指令, 实现状态的保存和恢复, ==例如文件IO, 网络IO, 锁等待==</p>
+<ul>
+<li>保存,运行中的线程中的执行状态</li>
+<li>恢复,让处于等待的线程执行</li>
+</ul>
+</li>
+<li>
+<p>程序中创建了大量的线程, 或者有线程一直占用CPU 资源 , 比如说死循环</p>
+</li>
+<li>
+<p>top 命令查看 java 进程占用CPU 的情况</p>
+</li>
+<li>
+<p>jstack 导出进程栈, ==看是否有不恰当的锁使用,有没有频繁的锁资源的争抢, 有频繁的IO 操作, 密集的CPU运算, 或者是频繁的触发full GC,大量日志写入==</p>
+</li>
+</ol>
+<h1 id="57-mybatis-中的--和--的区别">57. mybatis 中的 #{} 和 ${} 的区别
+</h1><p>都是用来传递参数的, # 号不会造成sql 注入, $ 符号 将传递的参数值直接替换到SQL语句中，不会进行预处理, 不适用于预处理的场景使用 如, ==动态表名, 列名==</p>
+<pre><code class="language-xml">&lt;!-- 使用预处理参数 --&gt;
+&lt;select id=&quot;selectUsers&quot; resultType=&quot;User&quot;&gt;
+  SELECT * FROM users WHERE id = #{id}
+&lt;/select&gt;
+
+&lt;!-- 使用字符串替换参数 --&gt;
+&lt;select id=&quot;selectUsersByTableName&quot; resultType=&quot;User&quot;&gt;
+  SELECT * FROM ${tableName} WHERE id = #{id}
+&lt;/select&gt;
+
+</code></pre>
+<h1 id="58-mybatis-如何进行分页">58. mybatis 如何进行分页
+</h1><p>三种方式</p>
+<ol>
+<li>
+<p>物理分页: select 语句里面加上 页码和每页条数的参数</p>
+</li>
+<li>
+<p>逻辑分页: mybatis 提供了 RowBounds 对象, 实现了内存级别的分页,  不依赖于数据库层的分页功能，而是通过 MyBatis 在内存中对结果集进行截取，从而实现分页</p>
+</li>
+<li>
+<p>基于mybatis interceptor 拦截器, 对select 语句进行动态的分页关键字的拼接</p>
+</li>
+</ol>
+<h1 id="59-mysql索引结构为什么使用b树">59. Mysql索引结构为什么使用B+树
+</h1><p>从三个方面看</p>
+<ul>
+<li>了解二叉树, AVL树, B树的概念</li>
+<li>B树和B+树的应用场景</li>
+<li>为什么使用B树或者B+树来做索引结构</li>
+</ul>
+<p>二叉树</p>
+<p><img src="/p/interview/images/image-20241204145559187.png"
+	width="430"
+	height="244"
+	
+	loading="lazy"
+	
+		alt="image-20241204145559187"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="176"
+		data-flex-basis="422px"
+	
+></p>
+<p>左右两个子树的高度值不能超过1, 所以引入了左旋和右旋的机制</p>
+<p><img src="/p/interview/images/image-20241204145622224.png"
+	width="438"
+	height="220"
+	
+	loading="lazy"
+	
+		alt="image-20241204145622224"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="199"
+		data-flex-basis="477px"
+	
+></p>
+<p>B树-多路平衡查找树, ==可以有多个子树, 子树的数量取决于关键字的数量==, 可以拥有的子树的数量等于关键字的数量加上1</p>
+<p><img src="/p/interview/images/image-20241204145738154.png"
+	width="382"
+	height="255"
+	
+	loading="lazy"
+	
+		alt="image-20241204145738154"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="149"
+		data-flex-basis="359px"
+	
+></p>
+<p>B树存储结构<img src="/p/interview/images/image-20241204150712662.png"
+	width="1157"
+	height="392"
+	
+	loading="lazy"
+	
+		alt="image-20241204150712662"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="295"
+		data-flex-basis="708px"
+	
+></p>
+<p>B+树存储结构</p>
+<ol>
+<li>树节点只存储关键字, 所有数据存储在叶子节点</li>
+<li><strong>并且叶子节点的所有数据使用的是双向链表来关联 Innodb</strong></li>
+</ol>
+<p><img src="/p/interview/images/image-20241204150847577.png"
+	width="1001"
+	height="384"
+	
+	loading="lazy"
+	
+		alt="image-20241204150847577"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="260"
+		data-flex-basis="625px"
+	
+></p>
+<p><img src="/p/interview/images/image-20241204151207028.png"
+	width="1003"
+	height="323"
+	
+	loading="lazy"
+	
+		alt="image-20241204151207028"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="310"
+		data-flex-basis="745px"
+	
+></p>
+<p>==树的高度决定了磁盘IO的次数, 磁盘IO次数越少, 对于性能的提升就越大==</p>
+<ul>
+<li><strong>存储数据量维度</strong>：==B树的数据存储在每个节点上, B + 树内节点仅<strong>存索引关键字与指针</strong>，<strong>叶节点存完整数据记录或指向记录的指针</strong>==，相同磁盘页空间可容纳更多索引项，<strong>树的阶数更高，索引层次减少</strong>，在海量数据存储场景下能高效管理并快速定位数据，像大型电商商品数据表，可轻松应对海量商品信息索引构建与查询需求。</li>
+<li><strong>范围查询效能</strong>：**B + 树叶节点以链表形式有序连接，范围查询时，从起始点顺链表依次读取即可，无需回溯上层节点，**磁盘 I/O 次数稳定可预测，相比之下，B 树范围查询可能多次回溯上层节点，I/O 操作繁杂，B + 树大幅提升范围查询效率，适用于查询日期区间内订单记录等场景，保障数据有序读取与快速检索。</li>
+<li><strong>数据检索速度</strong>：<strong>B + 树数据存于叶节点，查询路径固定从根至叶，检索时依索引键快速定位叶节点获取数据，缓存命中率因路径稳定而提升，数据读取高效</strong>。B 树内节点存数据，检索可能中途获取数据，访问路径多变，<strong>缓存利用欠佳</strong>，B + 树在频繁数据检索场景，如高频用户信息查询系统中，优势尽显，加快数据读取响应。</li>
+<li><strong>全局扫描表现</strong>：<strong>B + 树叶节点链表有序，全表扫描顺链表遍历即可，高效且有序</strong>。B 树无此链表结构，<strong>扫描需按层次遍历</strong>，节点访问无序易致磁盘频繁寻道，I/O 负担重。在执行统计全库数据量、计算平均值等操作时，B + 树可快速完成，降低系统资源消耗，提升整体运算效率。</li>
+<li><strong>避免叶子节点分裂优势</strong>：数据插入更新时，B + 树叶节点以页为单位管理，满时分裂以页为单位分配调整，保持叶节点数据紧凑有序。<strong>B 树节点分裂按关键字平衡原则，易引发连锁反应，致树结构频繁调整与磁盘 I/O 波动</strong>，B + 树分裂策略简单高效，维护索引结构稳定，减少索引维护成本，保障数据库持续稳定运行与高效性能发挥，在高并发数据更新场景中优势显著。</li>
+</ul>
+<p>总结</p>
+<ol>
+<li>减少磁盘IO,  同层高存储更多索引数据</li>
+<li>范围查询比较高效</li>
+<li>全表扫描, 叶子节点存储所有的数据, 只需要扫描叶子节点</li>
+<li>自增方面看, 用自增的整型数字作为主键的话, B树会造成叶子节点分裂</li>
+</ol>
+<h1 id="60-mysql-事务实现原理">60. Mysql 事务实现原理
+</h1><p>MySQL 中的事务遵循 ACID 属性，这保证了事务的可靠性和一致性：</p>
+<ul>
+<li><strong>原子性（Atomicity）</strong>：事务中的所有操作要么全部完成，要么全部不执行。使用<strong>日志管理机制</strong>（如二进制日志和事务日志）来确保原子性。</li>
+<li><strong>一致性（Consistency）</strong>：事务必须使数据库从一个一致性状态转换到另一个一致性状态。==数据的完整性没有被破坏==。</li>
+<li><strong>隔离性（Isolation）</strong>：<strong>多个事务并发执行</strong>时，彼此之间的操作不会相互干扰。<strong>MySQL 支持多种隔离级别</strong>来控制事务之间的可见性。</li>
+<li><strong>持久性（Durability）</strong>：一旦事务提交，其结果是永久性的，即使系统崩溃也能保留事务的结果。使用持久化机制（如将数据写入磁盘）来确保持久性。</li>
+</ul>
+<p>==存储引擎==</p>
+<p>MySQL 支持多种存储引擎（如 InnoDB、MyISAM 等），不同存储引擎的事务实现机制不同。InnoDB 引擎是支持事务的主要引擎，采用以下机制实现事务：</p>
+<p>==锁机制==</p>
+<ul>
+<li><strong>行级锁</strong>：InnoDB 通过使用<strong>行级锁来允许多用户并发访问同一数据，降低了锁竞争</strong>，提高了并发性能。</li>
+<li><strong>间隙锁</strong>：用于<strong>防止幻读问题，锁定某些范围内的记录</strong>。</li>
+<li><strong>意向锁</strong>：帮助管理行级锁的过程，避免死锁。</li>
+</ul>
+<p>==日志机制==</p>
+<ul>
+<li>
+<p><strong>重做日志（Redo Log）</strong>：用于保证事务持久性。在事务提交时，InnoDB 会将变更写入<code>Redo Log</code>，以便在系统崩溃后恢复数据。</p>
+</li>
+<li>
+<p><strong>回滚日志（Undo Log）</strong>：实现<strong>事务的原子性和隔离性</strong>。它记录了<strong>事务修改数据的历史</strong>，可以使用这些日志进行数据的回滚。</p>
+</li>
+</ul>
+<p>==多版本并发控制（MVCC）==</p>
+<p>MVCC 是一种常用的并发控制机制 ==MVCC 允许多个事务同时读取和修改数据而不会互相干扰==，从而提高数据库系统的并发性能和响应速度 ，<strong>避免了读锁和写锁的竞争</strong>。每次修改记录时，<strong>创建一个新的版本</strong>，<strong>读取操作可以读取旧版本，而不必等待写操作完成。InnoDB 通过时间戳来标识事务，支持实现高效的并发访问。</strong></p>
+<p>在执行过程中，事务可能处于以下状态之一：</p>
+<ul>
+<li><strong>活跃（Active）</strong>：事务正在执行。</li>
+<li><strong>部分提交（Partially Committed）</strong>：事务可能已经执行了一部分，但还未完全提交。</li>
+<li><strong>失败（Failed）</strong>：事务因错误而失败，需要回滚。</li>
+<li><strong>已提交（Committed）</strong>：事务已成功提交，数据已持久化。</li>
+<li><strong>已回滚（Rolled Back）</strong>：事务已失败，所有更改被撤消。</li>
+</ul>
+<p>MySQL 通过结合 ACID 属性、存储引擎的功能、锁机制、日志机制和 MVCC 等技术来实现事务管理。通过这些机制，MySQL 能够确保在多用户并发环境中数据的完整性和一致性，同时提供高效的性能。</p>
+<h1 id="61-mysql-事务隔离级别">61. Mysql 事务隔离级别
+</h1><p>定义了多个事务之间的可见性，主要用于控制事务之间的数据访问和并发性。</p>
+<ol>
+<li><strong>READ UNCOMMITTED（未提交读）</strong>：
+<ul>
+<li>在此级别下，一个事务可以读取另一个未提交事务的数据。</li>
+<li>存在 “脏读” 的风险，即读取到的数据可能在后续被回滚。</li>
+<li>适合对数据一致性要求不高的场景，但通常不推荐使用。</li>
+</ul>
+</li>
+<li><strong>READ COMMITTED（已提交读）</strong>：
+<ul>
+<li>事务只能读取已提交事务的数据。</li>
+<li>避免了脏读的发生，<strong>但仍然可能出现 “不可重复读” 问题，即在同一事务中多次读取同一数据时，结果可能不同。</strong></li>
+<li>一般在许多应用中被广泛使用，因为它在平衡一致性和并发性方面提供了较好的选择。</li>
+</ul>
+</li>
+<li><strong>REPEATABLE READ（可重复读）</strong>：
+<ul>
+<li>在该级别下，<strong>同一事务内多次读取同一数据所得到的结果是一致的，即不会发生不可重复读</strong>。</li>
+<li>此级别是 MySQL 的默认隔离级别。</li>
+<li>可能仍然会发生 “幻读” 现象，即在同一事务中，查询的结果集在<strong>两次查询之间可能会增加或减少新行</strong>。</li>
+</ul>
+</li>
+<li><strong>SERIALIZABLE（可串行化）</strong>：
+<ul>
+<li>这是最高的事务隔离级别，所有的事务按顺序执行，完全避免了幻读、不可重复读和脏读。</li>
+<li>由于强大的数据一致性保障，这一级别会显著降低并发性能，可能导致较高的锁争用和事务阻塞。</li>
+<li>适用于对数据一致性要求极高的场景，但通常会影响系统的吞吐量。</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><strong>READ UNCOMMITTED</strong>: 最低隔离级别，允许脏读。</li>
+<li><strong>READ COMMITTED</strong>: 避免脏读，可能出现不可重复读。</li>
+<li><strong>REPEATABLE READ</strong>: 避免不可重复读，可能出现幻读（MySQL 默认）。</li>
+<li><strong>SERIALIZABLE</strong>: 最高隔离级别，避免所有读数据冲突，但性能最差。</li>
+</ul>
+<h1 id="62-mvcc">62. MVCC
+</h1><pre><code> MVCC 通过为**每个数据行创建多个版本来实现并发控制**。每个事务在**读取数据时可以看到事务开始时的数据状态，而不是当前的数据状态**。这种方式可以避免读操作与写操作之间的相互阻塞。 
+</code></pre>
+<p><strong>每次修改都会创建新的版本</strong>：每次执行 <code>INSERT</code>、<code>UPDATE</code> 或 <code>DELETE</code> 操作时，InnoDB 会创建一个新的版本，并通过事务 ID 来管理版本的可见性。</p>
+<p><strong>数据行有多个版本</strong>：每个版本包含自己的事务 ID（创建时间戳），以及在删除的情况下，记录删除的事务 ID（删除时间戳）。这些时间戳用于判断事务是否能看到该版本的记录。</p>
+<p><strong>MVCC 通过时间戳控制可见性</strong>：</p>
+<p>==在数据库中维护多个版本的数据行，确保高并发环境下的事务隔离性，同时提高并发性能==</p>
+<p>==版本管理==</p>
+<p>在 MVCC 中，<strong>每条记录都包含与其版本相关的两个时间戳</strong>：</p>
+<ul>
+<li><strong>创建时间戳</strong>：表示事务创建时的时间戳，用于标识记录何时被创建。</li>
+<li><strong>删除时间戳</strong>：表示事务删除记录时的时间戳，用于标识记录何时被逻辑删除。</li>
+</ul>
+<p>==垃圾回收==</p>
+<p>随着事务的执行和数据版本的增加，旧版本的数据会占用越来越多的存储空间。因此，MVCC 需要定期进行垃圾回收，以清理那些不再被任何活动事务引用的旧版本。</p>
+<h2 id="1-读取数据的机制">1. 读取数据的机制
+</h2><ol>
+<li><strong>读取快照</strong>：当事务开始时，MVCC 会为其创建一个数据快照，保存数据行的版本信息。<strong>事务在执行查询时，总是读取快照中的数据版本，而非正在更新的版本</strong>。</li>
+<li><strong>可见性判断</strong>：在执行读取操作时，<strong>MVCC 会根据事务的时间戳判断哪个版本的记录是可见的</strong>：
+<ul>
+<li>==只有创建时间戳小于或等于当前事务时间戳，且删除时间戳大于当前事务的记录，才会对当前事务可见==。</li>
+</ul>
+</li>
+</ol>
+<h2 id="2-写入数据的机制">2. 写入数据的机制
+</h2><ul>
+<li>当事务修改数据时，它<strong>不会立即覆盖原有数据，而是创建一个新的版本</strong>。旧版本的数据仍然保留，直到没有事务再访问它。从而<strong>实现数据的修改而不影响正在读取这些数据的其他事务</strong>。</li>
+</ul>
+<h1 id="63-行锁-临键锁-间隙锁">63. 行锁, 临键锁, 间隙锁
+</h1><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>锁类型</th>
+          <th>锁定范围</th>
+          <th>用途</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>行锁</td>
+          <td>单行记录</td>
+          <td>防止特定行被修改或者写入冲突</td>
+      </tr>
+      <tr>
+          <td>临键锁</td>
+          <td>行记录+相邻间隙</td>
+          <td>防止幻读和插入</td>
+      </tr>
+      <tr>
+          <td>间隙锁</td>
+          <td>数据间的区间(不含具体行)</td>
+          <td>仅防止插入</td>
+      </tr>
+  </tbody>
+</table></div>
+<h2 id="1-行锁-记录锁">1. 行锁 (记录锁)
+</h2><p><code>UPDATE</code>、<code>DELETE</code>或<code>SELECT ... FOR UPDATE</code>的操作</p>
+<pre><code>行锁是一种粒度较小的锁，仅锁定数据库中的某一行记录，从而允许多个事务同时访问表中的不同记录。这种锁粒度小，可以实现高并发的事务处理。
+</code></pre>
+<ul>
+<li><strong>并发性高</strong>：相比于表锁，行锁允许更多的事务并发执行，适合高并发访问的场景。</li>
+<li><strong>锁定具体行</strong>：只有被修改的数据行会被锁定，其它行仍然可以被访问。</li>
+<li><strong>可重复读</strong>：通过行锁机制，可以防止<strong>不可重复读和幻读</strong>现象的发生。</li>
+</ul>
+<h2 id="2-临键锁">2. 临键锁
+</h2><p><strong>它结合了行锁和间隙锁</strong></p>
+<p>临键锁是 InnoDB 的一种组合锁，它==<strong>既锁定了符合条件的记录（行锁），也锁定了该记录的前一个位置</strong>==。这种锁机制通常用于避免幻读的发生。</p>
+<ul>
+<li><strong>范围锁定</strong>：在添加或修改记录时，临键锁会锁定一个范围，包括目标行以及该行的上一个间隙，从而<strong>避免其他事务在这个范围内插入新记录</strong>。</li>
+<li><strong>用于范围查询</strong>：当进行范围查询时，可以防止其他事务插入新的符合查询条件的行，从而避免幻读。</li>
+</ul>
+<p>==用于<code>REPEATABLE READ</code>隔离级别下的范围查询（如<code>SELECT ... WHERE</code>==</p>
+<p><strong>场景</strong>： 当查询范围为<code>id BETWEEN 10 AND 20</code>时，数据库会锁住符合条件的行以及这些行之间的间隙，防止其他事务插入新行（比如<code>id=15</code>）</p>
+<h2 id="3-间隙锁">3. 间隙锁
+</h2><p>间隙锁是一种<strong>锁定在某一记录之间的空间</strong>，而不是锁定具体记录。<strong>它用于锁定 “间隙”，防止其他事务在此间隙中插入新记录，从而避免幻读现象</strong>。</p>
+<p>==特点==</p>
+<ul>
+<li><strong>锁定间隙</strong>：在不同记录之间的空隙处添加锁，阻止其他事务在这个空间内插入新数据。</li>
+<li><strong>适用于防止幻读</strong>：当应用了范围查询时，可以有效防止插入幻读的发生。</li>
+<li><strong>不能直接访问</strong>：间隙锁不会锁定具体的行，而是锁定行之间的空间。</li>
+</ul>
+<h1 id="64-mysql索引失效的情况">64. Mysql索引失效的情况
+</h1><ul>
+<li><strong>使用了不支持索引的表达式</strong>（如计算字段）</li>
+<li><strong>不适当的 <code>LIKE</code> 操作</strong></li>
+<li><strong><code>OR</code> 条件的使用</strong></li>
+<li><strong>数据类型不匹配</strong></li>
+<li><strong>使用了 <code>NULL</code> 值</strong>进行比较</li>
+<li><strong>函数或操作导致索引失效</strong></li>
+<li><strong>缺乏合适的索引覆盖</strong>。</li>
+</ul>
+<ol>
+<li>
+<p><strong>在索引列上做运算, 比如说加函数</strong>, Mysql 在生成执行计划的时候会根据统计信息判断, 是否要去使用索引的, 加了函数运算, 导致mysql 无法识别索引列, 不过从8.0开始Mysql 加了函数索引来解决这个问题</p>
+</li>
+<li>
+<p>在一个多列构成的组合索引里面, 需要按照<strong>最左匹配原则</strong>,</p>
+<ol>
+<li>最左匹配原则的定义
+<ul>
+<li>最左匹配原则是 MySQL 在使用联合索引（即由多个列组成的索引）时遵循的一个重要原则。==它指的是在查询条件中使用联合索引时，索引的匹配是从最左边的列开始的，并且要按照索引列的顺序依次进行匹配==。只有当查询条件中使用了联合索引最左边的列，索引才会被部分使用；如果从最左边开始连续的列都在查询条件中使用，那么索引可以被更充分地利用。</li>
+</ul>
+</li>
+<li>联合索引的存储结构基础
+<ul>
+<li>联合索引在 MySQL 的存储引擎（如 InnoDB）中是<strong>按照索引列的顺序构建 B + 树的</strong>。<strong>以一个包含列 A、B、C 的联合索引为例，在 B + 树的叶子节点中，数据是按照 A、B、C 列的值进行排序存储的</strong>。最左列 A 的值首先被用来构建索引树的第一层排序，对于 A 列值相同的记录，再根据 B 列的值进行排序，以此类推。</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>
+<p><strong>索引列存在隐式转换</strong>, 索引列是字符串类型, 但是sql 查询的时候没有使用引号, mysql 就会去做自动类型转换, 导致索引失效, 常见的隐式转换</p>
+<ol>
+<li>数值与字符串</li>
+<li>字符串和日期</li>
+<li>数字和布尔值</li>
+</ol>
+</li>
+<li>
+<p>在<strong>索引列使用不等于号, 或者 not</strong></p>
+</li>
+<li>
+<p>like 操作 使用左通配符</p>
+</li>
+<li>
+<p>or  当 <code>OR</code> 的左右两边的条件没有共同的索引时。</p>
+</li>
+</ol>
+<h2 id="1-聚簇索引clustered-index"><strong>1. 聚簇索引（Clustered Index）</strong>
+</h2><p><strong>定义</strong>：</p>
+<p>聚簇索引是将表的数据行与索引行按照相同的顺序存储在一起的一种索引方式。一个表只能有一个聚簇索引，因为表的数据行只能按照一种顺序存储。</p>
+<p><strong>特点</strong>：</p>
+<ol>
+<li><strong>索引和数据存储在一起</strong>：
+<ul>
+<li>聚簇索引的叶子节点存储的是数据本身。</li>
+<li>索引值与数据行的物理存储顺序一致。</li>
+</ul>
+</li>
+<li><strong>主键默认作为聚簇索引</strong>：
+<ul>
+<li>如果表定义了主键，MySQL（InnoDB 存储引擎）会默认将主键作为聚簇索引。</li>
+<li>如果没有主键，MySQL 会选择一个唯一非空索引作为聚簇索引。</li>
+<li>如果既没有主键也没有唯一非空索引，MySQL 会生成一个隐藏的聚簇索引。</li>
+</ul>
+</li>
+<li><strong>查询效率高</strong>：
+<ul>
+<li>查询基于主键的范围时性能更高，因为数据已经按照主键的顺序存储。</li>
+</ul>
+</li>
+</ol>
+<p><strong>优点</strong>：</p>
+<ul>
+<li>查询主键或主键范围时速度很快。</li>
+<li>数据存储与索引顺序一致，减少了磁盘 I/O。</li>
+</ul>
+<p><strong>缺点</strong>：</p>
+<ul>
+<li>插入速度可能较慢，尤其是主键非连续的情况下（需要重新排列存储位置）。</li>
+<li>需要更新数据时，可能涉及更多的磁盘操作。</li>
+<li>聚簇索引可能导致数据存储碎片。</li>
+</ul>
+<h2 id="2-非聚簇索引non-clustered-index"><strong>2. 非聚簇索引（Non-Clustered Index）</strong>
+</h2><p><strong>定义</strong>：</p>
+<p>非聚簇索引是指索引结构与数据存储是分离的，索引的叶子节点存储的是数据行的指针（如主键或行号），而不是实际数据。</p>
+<p><strong>特点</strong>：</p>
+<ol>
+<li><strong>索引与数据分离</strong>：
+<ul>
+<li>非聚簇索引的叶子节点包含指向数据行的引用（如主键值或 ROWID）。</li>
+<li>索引结构与表数据分开存储。</li>
+</ul>
+</li>
+<li><strong>可以有多个非聚簇索引</strong>：
+<ul>
+<li>一个表可以有多个非聚簇索引，每个非聚簇索引对应一个独立的索引结构。</li>
+</ul>
+</li>
+<li><strong>查询需要回表</strong>：
+<ul>
+<li>使用非聚簇索引查询时，可能需要通过索引找到对应的主键或行号，然后再回到聚簇索引中查找实际数据，这一过程称为<strong>回表</strong>。</li>
+</ul>
+</li>
+</ol>
+<p><strong>优点</strong>：</p>
+<ul>
+<li>可以为不同的列创建多个非聚簇索引，灵活支持多种查询。</li>
+<li>不受数据行存储顺序的限制。</li>
+</ul>
+<p><strong>缺点</strong>：</p>
+<ul>
+<li>查询非主键列时，可能需要回表操作，导致性能开销增加。</li>
+<li>索引维护开销较高（如插入、删除、更新时需要更新索引结构）。</li>
+</ul>
+<h2 id="3-总结-1">3. 总结
+</h2><p><strong>InnoDB 默认使用聚簇索引</strong>：</p>
+<ul>
+<li>InnoDB 存储引擎默认将主键作为聚簇索引。</li>
+<li>MyISAM 存储引擎不支持聚簇索引，所有索引都是非聚簇索引。</li>
+</ul>
+<p><strong>回表操作</strong>：</p>
+<ul>
+<li>如果查询字段不在非聚簇索引中，需要通过索引的指针回到聚簇索引中查找数据。</li>
+</ul>
+<p><strong>覆盖索引</strong>：</p>
+<ul>
+<li>如果非聚簇索引包含了查询需要的所有列，则可以避免回表操作，提高查询效率。</li>
+</ul>
+<p><strong>索引选择</strong>：</p>
+<ul>
+<li>主键列适合作为聚簇索引。</li>
+<li>对频繁查询但不作为主键的列，可以建立非聚簇索引</li>
+</ul>
+<p><strong>聚簇索引</strong>：数据和索引存储在一起，主键查询效率高，适用于频繁的范围查询和排序。</p>
+<p><strong>非聚簇索引</strong>：数据和索引分离，支持多列查询，但可能需要回表操作。</p>
+<h1 id="65-myisam-和-innodb-引擎的区别">65. MyISAM 和 InnoDB 引擎的区别
+</h1><p>存储引擎</p>
+<ul>
+<li>定义数据的存储方式</li>
+<li>数据读取的实现逻辑</li>
+</ul>
+<p>MyISAM 两个文件</p>
+<ul>
+<li>.MYD 存数据</li>
+<li>.MYI  存索引</li>
+</ul>
+<p>Innodb 只有一个文件 ibd, 包含了索引和数据</p>
+<ol>
+<li>数据存储不同</li>
+<li>事务的支持</li>
+<li>锁的支持</li>
+<li>Innodb 支持外键</li>
+</ol>
+<h1 id="66-md5-值应该用char-还是varchar">66. MD5 值应该用char 还是varchar
+</h1><p>因为MD5 长度是固定的, 32或者16位</p>
+<ol>
+<li>占用空间不同, char 是固定的, varchar 是可变的</li>
+<li>存储效率不同, varchar 每次更新都需要更新存储空间的长度, 效率较低</li>
+</ol>
+<h1 id="67-update-语句用什么锁">67. update 语句用什么锁
+</h1><p>取决于执行的条件where , 事务隔离级别</p>
+<ul>
+<li><strong>行锁情况</strong>：在 InnoDB 存储引擎下，默认事务隔离级别为可重复读（Repeatable Read）时，<code>UPDATE</code>语句通常施加行级锁。当更新操作涉及特定行数据时，仅锁住该行，不同事务可并发更新其他行，减少锁冲突、提升并发性能。
+<ul>
+<li>例如，在员工信息表中，
+<ul>
+<li>事务 T1 更新员工 A 的薪资，</li>
+<li>事务 T2 更新员工 B 的薪资，</li>
+<li>两者可并行，互不干扰。</li>
+<li>此机制利用记录中的隐藏字段及索引实现精准锁定，确保数据一致性与事务隔离性，在高并发的 OLTP（联机事务处理）场景中优势显著，如电商订单处理、金融交易系统等频繁修改少量行数据的应用场景。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>表锁情况</strong>：<strong>若未使用索引或索引失效，InnoDB 可能退化为表锁</strong>。
+<ul>
+<li>如在数据量小且频繁全表更新的表中，使用<code>UPDATE</code>语句<strong>更新大量行数据</strong>（超表行数一定比例），InnoDB 为保证事务一致性与操作简便性，<strong>可能对整个表加锁</strong>，虽牺牲并发性能，但避免复杂锁管理开销。</li>
+<li>MyISAM 存储引擎执行<code>UPDATE</code>语句一般用表锁，因其设计侧重简单高效，适用于读多写少、对并发要求不高的场景，如数据仓库中的历史数据报表生成场景，频繁全表更新时表锁可快速完成操作，减少资源竞争与事务协调成本。</li>
+</ul>
+</li>
+</ul>
+<p>join不要超过三张表</p>
+<ol>
+<li>性能问题</li>
+<li>维护性, 可读性</li>
+</ol>
+<h1 id="68-mysql-性能优化">68. Mysql 性能优化
+</h1><ul>
+<li>
+<p><strong>查询优化</strong>：合理使用索引，避免全表扫描，Explain 优化 SQL 语句, 慢查询优化</p>
+</li>
+<li>
+<p><strong>数据库配置优化</strong>：调整 MySQL 配置参数（如缓存、连接池、日志等）以提升性能。</p>
+<ul>
+<li><strong>InnoDB Buffer Pool</strong>：<code>innodb_buffer_pool_size</code> 是最关键的参数之一，它决定了 InnoDB 缓存的数据页的大小。如果它设置得过小，会导致磁盘 I/O 增加。   ==专用数据库服务器总内存的 70%-80%==</li>
+</ul>
+</li>
+<li>
+<p><strong>硬件优化</strong>：使用 SSD、调整 RAID 配置等提升硬件性能。</p>
+</li>
+<li>
+<p><strong>架构优化</strong>：使用数据库分区、读写分离、分库分表等方法提高数据库扩展性和并发能力。</p>
+</li>
+</ul>
+<h1 id="69-spring-boot-约定大于配置">69. Spring boot 约定大于配置
+</h1><p>繁琐的配置</p>
+<ol>
+<li>管理jar包依赖</li>
+<li>web.xml 文件维护</li>
+<li>Dispatch-Servlet.xml 文件维护</li>
+<li>应用部署到web容器</li>
+<li>第三方组件, Mybatis 集成 需要维护配置文件</li>
+</ol>
+<p>约定大于配置的体现</p>
+<ol>
+<li>spring boot  会自动为你处理常用依赖的版本, 例如引入  <code>spring-boot-starter-web</code> 会依赖 <code>spring-web</code> 和 <code>spring-webmvc</code>，并且这些库的版本会自动和 Spring Boot 的版本兼容。</li>
+<li>Spring boot 自动装配机制, 通过扫描约定路径下的spring.factories 文件, 用来识别配置类, 从而实现Bean的自动装载</li>
+<li>配置文件</li>
+</ol>
+<p>每个 Starter 都是一个<strong>预定义的依赖集合</strong>，<strong>包含了默认的库和配置</strong>：</p>
+<ul>
+<li><code>spring-boot-starter-web</code>：包含了开发 Web 应用所需的常用库和配置，比如 <code>spring-webmvc</code>、<code>Tomcat</code>、<code>Jackson</code> 等，开发者只需添加这个 Starter 就能自动获得这些功能。</li>
+<li><code>spring-boot-starter-data-jpa</code>：为 JPA 项目提供默认的配置，自动配置数据源、实体管理器工厂、事务管理等。</li>
+</ul>
+<h1 id="70-spring-boot-是如何实现自动配置的">70. Spring boot 是如何实现自动配置的
+</h1><p>自动装配: 自动把第三方的bean装载到 Spring IOC 容器里面, 不需要再去写Bean 相关的一些配置</p>
+<p>@SpringBootApplication 里面的 @EnableAutoConfiguration 注解 是实现自动装配的关键</p>
+<p><img src="/p/interview/images/image-20241206164125293.png"
+	width="1361"
+	height="664"
+	
+	loading="lazy"
+	
+		alt="image-20241206164125293"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="204"
+		data-flex-basis="491px"
+	
+></p>
+<p>自动装配的实现主要依靠</p>
+<ol>
+<li>引入starter 启动依赖组件的时候, 这个组件里面必须包含一个 @Configuration 配置类, 配置类里面需要通过 @Bean 注解声明需要装载到 IOC 容器的对象</li>
+<li>这个配置类是在第三方的 jar 包里面, 这个类的全类路径放在 classpath/META-INFO/spring.factories 中, 这样 spring boot 就能知道 第三方jar 包的这个配置类的位置, 这个步骤是通过 SpringFactoriesLoader 来完成的</li>
+<li>Spring boot拿到所有的配置类之后, <strong>通过 @Conditional 注解条件判断之后 再 通过 ImportSelector</strong> 这样一个接口 来实现对这些配置类的动态加载,  ImportSelector 是 Spring 框架中的一个接口,  <strong>AutoConfigurationImportSelector</strong> 是springboot 的继承了该接口的实现类，用于在==配置类中实现动态导入其他配置类的功能==</li>
+</ol>
+<p>==@Enable 注解就是用来帮助我们对这个模块的bean 的自动注入的 思想相关的注解==</p>
+<p>ImportSelector  工作原理</p>
+<ul>
+<li>当在一个带有<code>@Configuration</code>注解的类上使用<code>@Import</code>注解并指定一个实现了<code>ImportSelector</code>接口的类时，Spring 会在容器初始化阶段<strong>调用该接口的<code>selectImports</code>方法</strong>。这个方法返回一个包含要导入的<strong>配置类全限定名的字符串数组</strong>。Spring 会根据这些返回的类名，将对应的配置类加载到容器中。</li>
+</ul>
+<h1 id="71-starter-的作用">71. starter 的作用
+</h1><p><img src="/p/interview/images/image-20241206173018549.png"
+	width="935"
+	height="382"
+	
+	loading="lazy"
+	
+		alt="image-20241206173018549"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="244"
+		data-flex-basis="587px"
+	
+></p>
+<ol>
+<li>
+<p>会把所有需要的jar 包给全部倒入进来, 并且jar 包版本自动管理</p>
+</li>
+<li>
+<p>starter 可以自动装配</p>
+</li>
+<li>
+<p>所有自定义的配置都可以集成到 spring boot, 只需要通过维护 applicatio.yml 文件就可以了</p>
+</li>
+</ol>
+<p><img src="/p/interview/images/image-20241206173400761.png"
+	width="379"
+	height="259"
+	
+	loading="lazy"
+	
+		alt="image-20241206173400761"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="146"
+		data-flex-basis="351px"
+	
+></p>
+<h1 id="72-conditional-注解的作用">72. @Conditional 注解的作用
+</h1><p>条件化装配机制, <strong>允许在特定条件满足时加载或者跳过 Bean的定义与配置</strong></p>
+<p>可以接受一个或者多个实现了 Condition 接口的类, Condition 接口里面</p>
+<pre><code>@FunctionalInterface
+public interface Condition {
+    boolean matches(ConditionContext var1, AnnotatedTypeMetadata var2);
+}
+
+
+</code></pre>
+<p><strong>作用</strong>：基于条件动态配置 Bean，增强应用的灵活性与可扩展性。</p>
+<p><strong>使用场景</strong>：环境适配、属性控制、自动配置等。</p>
+<p><strong>设计理念</strong>：关注点分离，避免硬编码，提升可维护性与可读性。</p>
+<h1 id="73-spring-aop的原理">73. Spring Aop的原理
+</h1><p>动态代理是 运行时动态生成的, 基于Java 反射机制或者字节码操作, ==代理对象是在运行时在 JVM 内存中生成的, 在第一次使用的时候生成的==, 通过文件系统是看不到的</p>
+<ol>
+<li>切面 Aspect, ==业务场景日志拦截,事务管理,权限校验==</li>
+<li>通知 Advice,  ==决定了拦截方法的前后或其他状态，具体增强代码写在哪里由==
+<ol>
+<li>前置通知</li>
+<li>后置通知</li>
+<li>环绕通知</li>
+<li>返回通知</li>
+<li>异常通知</li>
+</ol>
+</li>
+<li>连接点, Joinpoint, ==代码执行过程中可以被切入的点, (<strong>方法调用</strong>),<strong>拦截的是方法的话就是被拦截的方法就是连接点</strong>,包含的内容==
+<ol>
+<li><strong>方法签名</strong>：即方法的包路径、类名和方法名。</li>
+<li><strong>方法参数</strong>：目标方法的参数值。</li>
+<li><strong>目标对象</strong>：被代理的具体实例。</li>
+<li><strong>代理对象</strong>：AOP 生成的代理对象。</li>
+</ol>
+</li>
+<li>切点, PointCut, 定义在连接点上织入通知的表达式</li>
+<li>织入 Weaving , <strong>动态代理</strong>完成</li>
+</ol>
+<pre><code class="language-java">public void getUser() {
+    System.out.println(&quot;Getting user...&quot;);
+}
+
+@Aspect
+@Component
+public class LoggingAspect {
+
+     @Before(&quot;execution(* com.example.service.*.*(..))&quot;)
+    public void logBefore(JoinPoint joinPoint) {
+        System.out.println(&quot;拦截的方法签名：&quot; + joinPoint.getSignature()); // 获取方法签名
+        System.out.println(&quot;目标对象：&quot; + joinPoint.getTarget()); // 获取目标对象
+        System.out.println(&quot;方法参数：&quot; + Arrays.toString(joinPoint.getArgs())); // 获取参数
+    }
+}
+</code></pre>
+<p>是基于动态代理 ( JDK, CGLIB ) 实现的</p>
+<ul>
+<li>
+<p>如果目标对象的实现类实现了接口，Spring AOP 将会采用 JDK 动态代理来生成 AOP 代理类；</p>
+</li>
+<li>
+<p>如果目标对象的实现类没有实现接口，Spring AOP 将会采用 CGLIB 来生成 AOP 代理类——不过这个选择过程对开发者完全透明、开发者也无需关心</p>
+</li>
+</ul>
+<p><img src="/p/interview/images/image-20241207134458649.png"
+	width="1645"
+	height="788"
+	
+	loading="lazy"
+	
+		alt="image-20241207134458649"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="208"
+		data-flex-basis="501px"
+	
+></p>
+<blockquote>
+<p><strong>AspectJ 是专门为 Java 语言设计的 AOP 框架</strong>，它基于 Java 语言进行扩展，提供了强大的面向切面编程（AOP）能力。然而，它的核心原理和运行机制使它能够在一定程度上支持其他与 Java 生态兼容的语言，如 Kotlin 和 Groovy，但这种支持是有限的。</p>
+</blockquote>
+<p>四个步骤</p>
+<ol>
+<li>创建代理对象</li>
+<li>拦截目标对象</li>
+<li>调用代理对象</li>
+<li>调用目标对象</li>
+</ol>
+<ul>
+<li>代理对象: Spring 代理策略生成的对象</li>
+<li>目标对象: 业务代码</li>
+<li>织入代码: 就是代理方法的代码</li>
+<li>切面通知: 封装织入代码片段的回调方法</li>
+<li>MethodInvocation: 负责执行拦截器链, 在processd() 方法中执行</li>
+</ul>
+<h2 id="1-创建代理目标">1. 创建代理目标
+</h2><p>==按需加载==只有当被代理的 Bean 被注入到容器或首次使用时，Spring 才会为其创建代理对象</p>
+<p>在Spring 中创建Bean 实例都是从getBean() 方法开始的 , 在实例创建之后, Spring IOC 容器将会根据AOP 的配置, 去<strong>匹配目标类的类名, 看目标类的类名是否满足切面规则</strong></p>
+<p>调用ProxyFactory 创建代理bean , 并且缓存到IOC 容器中, 根据目标对象会选择不同的代理策略</p>
+<ol>
+<li>代理类实现了接口用jdk代理</li>
+<li>没有实现就用CGlib 代理</li>
+</ol>
+<p>==也可以通过配置, 强制Spring 去使用 CGlib 代理==</p>
+<ol>
+<li><strong>JDK 动态代理</strong>：基于接口的代理，通过 Java 的 <code>Proxy.newProxyInstance</code> 动态生成代理对象。</li>
+<li><strong>CGLIB 动态代理</strong>：基于子类的代理，通过生成目标类的<strong>子类字节码</strong>来实现，运行时生成子类。</li>
+</ol>
+<h2 id="2-拦截目标对象">2. 拦截目标对象
+</h2><p>当用户调用目标对象的某个方法的时候,  将会被 AopProxy 的对象拦截, Spring 将所有的调用策略封装到了该对象</p>
+<p>​	AopProxy 有两种实现</p>
+<ol>
+<li>JdkDynamicAopProxy</li>
+<li>ObjenesisCglibAopProxy</li>
+</ol>
+<p><img src="/p/interview/images/image-20241207145358713.png"
+	width="552"
+	height="578"
+	
+	loading="lazy"
+	
+		alt="image-20241207145358713"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="95"
+		data-flex-basis="229px"
+	
+></p>
+<h2 id="3-调用代理对象阶段">3. 调用代理对象阶段
+</h2><p>Spring Aop 拦截器链中每个元素都会被命名为 MethodInterceptor,  ==其实就是切面中的 Advice 通知==, 被织入的代码片段, 会在这个阶段被执行</p>
+<p><strong>拦截器链的典型结构</strong></p>
+<p>假设有以下增强：</p>
+<ul>
+<li>一个前置通知（<code>@Before</code>）</li>
+<li>一个后置通知（<code>@After</code>）</li>
+<li>一个环绕通知（<code>@Around</code>）</li>
+</ul>
+<p>==调用过程==</p>
+<pre><code>调用代理方法 -&gt;
+  环绕通知（进入前） -&gt;
+    前置通知 -&gt;
+      调用目标方法 -&gt;
+    后置通知 -&gt;
+  环绕通知（退出后） -&gt;
+返回结果
+
+</code></pre>
+<h1 id="74-spring-bean的定义">74. Spring Bean的定义
+</h1><p>三个阶段</p>
+<p><img src="/p/interview/images/image-20241207152206194.png"
+	width="794"
+	height="359"
+	
+	loading="lazy"
+	
+		alt="image-20241207152206194"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="221"
+		data-flex-basis="530px"
+	
+></p>
+<ol>
+<li><strong>class</strong>：指定Bean的实现类。Spring容器会使用这个类来创建Bean实例。</li>
+<li><strong>scope</strong>：定义Bean的作用域。常见的作用域包括单例（singleton）、原型（prototype）、会话（session）等。</li>
+<li><strong>lazy-init</strong>：一个布尔值，用于指定Bean是否应该延迟初始化。如果设置为true，Bean在首次使用时才会被创建。</li>
+<li><strong>depends-on</strong>：指定Bean在创建之前需要先创建的其他Bean。这用于处理Bean之间的依赖关系。</li>
+<li><strong>name 或 id</strong>：Bean的名称或ID，<strong>用于在Spring容器中唯一标识一个Bean,并且不能以大写字母开头的</strong>。</li>
+<li><strong>constructor-arg</strong>：没有无惨构造的话, 此属性是必须的, 用于指定构造函数参数，以便在创建Bean实例时传递给构造函数。</li>
+<li><strong>properties</strong>：用于设置Bean的属性值。这些属性值可以在Bean创建后通过setter方法设置。</li>
+<li><strong>init-method</strong>：指定初始化方法，该方法在Bean创建并设置完所有属性后被调用。</li>
+<li><strong>destroy-method</strong>：指定销毁方法，该方法在Bean即将从Spring容器中移除时被调用，用于执行清理工作。</li>
+</ol>
+<h1 id="75-spring-bean的生命周期">75. Spring Bean的生命周期
+</h1><p><img src="/p/interview/images/image-20241207153726570.png"
+	width="2032"
+	height="980"
+	
+	loading="lazy"
+	
+		alt="image-20241207153726570"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="207"
+		data-flex-basis="497px"
+	
+></p>
+<p><strong>BeanFactory</strong> 是 Spring 框架中的 <strong>核心接口</strong>，它是 <strong>IOC 容器（Inversion of Control，控制反转容器）</strong> 的==基础实现==，负责管理 Bean 的创建、初始化、生命周期和依赖注入等。</p>
+<blockquote>
+<p><code>Aware</code> 接口是一组特定的接口，它们使得 Spring Bean 能够在初始化阶段获得 Spring 容器的某些核心功能。通过这些接口，Spring Bean 可以访问容器的一些关键组件或信息（如 <code>ApplicationContext</code>、<code>BeanFactory</code>、<code>Environment</code> 等）</p>
+<p>假设我们有一个 <code>MyBean</code> 类，它需要访问 <code>ApplicationContext</code>。我们可以实现 <code>ApplicationContextAware</code> 接口来实现这一点</p>
+</blockquote>
+<pre><code class="language-java">@Component
+public class MyBean implements ApplicationContextAware {
+
+    private ApplicationContext applicationContext;
+
+    // 通过实现 ApplicationContextAware 接口，注入 ApplicationContext
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    public void printBeanDefinitionNames() {
+        // 使用获取到的 ApplicationContext 打印 Bean 的定义
+        String[] beanDefinitionNames = applicationContext.getBeanDefinitionNames();
+        System.out.println(&quot;Bean definitions in the context: &quot; + Arrays.toString(beanDefinitionNames));
+    }
+}
+
+</code></pre>
+<p>五个阶段</p>
+<ol>
+<li>创建前</li>
+<li>准备阶段</li>
+<li>创建实例阶段</li>
+<li>依赖注入阶段</li>
+<li>容器缓存阶段</li>
+<li>销毁实例阶段</li>
+</ol>
+<ul>
+<li>BeanFactoryPostProcessor 有什么用? 和 BeanPostProcessor 有什么区别
+<ul>
+<li>BeanFactoryPostProcessor
+<ul>
+<li><code>BeanFactoryPostProcessor</code> 会在 <strong>Bean 实例化之前</strong>执行，它是在 <code>BeanFactory</code> 中的 <code>BeanDefinition</code> 完成加载并且准备创建 Bean 之前执行的。</li>
+<li>它的执行顺序发生在 Spring 容器初始化阶段的早期，目标是修改容器中的 <strong>Bean 定义</strong>，而不是 Bean 的实例</li>
+<li>修改 Bean 的配置，例如修改某个 Bean 的 <code>scope</code>、<code>lazy</code> 属性。</li>
+<li>在容器启动时调整 Bean 定义，以便动态改变容器的行为。</li>
+</ul>
+</li>
+<li>BeanPostProcessor
+<ul>
+<li><code>BeanPostProcessor</code> 会在 <strong>Bean 实例化之后</strong>、<strong>初始化之前</strong>、以及 <strong>初始化之后</strong> 的不同阶段执行。</li>
+<li>为 Bean 添加一些功能（如 AOP 代理、日志记录、性能监控等）。</li>
+<li>修改 Bean 实例的属性、字段等（比如为某个 Bean 动态注入值）</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="/p/interview/images/image-20241207165915891.png"
+	width="1013"
+	height="574"
+	
+	loading="lazy"
+	
+		alt="image-20241207165915891"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="176"
+		data-flex-basis="423px"
+	
+></p>
+<ul>
+<li>dubbo 是怎么通过BeanPostProcessor 对Bean 进行拓展的
+<ul>
+<li>Dubbo 发现一个 <code>@Service</code> 注解标记的 Bean 时，它会通过 <code>BeanPostProcessor</code> 来增强该 Bean，把它暴露为一个 Dubbo 服务。</li>
+<li>Dubbo 发现一个 <code>@Reference</code> 注解标记的 Bean 时，它会通过 <code>BeanPostProcessor</code> 来动态创建该 Bean 的代理，代理后的 Bean 将会负责与 Dubbo 服务端进行远程调用。</li>
+</ul>
+</li>
+</ul>
+<h2 id="1-加载配置文件或注解"><strong>1. 加载配置文件或注解</strong>
+</h2><ul>
+<li><strong>过程</strong>：Spring 通过 <code>BeanDefinitionReader</code> 解析配置文件（如 XML）或注解（如 <code>@Configuration</code>、<code>@Component</code>）。</li>
+<li><strong>作用</strong>：将每个 Bean 的定义（<code>BeanDefinition</code>）加载到容器中。</li>
+<li><strong>图中位置</strong>：左侧的 <code>BeanDefinition Reader</code> 模块，解析了 XML 和注解，形成 <code>BeanDefinition</code>。</li>
+</ul>
+<hr>
+<h2 id="2-beandefinition-处理"><strong>2. BeanDefinition 处理</strong>
+</h2><ul>
+<li>过程: Spring 使用 <code>BeanFactoryPostProcessor</code>对 BeanDefinition进行修改或扩展。
+<ul>
+<li>==比如修改 Bean 的属性值，或注册新的 Bean==。</li>
+</ul>
+</li>
+<li><strong>作用</strong>：在 Bean 实例化之前进行全局的配置调整。</li>
+<li><strong>图中位置</strong>：<code>BeanFactoryPostProcessor</code> 模块，用于处理 <code>BeanDefinition</code> 的相关信息。</li>
+</ul>
+<hr>
+<h2 id="3-bean-实例化"><strong>3. Bean 实例化</strong>
+</h2><ul>
+<li><strong>过程</strong>：Spring 容器通过反射，根据 <code>BeanDefinition</code> 创建 Bean 的原始实例（未进行属性填充）。</li>
+<li><strong>作用</strong>：将 Bean 加载到内存中，分配内存空间。</li>
+<li><strong>图中位置</strong>：右侧的 “实例化” 流程。</li>
+</ul>
+<hr>
+<h2 id="4-属性填充"><strong>4. 属性填充</strong>
+</h2><ul>
+<li>
+<p>过程: Spring 使用依赖注入（DI），将 Bean 所需的依赖注入到对象中。</p>
+<p>​	包括通过==构造方法、Setter 方法或字段注入依赖==。</p>
+</li>
+<li>
+<p><strong>作用</strong>：完成 Bean 的依赖配置，确保它可以正常工作。</p>
+</li>
+<li>
+<p><strong>图中位置</strong>：初始化阶段中的 “填充属性”。</p>
+</li>
+</ul>
+<hr>
+<h2 id="5-设置-aware-接口属性"><strong>5. 设置 Aware 接口属性</strong>
+</h2><ul>
+<li><strong>过程</strong>：如果 Bean 实现了某些特殊接口（如 <code>BeanNameAware</code>、<code>ApplicationContextAware</code>），Spring 会调用这些方法，==传递容器相关的上下文信息==22。</li>
+<li><strong>作用</strong>：让 Bean 感知容器环境，比如 Bean 的名称或 <code>ApplicationContext</code>。</li>
+<li><strong>图中位置</strong>：设置 Aware 接口的属性。</li>
+</ul>
+<hr>
+<h2 id="6-调用-beanpostprocessor-的-postprocessbeforeinitialization"><strong>6. 调用 BeanPostProcessor 的 <code>postProcessBeforeInitialization</code></strong>
+</h2><ul>
+<li>过程：Spring 调用所有注册的 BeanPostProcessor 的 <code>postProcessBeforeInitialization</code>方法，对 Bean 进行前置增强处理。
+<ul>
+<li>比如自定义一些逻辑，如动态修改 Bean 的某些属性。</li>
+</ul>
+</li>
+<li><strong>作用</strong>：允许开发者在 Bean 初始化之前插入额外逻辑。</li>
+<li><strong>图中位置</strong>：<code>BeanPostProcessor#before</code>。</li>
+</ul>
+<hr>
+<h2 id="7-bean-初始化"><strong>7. Bean 初始化</strong>
+</h2><ul>
+<li>过程：
+<ul>
+<li>如果 Bean 实现了 <code>InitializingBean</code> 接口，会调用其 <code>afterPropertiesSet()</code> 方法。</li>
+<li>如果在配置中指定了 <code>init-method</code>，Spring 也会调用该方法。</li>
+</ul>
+</li>
+<li><strong>作用</strong>：初始化 Bean，完成它的内部逻辑配置。</li>
+<li><strong>图中位置</strong>：<code>initializingBean#afterPropertiesSet</code> 和 <code>执行init-method方法</code>。</li>
+</ul>
+<hr>
+<h2 id="8-调用-beanpostprocessor-的-postprocessafterinitialization"><strong>8. 调用 BeanPostProcessor 的 <code>postProcessAfterInitialization</code></strong>
+</h2><ul>
+<li>过程：Spring 调用所有注册的 BeanPostProcessor 的 <code>postProcessAfterInitialization</code>方法。
+<ul>
+<li>比如在这个阶段进行代理逻辑的实现（AOP）。</li>
+</ul>
+</li>
+<li><strong>作用</strong>：为 Bean 添加更多增强功能（如代理）。</li>
+<li><strong>图中位置</strong>：<code>BeanPostProcessor#after</code>。</li>
+</ul>
+<hr>
+<h2 id="9-bean-完成初始化ready-to-use"><strong>9. Bean 完成初始化（Ready to Use）</strong>
+</h2><ul>
+<li><strong>过程</strong>：Bean 已经完成所有初始化流程，Spring 容器将其标记为可用。</li>
+<li><strong>作用</strong>：Bean 可以被其他组件调用或使用。</li>
+<li><strong>图中位置</strong>：完成对象 -&gt; 添加到 <code>BeanFactory</code> 的单例池中。</li>
+</ul>
+<hr>
+<h2 id="10-销毁当容器关闭时"><strong>10. 销毁（当容器关闭时）</strong>
+</h2><ul>
+<li>过程：
+<ul>
+<li>如果 Bean 实现了 <code>DisposableBean</code> 接口，Spring 会调用其 <code>destroy()</code> 方法。</li>
+<li>如果配置了 <code>destroy-method</code>，Spring 也会执行该方法。</li>
+</ul>
+</li>
+<li><strong>作用</strong>：清理资源，确保 Bean 的生命周期完整结束。</li>
+<li><strong>图中位置</strong>：此阶段未在图中标明，但与初始化的对称操作类似。</li>
+</ul>
+<h1 id="76-spring-里面可以存在id-相同的两个bean吗">76. Spring 里面可以存在Id 相同的两个Bean吗?
+</h1><ol>
+<li>
+<p>同一个配置文件不可以</p>
+</li>
+<li>
+<p>不同的配置文件可以, ==后加载的会覆盖前面加载的==</p>
+</li>
+<li>
+<p><strong>ID 相同的 Bean 会导致冲突</strong>，在 Spring 配置（XML 或注解）中不能直接定义多个 ID 相同的 Bean。</p>
+</li>
+<li>
+<p>如果有多个 Bean 的 ID 相同，Spring 会根据注解或配置使用 <strong><code>@Primary</code></strong> 或 <strong><code>@Qualifier</code></strong> 来确定注入哪个 Bean。</p>
+<ol>
+<li>==<code>@Qualifier</code> 注解来指定注入特定的 Bean 实例==。通过这种方式，你可以<strong>在同一个上下文中使用多个相同类型的 Bean，只要它们有不同的 <code>id</code> 或 <code>name</code></strong>。</li>
+</ol>
+</li>
+<li>
+<p><strong>多个相同类型 Bean 的 ID 冲突</strong> 可能会抛出 <code>NoUniqueBeanDefinitionException</code>，这时需要明确指定 Bean 的 ID 或使用 <code>@Qualifier</code>。</p>
+</li>
+<li>
+<p><strong><code>@Scope(&quot;prototype&quot;)</code></strong> 类型的 Bean 虽然 ID 相同，但每次请求都会返回一个新的实例。</p>
+</li>
+<li>
+<p>使用 <strong><code>@Configuration</code></strong> 类时，==多个同名的 Bean 只会加载第一个==</p>
+</li>
+</ol>
+<p>总之，Spring 要求 Bean 的 ID 必须是唯一的，只有在符合特定规则（如使用 <code>@Primary</code>、<code>@Qualifier</code>）的情况下，才能避免 ID 冲突问题。</p>
+<h1 id="77-spring-如何解决循环依赖的问题">77. Spring 如何解决循环依赖的问题
+</h1><ol>
+<li>
+<p>spring 循环依赖的问题是在Bean哪个生命周期的步骤中产生的问题</p>
+</li>
+<li>
+<p>产生循环依赖的情况有哪些?</p>
+<ol>
+<li>
+<p>互相依赖</p>
+<ol>
+<li><img src="/p/interview/images/image-20241207185133717.png"
+	width="639"
+	height="335"
+	
+	loading="lazy"
+	
+		alt="image-20241207185133717"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="190"
+		data-flex-basis="457px"
+	
+></li>
+</ol>
+</li>
+<li>
+<p>间接依赖, 循环调用</p>
+<ol>
+<li><img src="/p/interview/images/image-20241207185224525.png"
+	width="599"
+	height="524"
+	
+	loading="lazy"
+	
+		alt="image-20241207185224525"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="114"
+		data-flex-basis="274px"
+	
+></li>
+</ol>
+</li>
+<li>
+<p>自我依赖</p>
+</li>
+</ol>
+</li>
+</ol>
+<p>三级缓存</p>
+<ul>
+<li>一级缓存存放的是完全被初始化好的bean</li>
+<li>二级缓存, 存放原始Bean, 属性还没有被赋值, 没有被依赖注入</li>
+<li>三级缓存放的是 BeanFactory 对象, 用来生成原始Bean 对象并存放到二级缓存里面</li>
+</ul>
+<p>解决这个问题的==核心思想就是把bean的实例化和bean的属性依赖注入的这个过程给分离开来==</p>
+<p><img src="/p/interview/images/image-20241207192238559.png"
+	width="1458"
+	height="769"
+	
+	loading="lazy"
+	
+		alt="image-20241207192238559"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="189"
+		data-flex-basis="455px"
+	
+></p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>步骤</th>
+          <th>操作描述</th>
+          <th>一级缓存（singletonObjects）</th>
+          <th>二级缓存（earlySingletonObjects）</th>
+          <th>三级缓存（singletonFactories）</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td>Spring 创建 Bean A，发现需要注入 B，进入创建 B  的流程。</td>
+          <td></td>
+          <td></td>
+          <td>A 的工厂方法进入三级缓存</td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td>创建 B，发现需要注入 A，检查是否存在已创建的  A。</td>
+          <td></td>
+          <td></td>
+          <td>A 的工厂方法存在</td>
+      </tr>
+      <tr>
+          <td>3</td>
+          <td>从三级缓存中获取 A 的工厂，并通过工厂方法生成早期的 A 半成品，加入二级缓存。</td>
+          <td></td>
+          <td>A 半成品</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>4</td>
+          <td>B 完成依赖注入（引用 A 的半成品）并初始化完成，放入一级缓存。</td>
+          <td>B</td>
+          <td>A 半成品</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>5</td>
+          <td>回到 A 的创建流程，发现 B  已完成注入，继续初始化 A  并完成创建，放入一级缓存。</td>
+          <td>B, A</td>
+          <td></td>
+          <td></td>
+      </tr>
+  </tbody>
+</table></div>
+<p>spring本身只能解决单实例存在的循环引用问题</p>
+<p>以下四种情况需要人为干预</p>
+<ol>
+<li>
+<p><strong>多实例的 Setter 注入导致的循环依赖</strong></p>
+</li>
+<li>
+<p>构造器注入导致的循环依赖</p>
+<ol>
+<li>==<strong>注解方式</strong>：使用 <code>@Autowired</code> 标注在构造器上。==</li>
+<li>使用构造器注入时，如果两个 Bean 相互依赖（<code>A</code> 的构造器需要 <code>B</code>，<code>B</code> 的构造器又需要 <code>A</code>），会导致循环依赖。</li>
+<li>==使用 <code>@Lazy</code> 注解延迟初始化==。这样可以让某个依赖在实际需要时才加载，从而避免循环依赖。</li>
+</ol>
+</li>
+<li>
+<p><code>@DependsOn</code> 导致的循环依赖 ,  ==注解显式指定 Bean 的加载顺序时==，如果两个 Bean 的加载顺序互相依赖，可能导致循环依赖问题。</p>
+</li>
+<li>
+<p>单例代理对象的 <strong>Setter 注入导致的循环依赖</strong></p>
+<ol>
+<li>
+<p>单例代理对象通过 Setter 注入另一个 Bean，而这个被注入的 Bean 又依赖于==代理对象==本身，会导致循环依赖。</p>
+</li>
+<li>
+<p>解决方式: 使用 <code>@Lazy</code> 延迟加载，避免在 Bean 初始化阶段立即触发依赖。</p>
+<p>或者使用 <code>@DependsOn</code> 注解，显式指定加载顺序，确保代理对象的依赖在正确的时机被加载</p>
+</li>
+</ol>
+</li>
+</ol>
+<h2 id="1-为什么必须要三级缓存">1. 为什么必须要三级缓存
+</h2><p>主要原因是 <strong>动态代理</strong> 和 <strong>增强机制</strong>。下面从几个关键点分析：</p>
+<p>二级缓存的局限性</p>
+<ul>
+<li>
+<p>如果一个 ==<strong>Bean 在创建过程中需要进行动态代理（如 AOP 增强）</strong>==，它的==最终实例不是原始对象，而是动态代理对象==。</p>
+</li>
+<li>
+<p>==如果只用二级缓存（直接存储半成品对象），Spring 无法提前暴露代理后的对象，导致依赖的对象拿到的不是最终增强后的实例==。</p>
+</li>
+<li>
+<p>如果检测到可能存在循环依赖，Spring 会将该 Bean 的 &ldquo;早期引用&rdquo; 放入三级缓存。</p>
+<p>这个<strong>早期引用是通过 <code>ObjectFactory</code> 提供的，可以延迟加载。如果需要代理，这里生成的是代理对象</strong>。</p>
+</li>
+</ul>
+<pre><code class="language-java">@Component
+public class A {
+    @Autowired
+    private B b;
+}
+
+@Component
+public class B {
+    @Autowired
+    private A a;
+}
+</code></pre>
+<ul>
+<li>假设 <code>A</code> 是需要动态代理的（如使用了 <code>@Transactional</code>）。</li>
+<li>在二级缓存中，<code>A</code> 的原始对象被提前暴露给 <code>B</code>，但 <code>B</code> 需要的是增强后的代理对象。</li>
+<li>二级缓存只能存储原始对象，因此无法满足需求。</li>
+</ul>
+<p>​	通过 <code>ObjectFactory</code> 延迟生成 Bean 的最终形式（如动态代理对象），确保注入的对象是完整可用的。</p>
+<p>必要性：==在支持动态代理、AOP 增强等场景时,三级缓存是解决循环依赖的关键机制==</p>
+<h1 id="78-spring-beanfactory-和-factorybean的区别">78. Spring BeanFactory 和 FactoryBean的区别
+</h1><p>BeanFactory&ndash; ==<strong>是容器本身,用来管理Bean生命周期和依赖注入</strong>==</p>
+<ul>
+<li><code>BeanFactory</code> 是 Spring 的 <strong>IoC 容器</strong>的核心接口，是 Spring 中用于管理和提供 Bean 的基础容器。</li>
+<li>它负责创建、管理和检索 Bean</li>
+</ul>
+<p>Factorybean  <strong>不是容器</strong>，而是一个 Bean 类型。 用于<strong>定义复杂对象的创建逻辑</strong></p>
+<ul>
+<li>实现了 <code>FactoryBean</code> 接口的类可以自定义生成某种对象。</li>
+<li>常见的使用场景是创建复杂对象，如动态代理、ORM 框架中的 SessionFactory 等。</li>
+</ul>
+<p>二者的关系是：<code>BeanFactory</code> 可以管理 <code>FactoryBean</code>，并通过 <code>getObject()</code> 方法返回 <code>FactoryBean</code> 创建的对象。</p>
+<h1 id="79-spring-事务">79. Spring 事务
+</h1><ol>
+<li>
+<p>PROPAGATION_REQUIRED ，==默认==的spring事务传播级别，==如果上下文中已经存在事务，那么就加入到事务中执行，如果当前上下文中不存在事务，则新建事务执行==。所以这个级别通常能满足处理大多数的业务场景。</p>
+</li>
+<li>
+<p>PROPAGATION_SUPPORTS ，==如果上下文存在事务，则支持事务加入事务，如果没有事务，则使用非事务的方式执行==。所以说，并非所有的包在transactionTemplate.execute中的代码都会有事务支持。这个通常是用来处理那些并非原子性的非核心业务逻辑操作。应用场景较少。</p>
+</li>
+<li>
+<p>PROPAGATION_MANDATORY（强制） ， ==该级别的事务要求上下文中必须要存在事务，否则就会抛出异常！==配置该方式的传播级别是有效的控制上下文调用代码遗漏添加事务控制的保证手段。比如一段代码不能单独被调用执行，但是一旦被调用，就必须有事务包含的情况，就可以使用这个传播级别。</p>
+</li>
+<li>
+<p>PROPAGATION_REQUIRES_NEW ，==每次都会新建一个事务，并且同时将上下文中的事务挂起，执行当前新建事务完成以后，上下文事务恢复再执行==</p>
+<ul>
+<li>这是一个很有用的传播级别，举一个应用场景：现在有一个发送100个红包的操作，在发送之前，要做一些系统的初始化、验证、数据记录操作，然后发送100封红包，然后再记录发送日志，发送日志要求100%的准确，如果日志不准确，那么整个父事务逻辑需要回滚。
+怎么处理整个业务需求呢？就是通过这个PROPAGATION_REQUIRES_NEW 级别的事务传播控制就可以完成。发送红包的子事务不会直接影响到父事务的提交和回滚。</li>
+</ul>
+</li>
+<li>
+<p>PROPAGATION_NOT_SUPPORTED ，当前级别的特点就是<strong>上下文中存在事务</strong>，==则挂起事务，执行当前逻辑，结束后恢复上下文的事务==。</p>
+</li>
+<li>
+<p>PROPAGATION_NEVER ,  不允许当前方法在事务中运行 ，就抛出runtime异常，强制停止执行！</p>
+</li>
+<li>
+<p>PROPAGATION_NESTED ，字面也可知道，nested，嵌套级别事务。该传播级别特征是，如果上下文中存在事务，则==嵌套事务==执行，如果不存在事务，则新建事务。</p>
+<ul>
+<li>还是子事务先提交，父事务再提交, 子事务是父事务的一部分，由父事务统一提交。</li>
+<li>回滚特性
+<ul>
+<li>主事务和嵌套事务属于同一个事务</li>
+<li>嵌套事务出错回滚不会影响到主事务</li>
+<li>主事务回滚会将嵌套事务一起回滚了</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>require, 默认, 如果有则加入, 没有则新建</strong></p>
+</li>
+<li>
+<p><strong>require_new, 新建事务</strong>, 挂起上下文事务, 先执行自己的, 不会因为子事务异常回滚父事务</p>
+</li>
+<li>
+<p><strong>nested, 不存在会新建, 嵌套事务, 嵌套事务异常 ,主事务不会回滚, 主事务异常会全部回滚</strong></p>
+</li>
+<li>
+<p><strong>support, 有则加入, 没有就非事务方式执行</strong></p>
+</li>
+<li>
+<p><strong>not_support, 不支持, 有也不会执行事务</strong></p>
+</li>
+<li>
+<p><strong>mandatory, 强制, 上下文中必须存在事务, 否则抛异常</strong></p>
+</li>
+<li>
+<p><strong>never, 强制非事务执行, 有就抛异常</strong></p>
+</li>
+</ol>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>传播行为</th>
+          <th>当前有事务</th>
+          <th>当前无事务</th>
+          <th>应用场景</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>REQUIRED</td>
+          <td>加入当前事务</td>
+          <td>新建事务</td>
+          <td>默认行为，绝大多数场景适用</td>
+      </tr>
+      <tr>
+          <td>SUPPORTS</td>
+          <td>加入当前事务</td>
+          <td>非事务方式运行</td>
+          <td>查询等对事务依赖不强的场景</td>
+      </tr>
+      <tr>
+          <td>MANDATORY</td>
+          <td>加入当前事务</td>
+          <td>抛异常</td>
+          <td>必须在事务中运行的场景</td>
+      </tr>
+      <tr>
+          <td>REQUIRES_NEW</td>
+          <td>挂起当前事务，新建事务</td>
+          <td>新建事务</td>
+          <td>独立子事务，例如日志或补偿事务</td>
+      </tr>
+      <tr>
+          <td>NOT_SUPPORTED</td>
+          <td>挂起当前事务，非事务运行</td>
+          <td>非事务方式运行</td>
+          <td>非事务操作，例如批量操作或查询</td>
+      </tr>
+      <tr>
+          <td>NEVER</td>
+          <td>抛异常</td>
+          <td>非事务方式运行</td>
+          <td>明确不允许事务运行的场景</td>
+      </tr>
+      <tr>
+          <td>NESTED</td>
+          <td>创建嵌套事务</td>
+          <td>新建事务</td>
+          <td>子事务与父事务部分独立且可单独回滚的场景</td>
+      </tr>
+  </tbody>
+</table></div>
+<h1 id="80-spring-bean注入ioc容器的方式">80. Spring Bean注入IOC容器的方式
+</h1><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>注入方式</th>
+          <th>特点</th>
+          <th>适用场景</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>注解（@Component）</td>
+          <td>简洁高效，自动扫描管理</td>
+          <td>大部分场景，特别是简单项目</td>
+      </tr>
+      <tr>
+          <td>Java 配置（@Bean）</td>
+          <td>灵活、可定制</td>
+          <td>需要复杂创建逻辑或条件注入</td>
+      </tr>
+      <tr>
+          <td>XML 配置</td>
+          <td>可配置性强，但冗长</td>
+          <td>早期项目或对注解不支持的环境</td>
+      </tr>
+      <tr>
+          <td>FactoryBean</td>
+          <td>动态创建复杂 Bean</td>
+          <td>需要创建动态或代理对象</td>
+      </tr>
+      <tr>
+          <td>@Conditional</td>
+          <td>条件化注入</td>
+          <td>环境依赖、动态注入场景</td>
+      </tr>
+      <tr>
+          <td>@Profile</td>
+          <td>基于环境配置</td>
+          <td>多环境切换（如开发、生产）</td>
+      </tr>
+      <tr>
+          <td>动态注册</td>
+          <td>编程式，灵活</td>
+          <td>特殊场景，如运行时动态加载 Bean</td>
+      </tr>
+  </tbody>
+</table></div>
+<ul>
+<li>使用XML</li>
+<li>使用@CompontScan 注解 扫描 @Controller</li>
+<li>@Configuration 声明配置类, @Bean 实现Bean 定义, 这种方式是 Xml 配置的一种演变</li>
+<li>@Import 注解, 导入配置类或者普通的bean</li>
+<li>FactoryBean 工厂Bean, 动态构建Bean 实例, Spring cloud open feign 里的 <strong>动态代理实例</strong>, 就是基于它</li>
+<li>实现 ImportSelector 接口, Spring boot starter自动装配的时候有用到</li>
+</ul>
+<h1 id="81-过滤器和拦截器的区别">81. 过滤器和拦截器的区别
+</h1><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>维度</th>
+          <th>过滤器（Filter）</th>
+          <th>拦截器（Interceptor）</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>依赖规范</td>
+          <td>Java EE 规范的一部分，==<strong>依赖 Servlet API</strong>==。</td>
+          <td>Spring 或其他框架的扩展机制，==依赖 Spring 容器==。</td>
+      </tr>
+      <tr>
+          <td>作用范围</td>
+          <td><strong>全局 HTTP 请求和响应。</strong></td>
+          <td>Spring MVC 层（控制器及之后的逻辑层）。</td>
+      </tr>
+      <tr>
+          <td>触发时机</td>
+          <td>Servlet 执行前后。</td>
+          <td>控制器方法执行前后，以及请求完成之后。</td>
+      </tr>
+      <tr>
+          <td>访问能力</td>
+          <td>无法直接访问 Controller、Service 的信息。</td>
+          <td>可以访问 Controller 的上下文和业务逻辑层的返回值。</td>
+      </tr>
+  </tbody>
+</table></div>
+<ul>
+<li>运行顺序不同：过滤器在 Servlet 容器接收到请求后、Servlet 被调用前运行；拦截器在 Servlet 被调用后、响应发送到客户端前运行。</li>
+<li>依赖关系不同：过滤器依赖 Servlet 容器；拦截器不依赖 Servlet 容器。</li>
+<li>操作对象不同：过滤器只能对 request 和 response 操作；拦截器可对 request、response、handle、model and view、exception 操作。</li>
+</ul>
+<h1 id="82-spring-mvc-执行流程">82. Spring Mvc 执行流程
+</h1><p><img src="/p/interview/images/image-20241208144250849.png"
+	width="1795"
+	height="982"
+	
+	loading="lazy"
+	
+		alt="image-20241208144250849"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="182"
+		data-flex-basis="438px"
+	
+></p>
+<pre><code class="language-properties">客户端请求
+    ↓
+DispatcherServlet(前端控制器) 作为中央调度器，负责将请求分发到具体的处理组件。 HttpServletRequest 和 HttpServletResponse 对象通常是由 Web 容器在请求到达 DispatcherServlet 时自动创建的
+    ↓
+HandlerMapping → 查找合适的 Controller
+    ↓
+HandlerAdapter → 反射调用 Controller 方法
+    ↓
+Controller 返回 ModelAndView 或 视图名
+    ↓
+ViewResolver →视图解析器, 解析视图名，找到具体视图
+    ↓
+渲染视图 → 返回 HTML 或其他格式
+    ↓
+客户端接收响应，渲染页面
+
+</code></pre>
+<h1 id="83-spring-ioc-原理">83. Spring IOC 原理
+</h1><p>Spring IoC 的核心原理就是**通过容器管理 Bean 的生命周期、依赖关系和初始化过程。**容器通过依赖注入来==解耦各个 Bean 之间的关系，减少了类与类之间的紧耦合，提高了应用程序的可维护性和扩展性==。整个过程依赖于反射、工厂模式、策略模式等设计模式。</p>
+<p>通过 IoC 和 DI，Spring 实现了松耦合的编程模型，使得 Bean 的创建和管理交由容器负责，开发人员只需关注业务逻辑。</p>
+<p>IoC 控制反转 是==将对象的管理责任交给容器，而非由程序显式地管理==。</p>
+<p>DI 依赖注入 , 将类的依赖（通常是其他类的实例）注入到目标类中 ,  ==构造器注入、Setter 方法注入和字段注入==</p>
+<p><strong>BeanFactory</strong>：最基础的容器，通常用于轻量级的应用。<code>BeanFactory</code> 负责 Bean 的创建和管理，但其不处理任何 Bean 的生命周期管理和事件机制。</p>
+<p><strong>ApplicationContext</strong>：是 <code>BeanFactory</code> 的==子接口，扩展了更多功能（例如事件传播、AOP 支持、国际化等）==。<code>ApplicationContext</code> 是 <strong>Spring 最常用的容器</strong>，具有更加丰富的功能。</p>
+<h1 id="84-spring-mvc的理解">84. Spring Mvc的理解
+</h1><p>本质上是一个web框架, 基于servlet, servlet 是一个基础的技术规范, 提供了处理请求和响应的基本能力, mvc 在 此基础上进行了扩展，封装了<strong>请求分发、处理和响应的流程</strong>，通过 <code>DispatcherServlet</code> 来管理请求的流转和控制。</p>
+<ul>
+<li>把传统MVC框架做了拆分
+<ul>
+<li>前端控制器 DispatcherServlet</li>
+<li>后端控制器 Controller</li>
+</ul>
+</li>
+<li>Model 模型 拆分,  Model 是负责应用程序的数据和业务逻辑。
+<ul>
+<li>业务层service</li>
+<li>数据访问层 Repository</li>
+</ul>
+</li>
+</ul>
+<h1 id="85-spring-bean-作用域">85. Spring Bean 作用域
+</h1><p>作用域的主要作用是==保护bean的使用安全==</p>
+<p><strong>Singleton</strong>：</p>
+<ul>
+<li><strong>应用场景</strong>：常见于服务层 Bean、工具类、数据库连接池等需要全局共享的 Bean。</li>
+<li><strong>优点</strong>：内存占用小，性能好。</li>
+<li><strong>缺点</strong>：所有请求共享同一个实例，可能导致线程安全问题。</li>
+</ul>
+<p><strong>Prototype</strong>：</p>
+<ul>
+<li><strong>应用场景</strong>：适用于每次操作需要一个新的实例的情况，例如处理不同用户的请求时，每次都需要一个新的 Bean。</li>
+<li><strong>优点</strong>：能够为每次请求创建独立的 Bean 实例。</li>
+<li><strong>缺点</strong>：可能增加性能开销，因为每次都会创建新的实例，且 <strong>Spring 容器不会管理其生命周期</strong>。</li>
+</ul>
+<p><strong>Request</strong>：</p>
+<ul>
+<li><strong>应用场景</strong>：用于 Web 应用程序中，每次请求需要一个新的 Bean 实例，适合于请求级别的状态管理（如分页信息、表单提交数据等）。</li>
+<li><strong>优点</strong>：<strong>Bean 在请求结束后会被销毁，有效隔离了不同请求的数据。</strong></li>
+<li><strong>缺点</strong>：仅适用于 Web 环境。</li>
+</ul>
+<p><strong>Session</strong>：</p>
+<ul>
+<li><strong>应用场景</strong>：用于 Web 应用程序中，每个用户会话需要一个独立的 Bean 实例，适合于保存用户的会话状态（如购物车、用户登录信息等）。</li>
+<li><strong>优点</strong>：可以跨多个请求保持用户的状态。</li>
+<li><strong>缺点</strong>：会话结束后，Bean 会被销毁。如果会话过多，可能导致内存压力。</li>
+</ul>
+<p><strong>Application</strong>：</p>
+<ul>
+<li><strong>应用场景</strong>：用于 Web 应用程序中跨整个应用共享的 Bean，比如缓存、全局配置等。</li>
+<li><strong>优点</strong>：适用于全局共享的数据和资源。</li>
+<li><strong>缺点</strong>：如果 Bean 状态被修改，可能会影响到应用的其他部分。</li>
+</ul>
+<p><strong>WebSocket</strong>：</p>
+<ul>
+<li><strong>应用场景</strong>：适用于 WebSocket 连接中的 Bean 状态管理，支持为每个 WebSocket 连接创建独立的 Bean。</li>
+<li><strong>优点</strong>：能够保持 WebSocket 会话的状态。</li>
+<li><strong>缺点</strong>：仅适用于 WebSocket 环境。</li>
+</ul>
+<p><img src="/p/interview/images/image-20241208161125459.png"
+	width="880"
+	height="517"
+	
+	loading="lazy"
+	
+		alt="image-20241208161125459"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="170"
+		data-flex-basis="408px"
+	
+></p>
+<h1 id="86-webapplicationcontext-和-applicationcontext">86. WebApplicationContext 和 ApplicationContext
+</h1><ul>
+<li><strong><code>WebApplicationContext</code></strong> 是 <code>ApplicationContext</code> 的==<strong>子接口</strong>==，专门为 Web 环境设计，扩展了 <code>ApplicationContext</code> 提供的功能，增加了 Web 环境的支持（如 HTTP 请求、会话管理等）。</li>
+<li><code>ApplicationContext</code> 是通用的 Spring 容器接口，适用于非 Web 环境，而 <code>WebApplicationContext</code> 则是基于 Web 环境的一种实现。</li>
+</ul>
+<h1 id="87-seata">87. Seata
+</h1><p>见seata文档</p>
+<ol>
+<li>支持的模式有 AT, TCC, SAGA 长事务</li>
+<li>可以无侵入的实现事务控制, 代理的 DataSource</li>
+<li>AT 模式的流程</li>
+</ol>
+<p><img src="/p/interview/images/image-20241208172933247.png"
+	width="982"
+	height="851"
+	
+	loading="lazy"
+	
+		alt="image-20241208172933247"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="115"
+		data-flex-basis="276px"
+	
+></p>
+<h1 id="88-dubbo请求失败重试">88. Dubbo请求失败重试
+</h1><p>默认是会进行多两次的重试的</p>
+<p>dubbo 是 rpc 框架, 衍生的能力有</p>
+<ul>
+<li>动态路由</li>
+<li>容错重试</li>
+<li>负载均衡</li>
+</ul>
+<p>集群容错策略</p>
+<p><strong>Failover Cluster（默认，失败自动切换）：</strong></p>
+<ul>
+<li>调用失败后，切换到其他节点重试。</li>
+<li>配合 <code>retries</code> 参数，控制总调用次数。</li>
+</ul>
+<p><strong>Failfast Cluster（快速失败）：</strong></p>
+<ul>
+<li>一次调用失败即返回错误，不进行重试。</li>
+</ul>
+<p><strong>Failsafe Cluster（失败安全）：</strong></p>
+<ul>
+<li>调用失败直接忽略，不抛出异常（适用于日志等非关键操作）。</li>
+</ul>
+<p><strong>Failback Cluster（失败自动恢复）：</strong></p>
+<ul>
+<li>==调用失败后，异步记录并定期重试==。</li>
+</ul>
+<p><strong>Forking Cluster（并行调用）：</strong></p>
+<ul>
+<li>并行调用多个节点，只要一个成功即返回。</li>
+<li><strong>无重试逻辑</strong>，但可以通过并行多调用实现类似效果。</li>
+</ul>
+<h1 id="89-redis和mysql-如何保持数据一致">89. redis和mysql 如何保持数据一致
+</h1><p>==问题产生的根源==</p>
+<ol>
+<li>redis和mysql 数据不一致
+<ol>
+<li>缓存被提前删除,更新</li>
+<li>缓存失效和创建时机不对</li>
+</ol>
+</li>
+<li>并发操作, 多个线程同时修改数据</li>
+<li>网络或服务异常, 更新数据库或缓存失败</li>
+</ol>
+<p>常用的解决方案</p>
+<ol>
+<li>Cache Aside 模式（常用）</li>
+</ol>
+<blockquote>
+<p>缓存和数据库的更新分开操作：</p>
+<ul>
+<li>读操作：先读缓存，如果缓存没有数据（缓存穿透），则查询数据库并将结果写入缓存。</li>
+<li>写操作：先更新数据库，再删除缓存（推荐）。</li>
+<li>优点: 简单易用</li>
+<li>缺点: 会有短暂的数据不一致的问题, 更新完数据库后还没来得及更新缓存</li>
+</ul>
+</blockquote>
+<ol start="2">
+<li>Write Through 模式</li>
+</ol>
+<blockquote>
+<p>数据写入操作先更新缓存,再更新数据库</p>
+<ul>
+<li>优点: 缓存数据库实时同步</li>
+<li>缺点: 写操作延迟高, ==适用读多写少的场景==</li>
+</ul>
+</blockquote>
+<ol start="3">
+<li>Read Through 模式</li>
+</ol>
+<blockquote>
+<p>先找缓存, 没有就找数据库并更新缓存</p>
+</blockquote>
+<ol start="4">
+<li>Write Behind 模式</li>
+</ol>
+<blockquote>
+<p>先更新缓存, 再异步刷新数据库</p>
+<p>优点: 提高写性能</p>
+<p>缺点: 数据不一致的</p>
+</blockquote>
+<h1 id="90-spring-cloud-理解">90. Spring cloud 理解
+</h1><p><strong>微服务的一套标准</strong>, 提供一些解决方案, 降低了微服务架构的开发难度, 只用在spring-boot 中引入相关的starter 就可以集成相关的组件</p>
+<blockquote>
+<p>Ribbon 负载均衡</p>
+<p>Gateway 网关</p>
+<p>Hystrix 服务熔断</p>
+</blockquote>
+<p>alibaba</p>
+<blockquote>
+<p>dubbo</p>
+<p>nacos 配置中心, 注册中心</p>
+<p>sentinel 限流和降级</p>
+</blockquote>
+<h1 id="91-rpc-和-http">91. Rpc 和 Http
+</h1><p>rpc ==不是通信协议, 是一个远程过程调用协议==, 是方便开发人员在对远程方法进行调用的时候就像调用本地方法一样, rpc 里面服务之间的通信协议可以是http, 也可以是tcp, 或者是自定义的协议</p>
+<p><img src="/p/interview/images/image-20241209165439649.png"
+	width="364"
+	height="427"
+	
+	loading="lazy"
+	
+		alt="image-20241209165439649"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="85"
+		data-flex-basis="204px"
+	
+></p>
+<p>http 是通信协议, 基于Tcp协议</p>
+<p>什么是序列化和反序列化</p>
+<ol>
+<li>
+<p>序列化是为了解决网络传输过程中, 对象通信的问题, ==序列化就是把对象转化为字节流==</p>
+</li>
+<li>
+<p>反序列化就是从网络上获取对象的字节流, 重新构建一个新的对象</p>
+</li>
+</ol>
+<h1 id="92-一致性hash算法">92. 一致性Hash算法
+</h1><pre><code>分布式系统中常用的**负载均衡和数据分布算法**。它通过**将数据分布到多个节点上，减少节点增删时数据迁移的范围，从而提高系统的可扩展性和稳定性**。 redis 里面就有用到
+</code></pre>
+<h2 id="基本原理"><strong>基本原理</strong>
+</h2><ol>
+<li><strong>哈希环</strong>：
+<ul>
+<li>一致性哈希将整个哈希值空间（例如 <code>0 ~ 2^32-1</code>）抽象为一个<strong>环状结构</strong>，称为哈希环。</li>
+<li>环的起点和终点相连，形成一个闭合的哈希空间。</li>
+</ul>
+</li>
+<li><strong>节点映射到环上</strong>：
+<ul>
+<li>通过哈希函数（如 <code>Hash(nodeId)</code>），将节点映射到哈希环上的某个点。</li>
+<li><strong>这些点代表物理节点或服务器</strong>。</li>
+</ul>
+</li>
+<li><strong>数据映射到环上</strong>：
+<ul>
+<li>通过哈希函数（如 <code>Hash(dataKey)</code>），将数据键映射到哈希环上的某个点。</li>
+<li>数据分配规则：数据存储在<strong>顺时针方向的第一个节点</strong>上。</li>
+</ul>
+</li>
+</ol>
+<h2 id="传统哈希缺点"><strong>传统哈希缺点</strong>
+</h2><ul>
+<li>如果节点数量发生变化（增减节点），所有的数据需要重新计算哈希值并迁移到新节点，成本高。</li>
+</ul>
+<h2 id="一致性哈希改进"><strong>一致性哈希改进</strong>
+</h2><ul>
+<li>当节点增加或减少时，只影响哈希环上<strong>相邻的一小部分数据</strong>，不会影响整个系统。
+<ul>
+<li><strong>新增节点</strong>：数据只从新节点的顺时针后继节点迁移。</li>
+<li><strong>移除节点</strong>：数据只从被移除节点迁移到其顺时针后继节点。</li>
+</ul>
+</li>
+</ul>
+<h1 id="93-分布式和微服务的理解">93. 分布式和微服务的理解
+</h1><ol>
+<li><strong>分布式系统</strong>是把一个大系统拆分到多个机器上运行，解决性能瓶颈和高可用问题，重点是<strong>让多台机器协作完成一个任务</strong>。</li>
+<li><strong>微服务架构</strong>是把一个大应用拆成多个小服务，每个服务独立负责一个功能，重点是<strong>按业务模块解耦</strong>，并且可以通过分布式技术来部署。</li>
+</ol>
+<p><strong>区别</strong>：分布式更关注系统架构层面，微服务更关注业务功能划分。
+<strong>关系</strong>：微服务通常基于分布式技术实现，但分布式不一定是微服务。</p>
+<h1 id="94-nacos-配置更新流程">94. Nacos 配置更新流程
+</h1><ol>
+<li>Nacos 采用的是长轮训的方式向Nacos Server 端去发起配置更新的查询
+<ul>
+<li>长轮训就是客户端发起一次轮训请求到服务端, 当服务器端的配置==没有任何的变动的时候, 连接会一直的打开==, 当配置更新或者连接超时之后进行返回</li>
+<li>客户端把需要去进行比较的==配置会进行分片,3000个配置一个分片==</li>
+<li>客户端会 分包进行比较和更新,
+<ul>
+<li>3000个配置key, value 拼接的字符串进行MD5 比较</li>
+<li>服务端会逐个比较, 把存在更新的key</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<p>Nacos 既支持 CP（一致性）模型，也支持 AP（可用性）模型。具体来说：</p>
+<ol>
+<li><strong>AP 模型</strong>：Nacos 默认采用 AP 模型，即在网络分区的情况下，优先保证系统的可用性，而不是一致性。这意味着在网络分区时，Nacos 仍然可以对外提供服务，但可能会出现数据不一致的情况。</li>
+<li><strong>CP 模型</strong>：Nacos 也支持 CP 模型，即在网络分区的情况下，优先保证数据的一致性，而不是可用性。这意味着在网络分区时，Nacos 可能会暂时无法对外提供服务，直到网络恢复并达到一致性</li>
+</ol>
+<h1 id="95-分布式id设计方案">95. 分布式ID设计方案
+</h1><p>需要考虑因素</p>
+<ol>
+<li>有序性, 在Mysql B+数的存储结构中, 范围查询的效率更高, B+树数据的维护效率更高</li>
+<li>安全性, 反爬</li>
+<li>可用性要高, 如果出现问题会导致大部分业务不可用</li>
+<li>性能</li>
+</ol>
+<p>通常用的是 雪花id, 64位长度组成的, 区域划分</p>
+<p><img src="/p/interview/images/image-20241210150428196.png"
+	width="491"
+	height="106"
+	
+	loading="lazy"
+	
+		alt="image-20241210150428196"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="463"
+		data-flex-basis="1111px"
+	
+></p>
+<h1 id="97-nosql">97. Nosql
+</h1><p>Nacos 既支持 CP（一致性）模型，也支持 AP（可用性）模型。具体来说：</p>
+<ol>
+<li><strong>AP 模型</strong>：Nacos 默认采用 AP 模型，即在网络分区的情况下，优先保证系统的可用性，而不是一致性。这意味着在网络分区时，Nacos 仍然可以对外提供服务，但可能会出现数据不一致的情况。</li>
+<li><strong>CP 模型</strong>：Nacos 也支持 CP 模型，即在网络分区的情况下，优先保证数据的一致性，而不是可用性。这意味着在网络分区时，Nacos 可能会暂时无法对外提供服务，直到网络恢复并达到一致性</li>
+</ol>
+<h1 id="98-分布式锁">98. 分布式锁
+</h1><blockquote>
+<p>使用分布式锁是因为在同一个时间, 多个服务之间有多个线程去争抢同一个资源所造成的线程安全的问题</p>
+</blockquote>
+<p>==redis==</p>
+<ul>
+<li>
+<p>使用 setNx, <strong>如果不存在就设置</strong></p>
+</li>
+<li>
+<p>使用redission, 他提供了<strong>分布式锁的封装</strong></p>
+<ul>
+<li>
+<p>红锁（RedLock）是什么？  <strong>确保锁在多个 Redis 节点上获取到，避免单点故障带来的问题。</strong>  <strong>如果仅在一个 Redis 节点上加锁，Redis 节点宕机后，锁就失效了。</strong></p>
+</li>
+<li>
+<blockquote>
+<p>在<strong>分布式系统</strong>中，多个 Redis 节点会部署在不同的服务器上。</p>
+<p>当需要实现一个全局唯一的分布式锁（如协调多个服务同时对一个资源操作），就需要一种机制来<strong>在多个节点上保证锁的一致性</strong>。</p>
+<p><strong>红锁是 Redis 提供的一种分布式锁算法，适用于集群模式和多节点部署场景。</strong></p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+<p>==zookeeper==</p>
+<ul>
+<li>使用同一个节点的唯一性或者有序节点, 这样的特性</li>
+</ul>
+<h1 id="99-时间轮算法">99. 时间轮算法
+</h1><h2 id="概念">概念
+</h2><ul>
+<li><strong>时间轮</strong>：一个轮状结构，可以想象成时钟的“表盘”，每一格是一个槽。</li>
+<li><strong>时间槽（Slot）</strong>：时间轮中的每个区域，代表一个单位时间（比如1秒、1分钟等）。</li>
+<li><strong>指针（Pointer）</strong>：轮子的指针表示当前的时间，随着时间流逝不断向前移动，指向下一个时间槽。</li>
+</ul>
+<h2 id="时间轮的工作流程">时间轮的工作流程
+</h2><ol>
+<li><strong>时间轮的结构</strong>： 时间轮由一个固定大小的槽数组（Slot array）构成，每个槽代表一个时间单位（比如1秒、1分钟等）。每个槽可以存放一个定时任务队列。</li>
+<li><strong>定时任务的加入</strong>： 当一个定时任务需要执行时，系统会根据任务的执行时间（延时）计算出应该放置在时间轮的哪个槽中。任务会被放入对应的槽队列中。</li>
+<li><strong>时间轮的转动</strong>： 每当轮子“走一步”时，时间轮指针就会移动到下一个槽。当指针指向某个槽时，如果该槽内有定时任务，系统就会执行这些任务。</li>
+<li><strong>任务的执行</strong>： 如果指针指向的槽内有任务，系统会将这些任务取出并执行。每次执行后，指针继续前进。</li>
+<li><strong>任务的超时处理</strong>： 时间轮的每一圈就是一个时间周期，指针每移动一步，表示时间的流逝。如果任务已经到达它的执行时间，它就会被触发执行。如果任务还没有到时间，它会留在该时间槽中等待下一次轮转。</li>
+</ol>
+<h1 id="100-令牌桶-漏桶">100. 令牌桶, 漏桶
+</h1><p>==令牌桶==</p>
+<ul>
+<li>系统以固定速率向桶中添加令牌（单位时间生成一定数量的令牌），代表系统的处理能力。</li>
+<li>桶的容量是固定的，<strong>超过容量的新令牌会被丢弃</strong></li>
+<li>==请求处理方式==:  每次请求到来时，系统从桶中取出一个或多个令牌。如果桶中有足够的令牌，则请求被处理；否则，请求被拒绝或延迟处理。</li>
+</ul>
+<p>==漏桶==</p>
+<ul>
+<li>模拟一个有固定容量的漏桶（如水桶）。</li>
+<li><strong>桶内的水（请求）以固定速率流出</strong>。</li>
+</ul>
+<p>==请求处理方式==</p>
+<ul>
+<li>
+<p>如果桶未满，请求被放入桶中。</p>
+</li>
+<li>
+<p>如果桶已满，新的请求将被丢弃。</p>
+</li>
+<li>
+<p>无论请求到达的速率如何，桶中的内容都会以固定速率“漏出”（处理）</p>
+</li>
+</ul>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th>令牌桶</th>
+          <th>漏桶</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>突发流量处理</td>
+          <td>支持</td>
+          <td>不支持</td>
+      </tr>
+      <tr>
+          <td>实现方式</td>
+          <td>通过生成令牌控制流量</td>
+          <td>通过固定速率漏水控制流量</td>
+      </tr>
+      <tr>
+          <td>限流行为</td>
+          <td>限制平均速率，允许短时突发流量</td>
+          <td>限制恒定速率，平滑输出流量</td>
+      </tr>
+  </tbody>
+</table></div>
+<h1 id="101-滑动窗口算法">101. 滑动窗口算法
+</h1><p>滑动窗口的核心在于维护一个窗口（范围），并在窗口中动态调整以找到目标解。窗口的范围可以通过起点和终点两个指针表示。</p>
+<ul>
+<li>
+<p><strong>窗口左端点</strong>：表示当前子区间的起始位置。</p>
+</li>
+<li>
+<p><strong>窗口右端点</strong>：表示当前子区间的结束位置。</p>
+<p>通过移动左端点和右端点，可以动态调整窗口的大小和位置，<strong>从而在数据结构中进行遍历和筛选</strong>。</p>
+</li>
+</ul>
+<p><img src="/p/interview/images/image-20241211172332803.png"
+	width="406"
+	height="338"
+	
+	loading="lazy"
+	
+		alt="image-20241211172332803"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="120"
+		data-flex-basis="288px"
+	
+></p>
+<ul>
+<li>用来解决数组的统计问题</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2020 - 
+        
+        2024 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+		<script>
+			document.addEventListener("DOMContentLoaded", function() {
+				const highlightedTexts = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, li'); 
+				highlightedTexts.forEach(element => {
+					element.innerHTML = element.innerHTML.replace(/==(.+?)==/g, '<span class="highlight">$1</span>');
+				});
+			});
+		</script>
+    </body>
+</html>

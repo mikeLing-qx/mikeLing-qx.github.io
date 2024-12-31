@@ -10,9 +10,12 @@
 <meta property='og:description' content="slogen">
 <meta property='og:url' content='https://mikeLing-qx.github.io/post/'>
 <meta property='og:site_name' content='mikeLing'>
-<meta property='og:type' content='website'><meta property='og:updated_time' content=' 2024-12-31T18:04:23&#43;08:00 '/>
+<meta property='og:type' content='website'><meta property='og:updated_time' content=' 2024-12-31T18:39:58&#43;08:00 '/>
 <meta name="twitter:title" content="Posts">
 <meta name="twitter:description" content="slogen"><link rel="alternate" type="application/rss&#43;xml" href="https://mikeLing-qx.github.io/post/index.xml">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     </head>
     <body class="">
     <script>
@@ -309,7 +312,7 @@
                     <a href="/archives/#2024">
                         
                             <span class="year">2024</span>
-                            <span class="count">3</span>
+                            <span class="count">1</span>
                         
                     </a> 
                 </div>
@@ -374,7 +377,7 @@
 
         <div class="section-card">
             <div class="section-details">
-                <h3 class="section-count">3 个页面</h3>
+                <h3 class="section-count">1 个页面</h3>
                 <h1 class="section-term">Posts</h1>
                 
             </div>
@@ -384,33 +387,11 @@
     <section class="article-list--compact">
         
             <article>
-    <a href="/p/thread/">
+    <a href="/p/interview/">
         <div class="article-details">
-            <h2 class="article-title">Thread</h2>
+            <h2 class="article-title">Interview</h2>
             <footer class="article-time">
-                <time datetime='2024-12-31T18:04:23&#43;08:00'>Dec 31, 2024</time>
-            </footer>
-        </div>
-    </a>
-</article>
-        
-            <article>
-    <a href="/p/image-test/">
-        <div class="article-details">
-            <h2 class="article-title">Image Test</h2>
-            <footer class="article-time">
-                <time datetime='2024-12-31T17:01:24&#43;08:00'>Dec 31, 2024</time>
-            </footer>
-        </div>
-    </a>
-</article>
-        
-            <article>
-    <a href="/p/spring/">
-        <div class="article-details">
-            <h2 class="article-title">Spring</h2>
-            <footer class="article-time">
-                <time datetime='2024-12-31T16:42:10&#43;08:00'>Dec 31, 2024</time>
+                <time datetime='2024-12-31T18:39:58&#43;08:00'>Dec 31, 2024</time>
             </footer>
         </div>
     </a>
@@ -452,5 +433,16 @@
     }());
 </script>
 
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+		<script>
+			document.addEventListener("DOMContentLoaded", function() {
+				const highlightedTexts = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, li'); 
+				highlightedTexts.forEach(element => {
+					element.innerHTML = element.innerHTML.replace(/==(.+?)==/g, '<span class="highlight">$1</span>');
+				});
+			});
+		</script>
     </body>
 </html>

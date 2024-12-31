@@ -13,6 +13,9 @@
 <meta property='og:type' content='website'>
 <meta name="twitter:title" content="Categories">
 <meta name="twitter:description" content="Example description"><link rel="alternate" type="application/rss&#43;xml" href="https://mikeLing-qx.github.io/en/categories/index.xml">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     </head>
     <body class="">
     <script>
@@ -279,5 +282,16 @@
     }());
 </script>
 
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+		<script>
+			document.addEventListener("DOMContentLoaded", function() {
+				const highlightedTexts = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, li'); 
+				highlightedTexts.forEach(element => {
+					element.innerHTML = element.innerHTML.replace(/==(.+?)==/g, '<span class="highlight">$1</span>');
+				});
+			});
+		</script>
     </body>
 </html>
