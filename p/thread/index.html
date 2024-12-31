@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="1. 概述 常见lamda 函数式接口:\n1 2 3 4 5 6 runAsync：异步执行没有返回值； supplyAsync：异步执行有返回值； thenApply：继续执行当前线程future完成的函数，不需要阻塞等待其处理完成； thenApplyAsync：在不同线程池异步地应用参数中的函数； thenCompose：用于多个彼此依赖的futrue进行串联起来, 串行 thenCombine：并联起两个独立的future，注意，这些future都是在长时间计算都完成以后, 并行关系 每个变种函数的第三个方法也许会发现里面都有一个 ==Executor 类型的参数==，用于指定线程池\n">
+<title>Thread</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/thread/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Thread">
+<meta property='og:description' content="1. 概述 常见lamda 函数式接口:\n1 2 3 4 5 6 runAsync：异步执行没有返回值； supplyAsync：异步执行有返回值； thenApply：继续执行当前线程future完成的函数，不需要阻塞等待其处理完成； thenApplyAsync：在不同线程池异步地应用参数中的函数； thenCompose：用于多个彼此依赖的futrue进行串联起来, 串行 thenCombine：并联起两个独立的future，注意，这些future都是在长时间计算都完成以后, 并行关系 每个变种函数的第三个方法也许会发现里面都有一个 ==Executor 类型的参数==，用于指定线程池\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/thread/'>
+<meta property='og:site_name' content='mikeLing'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-12-31T18:04:23&#43;08:00'/><meta property='article:modified_time' content='2024-12-31T18:04:23&#43;08:00'/>
+<meta name="twitter:title" content="Thread">
+<meta name="twitter:description" content="1. 概述 常见lamda 函数式接口:\n1 2 3 4 5 6 runAsync：异步执行没有返回值； supplyAsync：异步执行有返回值； thenApply：继续执行当前线程future完成的函数，不需要阻塞等待其处理完成； thenApplyAsync：在不同线程池异步地应用参数中的函数； thenCompose：用于多个彼此依赖的futrue进行串联起来, 串行 thenCombine：并联起两个独立的future，注意，这些future都是在长时间计算都完成以后, 并行关系 每个变种函数的第三个方法也许会发现里面都有一个 ==Executor 类型的参数==，用于指定线程池\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu13739649187745961479.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">mikeLing</a></h1>
+            <h2 class="site-description">slogen</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="https://mikeLing-qx.github.io/en/" >English</option>
+                                
+                                    <option value="https://mikeLing-qx.github.io/" selected>中文</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-概述">1. 概述</a></li>
+    <li><a href="#2-类结构">2. 类结构</a>
+      <ul>
+        <li><a href="#1-future">1. Future</a></li>
+        <li><a href="#2-completionstage">2. CompletionStage</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-线程关系">3. 线程关系</a></li>
+    <li><a href="#4-completeablefutute-方法总览">4. CompleteableFutute 方法总览</a>
+      <ul>
+        <li><a href="#0-常用api-概述">0. 常用api 概述</a></li>
+        <li><a href="#1-串行关系">1. 串行关系</a></li>
+        <li><a href="#2-聚合关系-and">2. 聚合关系 and</a></li>
+        <li><a href="#3-or或-关系">3. or或 关系</a></li>
+        <li><a href="#4-异常处理">4. 异常处理</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-性能">5. 性能</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/thread/">Thread</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Dec 31, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 4 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="1-概述">1. 概述
+</h1><p>常见lamda 函数式接口:</p>
+<p><img src="/p/thread/images/image-20221222102339817.png"
+	width="560"
+	height="205"
+	
+	loading="lazy"
+	
+		alt="image-20221222102339817"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="273"
+		data-flex-basis="655px"
+	
+></p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-properties" data-lang="properties"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">runAsync：异步执行没有返回值；</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">supplyAsync：异步执行有返回值；</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">thenApply：继续执行当前线程future完成的函数，不需要阻塞等待其处理完成；</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">thenApplyAsync：在不同线程池异步地应用参数中的函数；</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">thenCompose：用于多个彼此依赖的futrue进行串联起来,</span> <span style="color:#e6db74">串行</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">thenCombine：并联起两个独立的future，注意，这些future都是在长时间计算都完成以后,</span> <span style="color:#e6db74">并行关系 </span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>每个变种函数的第三个方法也许会发现里面都有一个 ==Executor 类型的参数==，用于指定线程池</p>
+<p>如果没有指定线程池，那自然就会有一个默认的线程池，也就是 ForkJoinPool</p>
+<p>ForkJoinPool 的线程数默认是==CPU 的核心数==</p>
+<blockquote>
+<p><strong>不要所有业务共用一个线程池</strong>，因为，一旦有任务执行一些很慢的 I/O 操作，就会导致线程池中所有线程都阻塞在 I/O 操作上，从而造成线程饥饿，进而影响整个系统的性能</p>
+</blockquote>
+<p>Jdk9 升级内容</p>
+<ol>
+<li>
+<p>添加了新的工厂方法</p>
+</li>
+<li>
+<p>支持延迟和超时处理</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>orTimeout()
+</span></span><span style="display:flex;"><span>completeOnTimeout()
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ol>
+<h1 id="2-类结构">2. 类结构
+</h1><p><img src="/p/thread/images/image-20221222102610060.png"
+	width="475"
+	height="173"
+	
+	loading="lazy"
+	
+		alt="image-20221222102610060"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="274"
+		data-flex-basis="658px"
+	
+></p>
+<h2 id="1-future">1. Future
+</h2><p>实现了 Future 接口，那就具有 Future 接口的相关特性，请脑补 Future 那少的可怜的 5 个方法，这里不再赘述，具体请查看 不会用Java Future，我怀疑你泡茶没我快</p>
+<h2 id="2-completionstage">2. CompletionStage
+</h2><p>CompletionStage 这个接口还是挺陌生的，中文直译过来是【竣工阶段】，如果将烧水泡茶比喻成一项大工程，他们的竣工阶段体现是不一样的</p>
+<h1 id="3-线程关系">3. 线程关系
+</h1><p><img src="/p/thread/images/image-20221222105010286.png"
+	width="618"
+	height="133"
+	
+	loading="lazy"
+	
+		alt="image-20221222105010286"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="464"
+		data-flex-basis="1115px"
+	
+></p>
+<ol>
+<li>单看线程1 或单看线程 2 就是一种串行关系，做完一步之后做下一步</li>
+<li>一起看线程1 和 线程 2，它们彼此就是并行关系，两个线程做的事彼此独立互补干扰</li>
+<li>泡茶就是线程1 和 线程 2 的汇总/组合，也就是线程 1 和 线程 2 都完成之后才能到这个阶段（当然也存在线程1 或 线程 2 任意一个线程竣工就可以开启下一阶段的场景）</li>
+</ol>
+<p>CompletionStage 所有函数都是用于描述任务的时序关系</p>
+<p><img src="/p/thread/images/image-20221222105056465.png"
+	width="463"
+	height="255"
+	
+	loading="lazy"
+	
+		alt="image-20221222105056465"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="181"
+		data-flex-basis="435px"
+	
+></p>
+<h1 id="4-completeablefutute-方法总览">4. CompleteableFutute 方法总览
+</h1><h2 id="0-常用api-概述">0. 常用api 概述
+</h2><p>参考资料: <a class="link" href="https://blog.51cto.com/zhangzhixi/5626288"  target="_blank" rel="noopener"
+    >https://blog.51cto.com/zhangzhixi/5626288</a></p>
+<p>==提交任务==：</p>
+<ol>
+<li>
+<p>supplyAsync 需要返回值时使用</p>
+</li>
+<li>
+<p>runAsync</p>
+</li>
+</ol>
+<p>==接力处理==：</p>
+<ul>
+<li>
+<p>thenRun thenRunAsync</p>
+</li>
+<li>
+<p>thenAccept thenAcceptAsync</p>
+</li>
+<li>
+<p>thenApply thenApplyAsync</p>
+</li>
+<li>
+<p>handle handleAsync</p>
+</li>
+<li>
+<p>applyToEither applyToEitherAsync</p>
+</li>
+<li>
+<p>acceptEither acceptEitherAsync</p>
+</li>
+<li>
+<p>runAfterEither runAfterEitherAsync</p>
+</li>
+<li>
+<p>thenCombine thenCombineAsync</p>
+</li>
+<li>
+<p>thenAcceptBoth thenAcceptBothAsync</p>
+</li>
+</ul>
+<p>==获取结果==：</p>
+<ul>
+<li>join 阻塞等待，不会抛异常</li>
+<li>get 阻塞等待，会抛异常</li>
+<li>complete(T value) 不阻塞，如果任务已完成，返回处理结果。如果没完成，则返回传参value。</li>
+</ul>
+<p>==总结分类==</p>
+<ul>
+<li>带run的方法，无入参，无返回值。</li>
+<li>带accept的方法，有入参，无返回值。</li>
+<li>带supply的方法，无入参，有返回值。</li>
+<li>带apply的方法，有入参，有返回值。</li>
+<li>带handle的方法，有入参，有返回值，并且带异常处理。</li>
+<li>以Async结尾的方法，都是异步的，否则是同步的。</li>
+<li>以Either结尾的方法，只需完成任意一个。</li>
+<li>以Both/Combine结尾的方法，必须所有都完成</li>
+</ul>
+<p>completeExceptionally(Throwable ex) 不阻塞，如果任务已完成，返回处理结果。如果没完成，抛异常。</p>
+<h2 id="1-串行关系">1. 串行关系
+</h2><p><code>then</code> 直译【然后】，也就是表示下一步，所以通常是一种串行关系体现, then 后面的单词（比如 run /apply/accept）就是上面说的函数式接口中的抽象方法名称了，它的作用和那几个函数式接口的作用是一样一样滴</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// run 是没有返回值的 </span>
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenRun</span>(Runnable action)
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenRunAsync</span>(Runnable action)
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenRunAsync</span>(Runnable action, Executor executor)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenApply</span>(Function<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T,<span style="color:#f92672">?</span> <span style="color:#66d9ef">extends</span> U<span style="color:#f92672">&gt;</span> fn)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenApplyAsync</span>(Function<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T,<span style="color:#f92672">?</span> <span style="color:#66d9ef">extends</span> U<span style="color:#f92672">&gt;</span> fn)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenApplyAsync</span>(Function<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T,<span style="color:#f92672">?</span> <span style="color:#66d9ef">extends</span> U<span style="color:#f92672">&gt;</span> fn, Executor executor)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenAccept</span>(Consumer<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T<span style="color:#f92672">&gt;</span> action) 
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenAcceptAsync</span>(Consumer<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T<span style="color:#f92672">&gt;</span> action)
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenAcceptAsync</span>(Consumer<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T<span style="color:#f92672">&gt;</span> action, Executor executor)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenCompose</span>(Function<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T, <span style="color:#f92672">?</span> <span style="color:#66d9ef">extends</span> CompletionStage<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;&gt;</span> fn)  
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenComposeAsync</span>(Function<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T, <span style="color:#f92672">?</span> <span style="color:#66d9ef">extends</span> CompletionStage<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;&gt;</span> fn)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenComposeAsync</span>(Function<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T, <span style="color:#f92672">?</span> <span style="color:#66d9ef">extends</span> CompletionStage<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;&gt;</span> fn, Executor executor)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="2-聚合关系-and">2. 聚合关系 and
+</h2><p><code>combine... with...</code> 和 <code>both...and...</code> 都是要求两者都满足，也就是 and 的关系了</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U,V<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>V<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenCombine</span>(CompletionStage<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">extends</span> U<span style="color:#f92672">&gt;</span> other, BiFunction<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T,<span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> U,<span style="color:#f92672">?</span> <span style="color:#66d9ef">extends</span> V<span style="color:#f92672">&gt;</span> fn)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U,V<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>V<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenCombineAsync</span>(CompletionStage<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">extends</span> U<span style="color:#f92672">&gt;</span> other, BiFunction<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T,<span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> U,<span style="color:#f92672">?</span> <span style="color:#66d9ef">extends</span> V<span style="color:#f92672">&gt;</span> fn)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U,V<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>V<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenCombineAsync</span>(CompletionStage<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">extends</span> U<span style="color:#f92672">&gt;</span> other, BiFunction<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T,<span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> U,<span style="color:#f92672">?</span> <span style="color:#66d9ef">extends</span> V<span style="color:#f92672">&gt;</span> fn, Executor executor)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenAcceptBoth</span>(CompletionStage<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">extends</span> U<span style="color:#f92672">&gt;</span> other, BiConsumer<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T, <span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> U<span style="color:#f92672">&gt;</span> action)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenAcceptBothAsync</span>(CompletionStage<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">extends</span> U<span style="color:#f92672">&gt;</span> other, BiConsumer<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T, <span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> U<span style="color:#f92672">&gt;</span> action)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">thenAcceptBothAsync</span>( CompletionStage<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">extends</span> U<span style="color:#f92672">&gt;</span> other, BiConsumer<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T, <span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> U<span style="color:#f92672">&gt;</span> action, Executor executor)
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">runAfterBoth</span>(CompletionStage<span style="color:#f92672">&lt;?&gt;</span> other, Runnable action)
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">runAfterBothAsync</span>(CompletionStage<span style="color:#f92672">&lt;?&gt;</span> other, Runnable action)
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">runAfterBothAsync</span>(CompletionStage<span style="color:#f92672">&lt;?&gt;</span> other, Runnable action, Executor executor)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="3-or或-关系">3. or或 关系
+</h2><p><code>Either...or...</code> 表示两者中的一个，自然也就是 Or 的体现了</p>
+<div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">applyToEither</span>(CompletionStage<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">extends</span> T<span style="color:#f92672">&gt;</span> other, Function<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T, U<span style="color:#f92672">&gt;</span> fn)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">applyToEitherAsync</span>(<span style="color:#960050;background-color:#1e0010">、</span>CompletionStage<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">extends</span> T<span style="color:#f92672">&gt;</span> other, Function<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T, U<span style="color:#f92672">&gt;</span> fn)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">applyToEitherAsync</span>(CompletionStage<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">extends</span> T<span style="color:#f92672">&gt;</span> other, Function<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T, U<span style="color:#f92672">&gt;</span> fn, Executor executor)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">acceptEither</span>(CompletionStage<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">extends</span> T<span style="color:#f92672">&gt;</span> other, Consumer<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T<span style="color:#f92672">&gt;</span> action)
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">acceptEitherAsync</span>(CompletionStage<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">extends</span> T<span style="color:#f92672">&gt;</span> other, Consumer<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T<span style="color:#f92672">&gt;</span> action)
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">acceptEitherAsync</span>(CompletionStage<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">extends</span> T<span style="color:#f92672">&gt;</span> other, Consumer<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T<span style="color:#f92672">&gt;</span> action, Executor executor)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">runAfterEither</span>(CompletionStage<span style="color:#f92672">&lt;?&gt;</span> other, Runnable action)
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">runAfterEitherAsync</span>(CompletionStage<span style="color:#f92672">&lt;?&gt;</span> other, Runnable action)
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>Void<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">runAfterEitherAsync</span>(CompletionStage<span style="color:#f92672">&lt;?&gt;</span> other, Runnable action, Executor executor)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="4-异常处理">4. 异常处理
+</h2><div class="highlight"><div style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">exceptionally</span>(Function<span style="color:#f92672">&lt;</span>Throwable, <span style="color:#f92672">?</span> <span style="color:#66d9ef">extends</span> T<span style="color:#f92672">&gt;</span> fn)
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">exceptionallyAsync</span>(Function<span style="color:#f92672">&lt;</span>Throwable, <span style="color:#f92672">?</span> <span style="color:#66d9ef">extends</span> T<span style="color:#f92672">&gt;</span> fn)
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">exceptionallyAsync</span>(Function<span style="color:#f92672">&lt;</span>Throwable, <span style="color:#f92672">?</span> <span style="color:#66d9ef">extends</span> T<span style="color:#f92672">&gt;</span> fn, Executor executor)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">whenComplete</span>(BiConsumer<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T, <span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> Throwable<span style="color:#f92672">&gt;</span> action)
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">whenCompleteAsync</span>(BiConsumer<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T, <span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> Throwable<span style="color:#f92672">&gt;</span> action)
+</span></span><span style="display:flex;"><span>CompletableFuture<span style="color:#f92672">&lt;</span>T<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">whenCompleteAsync</span>(BiConsumer<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T, <span style="color:#f92672">?</span> <span style="color:#66d9ef">super</span> Throwable<span style="color:#f92672">&gt;</span> action, Executor executor)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>       
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">handle</span>(BiFunction<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T, Throwable, <span style="color:#f92672">?</span> <span style="color:#66d9ef">extends</span> U<span style="color:#f92672">&gt;</span> fn)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">handleAsync</span>(BiFunction<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T, Throwable, <span style="color:#f92672">?</span> <span style="color:#66d9ef">extends</span> U<span style="color:#f92672">&gt;</span> fn)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> CompletableFuture<span style="color:#f92672">&lt;</span>U<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">handleAsync</span>(BiFunction<span style="color:#f92672">&lt;?</span> <span style="color:#66d9ef">super</span> T, Throwable, <span style="color:#f92672">?</span> <span style="color:#66d9ef">extends</span> U<span style="color:#f92672">&gt;</span> fn, Executor executor)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>==exceptionally 和 whenComplete, handle 的区别==</p>
+<p><img src="/p/thread/images/image-20221222112307270.png"
+	width="519"
+	height="241"
+	
+	loading="lazy"
+	
+		alt="image-20221222112307270"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="215"
+		data-flex-basis="516px"
+	
+></p>
+<h1 id="5-性能">5. 性能
+</h1><ol>
+<li>任务巨多, 如何保证性能</li>
+<li>如何观察任务的调度情况 (存在线程复用的情况)
+<ol>
+<li>可以使用线程池. 设置核心线程数为0, 线程存活时间为0, 保证每个任务都在新线程上执行</li>
+</ol>
+</li>
+</ol>
+<p>​</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2020 - 
+        
+        2024 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
