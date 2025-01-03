@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>缓存 on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/tags/%E7%BC%93%E5%AD%98/</link>
+        <description>Recent content in 缓存 on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Mon, 06 Jun 2022 15:07:52 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/tags/%E7%BC%93%E5%AD%98/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Spring_cache</title>
+        <link>https://mikeLing-qx.github.io/p/spring_cache/</link>
+        <pubDate>Mon, 06 Jun 2022 15:07:52 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/spring_cache/</guid>
+        <description>&lt;h1 id=&#34;1-入门使用&#34;&gt;1. 入门使用
+&lt;/h1&gt;&lt;p&gt;==参考资料==: &lt;a class=&#34;link&#34; href=&#34;https://juejin.cn/post/7097389644441976846&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://juejin.cn/post/7097389644441976846&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;1-enablecaching启用缓存功能&#34;&gt;1. @EnableCaching：启用缓存功能
+&lt;/h2&gt;&lt;p&gt;​	开启缓存功能，配置类中需要加上这个注解，有了这个注解之后，spring才知道你需要使用缓存的功能，其他和缓存相关的注解才会有效，spring中主要是==通过aop实现的==，通过aop来拦截需要使用缓存的方法，实现缓存的功能。&lt;/p&gt;
+&lt;h2 id=&#34;2-cacheable赋予缓存功能&#34;&gt;2. @Cacheable：赋予缓存功能
+&lt;/h2&gt;&lt;p&gt;​	@Cacheable可以==标记在一个方法上，也可以标记在一个类上==。当标记在一个方法上时表示该==方法是支持缓存的==，==当标记在一个类上时则表示该类所有的方法都是支持缓存的==。对于一个支持缓存的方法，==Spring会在其被调用后将其返回值缓存起来==，以保证下次利用同样的参数来执行该方法时可以直接从缓存中获取结果，而不需要再次执行该方法。Spring在缓存方法的返回值时是以键值对进行缓存的，值就是方法的返回结果，==至于键的话，Spring又支持两种策略，默认策略和自定义策略==，这个稍后会进行说明。需要注意的是当一个支持缓存的方法在对象==内部被调用时是不会触发缓存功能==的。@Cacheable可以指定三个属性，==value、key和condition。==&lt;/p&gt;
+&lt;h3 id=&#34;1-value-属性-指定cache名称&#34;&gt;1. value 属性: 指定cache名称
+&lt;/h3&gt;&lt;p&gt;​		value和cacheNames属性作用一样，必须指定其中一个，表示当前方法的返回值是会被缓存在哪个Cache上的，对应Cache的名称。其可以是一个Cache也可以是多个Cache，当需要指定多个Cache时其是一个数组。&lt;/p&gt;
+&lt;p&gt;​		可以将Cache想象为一个HashMap，系统中可以有很多个Cache，每个Cache有一个名字，你需要将方法的返回值放在哪个缓存中，需要通过缓存的名称来指定。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+@EnableCaching //@0
+@ComponentScan
+@Configuration
+public class MainConfig1 {
+
+    //@1：缓存管理器
+    @Bean
+    public CacheManager cacheManager() {
+        //创建缓存管理器(ConcurrentMapCacheManager：其内部使用ConcurrentMap实现的)，构造器用来指定缓存的名称，可以指定多个
+        ConcurrentMapCacheManager cacheManager = new ConcurrentMapCacheManager(&amp;quot;cache1&amp;quot;);
+        return cacheManager;
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;缓存管理器，类型为&lt;code&gt;CacheManager&lt;/code&gt;，&lt;code&gt;CacheManager&lt;/code&gt;这个是个接口，有好几个实现（比如使用redis、ConcurrentMap来存储缓存信息），此处我们使用&lt;code&gt;ConcurrentMapCacheManager&lt;/code&gt;，内部使用ConcurrentHashMap将缓存信息直接存储在本地jvm内存中，不过线上环境一般是集群的方式，可以通过redis实现&lt;/p&gt;
+&lt;h3 id=&#34;2-key-属性-自定义key&#34;&gt;2. key 属性: 自定义key
+&lt;/h3&gt;&lt;p&gt;​	key属性用来指定Spring缓存方法的返回结果时对应的key的，上面说了你可以将Cache理解为一个hashMap，缓存以key-&amp;gt;value的形式存储在hashmap中，value就是需要缓存值（即方法的返回值）&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;属性名称&lt;/th&gt;
+          &lt;th&gt;描述&lt;/th&gt;
+          &lt;th&gt;实例&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;methodName&lt;/td&gt;
+          &lt;td&gt;当前方法名&lt;/td&gt;
+          &lt;td&gt;#root.methodName&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;method&lt;/td&gt;
+          &lt;td&gt;当前方法&lt;/td&gt;
+          &lt;td&gt;#root.method,name&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;target&lt;/td&gt;
+          &lt;td&gt;当前被调用的对象&lt;/td&gt;
+          &lt;td&gt;#root.targetClass&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;args&lt;/td&gt;
+          &lt;td&gt;当前方法参数组成的数组&lt;/td&gt;
+          &lt;td&gt;#root.args[0]&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;caches&lt;/td&gt;
+          &lt;td&gt;当前被调用方法使用的cache&lt;/td&gt;
+          &lt;td&gt;#root.caches[0].name&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h1 id=&#34;2-问题&#34;&gt;2. 问题
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;如果项目重启, 那么会对redis 缓存有影响吗? 重新请求接口走的是缓存吗?    有影响, 不走缓存&lt;/li&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;3-demo&#34;&gt;3. demo
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;开启@EnableCaching 注解&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;==注入 cacheManager bean==&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;@Bean
+    public CacheManager cacheManager(RedisTemplate redisTemplate) {
+        // 1. 非锁方式：nonLockingRedisCacheWriter(RedisConnectionFactory connectionFactory);
+        //    有锁方式：lockingRedisCacheWriter(RedisConnectionFactory connectionFactory);
+
+        RedisCacheWriter redisCacheWriter = RedisCacheWriter
+                .nonLockingRedisCacheWriter(Objects.requireNonNull(redisTemplate.getConnectionFactory()));
+
+        //2.创建Jackson对象并传入需要序列化的对象
+        Jackson2JsonRedisSerializer&amp;lt;Object&amp;gt; serializer = new Jackson2JsonRedisSerializer&amp;lt;&amp;gt;(Object.class);
+        ObjectMapper om = new ObjectMapper();
+        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        om.activateDefaultTyping(om.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.WRAPPER_ARRAY);
+        serializer.setObjectMapper(om);
+
+        //3.传入 Jackson对象 并获取 RedisSerializationContext对象
+        RedisSerializationContext&amp;lt;Object, Object&amp;gt; serializationContext = RedisSerializationContext.fromSerializer(serializer);
+
+        //4.配置RedisCacheConfiguration
+        /*
+         * RedisCacheConfiguration.defaultCacheConfig()
+         * 设置 value 的序列化 serializeValuesWit(SerializationPari&amp;lt;?&amp;gt; valueSerializationPari)
+         * 设置 key 的序列化 serializeKeysWith(SerializationPari valueSerializationPari)
+         */
+        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofDays(1L))
+                .serializeValuesWith(serializationContext.getValueSerializationPair());
+
+        //5.创建RedisCacheManager(RedisCacheWriter redisCacheWriter, RedisCacheConfiguration redisCacheConfiguration)对象并返回
+        return new RedisCacheManager(redisCacheWriter, redisCacheConfiguration);
+
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;使用&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Cacheable(cacheNames = {&amp;quot;zxipr&amp;quot;}, key = &amp;quot;#root.methodName&amp;quot;, cacheManager = &amp;quot;cacheManager&amp;quot;)
+public List&amp;lt;PatentTrademarkApplyCountEntity&amp;gt; listPatentTrademarkApplyTimeTrend(){}
+
+@Cacheable(cacheNames = {&amp;quot;zxipr:trademark&amp;quot;}, key = &amp;quot;#root.methodName&amp;quot;, cacheManager = &amp;quot;cacheManager&amp;quot;)
+public TrademarkCountEntity countTrademarks() {}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

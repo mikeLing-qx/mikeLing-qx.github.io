@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>开发工具 on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/categories/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/</link>
+        <description>Recent content in 开发工具 on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Tue, 01 Sep 2020 19:21:43 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/categories/%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Idea</title>
+        <link>https://mikeLing-qx.github.io/p/idea/</link>
+        <pubDate>Tue, 01 Sep 2020 19:21:43 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/idea/</guid>
+        <description>&lt;h1 id=&#34;1-常见图标含义&#34;&gt;1. 常见图标含义
+&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;参考文档:  &lt;a class=&#34;link&#34; href=&#34;https://www.cnblogs.com/lsgxeva/p/13386238.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.cnblogs.com/lsgxeva/p/13386238.html&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/idea/images/image-20220426182457557.png&#34;
+	width=&#34;365&#34;
+	height=&#34;162&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220426182457557&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;225&#34;
+		data-flex-basis=&#34;540px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;2-目录列表&#34;&gt;2. 目录列表
+&lt;/h1&gt;&lt;p&gt;自动定位到当前打开的文件&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/idea/images/image-20220812152106580.png&#34;
+	width=&#34;1007&#34;
+	height=&#34;707&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220812152106580&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;142&#34;
+		data-flex-basis=&#34;341px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;3-debug&#34;&gt;3. debug
+&lt;/h1&gt;&lt;p&gt;ctrl + f8 添加或删除断点&lt;/p&gt;
+&lt;p&gt;ctrl + shift + f8 查看所有断点&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Show Excuteion Point &amp;ndash; &lt;strong&gt;Alt + F10&lt;/strong&gt; &amp;ndash; 跳转到当前所在执行代码位置&lt;/p&gt;
+&lt;p&gt;Step Over &amp;ndash; &lt;strong&gt;F8&lt;/strong&gt; &amp;ndash; 单步执行，从当前执行代码开始执行下一条语句。&lt;/p&gt;
+&lt;p&gt;Step Into &amp;ndash; &lt;strong&gt;F7&lt;/strong&gt; &amp;ndash; 进入，如果当前行 有方法，则进入方法内；一般用于进入自定义方法，不会进入官方类库的方法。&lt;/p&gt;
+&lt;p&gt;Force Step Into &amp;ndash; &lt;strong&gt;Alt+Shift+F7&lt;/strong&gt; &amp;ndash; 强制进入，能进入任何方法；一般用于查看源码时，进入官方类库的方法。&lt;/p&gt;
+&lt;p&gt;Step Out &amp;ndash; &lt;strong&gt;Shift F8&lt;/strong&gt; &amp;ndash; 跳出，立即执行完当前正在执行的方法，返回方法的调用处。&lt;/p&gt;
+&lt;p&gt;Drop Frame &amp;ndash; 删除栈帧，从当前 执行方法 回退到 方法的调用处。&lt;/p&gt;
+&lt;p&gt;Run to Cursor &amp;ndash; &lt;strong&gt;Alt+F9&lt;/strong&gt; &amp;ndash; 执行到光标处。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;4-书签&#34;&gt;4. 书签
+&lt;/h1&gt;&lt;p&gt;f11: 在代码所在行添加书签&lt;/p&gt;
+&lt;p&gt;ctrl + shift + 数字{1, 9}:  添加助记书签&lt;/p&gt;
+&lt;p&gt;shift + f11: 查看所有书签&lt;/p&gt;
+&lt;p&gt;delete: 删除书签&lt;/p&gt;
+&lt;p&gt;Alt + 方向键上下:  上下移动书签。&lt;/p&gt;
+&lt;p&gt;ctrl+数字: 快速跳转&lt;/p&gt;
+&lt;h1 id=&#34;5-查找使用处&#34;&gt;5. 查找使用处
+&lt;/h1&gt;&lt;p&gt;Alt + f7&lt;/p&gt;
+&lt;h1 id=&#34;6-抽取变量&#34;&gt;6. 抽取变量
+&lt;/h1&gt;&lt;p&gt;ctrl + alt +m&lt;/p&gt;
+&lt;h1 id=&#34;7-远程debug&#34;&gt;7. 远程debug
+&lt;/h1&gt;&lt;pre&gt;&lt;code&gt;Test-NetConnection -ComputerName 172.29.8.144 -Port 8889
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/idea/images/image-20240508160409941.png&#34;
+	width=&#34;1464&#34;
+	height=&#34;934&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240508160409941&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;156&#34;
+		data-flex-basis=&#34;376px&#34;
+	
+&gt;&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

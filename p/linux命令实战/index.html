@@ -1,0 +1,2061 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="1. linux 基础 **Linux文件系统和目录结构：**了解基本的文件系统层次结构和常见的目录，比如/root,/home,/etc, /var等。了解文件权限以及如何改变文件权限(chmod, chown)。这些都是Linux基础知识。 chmod: 命令来改变文件或目录的权限\n">
+<title>Linux命令实战</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Linux命令实战">
+<meta property='og:description' content="1. linux 基础 **Linux文件系统和目录结构：**了解基本的文件系统层次结构和常见的目录，比如/root,/home,/etc, /var等。了解文件权限以及如何改变文件权限(chmod, chown)。这些都是Linux基础知识。 chmod: 命令来改变文件或目录的权限\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-09-18T11:23:54&#43;08:00'/><meta property='article:modified_time' content='2024-09-18T11:23:54&#43;08:00'/>
+<meta name="twitter:title" content="Linux命令实战">
+<meta name="twitter:description" content="1. linux 基础 **Linux文件系统和目录结构：**了解基本的文件系统层次结构和常见的目录，比如/root,/home,/etc, /var等。了解文件权限以及如何改变文件权限(chmod, chown)。这些都是Linux基础知识。 chmod: 命令来改变文件或目录的权限\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-linux-基础">1. linux 基础</a>
+      <ul>
+        <li><a href="#1--系统启动过程">1.  系统启动过程</a></li>
+        <li><a href="#2-系统目录结构">2. 系统目录结构</a></li>
+        <li><a href="#3-linux-文件基本属性">3. linux 文件基本属性</a></li>
+        <li><a href="#4-linux-磁盘管理">4. linux 磁盘管理</a>
+          <ul>
+            <li><a href="#1-fdisk-分区">1. fdisk 分区</a></li>
+            <li><a href="#2-分区表类型">2. 分区表类型</a>
+              <ul>
+                <li><a href="#1-mbr分区">1. MBR分区</a></li>
+                <li><a href="#2-gpt分区">2. GPT分区</a></li>
+                <li><a href="#3-loop">3. loop</a></li>
+              </ul>
+            </li>
+            <li><a href="#3-文件系统">3. 文件系统</a>
+              <ul>
+                <li>
+                  <ul>
+                    <li><a href="#1-inode-是什么">1. inode 是什么?</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li><a href="#4-parted-分区">4. parted 分区</a></li>
+            <li><a href="#5-文件系统">5. 文件系统</a>
+              <ul>
+                <li><a href="#1-文件系统类型">1. 文件系统类型</a></li>
+                <li><a href="#2-文件系统挂载">2. 文件系统挂载</a></li>
+                <li><a href="#3-开机自动挂载">3. 开机自动挂载</a></li>
+              </ul>
+            </li>
+            <li><a href="#6-swap-交换分区">6. swap 交换分区</a></li>
+            <li><a href="#7-内存不足">7. 内存不足</a></li>
+            <li><a href="#8-清理僵尸进程">8 清理僵尸进程</a></li>
+            <li><a href="#9-raid">9. raid</a>
+              <ul>
+                <li><a href="#1级别">1.级别</a></li>
+                <li><a href="#2--硬软">2.  硬,软</a>
+                  <ul>
+                    <li><a href="#1-硬raid">1. 硬raid</a></li>
+                    <li><a href="#2-软raid">2. 软raid</a></li>
+                  </ul>
+                </li>
+                <li><a href="#3-搭建raid">3. 搭建raid</a></li>
+                <li><a href="#4--raid-10-故障修复">4.  raid 10 故障修复</a></li>
+              </ul>
+            </li>
+            <li><a href="#10-lvm">10 .lvm</a>
+              <ul>
+                <li><a href="#1-相关概念">1. 相关概念</a></li>
+                <li><a href="#2-lvm-管理常见命令">2. lvm 管理常见命令</a></li>
+                <li><a href="#3--创建流程">3.  创建流程</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#2-文本三剑客">2. 文本三剑客</a>
+      <ul>
+        <li><a href="#1-awk">1. awk</a></li>
+        <li><a href="#2-grep">2. grep</a></li>
+        <li><a href="#3-sed">3. sed</a></li>
+        <li><a href="#4-vim">4. vim</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-命令">3. 命令</a>
+      <ul>
+        <li><a href="#1-ps--ef">1. ps -ef</a></li>
+        <li><a href="#2-grep-1">2. grep</a></li>
+        <li><a href="#3-tar">3. tar</a></li>
+        <li><a href="#4-partx">4. partx</a></li>
+        <li><a href="#5-ln-软硬链接">5. ln 软硬链接</a></li>
+        <li><a href="#6-df">6. df</a></li>
+        <li><a href="#7-du">7. du</a></li>
+        <li><a href="#8-查询占用">8. 查询占用</a></li>
+        <li><a href="#9-查看系统启动时间">9. 查看系统启动时间</a></li>
+        <li><a href="#10-less">10. less</a></li>
+        <li><a href="#11-gunzip">11. gunzip</a></li>
+        <li><a href="#12-tee">12. tee</a>
+          <ul>
+            <li><a href="#1-基本用法">1. 基本用法</a></li>
+            <li><a href="#2-示例">2. 示例</a></li>
+            <li><a href="#3-常用选项">3. 常用选项</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#4-服务器缩容">4. 服务器缩容</a>
+      <ul>
+        <li><a href="#1-常规磁盘">1. 常规磁盘</a></li>
+        <li><a href="#2-lvm-缩容">2. lvm 缩容</a>
+          <ul>
+            <li><a href="#1-理论回顾">1. 理论回顾</a></li>
+            <li><a href="#2-实际场景操作">2. 实际场景操作</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/">Linux命令实战</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Sep 18, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 24 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="1-linux-基础">1. linux 基础
+</h1><ol>
+<li>**Linux文件系统和目录结构：**了解基本的文件系统层次结构和常见的目录，比如<code>/root</code>,<code>/home</code>,<code>/etc</code>, <code>/var</code>等。了解文件权限以及如何改变文件权限(chmod, chown)。这些都是Linux基础知识。</li>
+</ol>
+<p>chmod:  命令来改变文件或目录的权限</p>
+<p>chown: 用来修改文件的所有者和组, 使用这个命令需要用超级用户</p>
+<ol>
+<li><strong>Linux磁盘管理：</strong> 理解磁盘如何在Linux中被管理，学习如何查看磁盘使用情况（df, du命令）。</li>
+<li><strong>分区和文件系统：</strong> 需要了解如何使用Linux系统工具（比如fdisk, parted）进行磁盘分区，以及如何格式化分区并创建文件系统（mkfs命令）。</li>
+<li>**挂载和卸载：**理解挂载点的概念，并学习如何挂载（mount）和卸载（umount）文件系统。</li>
+<li>**文件的复制和移动：**掌握如何复制和移动文件（cp, mv命令），并理解硬链接和软链接的区别和用法(ln命令)。</li>
+<li>**备份和恢复：**熟悉如何备份文件和文件系统（使用tar等工具），如何同步文件（rsync）。</li>
+<li>**问题排查：**如何查看和搜索日志文件，如何使用Linux内置的诊断工具进行问题排查（dmesg, fdisk, lsblk等）。</li>
+</ol>
+<h2 id="1--系统启动过程">1.  系统启动过程
+</h2><ul>
+<li>内核的引导。</li>
+<li>运行 init。</li>
+<li>系统初始化。</li>
+<li>建立终端 。</li>
+<li>用户登录系统</li>
+</ul>
+<pre><code>关机的话一般都要先运行 sync将数据由内存同步到硬盘中
+然后再执行shutdowon命令
+</code></pre>
+<h2 id="2-系统目录结构">2. 系统目录结构
+</h2><p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240426163746843.png"
+	width="1056"
+	height="627"
+	
+	loading="lazy"
+	
+		alt="image-20240426163746843"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="168"
+		data-flex-basis="404px"
+	
+></p>
+<ul>
+<li>
+<p><strong>/bin</strong>：
+bin 是 Binaries (二进制文件) 的缩写, 这个目录存放着最经常使用的命令。</p>
+</li>
+<li>
+<p><strong>/boot：</strong>
+这里存放的是启动 Linux 时使用的一些核心文件，包括一些连接文件以及镜像文件。</p>
+</li>
+<li>
+<p><strong>/dev ：</strong>
+dev 是 Device(设备) 的缩写, 该目录下存放的是 Linux 的外部设备，在 Linux 中访问设备的方式和访问文件的方式是相同的。</p>
+</li>
+<li>
+<p><strong>/etc：</strong>
+etc 是 Etcetera(等等) 的缩写,这个目录用来==存放所有的系统管理所需要的配置文件和子目录==。</p>
+</li>
+<li>
+<p><strong>/home</strong>：
+用户的主目录，在 Linux 中，==每个用户都有一个自己的目录，一般该目录名是以用户的账号命名==的，如上图中的 alice、bob 和 eve。 类似 /home/daheng</p>
+</li>
+<li>
+<p><strong>/lib</strong>：
+lib 是 Library(库) 的缩写这个目录里存放着系统最基本的动态连接共享库，其作用类似于 Windows 里的 DLL 文件。几乎所有的应用程序都需要用到这些共享库。</p>
+</li>
+<li>
+<p><strong>/lost+found</strong>：
+这个目录一般情况下是空的，当系统非法关机后，这里就存放了一些文件。</p>
+</li>
+<li>
+<p><strong>/media</strong>：
+linux 系统会自动识别一些设备，例如U盘、光驱等等，当识别后，Linux 会把识别的设备挂载到这个目录下。</p>
+</li>
+<li>
+<p><strong>/mnt</strong>：
+系统提供该目录是==为了让用户临时挂载别的文件系统的==，我们可以将光驱挂载在 /mnt/ 上，然后进入该目录就可以查看光驱里的内容了。</p>
+</li>
+<li>
+<p><strong>/opt</strong>：
+opt 是 optional(可选) 的缩写，这是给==主机额外安装软件所摆放的目录==。比如你安装一个ORACLE数据库则就可以放到这个目录下。默认是空的。</p>
+</li>
+<li>
+<p><strong>/proc</strong>：
+==proc 是 Processes(进程) 的缩写==，/proc 是一种伪文件系统（也即虚拟文件系统），存储的是当前内核运行状态的一系列特殊文件，这个目录是一个虚拟的目录，它是系统内存的映射，我们可以通过直接访问这个目录来获取系统信息。
+这个目录的内容不在硬盘上而是在内存里，我们也可以直接修改里面的某些文件，比如可以通过下面的命令来屏蔽主机的ping命令，使别人无法ping你的机器：</p>
+<pre><code>echo 1 &gt; /proc/sys/net/ipv4/icmp_echo_ignore_all
+</code></pre>
+</li>
+<li>
+<p><strong>/root</strong>：
+该目录为系统管理员，也称作超级权限者的用户主目录。</p>
+</li>
+<li>
+<p><strong>/sbin</strong>：
+s 就是 Super User 的意思，是 Superuser Binaries (超级用户的二进制文件) 的缩写，这里==存放的是系统管理员使用的系统管理程序==。</p>
+</li>
+<li>
+<p><strong>/selinux</strong>：
+这个目录是 Redhat/CentOS 所特有的目录，Selinux 是一个安全机制，类似于 windows 的防火墙，但是这套机制比较复杂，这个目录就是存放selinux相关的文件的。</p>
+</li>
+<li>
+<p><strong>/srv</strong>：
+该目录存放一些服务启动之后需要提取的数据。</p>
+</li>
+<li>
+<p><strong>/sys</strong>：</p>
+<p>这是 Linux2.6 内核的一个很大的变化。该目录下安装了 2.6 内核中新出现的一个文件系统 sysfs 。</p>
+<p>sysfs 文件系统集成了下面3种文件系统的信息：针对进程信息的 proc 文件系统、针对设备的 devfs 文件系统以及针对伪终端的 devpts 文件系统。</p>
+<p>该文件系统是内核设备树的一个直观反映。</p>
+<p>当一个内核对象被创建的时候，对应的文件和目录也在内核对象子系统中被创建。</p>
+</li>
+<li>
+<p><strong>/tmp</strong>：
+tmp 是 temporary(临时) 的缩写这个目录是用来存放一些临时文件的。</p>
+</li>
+<li>
+<p><strong>/usr</strong>：
+usr 是 unix shared resources(共享资源) 的缩写，这是一个非常重要的目录，==用户的很多应用程序和文件都放在这个目录下==，类似于 windows 下的 program files 目录。</p>
+</li>
+<li>
+<p><strong>/usr/bin：</strong>
+==系统用户使用的应用程序==。</p>
+</li>
+<li>
+<p><strong>/usr/sbin：</strong>
+超级用户使用的比较高级的管理程序和系统守护程序。</p>
+</li>
+<li>
+<p><strong>/usr/src：</strong>
+内核源代码默认的放置目录。</p>
+</li>
+<li>
+<p><strong>/var</strong>：
+var 是 variable(变量) 的缩写，这个目录中存放着在不断扩充着的东西，我们习惯将那些经常被修改的目录放在这个目录下。包括各种日志文件。</p>
+</li>
+<li>
+<p><strong>/run</strong>：
+是一个临时文件系统，存储系统启动以来的信息。当系统重启时，这个目录下的文件应该被删掉或清除。如果你的系统上有 /var/run 目录，应该让它指向 run。</p>
+</li>
+</ul>
+<h2 id="3-linux-文件基本属性">3. linux 文件基本属性
+</h2><ul>
+<li>chown (change owner) ： 修改所属用户与组。</li>
+<li>chmod (change mode) ： 修改用户的权限。</li>
+<li><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240426165322283.png"
+	width="806"
+	height="569"
+	
+	loading="lazy"
+	
+		alt="image-20240426165322283"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="141"
+		data-flex-basis="339px"
+	
+></li>
+</ul>
+<p><strong>ls –l</strong> 命令来显示一个文件的属性以及文件所属的用户和组</p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240426170215679.png"
+	width="1054"
+	height="553"
+	
+	loading="lazy"
+	
+		alt="image-20240426170215679"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="190"
+		data-flex-basis="457px"
+	
+></p>
+<h2 id="4-linux-磁盘管理">4. linux 磁盘管理
+</h2><p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240429112246088.png"
+	width="956"
+	height="878"
+	
+	loading="lazy"
+	
+		alt="image-20240429112246088"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="108"
+		data-flex-basis="261px"
+	
+></p>
+<p>机械硬盘</p>
+<ol>
+<li>磁盘的最小存储单位是 扇区, 512Bytes, 0.5kb,, sector</li>
+<li>操作系统文件存取的 最小单位是 块, 8个 连续的扇区 (横向的), 磁盘的最小存储单位block, 是4kb, 一个block 只能存放一个文件的内容, ==因此文件占用空间的大小, 只能是 block 的整数倍==, 在windows 中, 多个连续的扇区被称为==簇==</li>
+</ol>
+<h3 id="1-fdisk-分区">1. fdisk 分区
+</h3><p>fdisk 对磁盘进行格式化和分区</p>
+<h3 id="2-分区表类型">2. 分区表类型
+</h3><p>mbr 分区表, 硬盘容量受限制, 最大只支持2T</p>
+<p>gpt 分区表, 没有大小限制</p>
+<h4 id="1-mbr分区">1. MBR分区
+</h4><p>MBR是一种较传统的分区方法，早在DOS时代就开始使用。MBR的分区信息存储在位于物理硬盘的开头的Master Boot Record中（这也是MBR名称的由来）。</p>
+<p>MBR的一个主要限制是，它只支持==最大2TB大小的磁盘==，并且==只能创建最多4个主分区==，或者3个主分区加一个扩展分区。扩展分区可以被分为更多的逻辑分区。</p>
+<h4 id="2-gpt分区">2. GPT分区
+</h4><p>==该类型的分区表示没有拓展分区的==</p>
+<p>GPT是一种更新的分区方案，它是UEFI规范的一部分。GPT没有MBR分区的以上限制，它支持的磁盘大小理论上可以达到9.4 ZB（1ZB是1024的7次方字节），并且可以创建数量几乎无限的分区（具体数量取决于操作系统，Windows最多支持128个GPT分区）。</p>
+<p>相对于MBR，GPT提供了更加现代化的分区方式，包括磁盘和分区的唯一识别符，以及可恢复的分区表头等等。GPT也能在某些分区损坏的情况下，提供更好的数据安全性。</p>
+<p>目前主流的新硬件和操作系统，包括Windows，Linux，Mac OS等，都已经支持GPT分区。</p>
+<p>需要注意的是，不同的分区表结构对应不同的启动模式；MBR通常用于BIOS启动，而GPT则用于UEFI启动。在清楚自己的需求和硬件条件下选择合适的分区方法是非常重要的。</p>
+<h4 id="3-loop">3. loop
+</h4><p>&ldquo;loop&rdquo; 分区表类型并不是指 GPT 或 MBR，而是指这个设备被用作回环设备。回环设备通常不使用传统的分区表，因为它们通常代表单个文件系统，而不是一个包含多个分区的物理磁盘。</p>
+<h3 id="3-文件系统">3. 文件系统
+</h3><p>操作系统中==专门用于管理和存储文件的 信息软件被称为文件系统==</p>
+<p>==常见的文件系统==</p>
+<ul>
+<li>fat16 fat32, 最早的windows 文件系统, 单个文件不能超过2gb</li>
+<li>NTFS 文件系统, 支持文件加密, ==采用日志形式的文件系统, 详细的记录磁盘读写的操作, 支持数据恢复== 突破了单个问价4g 大小的限制</li>
+<li>exFAT 文件系统, 单个文件支持16gb 大小, 可以 在windows , linux, macos 同时识别</li>
+</ul>
+<p>==磁盘的RPM, 磁盘内电机主轴的旋转速度==, 一分钟内能够完成的最大旋转数</p>
+<p>linux 中==一切皆文件, 磁盘设备在系统中也是以文件形式 展示==</p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240429162919269.png"
+	width="883"
+	height="489"
+	
+	loading="lazy"
+	
+		alt="image-20240429162919269"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="180"
+		data-flex-basis="433px"
+	
+></p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240429163214674.png"
+	width="888"
+	height="330"
+	
+	loading="lazy"
+	
+		alt="image-20240429163214674"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="269"
+		data-flex-basis="645px"
+	
+></p>
+<h5 id="1-inode-是什么">1. inode 是什么?
+</h5><p>==stat  可以查看文件的元信息==</p>
+<p>文件是以==文件数据 + 文件元信息组成的==, 文件的inode 号 + 文件数据内容, 代表一个单个文件</p>
+<p>文件系统存储 文件元信息的地方就是 inode, 叫做索引节点</p>
+<p>查看文件的 inode号</p>
+<pre><code class="language-properties">ls -li  #打印出来的信息, 除了文件名, 其他信息都是inode存储的元信息
+</code></pre>
+<ul>
+<li>文件大小</li>
+<li>属主信息</li>
+<li>用户组信息</li>
+<li>文件权限数字</li>
+<li>文件的修改时间</li>
+<li>文件的实体指针, 指向block 的位置</li>
+</ul>
+<pre><code>df -hT 可以查看文件系统的类型
+</code></pre>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240429181604415.png"
+	width="1259"
+	height="944"
+	
+	loading="lazy"
+	
+		alt="image-20240429181604415"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="133"
+		data-flex-basis="320px"
+	
+></p>
+<h3 id="4-parted-分区">4. parted 分区
+</h3><p>对超过2T的硬盘进行分区</p>
+<h3 id="5-文件系统">5. 文件系统
+</h3><h4 id="1-文件系统类型">1. 文件系统类型
+</h4><p>vfs 虚拟文件系统</p>
+<p>磁盘为什么要格式化</p>
+<p>==不同的系统, 使用的文件系统也各不同==</p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240429185153248.png"
+	width="1224"
+	height="643"
+	
+	loading="lazy"
+	
+		alt="image-20240429185153248"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="190"
+		data-flex-basis="456px"
+	
+></p>
+<p>linux ==ext3 以后都是日志文件系统==</p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240429185319692.png"
+	width="1455"
+	height="658"
+	
+	loading="lazy"
+	
+		alt="image-20240429185319692"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="221"
+		data-flex-basis="530px"
+	
+></p>
+<p>文件系统创建工具</p>
+<pre><code>mkfs 可以把某个分区格式化为某种文件系统
+
+fsck 命令, 修复文件系统的命令
+	默认读取/etc/fatab 开机挂载文件的
+	
+	对磁盘进行修复检查
+    fsck -t 文件系统类型 设备名
+	
+查看文件系统的属性 lsbks
+</code></pre>
+<p>NFS 网络上共享文件系统 ,   UNIX 和类 UNIX 系统之间共享文件的标准方法</p>
+<pre><code>showmount -e localhost 查看当前设置为NFS 的 共享目录
+也可以直接查看 cat /etc/exports
+</code></pre>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430110106793.png"
+	width="755"
+	height="144"
+	
+	loading="lazy"
+	
+		alt="image-20240430110106793"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="524"
+		data-flex-basis="1258px"
+	
+></p>
+<h4 id="2-文件系统挂载">2. 文件系统挂载
+</h4><p>没有挂载的设备,相当于没有开窗的物资, 进不去也出不来, 相当于一个屋子没有出入口</p>
+<p>挂载通常是一个存储设备挂接到另一个已存在的文件夹中, 访问这个文件夹, 就是访问该存储设备的内容了</p>
+<p>挂载点就是 一个普通文件夹</p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430092810540.png"
+	width="1152"
+	height="548"
+	
+	loading="lazy"
+	
+		alt="image-20240430092810540"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="210"
+		data-flex-basis="504px"
+	
+></p>
+<h4 id="3-开机自动挂载">3. 开机自动挂载
+</h4><p>由于mount 命令直接输入是临时生效, 下次启动, 挂载的设备分区就无法使用了</p>
+<p>/etc/fstab 文件,  存放系统一些静态文件的地方</p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430144544628.png"
+	width="1188"
+	height="693"
+	
+	loading="lazy"
+	
+		alt="image-20240430144544628"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="171"
+		data-flex-basis="411px"
+	
+></p>
+<h3 id="6-swap-交换分区">6. swap 交换分区
+</h3><p>swap 是 linux 系统磁盘管理的一块特殊的分区, 当实际的物理内存不足的时候, 操作系统会从整个内存中, 取出一部分暂无使用的内存, 拿出来放到交换分区, 从而给当前在使用程序更多的内存</p>
+<p>swap 分区大小, 必须根据物理内存和硬盘容量来计算</p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430095355604.png"
+	width="1055"
+	height="127"
+	
+	loading="lazy"
+	
+		alt="image-20240430095355604"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="830"
+		data-flex-basis="1993px"
+	
+></p>
+<p>创建交换分区并使用</p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430095830220.png"
+	width="990"
+	height="203"
+	
+	loading="lazy"
+	
+		alt="image-20240430095830220"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="487"
+		data-flex-basis="1170px"
+	
+></p>
+<h3 id="7-内存不足">7. 内存不足
+</h3><p>无故提示内存不足, 但是在cache, buff 中又看到大量的内存, 如何释放</p>
+<p>以下都是临时释放缓存的命令</p>
+<ul>
+<li>释放cache命令</li>
+</ul>
+<pre><code>echo 1 &gt; /proc/sys/vm/drop_caches
+等同于
+sysctl -w vm.drop_caches=1
+</code></pre>
+<ul>
+<li>清除目录缓存</li>
+</ul>
+<pre><code>echo 2 &gt; /proc/sys/vm/drop_caches
+等同于
+sysctl -w vm.drop_caches=2
+</code></pre>
+<ul>
+<li>清除内存页的缓存</li>
+</ul>
+<pre><code>echo 3 &gt; /proc/sys/vm/drop_caches
+等同于
+sysctl -w vm.drop_caches=3
+
+</code></pre>
+<h3 id="8-清理僵尸进程">8 清理僵尸进程
+</h3><p>将内存缓冲区中的数据 写入到磁盘中</p>
+<pre><code>sync
+
+</code></pre>
+<h3 id="9-raid">9. raid
+</h3><h4 id="1级别">1.级别
+</h4><p>RAID（冗余独立磁盘阵列）是一种用于连接多块硬盘驱动器为一体，以提供数据冗余、增强性能或两者兼有的存储技术。有多种不同的 RAID 级别，每种 RAID 级别都在性能和冗余性之间实现了不同的平衡。以下是常见的 RAID 级别：</p>
+<ul>
+<li>
+<p><strong>RAID 0</strong>：条带化。在 RAID 0 设置中，数据会被均匀地分布在两个或更多的磁盘上。这种方法可以增加数据吞吐量，但如果其中任何一块磁盘失效，所有数据都会丢失。</p>
+</li>
+<li>
+<p><strong>RAID 1</strong>：镜像。在 RAID 1 设置中，两块磁盘会包含完全相同的数据，因此提供了数据冗余。如果一块磁盘出现故障，系统可以无缝地切换到另一块磁盘。然而，因为每次写入都必须写入两块磁盘，RAID 1 可能会对性能产生影响。</p>
+</li>
+<li>
+<p><strong>RAID 5</strong>：带奇偶校验的分块分条处理，至少需要 3 块磁盘，它提供了数据冗余和性能增强。在 RAID 5 设置中，==数据和奇偶校验位将在所有磁盘之间分布==。如果一块磁盘出现故障，数据仍然可以从剩余的磁盘中恢复。</p>
+</li>
+<li>
+<p><strong>RAID 6</strong>：是 RAID 5 的一个变种，至少需要 4 块磁盘。它使用两个奇偶校验块分布在每个磁盘，因此可以容忍两块磁盘的同时失败。</p>
+</li>
+<li>
+<p><strong>RAID 10</strong>：也被称为 &ldquo;1+0&rdquo;，是 RAID 1 和 RAID 0 的组合。它提供了 RAID 0 的性能提升，以及 RAID 1 的数据冗余。需要最少 4 块磁盘。 只要不是同一个硬盘组同时损坏, 就还是可用的</p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430154014268.png"
+	width="710"
+	height="501"
+	
+	loading="lazy"
+	
+		alt="image-20240430154014268"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="141"
+		data-flex-basis="340px"
+	
+></p>
+</li>
+</ul>
+<p>RAID 可以通过软件（使用操作系统的功能）或硬件（使用专用的 RAID 控制器）实现，除了上述的标准RAID级别，还有一些制造商特定的RAID级别，例如 RAID 50（RAID 5 的封套+ RAID 0）、RAID 60（RAID 6 + RAID 0）等。每种级别都各有其优势和劣势，你应根据你的存储需求和可接受的故障风险来选择适合的RAID级别</p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430153550687.png"
+	width="1048"
+	height="622"
+	
+	loading="lazy"
+	
+		alt="image-20240430153550687"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="168"
+		data-flex-basis="404px"
+	
+></p>
+<p>raid 3的特点是 存异或值 的磁盘不可以损坏, raid</p>
+<h4 id="2--硬软">2.  硬,软
+</h4><h5 id="1-硬raid">1. 硬raid
+</h5><p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430154327613.png"
+	width="994"
+	height="893"
+	
+	loading="lazy"
+	
+		alt="image-20240430154327613"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="111"
+		data-flex-basis="267px"
+	
+></p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430155030787.png"
+	width="1193"
+	height="887"
+	
+	loading="lazy"
+	
+		alt="image-20240430155030787"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="134"
+		data-flex-basis="322px"
+	
+></p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430154904092.png"
+	width="966"
+	height="484"
+	
+	loading="lazy"
+	
+		alt="image-20240430154904092"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="199"
+		data-flex-basis="479px"
+	
+></p>
+<h5 id="2-软raid">2. 软raid
+</h5><ul>
+<li>软raid 需要额外的消耗cpu 资源, 造成服务器压力</li>
+<li>硬raid 更稳定, 兼容性更好</li>
+</ul>
+<h4 id="3-搭建raid">3. 搭建raid
+</h4><p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430160240484.png"
+	width="1210"
+	height="891"
+	
+	loading="lazy"
+	
+		alt="image-20240430160240484"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="135"
+		data-flex-basis="325px"
+	
+></p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430160617298.png"
+	width="926"
+	height="407"
+	
+	loading="lazy"
+	
+		alt="image-20240430160617298"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="227"
+		data-flex-basis="546px"
+	
+></p>
+<ol start="9">
+<li>检查raid10的详细信息</li>
+</ol>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430160642562.png"
+	width="960"
+	height="668"
+	
+	loading="lazy"
+	
+		alt="image-20240430160642562"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="143"
+		data-flex-basis="344px"
+	
+></p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430161314568.png"
+	width="1120"
+	height="307"
+	
+	loading="lazy"
+	
+		alt="image-20240430161314568"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="364"
+		data-flex-basis="875px"
+	
+></p>
+<h4 id="4--raid-10-故障修复">4.  raid 10 故障修复
+</h4><p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430162243281.png"
+	width="844"
+	height="709"
+	
+	loading="lazy"
+	
+		alt="image-20240430162243281"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="119"
+		data-flex-basis="285px"
+	
+></p>
+<h3 id="10-lvm">10 .lvm
+</h3><h4 id="1-相关概念">1. 相关概念
+</h4><p>概要</p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430163436068.png"
+	width="1308"
+	height="449"
+	
+	loading="lazy"
+	
+		alt="image-20240430163436068"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="291"
+		data-flex-basis="699px"
+	
+></p>
+<p>图解lvm</p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430163236605.png"
+	width="691"
+	height="831"
+	
+	loading="lazy"
+	
+		alt="image-20240430163236605"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="83"
+		data-flex-basis="199px"
+	
+></p>
+<p>lvm 相关名词</p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430163811711.png"
+	width="1287"
+	height="178"
+	
+	loading="lazy"
+	
+		alt="image-20240430163811711"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="723"
+		data-flex-basis="1735px"
+	
+></p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430164152517.png"
+	width="1116"
+	height="398"
+	
+	loading="lazy"
+	
+		alt="image-20240430164152517"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="280"
+		data-flex-basis="672px"
+	
+></p>
+<p>LVM原理</p>
+<ul>
+<li>LVM 动态扩容, 其实就是通过互相交换PE的过程, 达到能够单行扩容分区大小</li>
+<li>想要减少空间容量, 就是提出PE的大小</li>
+<li>想要扩大容量, 就是把其他的PE 添加到自己的LV 中</li>
+<li>PE 默认大小是 4M, LVM 最多可以创建 65534 个PE,  因此 LVM最大 VG  卷组单位是256G</li>
+<li>PE 就是 LVM 最小存储单位, 类似操作系统的block</li>
+<li>LV 逻辑卷的概念 (理解为普通的分区概念, /dev/sda  /dev/sdb)</li>
+</ul>
+<h4 id="2-lvm-管理常见命令">2. lvm 管理常见命令
+</h4><p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430170336461.png"
+	width="596"
+	height="644"
+	
+	loading="lazy"
+	
+		alt="image-20240430170336461"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="92"
+		data-flex-basis="222px"
+	
+></p>
+<h4 id="3--创建流程">3.  创建流程
+</h4><ul>
+<li>物理磁盘被格式化成pv, 空间被分成一个个pe</li>
+<li>不同的pv假如通一个vg, 不同的pv的pe 全部将进入vg 的pe 池内</li>
+<li>lv基于 pe 创建, 大小为pe的整数倍, 组成lv的pe 可能来自不同的物理磁盘</li>
+<li>lv 现在就可以直接格式化后挂载使用了</li>
+<li>lv 的扩充缩减 实际上就是增加或减少组成该 lv 的 pe 数量, 其过程不丢失原始数据</li>
+</ul>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240515150056894.png"
+	width="1394"
+	height="533"
+	
+	loading="lazy"
+	
+		alt="image-20240515150056894"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="261"
+		data-flex-basis="627px"
+	
+></p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430170053509.png"
+	width="1244"
+	height="372"
+	
+	loading="lazy"
+	
+		alt="image-20240430170053509"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="334"
+		data-flex-basis="802px"
+	
+></p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430171458379.png"
+	width="942"
+	height="365"
+	
+	loading="lazy"
+	
+		alt="image-20240430171458379"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="258"
+		data-flex-basis="619px"
+	
+></p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430171603312.png"
+	width="932"
+	height="227"
+	
+	loading="lazy"
+	
+		alt="image-20240430171603312"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="410"
+		data-flex-basis="985px"
+	
+></p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430171423442.png"
+	width="889"
+	height="534"
+	
+	loading="lazy"
+	
+		alt="image-20240430171423442"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="166"
+		data-flex-basis="399px"
+	
+></p>
+<ol start="10">
+<li>对刚创建的 LV1 逻辑卷 进行格式化文件系统</li>
+</ol>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430171810187.png"
+	width="1053"
+	height="642"
+	
+	loading="lazy"
+	
+		alt="image-20240430171810187"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="164"
+		data-flex-basis="393px"
+	
+></p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430172411073.png"
+	width="1313"
+	height="512"
+	
+	loading="lazy"
+	
+		alt="image-20240430172411073"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="256"
+		data-flex-basis="615px"
+	
+></p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430172507499.png"
+	width="1291"
+	height="448"
+	
+	loading="lazy"
+	
+		alt="image-20240430172507499"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="288"
+		data-flex-basis="691px"
+	
+></p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430173043646.png"
+	width="1285"
+	height="395"
+	
+	loading="lazy"
+	
+		alt="image-20240430173043646"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="325"
+		data-flex-basis="780px"
+	
+></p>
+<h1 id="2-文本三剑客">2. 文本三剑客
+</h1><h2 id="1-awk">1. awk
+</h2><p>默认情况,  <code>awk</code>使用空白字符（如空格或制表符）作为字段分隔符</p>
+<pre><code>echo &quot;Hello World&quot; | awk '{print $1}'
+
+</code></pre>
+<p>可以自定义分隔符来满足你的需要。可以使用 <code>-F</code> 选项指定一个自定义的字段分隔符。例如：</p>
+<pre><code>echo &quot;Hello:World&quot; | awk -F':' '{print $1}'
+
+</code></pre>
+<p><code>awk</code>在行字段切分上这么强大的是，分隔符还可以是正则表达式。举个例子，你可以使用多个空格或者制表符作为分隔符，甚至混合使用它们：</p>
+<pre><code>awk -F'[ \t]+' ...
+
+</code></pre>
+<p>命令解析</p>
+<pre><code> awk '{print $11}' /var/log/nginx/access.log | sort | uniq -c | sort -nr | head -20
+
+</code></pre>
+<ol>
+<li><code>|</code>：这是管道符，用于将前一个命令的输出作为后一个命令的输入。</li>
+<li><code>awk {print $1}</code>：这是一个<code>awk</code>命令，作用是打印输入行的第一个字段。</li>
+<li><code>sort</code>：<code>sort</code>命令用于排序输入行。默认行为是进行字典排序。</li>
+<li><code>uniq -c</code>：<code>uniq</code>命令用于去重连续的重复行。<code>-c</code>选项会在去重的同时，显示每行的出现次数。</li>
+<li><code>sort -nr</code>：这是一个<code>sort</code>命令，<code>-n</code> 参数表明按数值顺序排序（而非字典顺序），<code>-r</code> 参数用于反转比较结果，使得排序结果为降序（默认为升序）。</li>
+<li><code>head -20</code>：<code>head</code>命令用于显示输入的前N行，<code>-20</code>参数指定显示前20行。</li>
+</ol>
+<p>总的来说，这串命令的作用是：将输入行第一个字段提取出来，然后统计每个不同字段出现的次数，按出现次数进行降序排序，最后取出现次数最多的前20个字段。</p>
+<h2 id="2-grep">2. grep
+</h2><p>==文件中搜索匹配指定模式的文本行 ==</p>
+<p><strong>常用选项：</strong></p>
+<ul>
+<li><code>-i</code>：忽略大小写。</li>
+<li><code>-r</code>：递归搜索目录中的文件。</li>
+<li><code>-v</code>：反转匹配，显示不包含模式的行。</li>
+<li><code>-n</code>：显示匹配行的行号。</li>
+</ul>
+<h2 id="3-sed">3. sed
+</h2><p><code>sed</code> 是一个流编辑器，用于逐行处理文本。它可以==执行查找和替换、插入、删除等操作==，适用于简单的文本操作和复杂的脚本处理。</p>
+<h2 id="4-vim">4. vim
+</h2><p>在 Vim 中撤回（撤销）修改可以使用 <code>u</code> 键。以下是一些常用的撤回和恢复操作：</p>
+<ol>
+<li><strong>撤销上一步操作</strong>：
+<ul>
+<li>==在普通模式下（按 <code>Esc</code> 确保处于普通模式），按 <code>u</code> 键撤销上一步操作==。</li>
+</ul>
+</li>
+<li><strong>重复撤销</strong>：
+<ul>
+<li>每按一次 <code>u</code> 键都会撤销一次操作，你可以连续按 <code>u</code> 多次撤销多个操作。</li>
+</ul>
+</li>
+<li><strong>重做撤销的操作</strong>：
+<ul>
+<li>如果你撤销了一些操作后想要恢复，可以按 <code>Ctrl + r</code> 键（在普通模式下）重做上一步被撤销的操作。</li>
+<li>和 <code>u</code> 键类似，你可以连续按 <code>Ctrl + r</code> 多次恢复多个被撤销的操作。</li>
+</ul>
+</li>
+<li><strong>查看撤销历史</strong>：
+<ul>
+<li>Vim 中的撤销操作是基于撤销树的，你可以使用 <code>:undolist</code> 查看当前缓冲区的撤销历史。</li>
+<li>执行 <code>:undolist</code> 会显示撤销树中各个节点的信息，包含每次修改的时间戳和编号。</li>
+</ul>
+</li>
+<li><strong>跳转到特定的撤销点</strong>：
+<ul>
+<li>你可以使用 <code>:earlier</code> 命令跳转到较早的编辑状态。例如，<code>:earlier 5m</code> 会将文件恢复到 5 分钟前的状态。</li>
+<li>类似地，使用 <code>:later</code> 可以恢复到较晚的状态。例如，<code>:later 5m</code> 会恢复到 5 分钟后的状态。</li>
+</ul>
+</li>
+<li><strong>撤销树导航</strong>：
+<ul>
+<li>使用 <code>g-</code> 可以回到上一个分支点（撤销树中的前一个节点）。</li>
+<li>使用 <code>g+</code> 可以前进到下一个分支点（撤销树中的下一个节点）。</li>
+</ul>
+</li>
+<li>复制当前行:</li>
+</ol>
+<h1 id="3-命令">3. 命令
+</h1><pre><code>vi 文本编辑保存并退出 shift + Z + Z
+vi 根据关键搜索 command模式下(默认就是)    '/关键字'
+查看进程 
+
+关闭防火墙
+systemctlstop firewalld
+systemctl iptables stop
+
+更改nginx配置文件后  
+cd /usr/local/openresty/nginx/sbin
+重新加载配置文件
+./nginx -s reload
+
+docker inspect mysql  查看docker的详细信息
+                                                            
+创建文件 touch a.txt 或者vim
+查看文件 cat a.txt
+输入内容 echo 123 &gt; a.txt
+
+
+清屏 ctrl + L
+
+查看redis 进程 ps -ef| grep redis
+杀掉进程 用 kill  端口号
+
+给文件操作授权(文件名字是白色的话就是没有权限执行)
+chmod 777 startup.sh (文件名)
+
+查找文件夹下的 se 开头的文件
+cat se
+
+vim 查看行号
+:set nu 
+
+vim 查找
+/`关键字`  或者 ?`关键字`   按n查找下一个
+
+查找特定的文件类型
+ll *.rb
+
+安装tomcat 并且启动
+tar -zxvf apache-tomcat
+cd bin
+开启tomcat 再查看日志  
+./startup.sh 
+tail -f ../logs/catalina.out 
+
+查看进程id
+ps -ef|grep tomcat 
+
+查看正在运行的java 进程
+jps -l
+
+查看 tomcat 运行的详细信息; 查看该jvm的运行参数 
+jinfo -flags 进程端口
+
+文件打包 进入指定文件夹内
+tar -cvf
+
+例如: 
+tar -cvf device-service.tar config/ lib/ lib-2021-11-27/ lib-2021-11-29/ lib-old/ shutdown.sh startup.sh
+
+</code></pre>
+<p>netstat -lnpt | grep 10666</p>
+<blockquote>
+<p>查看当前所有tcp端口</p>
+</blockquote>
+<p>通过进程号查看运行文件目录</p>
+<blockquote>
+<p>ll /proc/10666/cwd</p>
+</blockquote>
+<p>ctrl + x 强制退出, ctrl + z 强制退出</p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20230306112147984.png"
+	width="313"
+	height="66"
+	
+	loading="lazy"
+	
+		alt="image-20230306112147984"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="474"
+		data-flex-basis="1138px"
+	
+></p>
+<h2 id="1-ps--ef">1. ps -ef
+</h2><p>列出系统上运行的所有进程的详细信息。</p>
+<p>这个命令的各部分含义如下：</p>
+<ul>
+<li><code>ps</code>：process status的缩写，用于查看系统中的进程状态。</li>
+<li><code>-e</code>：这个参数代表“every”，意味着列出系统上的所有进程，不仅仅是当前用户的进程。</li>
+<li><code>-f</code>：这个参数代表“full”，意味着以全格式显示进程信息，这包括：UID（用户ID），PID（进程ID），PPID（父进程ID），C（CPU使用），STIME（进程开始时间），TTY（终端类型），TIME（CPU时间），CMD（命令行命令）。</li>
+</ul>
+<p>所以，<code>ps -ef</code>命令会列出系统上所有进程的详细信息，这是系统管理员和开发者排查问题时非常常用的一个命令。</p>
+<h2 id="2-grep-1">2. grep
+</h2><p><code>grep</code>命令是Linux系统中的一种强大的==文本搜索工具==，它能使用正则表达式搜索文本，并==打印出匹配的行==。</p>
+<p>例如，如果你想在文件中查找包含单词&quot;error&quot;的行，可以使用以下命令：</p>
+<p>bash</p>
+<pre><code class="language-bash">grep 'error' filename
+
+</code></pre>
+<p><code>grep</code>有许多参数可以改变其行为，以下是一些常见的参数：</p>
+<ul>
+<li><code>-i</code>：忽略大小写</li>
+<li><code>-v</code>：反向查找，即打印出不匹配模式的行</li>
+<li><code>-r</code> 或 <code>-R</code>：递归搜索，<code>grep</code>会查找指定目录下所有文件及子目录中文件</li>
+<li><code>-l</code>：仅显示含有匹配行的文件名</li>
+<li><code>-n</code>：显示匹配行及其行号</li>
+<li><code>-e</code>：可以指定多个搜索模式</li>
+</ul>
+<h2 id="3-tar">3. tar
+</h2><p>linux 下非常强大的打包工具，常常配合 gzip 或 bzip2 这样的压缩工具进行使用。它不仅可以用于备份和恢复文件，还经常用于在不同的系统间传输文件</p>
+<ol>
+<li>
+<p>==创建tar 包==, 使用 <code>-c</code> 选项</p>
+</li>
+<li>
+<p><code>-v</code> 选项, 会==显示==打包, 或者查看操作过的文件信息</p>
+</li>
+<li>
+<p><code>-t</code>   会显示包里面的内容</p>
+</li>
+<li>
+<p>提取tar 包,  <code>-x</code>, 可以==解压==到当前目录, 可以加==<code>-C</code> 命令 指定目录==</p>
+</li>
+<li>
+<p>创建并压缩 tar 包, 选项 <code>-z</code>  表示使用 gzip, -j 表示使用 bzip2</p>
+</li>
+<li>
+<p>命令中的 <code>-f</code> 选项后面是 tar 包的名字，它告诉 ==tar 使用的文件名==</p>
+</li>
+</ol>
+<h2 id="4-partx">4. partx
+</h2><p>partx 是一个在 Linux 下用于增加和删除分区的实用程序。它是一种可以直接在设备上操作分区而不需要重新启动系统的方法。</p>
+<p>这个工具主要在你需要临时添加一个设备分区，或者==系统未能正确识别出设备上的新分区时使用==。它也是一个非常适合脚本使用的工具，以便进行自动化的设备管理。</p>
+<pre><code class="language-properties"> partx -a /dev/sda   # 尝试添加所有在 /dev/sda 上的分区。如果有的分区已经存在，它将会被跳过。
+
+</code></pre>
+<p>这个命令不会在物理磁盘上创建或者删除分区，==它仅仅是在操作系统级别添加或者删除对分区的识别==</p>
+<h2 id="5-ln-软硬链接">5. ln 软硬链接
+</h2><p>创建快捷方式</p>
+<pre><code>软链接
+
+ln -s 目标文件绝对路径 快捷方式绝对路径
+
+</code></pre>
+<p>软链接的 inode 号是不一样的, 但是硬链接的inode 号是一样的</p>
+<ul>
+<li>目录文件夹不支持硬链接</li>
+<li>硬链接不可以跨文件系统, 软链接可以</li>
+</ul>
+<p>可以通过 ls  -l 查看文件的硬链接数量</p>
+<pre><code>ln 目标文件绝对路径 快捷方式绝对路径
+
+</code></pre>
+<ul>
+<li>删除软,硬链接对源文件都是没有影响的</li>
+<li>删除源文件对硬链接无影响, 但是影响软链接</li>
+<li>只有删除所有源文件和硬链接, 文件连接数为0, 文件数据丢失</li>
+<li>软链接和源文件 inode 是不同的, 硬链接是相同的</li>
+</ul>
+<h2 id="6-df">6. df
+</h2><p>可以显示 挂载点的使用情况</p>
+<p>df 可使用的参数是</p>
+<ul>
+<li>-h 显示kb, mb 单位大小</li>
+<li>-i  显示inode 数量</li>
+<li>-T 显示文件系统类型</li>
+</ul>
+<h2 id="7-du">7. du
+</h2><p>显示磁盘空间大小</p>
+<pre><code>显示文件大小, 以kb 为单位
+du -h 
+显示当前目录所有文件大小
+du -h * 
+所有文件的大小总和
+du -sh 
+
+</code></pre>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240430145948366.png"
+	width="861"
+	height="461"
+	
+	loading="lazy"
+	
+		alt="image-20240430145948366"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="186"
+		data-flex-basis="448px"
+	
+></p>
+<h2 id="8-查询占用">8. 查询占用
+</h2><pre><code>fuser -muv /data
+
+lsof /data
+
+</code></pre>
+<h2 id="9-查看系统启动时间">9. 查看系统启动时间
+</h2><ul>
+<li>w</li>
+<li>uptime</li>
+</ul>
+<h2 id="10-less">10. less
+</h2><ul>
+<li><code>less</code>是一个程序，用于在终端中分页或逐步查看文件的内容。与<code>cat</code>和<code>more</code>命令不同，<code>less</code>在打开文件时不会立即显示文件的全部内容，这使得它特别适用于查看大型文件。</li>
+<li>用户可以向前或向后浏览文件，搜索文本字符串，跳转到文件的特定行等。</li>
+<li><code>less</code>命令是交互式的，在查看文件时，用户可以使用键盘命令进行操作，==如搜索（/关键词）==，上下滚动（↑↓或PgUp/PgDn），跳转到文件开头（g）或结尾（G），以及==退出查看（q）==。</li>
+</ul>
+<h2 id="11-gunzip">11. gunzip
+</h2><p>解压<code>.gz</code>文件到当前文件夹，并且保留源文件不进行修改，您可以使用<code>gunzip</code>（或<code>gzip -d</code>）命令并加上<code>-c</code>选项。<code>-c</code>选项会将解压的内容输出到标准输出（stdout），然后您可以使用重定向<code>&gt;</code>将输出内容写入到一个新文件中。下面是具体操作步骤：</p>
+<p>假设您的文件名为<code>example.gz</code>，您希望解压这个文件到当前文件夹，并保留原文件<code>example.gz</code>不变，可以使用以下命令：</p>
+<pre><code class="language-bash">gunzip -c example.gz &gt; example
+
+</code></pre>
+<p>或者使用<code>gzip -d</code>命令的等价形式：</p>
+<pre><code class="language-bash">gzip -d -c example.gz &gt; example
+
+</code></pre>
+<p>这两个命令通过<code>-c</code>选项将<code>example.gz</code>解压的输出内容导向到<code>example</code>文件中。因为使用了重定向<code>&gt;</code>而不是直接解压覆盖，所以原<code>.gz</code>文件不会被修改或删除。</p>
+<p>这样，就能够在当前目录下解压<code>.gz</code>文件而不修改源<code>.gz</code>文件。</p>
+<h2 id="12-tee">12. tee
+</h2><p><code>tee</code> 命令是一个在 Unix 和类 Unix 系统中非常有用的命令。它的主要作用是将标准输入的数据写入到标准输出的同时，另存到一个或多个文件中。这在需要将输出数据同时查看和保存的场景中非常方便。</p>
+<h3 id="1-基本用法">1. 基本用法
+</h3><pre><code>bash复制代码command | tee file
+
+</code></pre>
+<ul>
+<li><code>command</code> 是你希望运行的命令，它的输出将被 <code>tee</code> 接收。</li>
+<li><code>file</code> 是你希望将输出数据保存的文件名。</li>
+</ul>
+<h3 id="2-示例">2. 示例
+</h3><ol>
+<li>
+<p><strong>将命令输出保存到文件并显示在终端</strong></p>
+<pre><code>bash复制代码ls -l | tee file.txt
+
+</code></pre>
+<p>这个命令会列出当前目录下的文件和文件夹，并将这些信息写入 <code>file.txt</code> 文件中，同时也显示在终端中。</p>
+</li>
+<li>
+<p><strong>追加输出到文件</strong></p>
+<pre><code>bash复制代码echo &quot;New line&quot; | tee -a file.txt
+
+</code></pre>
+<p>这里，<code>-a</code> 选项表示以追加模式打开文件，这样不会覆盖文件中的现有内容，而是将新内容添加到文件末尾。</p>
+</li>
+<li>
+<p><strong>同时写入多个文件</strong></p>
+<pre><code>bash复制代码echo &quot;Hello&quot; | tee file1.txt file2.txt
+
+</code></pre>
+<p>这个命令会将 &ldquo;Hello&rdquo; 同时写入到 <code>file1.txt</code> 和 <code>file2.txt</code> 文件中，并显示在终端。</p>
+</li>
+</ol>
+<h3 id="3-常用选项">3. 常用选项
+</h3><ul>
+<li><code>-a</code>：以追加模式写入文件，而不是覆盖。</li>
+<li><code>-i</code>：忽略中断信号。</li>
+</ul>
+<p><code>tee</code> 是一个非常有用的工具，特别是在调试脚本时，你可以实时查看输出，并同时将其保存到日志文件中以供后续分析。</p>
+<h1 id="4-服务器缩容">4. 服务器缩容
+</h1><h2 id="1-常规磁盘">1. 常规磁盘
+</h2><p>查看所有磁盘</p>
+<ul>
+<li><code>lsblk</code>  这个命令会列出系统中所有的块设备，包括硬盘、分区、USB驱动等。输出的信息中还包括设备名称、大小、挂载点等等 ,   lsblk -f  列出分区的文件系统类型</li>
+<li><code>fdisk -l</code>：这个命令会列出系统中所有的磁盘和它们的分区。这个命令还会输出很多其他信息，如每个磁盘的扇区数、每个分区的起止位置等等。通常，这个命令需要root权限来运行，你可能需要用 <code>sudo fdisk -l</code> 来执行</li>
+<li><code>df</code>  这个命令会显示所有==已经挂载的文件系统的磁盘使用情况==，包括总大小、已使用、可用空间和使用百分比等信息</li>
+</ul>
+<p>cat /etc/partitions 这个文件就存放了 系统的==磁盘分区表号==</p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240429171350403.png"
+	width="420"
+	height="215"
+	
+	loading="lazy"
+	
+		alt="image-20240429171350403"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="195"
+		data-flex-basis="468px"
+	
+></p>
+<p>在将文件从 <code>/dev/vdb</code> 拷贝到 <code>/dev/vdc</code> 之前，你需要确保他们都已经被==正确地分区并格式化为文件系统==，然后在系统中进行==挂载==。</p>
+<p>典型的步骤可能是这样的：</p>
+<ol>
+<li>首先查看 <code>/dev/vdb</code> 是否已经含有分区并格式化为文件系统。可以使用 <code>fdisk -l /dev/vdb</code> 或 <code>lsblk</code> 命令查看。如果已经挂载，你可以在输出中找到挂载点。</li>
+<li>对于 <code>/dev/vdc</code>，如果尚未分区，你要首先为其创建分区。可以使用 <code>fdisk /dev/vdc</code>, <code>cfdisk /dev/vdc</code> 或 <code>parted /dev/vdc</code> 等工具来创建分区。</li>
+<li>如果新创建的分区（假设是 <code>/dev/vdc1</code>）尚未被格式化为文件系统，你需要使用 <code>mkfs</code> 命令进行格式化，如 <code>sudo mkfs -t ext4 /dev/vdc1</code>。</li>
+<li>创建一个挂载点，然后挂载新的文件系统，例如：</li>
+</ol>
+<p>bash</p>
+<pre><code class="language-bash">    sudo mkdir /mnt/newdisk
+    sudo mount /dev/vdc1 /mnt/newdisk
+
+</code></pre>
+<ol>
+<li>现在，你可以使用 <code>cp</code> 命令将文件从 <code>/dev/vdb</code> 对应的挂载点复制到 <code>/mnt/newdisk</code>。例如，如果 <code>/dev/vdb</code> 的挂载点为 <code>/mnt/olddisk</code>，你可以：</li>
+</ol>
+<p>bash</p>
+<pre><code class="language-bash">sudo cp -R /mnt/olddisk/* /mnt/newdisk/
+
+</code></pre>
+<p>注意事项：</p>
+<ul>
+<li>上述所有操作都需要root权限，你可能需要使用 <code>sudo</code> 命令。</li>
+<li>格式化操作会清除目标分区上所有现有的数据，请在确认数据已经备份或数据可以丢失的情况下再进行格式化操作。</li>
+<li><code>cp -R</code> 命令将会递归复制所有文件和子目录。如果你只希望复制特定文件或目录，你可以直接指定他们的路径。</li>
+<li>复制大量文件可能会需要一段时间，具体取决于你的硬盘速度和数据量。</li>
+<li>挂载新硬盘的操作在重启后不会保留，如果你想在每次启动时自动挂载，你需要将其添加到 /etc/fstab 文件中。</li>
+</ul>
+<p>查看是否被进程使用</p>
+<p>实际步骤</p>
+<p>fdisk /dev/vdc</p>
+<p>g 创建gpt分区表</p>
+<p>n 创建分区</p>
+<p>mkfs 格式化分区</p>
+<p>新建文件夹 data1</p>
+<p>挂载 mount</p>
+<p>blkid 查看设备id</p>
+<p>编辑 /etc/fstab</p>
+<p>使用rsync</p>
+<pre><code>复制
+sudo rsync -avh --progress /data/ /datanew
+
+验证数据
+sudo rsync -avhn --progress /data/ /datanew/ | grep -v '^\.copying'
+
+</code></pre>
+<h2 id="2-lvm-缩容">2. lvm 缩容
+</h2><h3 id="1-理论回顾">1. 理论回顾
+</h3><p>逻辑卷&ndash;动态磁盘管理, 以逻辑卷的形式展现给上层系统, 就是取代原本的硬盘和分区, 对其进行格式化和挂载操作, ==将底层的物理硬盘抽象封装起来==, 大小可以动态调整, 且不会丢失现有数据</p>
+<p>PE physical extend 默认的大小是4m</p>
+<p>PV physical volume 把硬盘条带化, 实际上就是把硬盘变成可以使用的PE</p>
+<p>VG volume group 就是 一个空间池, 卷组</p>
+<p>LV logical volume 逻辑卷</p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240515144950739.png"
+	width="493"
+	height="321"
+	
+	loading="lazy"
+	
+		alt="image-20240515144950739"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="153"
+		data-flex-basis="368px"
+	
+></p>
+<p>逻辑卷的拉伸操作可以在线执行, 不需要卸载逻辑卷</p>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240515152238692.png"
+	width="1471"
+	height="978"
+	
+	loading="lazy"
+	
+		alt="image-20240515152238692"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="150"
+		data-flex-basis="360px"
+	
+></p>
+<p>pvs, pvdisplay 查看所有的物理卷</p>
+<p>缩小逻辑卷</p>
+<ul>
+<li>卸载已经挂载的逻辑卷  umount /dev/vdb1</li>
+<li>缩小文件系统  resize2fs /dev/ka</li>
+</ul>
+<p><img src="/p/linux%E5%91%BD%E4%BB%A4%E5%AE%9E%E6%88%98/images/image-20240515153628621.png"
+	width="1484"
+	height="1067"
+	
+	loading="lazy"
+	
+		alt="image-20240515153628621"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="139"
+		data-flex-basis="333px"
+	
+></p>
+<p>==注意==</p>
+<p>当文件系统大小resive 和实际缩小的容量不一致的时候, 可能会造成磁盘内容丢失, 如果一定要缩容, 最好的给一定缓冲额度</p>
+<h3 id="2-实际场景操作">2. 实际场景操作
+</h3><p>==AI 建议==</p>
+<p>你做任何操作之前，做好数据备份是明智的。我的指导会牵扯到LVM卷的调整，这有可能导致数据丢失。</p>
+<p>如果你想要移除<code>/dev/vdb</code>并使用全新磁盘<code>/dev/vdc</code>，你需要进行以下步骤：</p>
+<ul>
+<li>准备<code>/dev/vdc</code>成为一个物理卷：</li>
+</ul>
+<pre><code class="language-plaintext">    pvcreate /dev/vdc
+
+</code></pre>
+<ul>
+<li>扩展你想要存储新磁盘的卷组，我假设这是<code>klas</code>：</li>
+</ul>
+<pre><code class="language-plaintext">    vgextend klas /dev/vdc
+
+</code></pre>
+<ul>
+<li>移动<code>/dev/vdb</code>上的所有物理区域到<code>/dev/vdc</code>上：</li>
+</ul>
+<pre><code class="language-plaintext">    pvmove /dev/vdb /dev/vdc
+
+</code></pre>
+<ul>
+<li>一旦所有数据都被成功迁移，你可以从卷组中删除旧的物理卷：</li>
+</ul>
+<pre><code class="language-plaintext">    vgreduce klas /dev/vdb
+
+</code></pre>
+<ul>
+<li>最后你可以完全移除旧的物理卷：</li>
+</ul>
+<pre><code class="language-plaintext">    pvremove /dev/vdb
+
+</code></pre>
+<p>注意: 所有操作必须谨慎进行，只有当你确定了你理解了每一步的意义并且在必要时进行了数据备份，你才能进行这些操作。有些步骤一旦执行，将无法回退。举例来说，<code>pvremove</code>指令将彻底删除物理卷，这是一个无法恢复的操作。</p>
+<p><code>pvmove</code> 是一个 Linux 命令，用于在物理卷（Physical Volumes）之间移动物理区域。物理卷是 Logical Volume Management（LVM）系统的一部分，它允许你创建逻辑卷，这些逻辑卷可以跨越一个或多个物理硬盘。</p>
+<p>以下是 <code>pvmove</code> 的一些关键特性：</p>
+<ol>
+<li><strong>数据迁移</strong>：<code>pvmove</code> 可以在物理卷之间迁移数据。例如，如果你有一个物理卷（例如，<code>/dev/sda</code>），并且你想要迁移其数据到另一个物理卷（例如，<code>/dev/sdb</code>）。你可以使用 <code>pvmove /dev/sda /dev/sdb</code>命令来完成此操作。</li>
+<li>==<strong>无中断服务</strong>==：<code>pvmove</code> 的一个重要特性是你可以在系统正常运行时进行物理区域的迁移。这意味着，你的应用或用户不会因为数据迁移操作而中断。</li>
+<li><strong>迁移特定逻辑卷</strong>：你可以使用 <code>-n</code> 选项指定只迁移特定的逻辑卷。例如，<code>pvmove -n /dev/klas/root /dev/vdb /dev/vdc</code> 将会只迁移 <code>klas/root</code> 逻辑卷的数据。</li>
+<li><strong>错误处理</strong>：<code>pvmove</code> 命令在复制每个区域后，会更新元数据以反映这一变化。如果在迁移过程中发生错误，数据仍将保持一致。</li>
+<li><strong>数据同步</strong>：虽然 <code>pvmove</code> 可以在系统正常运行时进行，但是在数据同步期间，涉及的物理区域将被锁定，以防止写入操作。</li>
+</ol>
+<p>最后，强调一点，使用 <code>pvmove</code> 命令时，务必要谨慎，因为错误的操作可能会导致数据丢失。一般情况下，在执行此类操作之前，建议进行数据备份。</p>
+<p>pvmove的工作方式</p>
+<p>pvmove的工作方式如下：</p>
+<p>1.创建一个临时的“ pvmove” LV，以存储所需的所有数据移动的详细信息。</p>
+<p>2.在VG中的每个LV上搜索需要根据命令行参数移动的连续数据。对于找到的每个数据，将新段添加到pvmove LV的末尾。该段采用临时镜像的形式，用于将数据从原始位置复制到新分配的位置。原始LV已更新为在pvmove LV中使用新的临时镜像段，而不是直接访问数据。</p>
+<ol start="3">
+<li>
+<p>VG元数据在磁盘上更新。</p>
+</li>
+<li>
+<p>pvmove LV的第一段被激活，并开始镜像数据的第一部分。一次只能镜像一个段，因为通常这样会更有效。</p>
+</li>
+</ol>
+<p>5.守护程序按指定的时间间隔重复检查进度。当它检测到第一个临时镜像处于同步状态时，它将断开该镜像，以便仅使用该数据的新位置，并将检查点写入磁盘上的VG元数据中。然后，它为pvmove LV的下一个段激活镜像。</p>
+<p>6.当没有更多要镜像的段时，将删除临时LV，并更新VG元数据，以便LV反映新的数据位置。</p>
+<p>请注意，此新过程不能支持磁盘元数据的原始LVM1类型。可以使用vgconvert（8）转换元数据 。</p>
+<p>如果使用&ndash;atomic选项，则使用稍微不同的方法进行移动。同样，将创建一个临时的“ pvmove” LV以存储所需的所有数据移动的详细信息。该临时LV包含需要移动的各个LV的所有段。但是，在这种情况下，分配的相同LV包含相同数量的段，并且创建了镜像以将内容从第一个临时LV复制到第二个临时LV。完整复制后，将删除临时LV，并在目标PV上留下分段。如果在移动过程中发出中止命令，则所有被移动的LV将保留在源PV上。</p>
+<p>操作步骤</p>
+<ol>
+<li>
+<p>先扩容, 将/dev/vdc1 初始化为物理卷, pvcreate /dev/vdc1</p>
+</li>
+<li>
+<p>把pv 加入到 卷组vg中, vgextend</p>
+</li>
+<li>
+<p>pvmove 会处理一切,</p>
+</li>
+<li>
+<p>vgreduce</p>
+</li>
+<li>
+<p>检查结果 vgs</p>
+</li>
+<li>
+<p>再扩充逻辑卷, lvextend -L +350G /dev/vdc1</p>
+</li>
+<li>
+<p>查看扩充后的大小, lvs, lsdisplay</p>
+</li>
+<li>
+<p>更新文件系统 resize2fs /dev/vdc1</p>
+</li>
+<li>
+<p>查看更新后的文件系统 df -hT</p>
+</li>
+<li>
+<p>准备开始缩容</p>
+</li>
+<li>
+<p>==卸载已经挂载的逻辑卷 /dev/mapper/==</p>
+</li>
+</ol>
+<p>LInux 系统下, 现在我需要把 vdc 磁盘给回收, 我加入了一块新的磁盘 vdb, 然后通过 pvcreate 和 vgextend 把这块 vdc 加入了卷组中, 我有一个疑问, 我使用 lsblk 查看, 为什么我的 格式跟 原来的 /vdc2 不一致? 不是 lvm 类型?</p>
+<p>我是否需要将/vdb1格式化文件系统?  还是说这个应该是 LV 逻辑卷去操作的, 现在我只需要执行 pvmove /dev/vdc1 /dev/vdb1 就可以了? [root@app-01 xcsj_service]# lsblk
+NAME          MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+vda           253:0    0  130G  0 disk
+├─vda1        253:1    0  200M  0 part /boot/efi
+├─vda2        253:2    0    2G  0 part /boot
+├─vda3        253:3    0   16G  0 part [SWAP]
+└─vda4        253:4    0  100G  0 part
+└─klas-root 252:0    0  350G  0 lvm  /
+vdb           253:16   0  360G  0 disk
+└─vdb1        253:17   0  360G  0 part
+vdc           253:32   0  450G  0 disk
+├─vdc1        253:33   0  200G  0 part
+└─vdc2        253:34   0  250G  0 part
+└─klas-root 252:0    0  350G  0 lvm  /</p>
+<p>==可以的, 还可以不停机运行! 够强大!==</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

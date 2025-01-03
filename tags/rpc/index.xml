@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Rpc on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/tags/rpc/</link>
+        <description>Recent content in Rpc on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Wed, 13 Oct 2021 16:23:12 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/tags/rpc/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Dubbo</title>
+        <link>https://mikeLing-qx.github.io/p/dubbo/</link>
+        <pubDate>Wed, 13 Oct 2021 16:23:12 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/dubbo/</guid>
+        <description>&lt;h1 id=&#34;1-filter&#34;&gt;1. filter
+&lt;/h1&gt;&lt;p&gt;参考资料: &lt;a class=&#34;link&#34; href=&#34;https://segmentfault.com/a/1190000040755445&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://segmentfault.com/a/1190000040755445&lt;/a&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;dubbo filter是dubbo提供的一项扩展的功能，dubbo在做调用的过程中，会先经过一层filter，顾名思义，也就是一层拦截过滤。通过dubbo filter功能，我们可以记录一些额外的操作日志、传递一些公共的信息、做一些自定义校验和权限控制等。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;dubbo 提供了Filter接口类，我们只要定义一个自己的类，然后继承该接口即可实现自己的逻辑。 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​	以实现一个传递链路唯一追踪号为案例来看下如何实现，比如现在我有一个A服务，还有一个B服务，现在A服务有自己的逻辑链路追踪号，需要传递到B服务中去，使得两个服务能够用同一个追踪号来关联某一次请求的所有链路。
+A服务先定义一个自己的Filter类并实现dubbo的Filter接口：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;//对于服务提供端，Activate改为Constants.PROVIDER
+@Activate(group = {Constants.CONSUMER})
+public class UniqIdTraceFilter implements Filter {
+    @Override
+    public Result invoke(Invoker&amp;lt;?&amp;gt; invoker, Invocation invocation) throws RpcException {
+        //此处逻辑可以自定义
+        String traceId = UUID.randomUUID().toString().replace(&amp;quot;-&amp;quot;, &amp;quot;&amp;quot;);
+        RpcContext.getContext().setAttachment(&amp;quot;traceId&amp;quot;, traceId);
+        return invoker.invoke(invocation);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;再在resources目录下新建一个META-INF文件夹，在其下再创建一个dubbo目录。在META-INF\dubbo目录下创建一个名称为org.apache.dubbo.rpc.Filter（如果你用的是2.7之前的版本，则名称为com.alibaba.dubbo.rpc.Filter），如图&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/dubbo/images/image-20240131161057610.png&#34;
+	width=&#34;405&#34;
+	height=&#34;431&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240131161057610&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;93&#34;
+		data-flex-basis=&#34;225px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;#在文件里写上你定义的filter全名
+uniqIdTraceFilter=com.example.dubboanalyze.filter.UniqIdTraceFilter
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;使用内置的 Filter 实现 (默认是不开启的)&lt;/p&gt;
+&lt;p&gt;配置文件使用方式&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/dubbo/images/image-20240131161303521.png&#34;
+	width=&#34;1375&#34;
+	height=&#34;666&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240131161303521&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;206&#34;
+		data-flex-basis=&#34;495px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;注解使用方式&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/dubbo/images/image-20240131161351877.png&#34;
+	width=&#34;410&#34;
+	height=&#34;53&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240131161351877&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;773&#34;
+		data-flex-basis=&#34;1856px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;2-泛化调用&#34;&gt;2. 泛化调用
+&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;​	 泛化接口调用方式主要用于客户端没有 API 接口及模型类元的情况，这是官方的说法，对于新人我认为太抽象了，这里解释一下。我们在做正常的dubbo调用时，==服务端会提供一个所有接口的jar包让客户端引入==，此时客户端就知道服务端提供了哪些接口并进行使用，参考 &lt;a class=&#34;link&#34; href=&#34;https://segmentfault.com/a/1190000040511492&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;如何搭建并进行调用&lt;/a&gt;，而对于泛化调用，我们还是需要知道服务端提供了哪些接口，只不过是程序不知道而已，此时我们==在程序中使用泛化调用，显示填入需要调用的接口名称，dubbo会进行匹配并进行调用后返回==&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;服务端接口&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;package com.example.dubboprovider.rpc;
+ 
+public interface CityService {
+    String getCityName();
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;泛化调用最重要的就是 &lt;code&gt;GenericService&lt;/code&gt;，首先我们定义一个服务引用&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;@Reference(interfaceName = &amp;quot;com.example.dubboprovider.rpc.CityService&amp;quot;, generic = true)
+    GenericService genericService;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;注意上面的注解 `@Reference`，在之前的文章中说到过这个注解表明是一个dubbo引用，注解里面 `interfaceName` 用来表明你要使用的接口类，`generic` 为true用来表明是泛化调用，这样一个泛化接口就完成了。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;再来看下调用&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Object name = genericService.$invoke(&amp;quot;getCityName&amp;quot;, new String[]{}, new Object[]{});
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;原理:  两个filter分别叫做 &lt;code&gt;GenericImplFilter&lt;/code&gt;、&lt;code&gt;GenericFilter&lt;/code&gt;。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;这两个filter就是对泛化调用的处理，其中 &lt;code&gt;GenericImplFilter&lt;/code&gt; 是消费端的处理，而 &lt;code&gt;GenericFilter&lt;/code&gt; 是服务端的处理。消费端的处理就是对参数做一些预处理（非内置的进行序列化、以及获得结果之后的反序列化，内置的进行校验以及传递generic值），而服务端的处理就是对内置的泛化调用进行处理（序列化以及返序列化），从逻辑中我们可以看到其实 &lt;code&gt;generic&lt;/code&gt; 可以有三种赋值方式，分别为true、nativejava以及bean，其实就是对应的对于我们传递的参数的解析方式，下面分别介绍一下：&lt;/li&gt;
+&lt;li&gt;true
+这个是最简单的处理方式，dubbo内置的PojoUtils工具类就会进行解析。&lt;/li&gt;
+&lt;li&gt;nativejava
+如果参数是byte数组类型的，则我们可以通过实现 &lt;code&gt;Serialization&lt;/code&gt; 接口来自定义实现序列化和反序列化。&lt;/li&gt;
+&lt;li&gt;bean
+如果你的参数类继承JavaBeanDescriptor，则可以通过该种方式来转换对象。
+dubbo内置的类型转换已经很全了，如果你有自己的转换需求，可以考虑在这一块进行改造。
+从源码中我们也可以看出来，其实泛化调用就是通过filter过滤对传递的参数进行了一层转换，然后找到匹配的接口以及方法进行调用。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;3-隐式传参&#34;&gt;3. 隐式传参
+&lt;/h1&gt;&lt;pre&gt;&lt;code&gt; RpcContext.getContext().setAttachment(&amp;quot;traceId&amp;quot;, traceId); 
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

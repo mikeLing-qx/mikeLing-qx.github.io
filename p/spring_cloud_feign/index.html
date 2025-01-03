@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Spring cloud Feign 1. 简介 配置nacos 配置中心\nspring: cloud: nacos: discovery: server-addr: 127.0.0.1:8848 1.1 Feign Feign是Spring Cloud组件中的一个轻量级RESTful的HTTP服务客户端 Feign==内置了Ribbon==，用来做客户端负载均衡，去调用服务注册中心的服 务。 Feign的使用方式是：==使用Feign的注解定义接口，调用这个接口，就可以调用服务注册中心的服务== Feign支持的注解和用法请参考官方文档：https://github.com/OpenFeig n/feign ==Feign本身不支持Spring MVC的注解，它有一套自己的注解==\n">
+<title>Spring_cloud_feign</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/spring_cloud_feign/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Spring_cloud_feign">
+<meta property='og:description' content="Spring cloud Feign 1. 简介 配置nacos 配置中心\nspring: cloud: nacos: discovery: server-addr: 127.0.0.1:8848 1.1 Feign Feign是Spring Cloud组件中的一个轻量级RESTful的HTTP服务客户端 Feign==内置了Ribbon==，用来做客户端负载均衡，去调用服务注册中心的服 务。 Feign的使用方式是：==使用Feign的注解定义接口，调用这个接口，就可以调用服务注册中心的服务== Feign支持的注解和用法请参考官方文档：https://github.com/OpenFeig n/feign ==Feign本身不支持Spring MVC的注解，它有一套自己的注解==\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/spring_cloud_feign/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='springcloud' /><meta property='article:published_time' content='2022-04-27T10:11:27&#43;08:00'/><meta property='article:modified_time' content='2022-04-27T10:11:27&#43;08:00'/>
+<meta name="twitter:title" content="Spring_cloud_feign">
+<meta name="twitter:description" content="Spring cloud Feign 1. 简介 配置nacos 配置中心\nspring: cloud: nacos: discovery: server-addr: 127.0.0.1:8848 1.1 Feign Feign是Spring Cloud组件中的一个轻量级RESTful的HTTP服务客户端 Feign==内置了Ribbon==，用来做客户端负载均衡，去调用服务注册中心的服 务。 Feign的使用方式是：==使用Feign的注解定义接口，调用这个接口，就可以调用服务注册中心的服务== Feign支持的注解和用法请参考官方文档：https://github.com/OpenFeig n/feign ==Feign本身不支持Spring MVC的注解，它有一套自己的注解==\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#spring-cloud-feign">Spring cloud Feign</a></li>
+    <li><a href="#1-简介">1. 简介</a>
+      <ul>
+        <li><a href="#11-feign">1.1 Feign</a></li>
+        <li><a href="#12-feign-日志配置">1.2 Feign 日志配置</a></li>
+        <li><a href="#13-feign-数据压缩">1.3 Feign 数据压缩</a></li>
+        <li><a href="#12-openfeign">1.2 OpenFeign</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-openfeign-应用">2. OpenFeign 应用</a></li>
+    <li><a href="#3-源码解析">3. 源码解析</a>
+      <ul>
+        <li><a href="#1-如何为接口生成代理并放入ioc-容器-重点">1. 如何为接口生成代理并放入ioc 容器 (重点)</a>
+          <ul>
+            <li><a href="#1-注入feignclientfactorybean">1. 注入FeignClientfactorybean</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#import">@Import</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#2-feignclientfactorybean-获取代理对象">2. FeignClientFactorybean 获取代理对象</a></li>
+          </ul>
+        </li>
+        <li><a href="#2-代理拦截后如何走网络调用的">2. 代理拦截后如何走网络调用的</a>
+          <ul>
+            <li><a href="#1-代理拦截">1. 代理拦截</a></li>
+            <li><a href="#2-方法处理器执行请求">2. 方法处理器执行请求</a></li>
+            <li><a href="#3-进行负载均衡调用">3. 进行负载均衡调用</a></li>
+            <li><a href="#4-ribbon-中进行实际地址的替换">4. Ribbon 中进行实际地址的替换</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/springcloud/" >
+                Springcloud
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/spring_cloud_feign/">Spring_cloud_feign</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Apr 27, 2022</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 4 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="spring-cloud-feign">Spring cloud Feign
+</h1><h1 id="1-简介">1. 简介
+</h1><p>配置nacos 配置中心</p>
+<pre><code class="language-yaml">spring: 
+  cloud:
+     nacos:
+        discovery:
+          server-addr: 127.0.0.1:8848
+</code></pre>
+<h2 id="11-feign">1.1 Feign
+</h2><blockquote>
+<p>Feign是Spring Cloud组件中的一个轻量级RESTful的HTTP服务客户端
+Feign==内置了Ribbon==，用来做客户端负载均衡，去调用服务注册中心的服
+务。
+Feign的使用方式是：==使用Feign的注解定义接口，调用这个接口，就可以调用服务注册中心的服务==
+Feign支持的注解和用法请参考官方文档：https://github.com/OpenFeig
+n/feign
+==Feign本身不支持Spring MVC的注解，它有一套自己的注解==</p>
+</blockquote>
+<h2 id="12-feign-日志配置">1.2 Feign 日志配置
+</h2><blockquote>
+<p>Feign支持4中级别：</p>
+<p>NONE：不记录任何日志，默认值</p>
+<p>BASIC：仅记录请求的方法，URL以及响应状态码和执行时间</p>
+<p>HEADERS：在BASIC基础上，额外记录了请求和响应的头信息</p>
+<p>FULL：记录所有请求和响应的明细，包括头信息、请求体、元数据</p>
+</blockquote>
+<pre><code class="language-yaml">feign:
+  client:
+    config:
+      default: #这里default就是全局配置，如果是写服务名称，则是针对某个微服务的配置
+        LoggerLevel: FULL
+</code></pre>
+<h2 id="13-feign-数据压缩">1.3 Feign 数据压缩
+</h2><pre><code class="language-yaml">feign:
+  compression:
+    request:
+      enabled: true
+      mime-types: text/html,application/xml,application/json # 设置压缩的数据类 型
+      min-request-size: 2048 # 触发压缩的大小下限
+    response:
+      enabled: true # 响应压缩
+</code></pre>
+<h2 id="12-openfeign">1.2 OpenFeign
+</h2><p>​	OpenFeign是Spring Cloud 在Feign的基础上支持了Spring MVC的注解，
+如@RequesMapping等，是一个轻量级的Http封装工具对象,大大简化了Http请
+求，使得我们对服务的调用转换成了对本地接口方法的调用。
+OpenFeign 的@FeignClient 可以解析SpringMVC的@RequestMapping
+注解下的接口，==并通过动态代理的方式产生实现类，实现类中做负载均衡并调用其他服务。==</p>
+<ul>
+<li>集成了Ribbon的负载均衡功能</li>
+<li>集成Hystrix的熔断器功能</li>
+<li>支持请求压缩</li>
+<li>大大简化了远程调用的代码，同时功能还增强啦</li>
+<li>以更加优雅的方式编写远程调用代码，并简化重复代码</li>
+</ul>
+<h1 id="2-openfeign-应用">2. OpenFeign 应用
+</h1><pre><code>1:导入openfeign依赖
+2:编写openfeign客户端接口-将请求地址写到该接口上
+3:消费者启动引导类开启openfeign功能注解 
+@EnableFeignClients(basePackages = {&quot;com.itheima.driver.feign&quot;})
+4:访问接口测试
+</code></pre>
+<blockquote>
+<p>流程分析</p>
+<ol>
+<li>FeignClient 标注 对应的服务, 配置 fallback 降级
+<ul>
+<li>服务方法上通过spring mvc 的 注解 标注所要调用的方法</li>
+</ul>
+</li>
+<li>在启动类上标注EnableFeignClient
+<ul>
+<li>找到所有标注的了FeignClient  的接口生成代理</li>
+</ul>
+</li>
+<li>使用的时候通过@Autowired 自动注入 一个代理</li>
+</ol>
+</blockquote>
+<ol>
+<li>依赖</li>
+</ol>
+<pre><code class="language-properties">&lt;!--配置feign--&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-cloud-starter-openfeign&lt;/artifactId&gt;
+    &lt;version&gt;2.2.1.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<ol start="2">
+<li>创建Feign客户端接口</li>
+</ol>
+<pre><code class="language-java">@FeignClient(&quot;hailtaxi-driver&quot;)
+public interface DriverFeign {
+    // http://ip:port/driver/status/{id}/{status}
+    @PutMapping(value = &quot;/driver/status/{id}/{status}&quot;)
+    public Driver status(@PathVariable(value = &quot;id&quot;)String id, @PathVariable(value = &quot;status&quot;)Integer status);
+
+}
+</code></pre>
+<blockquote>
+<p>Feign会通过动态代理，帮我们生成实现类。
+注解@FeignClient声明Feign的客户端，==注解value指明服务名称==</p>
+<p>接口定义的方法，采用SpringMVC的注解。Feign会根据注解帮我们生成URL
+地址 注解@RequestMapping中的/driver，不要忘记。==因为Feign需要拼接可访问地址==</p>
+</blockquote>
+<h1 id="3-源码解析">3. 源码解析
+</h1><p>问:  和 Gateway 有什么区别吗?  Gateway 是通过 filter 转换成实际需要请求的地址</p>
+<h2 id="1-如何为接口生成代理并放入ioc-容器-重点">1. 如何为接口生成代理并放入ioc 容器 (重点)
+</h2><h3 id="1-注入feignclientfactorybean">1. 注入FeignClientfactorybean
+</h3><ol>
+<li>启动类上标注的 EnableFeignClients 为入口</li>
+</ol>
+<pre><code>@SpringBootApplication
+@EnableDiscoveryClient
+@EnableFeignClients(basePackages = {&quot;com.itheima.driver.feign&quot;})
+public class OrderApplication {
+	psvm
+}
+</code></pre>
+<ol start="2">
+<li>EnableFeignClients 源码</li>
+</ol>
+<blockquote>
+<h1 id="import">@Import
+</h1><p>@Import 注解支持==导入普通 java 类，并将其声明成一个bean==。主要用于将多个分散的 java config 配置类融合成一个更大的 config 类。</p>
+<ul>
+<li>@Import 注解在 4.2 之前只支持导入配置类。</li>
+<li>在4.2之后 @Import 注解支持导入普通的 java 类,并将其声明成一个 bean。</li>
+</ul>
+</blockquote>
+<pre><code class="language-java">@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+@Documented
+@Import({FeignClientsRegistrar.class})
+public @interface EnableFeignClients {
+    ....
+}
+</code></pre>
+<ol start="3">
+<li>启动扫描feign接口并注册</li>
+</ol>
+<p>FeignClientsRegistrar#registerBeanDefinitions</p>
+<pre><code>public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+        this.registerDefaultConfiguration(metadata, registry);
+        
+        // 这里会注册所有@FeignClient 修饰的接口
+        this.registerFeignClients(metadata, registry);
+}
+
+</code></pre>
+<ol start="4">
+<li>FeignClientsRegistrar#registerFeignClient</li>
+</ol>
+<blockquote>
+<p>==每个标注了 @FeignClient的接口, 真正向容器中注册的其实是一个 绑定了该接口信息的 FeignClientFactoryBean==</p>
+<pre><code>  1. 创建 FeignClientFactoryBean 的 BeanDefinition
+  1. 向BeanDefinition 中填充相关属性, 属性来源于接口上@FeignClient 的属性信息
+</code></pre>
+</blockquote>
+<pre><code>private void registerFeignClient(BeanDefinitionRegistry registry,
+			AnnotationMetadata annotationMetadata, Map&lt;String, Object&gt; attributes) {
+		// 接口全路径
+		String className = annotationMetadata.getClassName();
+		
+		/**
+		*  
+		*/
+		BeanDefinitionBuilder definition = BeanDefinitionBuilder
+				.genericBeanDefinition(FeignClientFactoryBean.class);
+		validate(attributes);
+		
+		....		
+}
+
+</code></pre>
+<ol start="5">
+<li>向容器中注入</li>
+</ol>
+<pre><code>beanName:  com.itheima.driver.feign.DriverFeign
+class: [org.springframework.cloud.openfeign.FeignClientFactoryBean]
+
+</code></pre>
+<p><img src="/p/spring_cloud_feign/images/image-20220426144512671.png"
+	width="1253"
+	height="372"
+	
+	loading="lazy"
+	
+		alt="image-20220426144512671"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="336"
+		data-flex-basis="808px"
+	
+></p>
+<h3 id="2-feignclientfactorybean-获取代理对象">2. FeignClientFactorybean 获取代理对象
+</h3><blockquote>
+<ol>
+<li>代理对象是怎么生成的?</li>
+<li>代理对象做了什么事?</li>
+</ol>
+</blockquote>
+<p><strong>FeignClientFactoryBean#loadBalance</strong>  默认的LoadBalance 是 Hystrix</p>
+<p><img src="/p/spring_cloud_feign/images/image-20220426160010570.png"
+	width="1042"
+	height="453"
+	
+	loading="lazy"
+	
+		alt="image-20220426160010570"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="230"
+		data-flex-basis="552px"
+	
+></p>
+<p>代理对象Proxy 中</p>
+<p><img src="/p/spring_cloud_feign/images/image-20220426175939557.png"
+	width="954"
+	height="533"
+	
+	loading="lazy"
+	
+		alt="image-20220426175939557"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="178"
+		data-flex-basis="429px"
+	
+></p>
+<p>总结</p>
+<ol>
+<li>@EnableFeignClient 注解包下的 所有@FeignClient 接口都会封装成 FeignClientFactoryBean</li>
+<li>FeignClientFactoryBean 的 getObject 方法会为 默认选择使用 Hrystrix 类型的 FeginLoadBalance  客户端  (可在配置文件中使用 Ribbon),使用jdk动态代理 生成代理对象,</li>
+<li>在代理方法的 Handler 中
+<ol>
+<li>封装了Target (Feign就是实际需要调用的服务 名称 以及 url)</li>
+<li>接口中所有方法 存储在 Dispatch 一个map中, key 是 method , value 是 该方法的处理器</li>
+</ol>
+</li>
+</ol>
+<h2 id="2-代理拦截后如何走网络调用的">2. 代理拦截后如何走网络调用的
+</h2><h3 id="1-代理拦截">1. 代理拦截
+</h3><p><strong>ReflectiveFeign.FeignInvocationHandler#invoke</strong></p>
+<pre><code class="language-java">@Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+      if (&quot;equals&quot;.equals(method.getName())) {
+        try {
+          Object otherHandler =
+              args.length &gt; 0 &amp;&amp; args[0] != null ? Proxy.getInvocationHandler(args[0]) : null;
+          return equals(otherHandler);
+        } catch (IllegalArgumentException e) {
+          return false;
+        }
+      } else if (&quot;hashCode&quot;.equals(method.getName())) {
+        return hashCode();
+      } else if (&quot;toString&quot;.equals(method.getName())) {
+        return toString();
+      }
+	
+	  // 从map 集合中根据方法Method 获取该方法的处理器 handler (SynchronousMethodHandler), 然后执行
+      return dispatch.get(method).invoke(args);
+    }
+
+</code></pre>
+<h3 id="2-方法处理器执行请求">2. 方法处理器执行请求
+</h3><p><strong>SynchronousMethodHandler#invoke</strong></p>
+<pre><code>client.execute(request, options); // 使用feign客户端发送请求获取响应
+
+</code></pre>
+<p><img src="/p/spring_cloud_feign/images/image-20220427103610277.png"
+	width="960"
+	height="536"
+	
+	loading="lazy"
+	
+		alt="image-20220427103610277"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="179"
+		data-flex-basis="429px"
+	
+></p>
+<h3 id="3-进行负载均衡调用">3. 进行负载均衡调用
+</h3><p>LoadBalancerFeignClient#execute</p>
+<p><img src="/p/spring_cloud_feign/images/image-20220427103940771.png"
+	width="864"
+	height="479"
+	
+	loading="lazy"
+	
+		alt="image-20220427103940771"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="180"
+		data-flex-basis="432px"
+	
+></p>
+<h3 id="4-ribbon-中进行实际地址的替换">4. Ribbon 中进行实际地址的替换
+</h3><p><img src="/p/spring_cloud_feign/images/image-20220427104033654.png"
+	width="953"
+	height="535"
+	
+	loading="lazy"
+	
+		alt="image-20220427104033654"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="178"
+		data-flex-basis="427px"
+	
+></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/springcloud/">Springcloud</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/spring_cloud_nacos/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Spring_cloud_nacos</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/spring_cloud_gateway/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Spring_cloud_gateway</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/spring_cloud_sentinel/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Spring_cloud_sentinel</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

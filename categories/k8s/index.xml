@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>K8S on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/categories/k8s/</link>
+        <description>Recent content in K8S on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Sun, 14 Jul 2024 17:44:10 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/categories/k8s/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>K8s入门</title>
+        <link>https://mikeLing-qx.github.io/p/k8s%E5%85%A5%E9%97%A8/</link>
+        <pubDate>Sun, 14 Jul 2024 17:44:10 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/k8s%E5%85%A5%E9%97%A8/</guid>
+        <description>&lt;h1 id=&#34;1-wsl安装k3s&#34;&gt;1. wsl安装k3s
+&lt;/h1&gt;&lt;p&gt;遇到问题&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;[System has not been booted with systemd as init system (PID 1). Can&amp;rsquo;t operate]&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;参考资料&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://askubuntu.com/questions/1379425/system-has-not-been-booted-with-systemd-as-init-system-pid-1-cant-operate&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://askubuntu.com/questions/1379425/system-has-not-been-booted-with-systemd-as-init-system-pid-1-cant-operate&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Kubernetes介绍：https://www.cnblogs.com/weicunqi/p/14892207.html
+资源管理：https://www.cnblogs.com/weicunqi/p/14894122.html
+实战入门：https://www.cnblogs.com/weicunqi/p/14894249.html&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;2-minikube-window安装&#34;&gt;2. minikube window安装
+&lt;/h1&gt;&lt;pre&gt;&lt;code&gt;New-Item -Path &#39;c:\&#39; -Name &#39;minikube&#39; -ItemType Directory -Force
+Invoke-WebRequest -OutFile &#39;c:\minikube\minikube.exe&#39; -Uri &#39;https://github.com/kubernetes/minikube/releases/latest/download/minikube-windows-amd64.exe&#39; -UseBasicParsing
+
+$oldPath = [Environment]::GetEnvironmentVariable(&#39;Path&#39;, [EnvironmentVariableTarget]::Machine)
+if ($oldPath.Split(&#39;;&#39;) -inotcontains &#39;C:\minikube&#39;){
+  [Environment]::SetEnvironmentVariable(&#39;Path&#39;, $(&#39;{0};C:\minikube&#39; -f $oldPath), [EnvironmentVariableTarget]::Machine)
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;控制台&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;minikube dashboard
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;测试pod&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;kubectl create deployment hello-minikube --image=kicbase/echo-server:1.0
+kubectl expose deployment hello-minikube --type=NodePort --port=8080
+
+kubectl get services hello-minikube
+
+minikube service hello-minikube
+
+kubectl port-forward service/hello-minikube 7080:8080
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;3-kube-命令&#34;&gt;3. kube 命令
+&lt;/h1&gt;&lt;p&gt;nginx-pod&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.12
+        ports:
+        - containerPort: 80
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;副本数量&lt;/p&gt;
+&lt;p&gt;==spec.replicas==是可以选字段，指定期望的pod数量，默认是1。&lt;/p&gt;
+&lt;p&gt;==.spec.selector==是可选字段，用来==指定 label selector ，圈定Deployment管理的pod范围==。如果被&lt;/p&gt;
+&lt;p&gt;指定， .spec.selector 必须匹配 .spec.template.metadata.labels，否则它将被API拒绝。如果&lt;/p&gt;
+&lt;p&gt;.spec.selector 没有被指定， .spec.selector.matchLabels 默认是.spec.template.metadata.labels。&lt;/p&gt;
+&lt;p&gt;==在Pod的template跟.spec.template不同或者数量超过了.spec.replicas规定的数量的情况下, Deployment会杀掉label跟selector不同的Pod==&lt;/p&gt;
+&lt;p&gt;Pod模板，.spec.template 是 .spec中唯一要求的字段&lt;/p&gt;
+&lt;p&gt;.spec.template.spec.restartPolicy 可以设置为 Always , 如果不指定的话这就是默认配置。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;创建pod&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;kubectl get pods -o wide -w
+kubectl apply -f nginx-pod.yml
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;删除pod&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;kubectl delete pod nginx-deployment-f77774fc5-cgs82
+# 查看Pod详情
+kubectl get pods -o wide
+
+它会重新拉起来
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;查看创建过程&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;kubectl describe pod nginx-deployment
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;查看pod 的详细信息&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;kubectl describe pod nginx
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;4-pod&#34;&gt;4. pod
+&lt;/h1&gt;&lt;h2 id=&#34;0-特点&#34;&gt;0. 特点
+&lt;/h2&gt;&lt;p&gt;​		Pod中封装着应用的容器（有的情况下是好几个容器），==存储、独立的网络IP==，管理容器如何运行&lt;/p&gt;
+&lt;p&gt;的策略选项。Pod代表着部署的一个单位：kubernetes中应用的一个实例，可能由一个或者多个容器组&lt;/p&gt;
+&lt;p&gt;合在一起共享资源。&lt;/p&gt;
+&lt;p&gt;==&lt;strong&gt;网络&lt;/strong&gt;==&lt;/p&gt;
+&lt;p&gt;==每一个Pod都会被指派一个唯一的Ip地址==，在Pod中的==每一个容器共享网络命名空间==，包括==Ip地址和 网络端口。在同一个Pod中的容器可以同locahost进行互相通信==。当Pod中的容器需要与Pod外的实体进 行通信时，则需要通过端口等共享的网络资源。&lt;/p&gt;
+&lt;p&gt;==&lt;strong&gt;存储&lt;/strong&gt;==&lt;/p&gt;
+&lt;p&gt;Pod能够被指定共享存储卷的集合，在Pod中所有的容器能够访问共享存储卷，允许这些容器共享 数据。存储卷也允许在一个Pod持久化数据，以防止其中的容器需要被重启。&lt;/p&gt;
+&lt;h2 id=&#34;1-镜像拉取策略&#34;&gt;1. 镜像拉取策略
+&lt;/h2&gt;&lt;p&gt;pod的镜像拉取策略分为三种：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;always（总是从官方下载镜像）&lt;/p&gt;
+&lt;p&gt;never（从不下载镜像）&lt;/p&gt;
+&lt;p&gt;ifnotpresent（如果本地没有镜像就从官方下载镜像）。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;2-生命周期行为&#34;&gt;2. 生命周期行为
+&lt;/h2&gt;&lt;h3 id=&#34;1-初始化容器-init-container-&#34;&gt;1. 初始化容器（ init container ）
+&lt;/h3&gt;&lt;p&gt;即应用程序的主容器启动之前要运行的容器，常用于为主容器 执行一些预置操作，它们具有两种典型特征。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;初始化容器必须运行完成直至结束，若某初始化容器运行失败，那么 kubernetes 需要重启它直到 成功完成。（注意：如果 pod 的 spec.restartPolicy 字段值为“ Never ”，那么运行失败的初始化 容器不会被重启。）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;每个初始化容器都==必须按定义的顺序串行运行==。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;2-容器探测&#34;&gt;2. 容器探测
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;容器探测（ container probe ）是 Pod 对象生命周期中的一项重要的日常任务，它是 kubelet 对&lt;/p&gt;
+&lt;p&gt;容器周期性执行的健康状态诊断，诊断操作由容器的处理器（ handler ）进行定义。&lt;/p&gt;
+&lt;p&gt;Kubernetes 支持三种处理器用于 Pod 探测：&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;ExecAction ：在容器内执行指定命令，并根据其返回的状态码进行诊断的操作称为 Exec 探测，&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;状态码为 0 表示成功，否则即为不健康状态。&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;TCPSocketAction ：通过与容器的某 TCP 端口尝试建立连接进行诊断，端口能够成功打开即为正&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;常，否则为不健康状态。&lt;/p&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;HTTPGetAction ：通过向容器 IP 地址的某指定端口的指定 path 发起 HTTP GET 请求进行诊断，&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;响应码为 2xx 或 3xx 时即为成功，否则为失败。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;任何一种探测方式都可能存在三种结果： “Success”（成功） 、 “Failure”（失败） 、 “Unknown”&lt;/p&gt;
+&lt;p&gt;（未知） ，只有 success 表示成功通过检测。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;3-健康检查&#34;&gt;3. 健康检查
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;存活探测 ==&lt;strong&gt;应用是否活着&lt;/strong&gt;==&lt;/li&gt;
+&lt;li&gt;就绪探测 ==用&lt;strong&gt;是否准备好为请求提供服务&lt;/strong&gt;==&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;Liveness探测和Readiness探测是两种Health Check机制,如果不特意配置,Kubernetes将对两种探&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;测采取相同的默认行为,即通过判断容器启动进程的返回值是否为零来判断探测是否成功。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;两种探测的配置方法完全一样,支持的配置参数也一样。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;不同之处在于探测失败后的行为:Liveness 探测是重启容器;Readiness探测则是将容器设置为不可用,不接收Service转发的请求。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Liveness探测和Readiness探测是独立执行的,二者之间没有依赖,所以可以单独使用,也可以同时使用。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;用Liveness探测判断容器是否需要重启以实现自愈;用Readiness探测判断容器是否已经准备好 对外提供服务&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;5-pod-控制器&#34;&gt;5. pod 控制器
+&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;​	Pod控制器是用于实现管理pod的中间层，确保pod资源符合预期的状态，pod的资源出现故障时， 会尝试 进行重启，当根据重启策略无效，则会重新新建pod的资源。 创建为具体的控制器对象之后，每个控制器均通过 API Server 提供的接口持续监控相关资源对象 的当前状态，并在因故障、更新或其他原因导致系统状态发生变化时，尝试让资源的当前状态想期望状 态迁移和逼近。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;一个 Pod 控制器资源至少应该包含三个基本的组成部分：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;标签选择器：匹配并关联 Pod 资源对象，并据此完成受其管控的 Pod 资源计数。&lt;/li&gt;
+&lt;li&gt;期望的副本数：期望在集群中精确运行着的 Pod 资源的对象量。&lt;/li&gt;
+&lt;li&gt;Pod模板：用于新建 Pod 资源对象的 Pod 模板资源。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;常见的控制器&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ReplicaSet: 代用户创建指定数量的 pod 副本数量，确保 pod 副本数量符合预期状态，并且支持滚动式自动扩容和缩容功能&lt;/li&gt;
+&lt;li&gt;Deployment: 工作在 ReplicaSet 之上，用于管理无状态应用，目前来说最好的控制器。支持滚动更新和回滚功能，还提供声明式配置。&lt;/li&gt;
+&lt;li&gt;DaemonSet: 用于确保集群中的每一个节点只运行特定的 pod 副本，常用于实现系统级后台任务。比如 ELK 服务&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;1-replicaset控制器&#34;&gt;1. ReplicaSet控制器
+&lt;/h2&gt;&lt;p&gt;示例&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;vi nginx-rs.yml
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-yml&#34;&gt;apiVersion: apps/v1   # api版本定义
+kind: ReplicaSet       # 定义资源类型为ReplicaSet
+metadata:
+  name: nginx-rs       # ReplicaSet的名称
+  namespace: default  # 命名空间
+spec:                 # ReplicaSet的规格定义
+  replicas: 2         # 定义副本数量为2个
+  selector:           # 标签选择器，定义匹配Pod的标签
+    matchLabels:
+      app: nginx
+  template:           # Pod的模板定义
+    metadata:         # Pod的元数据定义
+      name: nginx-pod # 自定义Pod的名称
+      labels:         # 定义Pod的标签
+        app: nginx    #定义Pod的标签，需要和上面的标签选择器内匹配规则中定义的标签一致，可以多出其他标签
+    spec:             # Pod的规格定义
+      containers:     # 容器定义
+      - name: nginx  # 容器名称
+        image: nginx:1.12  # 容器镜像
+        imagePullPolicy: IfNotPresent  # 拉取镜像的规则
+        ports:         # 暴露端口
+        - name: http   # 端口名称
+          containerPort: 80  # 容器端口
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;创建rs 控制器&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;kubectl apply -f nginx-rs.yaml
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;查看 rs 控制器&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;kubectl get rs
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;==更新控制器一般来说都是修改配置文件 然后再apply==&lt;/p&gt;
+&lt;p&gt;扩缩容, 使用scale 命令, (==用于临时的处理==), 永久的还是要使用配置文件&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;kubectl scale replicasets nginx-rs --replicas=4
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;删除rs 控制器,  数 cascade=false 设置不删除pod&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;kubectl delete replicasets nginx-rs --cascade=false
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-deployment-控制器&#34;&gt;2. Deployment 控制器
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;vi nginx-deployment.yml
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;更新策略&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;滚动更新: 滚动更新是==默认的更新策略==，==它在删除一些旧版本的Pod的同时补充创建一些新的Pod，更新期间 服务不会中断==。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;滚动更新期间，应用升级期间还要确保可用的Pod对象数量不低于某些阈值。确保可以持续处理客 户端请求。变动的方式和Pod对象的数量范围将通过==spec.strategy.roollingUpdata.maxSurge和 spec.strategy.roollingUpdata.maxunavailable两个属性协同进行定义。两个参数用法如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;maxSurge：指定升级期间存在的总Pod对象数量最多以超出期望值的个数，其值可以为0或者正整 数，也可以是一个期望值的百分比：例如如果期望值是3，当前的属性值为1，则表示Pod对象的总 数不能超过4个。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;maxUnavailable：升级期间正常可用的Pod副本数（包括新旧版本）最多不能低于期望的个数、其 值可以是0或者正整数。也可以是一个期望值的百分比，默认值为1；该值意味着如果期望值是3， 那么在升级期间至少要有两个Pod对象处于正常提供服务的状态&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;==查看pod的版本号==&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;kubectl get pods -o custom-columns=Name:metadata.name,Image:spec.containers[0].image 
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;重建更新: 先删除所有的Pod再根据新的模板创建新的Pod，中间会导致服务的不可用，用户要 么使用的是新版本，要么就是旧版本&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;执行回滚&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;kubectl rollout undo deployment/nginx-deployment
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;==回滚只能在最近的两个版本之间回滚, 如果想要回滚到指定的节点需要加版本==&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;kubectl rollout history deployment/nginx-deployment --revision=1
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;6-数据存储&#34;&gt;6. 数据存储
+&lt;/h1&gt;&lt;p&gt;通过命令 &lt;code&gt;kubectl explain pod.spec&lt;/code&gt; 可以查看 当前 kubernetes 版本支持的存储卷类型&lt;/p&gt;
+&lt;h2 id=&#34;1-emptydir&#34;&gt;1. emptydir
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;emptyDir 存储卷是 Pod 对象生命周期中的一个临时目录，类似于 Docker 上的 “docker 挂载&lt;/p&gt;
+&lt;p&gt;卷” ，在 Pod 对象启动时即被创建，而在 Pod 对象被移除时会被一并删除（永久删除）。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;==&lt;strong&gt;一个容器崩溃了不会导致数据的丢失，因为容器的崩溃并不移除&lt;/strong&gt; Pod==。&lt;/p&gt;
+&lt;h2 id=&#34;2-hostpath&#34;&gt;2. hostpath
+&lt;/h2&gt;&lt;p&gt;半持久化, 需要配合nfs 使用&lt;/p&gt;
+&lt;h1 id=&#34;7-service&#34;&gt;7. service
+&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;Kubernetes service 定义了这样一种抽象：一个 Pod 的逻辑分组，一种可以访问它们的策略 ——&lt;/p&gt;
+&lt;p&gt;通常称为微服务。这一组 pod 能够被 Service 访问到，通常是通过 Label selector&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Service 资源基于标签选择器将一组 Pod 定义成一个逻辑组合，并通过自己的 IP 地址和端口调度代理请求至组内的 Pod 对象之上，如下图所示，它向客户端隐藏了真实的、处理用户请求的 Pod 资源， 使得客户端的请求看上去就像是由 Service 直接处理并响应一样。 service 的 ip 也被称作为 cluster-ip&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/k8s%E5%85%A5%E9%97%A8/images/image-20240805122647839.png&#34;
+	width=&#34;781&#34;
+	height=&#34;242&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240805122647839&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;322&#34;
+		data-flex-basis=&#34;774px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;Service能够提供负载均衡的能力，但是在使用上有以下限制：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;只提供4层负载均衡能力，而没有7层功能，但有时我们可能需要更多的匹配规则来转发请求，这点上4层负载均衡是不支持的&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;客户端只需要访问 Service 的 IP，==Kubernetes 则负责建立和维护 Service 与 Pod 的映射关系==。&lt;/li&gt;
+&lt;li&gt;无论后端 Pod 如何变化，对客户端不会有任何影响，因为 Service 没有变&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;service 的 类型&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Clusterlp&lt;/strong&gt;：默认类型，自动分配一个仅 Cluster 内部可以访问的虚拟 IP&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;NodePort&lt;/strong&gt;：在 ClusterIP 基础上为 Service 在每台机器上绑定一个端口，这样就可以通过： NodePort 来访问该服务&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;LoadBalancer&lt;/strong&gt;：在 NodePort 的基础上，借助 cloud provider 创建一个外部负载均衡器，并将请求转发到：NodePort&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;ExternalName&lt;/strong&gt;：把集群外部的服务引入到集群内部来，在集群内部直接使用。没有任何类型代理&lt;/p&gt;
+&lt;p&gt;被创建，这只有kubernetes 1.7或更高版本的 kube-dns 才支持&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;1-clusterip&#34;&gt;1. clusterIp
+&lt;/h2&gt;&lt;p&gt;类型为ClusterIP的service，这个service有一个Cluster-IP，其实就一个VIP，具体实现原理依靠&lt;/p&gt;
+&lt;p&gt;kubeproxy组件，通过iptables或是ipvs实现。&lt;/p&gt;
+&lt;p&gt;==注意：这种类型的service只能在集群内访问==&lt;/p&gt;
+&lt;h2 id=&#34;2-nodeport&#34;&gt;2. NodePort
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;NodePort的最主要功能是进行外网访问，我们是不能通过访问 8000 端口访问的，他是内网端&lt;/p&gt;
+&lt;p&gt;口，外网访问需要访问映射出来的端口 8000:31337/TCP 这里映射出来的 nodeport 是 31337 ，&lt;/p&gt;
+&lt;p&gt;还可以通过指定 nodePort 来指定端口，要求端口必须大于30000&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/k8s%E5%85%A5%E9%97%A8/images/image-20240805123055409.png&#34;
+	width=&#34;871&#34;
+	height=&#34;595&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240805123055409&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;146&#34;
+		data-flex-basis=&#34;351px&#34;
+	
+&gt;&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

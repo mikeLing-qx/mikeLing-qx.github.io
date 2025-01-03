@@ -1,0 +1,3105 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="MongoDB 目标 了解什么是MongoDB 掌握MongoDB的安装 掌握MongoDB的常用命令 掌握mongo的索引 了解mongo集群原理，能够搭建集群 掌握mongodb-driver的基本使用 掌握SpringDataMongoDB的使用 了解如何在原有的spring-data框架中封装新的功能 第一章-MongoDB 知识点-MongoDB简介 1.目标 了解什么是MongoDB 2.路径 为什么要使用MongoDB 什么是MongoDB MongoDB特点 MongoDB体系结构 MongoDB数据类型 3.讲解 3.1 为什么要使用MongoDB ">
+<title>MongoDb</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/mongodb/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="MongoDb">
+<meta property='og:description' content="MongoDB 目标 了解什么是MongoDB 掌握MongoDB的安装 掌握MongoDB的常用命令 掌握mongo的索引 了解mongo集群原理，能够搭建集群 掌握mongodb-driver的基本使用 掌握SpringDataMongoDB的使用 了解如何在原有的spring-data框架中封装新的功能 第一章-MongoDB 知识点-MongoDB简介 1.目标 了解什么是MongoDB 2.路径 为什么要使用MongoDB 什么是MongoDB MongoDB特点 MongoDB体系结构 MongoDB数据类型 3.讲解 3.1 为什么要使用MongoDB ">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/mongodb/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='MongoDb' /><meta property='article:tag' content='NoSql' /><meta property='article:published_time' content='2025-01-03T14:32:15&#43;08:00'/><meta property='article:modified_time' content='2025-01-03T14:32:15&#43;08:00'/>
+<meta name="twitter:title" content="MongoDb">
+<meta name="twitter:description" content="MongoDB 目标 了解什么是MongoDB 掌握MongoDB的安装 掌握MongoDB的常用命令 掌握mongo的索引 了解mongo集群原理，能够搭建集群 掌握mongodb-driver的基本使用 掌握SpringDataMongoDB的使用 了解如何在原有的spring-data框架中封装新的功能 第一章-MongoDB 知识点-MongoDB简介 1.目标 了解什么是MongoDB 2.路径 为什么要使用MongoDB 什么是MongoDB MongoDB特点 MongoDB体系结构 MongoDB数据类型 3.讲解 3.1 为什么要使用MongoDB ">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#mongodb">MongoDB</a></li>
+    <li><a href="#目标">目标</a></li>
+    <li><a href="#第一章-mongodb">第一章-MongoDB</a>
+      <ul>
+        <li><a href="#知识点-mongodb简介">知识点-MongoDB简介</a>
+          <ul>
+            <li><a href="#1目标">1.目标</a></li>
+            <li><a href="#2路径">2.路径</a></li>
+            <li><a href="#3讲解">3.讲解</a>
+              <ul>
+                <li><a href="#31-为什么要使用mongodb">3.1 为什么要使用MongoDB</a></li>
+                <li><a href="#32-什么是mongodb">3.2 什么是MongoDB</a></li>
+                <li><a href="#33-mongodb特点">3.3 MongoDB特点</a></li>
+                <li><a href="#34-mongodb体系结构">3.4 MongoDB体系结构</a></li>
+                <li><a href="#35-mongodb数据类型">3.5 MongoDB数据类型</a></li>
+                <li><a href="#36-mongodb和redis比较面试">3.6 MongoDB和Redis比较【面试】</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#知识点-mongodb安装">知识点-MongoDB安装</a>
+          <ul>
+            <li><a href="#1目标-1">1.目标</a></li>
+            <li><a href="#2路径-1">2.路径</a></li>
+            <li><a href="#3讲解-1">3.讲解</a>
+              <ul>
+                <li><a href="#31-docker-环境下mongodb安装">3.1 Docker 环境下MongoDB安装</a></li>
+                <li><a href="#32客户端的安装和使用">3.2客户端的安装和使用</a></li>
+              </ul>
+            </li>
+            <li><a href="#4小结">4.小结</a></li>
+          </ul>
+        </li>
+        <li><a href="#知识点-常用命令">知识点-常用命令</a>
+          <ul>
+            <li><a href="#1目标-2">1.目标</a></li>
+            <li><a href="#2路径-2">2.路径</a></li>
+            <li><a href="#3讲解-2">3.讲解</a>
+              <ul>
+                <li><a href="#31-选择和创建数据库">3.1 选择和创建数据库</a></li>
+                <li><a href="#32-插入与查询文档">3.2 插入与查询文档</a></li>
+                <li><a href="#33-修改与删除文档">3.3 修改与删除文档</a></li>
+                <li><a href="#34-统计条数">3.4 统计条数</a></li>
+                <li><a href="#35-模糊查询">3.5 模糊查询</a></li>
+                <li><a href="#36-大于-小于-不等于">3.6 大于 小于 不等于</a></li>
+                <li><a href="#37-包含与不包含">3.7 包含与不包含</a></li>
+                <li><a href="#38-条件连接">3.8 条件连接</a></li>
+                <li><a href="#39-列值增长">3.9 列值增长</a></li>
+              </ul>
+            </li>
+            <li><a href="#4小结-1">4.小结</a></li>
+          </ul>
+        </li>
+        <li><a href="#知识点-索引的使用">知识点-索引的使用</a>
+          <ul>
+            <li><a href="#1目标-3">1.目标</a></li>
+            <li><a href="#2路径-3">2.路径</a></li>
+            <li><a href="#3讲解-3">3.讲解</a>
+              <ul>
+                <li><a href="#31-索引简介">3.1 索引简介</a></li>
+                <li><a href="#32-索引基本操作">3.2 索引基本操作</a>
+                  <ul>
+                    <li><a href="#321-创建索引">3.2.1 创建索引</a></li>
+                    <li><a href="#322-查看索引">3.2.2 查看索引</a></li>
+                    <li><a href="#323-删除索引">3.2.3 删除索引</a></li>
+                    <li><a href="#324-修改索引">3.2.4 修改索引</a></li>
+                  </ul>
+                </li>
+                <li><a href="#33-索引类型">3.3 索引类型</a>
+                  <ul>
+                    <li><a href="#普通索引-联合索引">普通索引, 联合索引</a></li>
+                    <li><a href="#多键索引数组索引">多键索引（数组索引）</a></li>
+                    <li><a href="#文本索引">文本索引</a></li>
+                    <li><a href="#哈希索引">哈希索引</a></li>
+                  </ul>
+                </li>
+                <li><a href="#34-索引属性">3.4 索引属性</a>
+                  <ul>
+                    <li><a href="#唯一索引">唯一索引</a></li>
+                    <li><a href="#部分索引">部分索引</a></li>
+                    <li><a href="#稀疏索引">稀疏索引</a></li>
+                    <li><a href="#ttl指数">TTL指数</a></li>
+                  </ul>
+                </li>
+                <li><a href="#35-索引分析">3.5 索引分析</a></li>
+              </ul>
+            </li>
+            <li><a href="#4总结">4.总结</a></li>
+          </ul>
+        </li>
+        <li><a href="#知识点-mongo集群搭建">知识点-mongo集群搭建	</a>
+          <ul>
+            <li><a href="#1目标-4">1.目标</a></li>
+            <li><a href="#2路径-4">2.路径</a></li>
+            <li><a href="#3讲解-4">3.讲解</a>
+              <ul>
+                <li><a href="#31-集群简介">3.1 集群简介</a></li>
+                <li><a href="#32-副本集">3.2 副本集</a>
+                  <ul>
+                    <li><a href="#321副本集角色">3.2.1副本集角色</a></li>
+                    <li><a href="#322-两种架构模式">3.2.2 两种架构模式</a></li>
+                  </ul>
+                </li>
+                <li><a href="#33-分片">3.3 分片</a></li>
+                <li><a href="#32-搭建集群">3.2 搭建集群</a>
+                  <ul>
+                    <li><a href="#321-创建配置服务复本集">3.2.1 创建配置服务复本集</a></li>
+                    <li><a href="#322-创建分片复本集">3.2.2 创建分片复本集</a></li>
+                    <li><a href="#323-初始化配置副本集和分片副本集"><strong>3.2.3 初始化配置副本集</strong>和分片副本集</a></li>
+                    <li><a href="#324-创建集群入口并关联配置集">3.2.4 创建集群入口并关联配置集</a></li>
+                    <li><a href="#325-在集群入口路由上挂载分片集">3.2.5 在集群入口(路由)上挂载分片集</a></li>
+                    <li><a href="#326-测试集群">3.2.6 测试集群</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li><a href="#4总结-1">4.总结</a></li>
+          </ul>
+        </li>
+        <li><a href="#知识点-mongo聚合查询">知识点-mongo聚合查询</a>
+          <ul>
+            <li><a href="#1目标-5">1.目标</a></li>
+            <li><a href="#2路径-5">2.路径</a></li>
+            <li><a href="#3讲解-5">3.讲解</a>
+              <ul>
+                <li><a href="#31-管道查询">3.1 管道查询</a></li>
+                <li><a href="#32-map-reduce">3.2 map-reduce</a></li>
+              </ul>
+            </li>
+            <li><a href="#4总结-2">4.总结</a></li>
+          </ul>
+        </li>
+        <li><a href="#知识点-mongodb-driver使用">知识点-mongodb-driver使用</a>
+          <ul>
+            <li><a href="#mongodb-driver">mongodb-driver</a>
+              <ul>
+                <li><a href="#32-查询所有">3.2 查询所有</a></li>
+                <li><a href="#33根据_id查询">3.3根据_id查询</a></li>
+                <li><a href="#34新增">3.4新增</a></li>
+                <li><a href="#35修改">3.5修改</a></li>
+                <li><a href="#36-删除">3.6 删除</a></li>
+              </ul>
+            </li>
+            <li><a href="#4小结-2">4.小结</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#第二章-springdatamongodb">第二章-SpringDataMongoDB</a>
+      <ul>
+        <li><a href="#知识点-基本crud实现">知识点-基本crud实现</a>
+          <ul>
+            <li><a href="#1目标-6">1.目标</a></li>
+            <li><a href="#2路径-6">2.路径</a></li>
+            <li><a href="#3讲解-6">3.讲解</a>
+              <ul>
+                <li><a href="#31-开发准备">3.1 开发准备</a></li>
+                <li><a href="#32基本crud">3.2基本CRUD</a>
+                  <ul>
+                    <li><a href="#321新增">3.2.1新增</a></li>
+                    <li><a href="#322删除">3.2.2删除</a></li>
+                    <li><a href="#323修改">3.2.3修改</a></li>
+                    <li><a href="#324查询所有">3.2.4查询所有</a></li>
+                    <li><a href="#325根据id查询">3.2.5根据id查询</a></li>
+                    <li><a href="#326-获取当前点赞数大于200并统计用户的总点赞数">3.2.6 获取当前点赞数大于200并统计用户的总点赞数</a></li>
+                    <li><a href="#327-按照点赞数排序查询前3条评论">3.2.7 按照点赞数排序，查询前3条评论</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li><a href="#4小结-3">4.小结</a></li>
+          </ul>
+        </li>
+        <li><a href="#知识点-框架封装">知识点-框架封装</a>
+          <ul>
+            <li><a href="#1目标-7">1.目标</a></li>
+            <li><a href="#2路径-7">2.路径</a></li>
+            <li><a href="#3讲解-7">3.讲解</a>
+              <ul>
+                <li><a href="#31-在原有的springdata框架上封装自己的功能">3.1 在原有的springdata框架上封装自己的功能</a></li>
+                <li><a href="#32-将我们自己实现的修改功能封装进框架">3.2 将我们自己实现的修改功能封装进框架</a></li>
+                <li><a href="#33-封装分页查询功能">3.3 封装分页查询功能</a></li>
+                <li><a href="#34-封装聚合查询功能">3.4 封装聚合查询功能</a>
+                  <ul>
+                    <li><a href="#341-管道查询">3.4.1 管道查询</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li><a href="#4小结-4">4.小结</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#第三章-聚合查询">第三章 聚合查询</a>
+      <ul>
+        <li><a href="#0-mysql类比">0. mysql类比</a></li>
+        <li><a href="#1-聚合管道操作符">1. 聚合管道操作符</a>
+          <ul>
+            <li><a href="#11-count">1.1 $count</a></li>
+            <li><a href="#12--group">1.2  $group</a></li>
+            <li><a href="#13-match">1.3 $match</a></li>
+            <li><a href="#14-unwind">1.4 $unwind</a></li>
+            <li><a href="#15-project">1.5 $project</a>
+              <ul>
+                <li><a href="#1-语法">1. 语法</a></li>
+                <li><a href="#2-例子">2. 例子</a></li>
+              </ul>
+            </li>
+            <li><a href="#16-lookup">1.6 $lookup</a></li>
+          </ul>
+        </li>
+        <li><a href="#2-find详解">2. find详解</a></li>
+        <li><a href="#3-游标">3. 游标</a></li>
+        <li><a href="#4-数组操作">4. 数组操作</a>
+          <ul>
+            <li><a href="#41-all">4.1 $all</a></li>
+            <li><a href="#42-size">4.2 $size</a></li>
+            <li><a href="#43-slice">4.3 $slice</a></li>
+            <li><a href="#44-elemmatch">4.4 $elemMatch</a></li>
+          </ul>
+        </li>
+        <li><a href="#50-mongodb-compass">5.0 mongodb compass</a></li>
+        <li><a href="#60-聚合性能分析">6.0 聚合性能分析</a></li>
+        <li><a href="#实践">实践</a></li>
+      </ul>
+    </li>
+    <li><a href="#第四章-文档设计">第四章 文档设计</a></li>
+    <li><a href="#深拷贝">深拷贝</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/mongodb/" >
+                MongoDb
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/mongodb/">MongoDb</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jan 03, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 42 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="mongodb">MongoDB
+</h1><h1 id="目标">目标
+</h1><ul>
+<li><input disabled="" type="checkbox"> 了解什么是MongoDB</li>
+<li><input disabled="" type="checkbox"> 掌握MongoDB的安装</li>
+<li><input disabled="" type="checkbox"> 掌握MongoDB的常用命令</li>
+<li><input disabled="" type="checkbox"> 掌握mongo的索引</li>
+<li><input disabled="" type="checkbox"> 了解mongo集群原理，能够搭建集群</li>
+<li><input disabled="" type="checkbox"> 掌握mongodb-driver的基本使用</li>
+<li><input disabled="" type="checkbox"> 掌握SpringDataMongoDB的使用</li>
+<li><input disabled="" type="checkbox"> 了解如何在原有的spring-data框架中封装新的功能</li>
+</ul>
+<h1 id="第一章-mongodb">第一章-MongoDB
+</h1><h2 id="知识点-mongodb简介">知识点-MongoDB简介
+</h2><h3 id="1目标">1.目标
+</h3><ul>
+<li><input disabled="" type="checkbox"> 了解什么是MongoDB</li>
+</ul>
+<h3 id="2路径">2.路径
+</h3><ol>
+<li>为什么要使用MongoDB</li>
+<li>什么是MongoDB</li>
+<li>MongoDB特点</li>
+<li>MongoDB体系结构</li>
+<li>MongoDB数据类型</li>
+</ol>
+<h3 id="3讲解">3.讲解
+</h3><h4 id="31-为什么要使用mongodb">3.1 为什么要使用MongoDB
+</h4><p><img src="/p/mongodb/images/1564300991182-1592442209458.png"
+	width="713"
+	height="430"
+	
+	loading="lazy"
+	
+		alt="1564300991182"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="165"
+		data-flex-basis="397px"
+	
+></p>
+<p>文章评论功能存在以下特点：</p>
+<ol>
+<li>数据量大</li>
+<li>写入操作频繁</li>
+<li>价值较低</li>
+</ol>
+<p>对于这样的数据，我们更适合使用MongoDB来实现数据的存储</p>
+<h4 id="32-什么是mongodb">3.2 什么是MongoDB
+</h4><p>​	MongoDB是一个基于分布式文件存储的数据库。由C++语言编写。旨在为WEB应用提供==可扩展的高性能数据存储解决方案==。
+​	MongoDB是一个介于关系数据库和非关系数据库之间的产品，是<strong>非关系数据库</strong>当中功能最丰富，最像关系数据库的。它支持的数据结构非常松散，是类似json的bson(数据类型)格式，因此可以存储比较复杂的数据类型。</p>
+<h4 id="33-mongodb特点">3.3 MongoDB特点
+</h4><p>​	Mongo最大的特点是它支持的<strong>查询语言非常强大</strong>，其语法有点类似于<strong>面向对象的查询语言</strong>，几乎可以实现类似关系数据库单表查询的绝大部分功能，而且还支持对数据建立<strong>索引</strong>。(正则表达式支持索引)</p>
+<p>它的特点是高性能、易部署、易使用，存储数据非常方便。主要功能特性有：</p>
+<ol>
+<li>面向集合存储，易存储对象类型的数据。(集合相当于表)</li>
+<li>模式自由。</li>
+<li>支持动态查询。</li>
+<li>支持完全索引，包含内部对象。</li>
+<li>支持查询。</li>
+<li>支持复制和故障恢复。(高可用)</li>
+<li>使用高效的二进制数据存储，包括大型对象（如视频等）。</li>
+<li>自动处理碎片，以支持云计算层次的扩展性。（mapreduce）</li>
+<li>支持RUBY，PYTHON，JAVA，C++，PHP，C#等多种语言。</li>
+<li>文件存储格式为BSON（一种JSON的扩展）。</li>
+</ol>
+<p>支持将mongodb bson文件转换成json 文件</p>
+<p>命令</p>
+<pre><code>bsondump collection.bson &gt; collection.json
+</code></pre>
+<h4 id="34-mongodb体系结构">3.4 MongoDB体系结构
+</h4><p>​	MongoDB 的逻辑结构是一种层次结构。主要由：文档(document)、集合(collection)、数据库(database)这三部分组成的。逻辑结构是面向用户的，用户使用 MongoDB 开发应用程序使用的就是逻辑结构。</p>
+<ol>
+<li>MongoDB 的文档（document），相当于关系数据库中的一行记录。</li>
+<li>多个文档组成一个集合（collection），相当于关系数据库的表。</li>
+<li>多个集合（collection），逻辑上组织在一起，就是数据库（database）。</li>
+<li>一个 MongoDB 实例支持多个数据库（database）。</li>
+</ol>
+<p>文档(document)、集合(collection)、数据库(database)的层次结构如下图:</p>
+<p><img src="/p/mongodb/images/1559303526465.png"
+	width="332"
+	height="340"
+	
+	loading="lazy"
+	
+		alt="1559303526465"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="97"
+		data-flex-basis="234px"
+	
+></p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>MongoDb</th>
+          <th>关系型数据库Mysql</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>数据库(databases)</td>
+          <td>数据库(databases)</td>
+      </tr>
+      <tr>
+          <td>集合(collections)</td>
+          <td>表(table)</td>
+      </tr>
+      <tr>
+          <td>文档(document)</td>
+          <td>行(row)</td>
+      </tr>
+  </tbody>
+</table></div>
+<h4 id="35-mongodb数据类型">3.5 MongoDB数据类型
+</h4><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>数据类型</th>
+          <th>描述</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>String</td>
+          <td>字符串。存储数据常用的数据类型。在  MongoDB 中，UTF-8 编码的字符串才是合法的。</td>
+      </tr>
+      <tr>
+          <td>Integer</td>
+          <td>整型数值。用于存储数值。根据你所采用的服务器，可分为  32 位或 64 位。</td>
+      </tr>
+      <tr>
+          <td>Boolean</td>
+          <td>布尔值。用于存储布尔值（真/假）。</td>
+      </tr>
+      <tr>
+          <td>Double</td>
+          <td>双精度浮点值。用于存储浮点值。</td>
+      </tr>
+      <tr>
+          <td>Array</td>
+          <td>用于将数组或列表或多个值存储为一个键。</td>
+      </tr>
+      <tr>
+          <td>Timestamp</td>
+          <td>时间戳。记录文档修改或添加的具体时间。</td>
+      </tr>
+      <tr>
+          <td>Object</td>
+          <td>用于内嵌文档。</td>
+      </tr>
+      <tr>
+          <td>Null</td>
+          <td>用于创建空值。</td>
+      </tr>
+      <tr>
+          <td>Date</td>
+          <td>日期时间。用  UNIX 时间格式来存储当前日期或时间。你可以指定自己的日期时间：创建 Date 对象，传入年月日信息。</td>
+      </tr>
+      <tr>
+          <td>Object  ID</td>
+          <td>对象  ID。用于创建文档的 ID。</td>
+      </tr>
+      <tr>
+          <td>Binary  Data</td>
+          <td>二进制数据。用于存储二进制数据。</td>
+      </tr>
+      <tr>
+          <td>Code</td>
+          <td>代码类型。用于在文档中存储  JavaScript 代码。</td>
+      </tr>
+      <tr>
+          <td>Regular  expression</td>
+          <td>正则表达式类型。用于存储正则表达式。</td>
+      </tr>
+  </tbody>
+</table></div>
+<p>特殊说明：</p>
+<ol>
+<li>
+<p>ObjectId</p>
+<p>ObjectId 类似唯一主键，可以很快的去生成和排序，包含 12 bytes，含义是：</p>
+<ul>
+<li>前 4 个字节表示创建 unix 时间戳，格林尼治时间 UTC 时间，比北京时间晚了 8 个小时</li>
+<li>接下来的 3 个字节是机器标识码</li>
+<li>紧接的两个字节由进程 id 组成 PID</li>
+<li>最后三个字节是随机数</li>
+</ul>
+<p><img src="/p/mongodb/images/1559617643826.png"
+	width="581"
+	height="78"
+	
+	loading="lazy"
+	
+		alt="1559617643826"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="744"
+		data-flex-basis="1787px"
+	
+></p>
+<p>MongoDB 中存储的文档必须有一个 _id 键。这个键的值可以是任何类型的，默认是个 ObjectId 对象</p>
+</li>
+<li>
+<p>时间戳</p>
+<p>BSON 有一个特殊的时间戳类型，与普通的日期类型不相关。时间戳值是一个 64 位的值。其中：</p>
+<ul>
+<li>前32位是一个 time_t 值【与Unix新纪元（1970年1月1日）相差的秒数】</li>
+<li>后32位是在某秒中操作的一个递增的序数</li>
+</ul>
+<p>在单个 mongod 实例中，时间戳值通常是唯一的。</p>
+</li>
+<li>
+<p>日期</p>
+<p>表示当前距离 Unix新纪元（1970年1月1日）的毫秒数。日期类型是有符号的, 负数表示 1970 年之前的日期。</p>
+</li>
+</ol>
+<h4 id="36-mongodb和redis比较面试">3.6 MongoDB和Redis比较【面试】
+</h4><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>比较指标</th>
+          <th>MongoDB(海量数据)</th>
+          <th>Redis（热点数据）</th>
+          <th>比较说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>实现语言</td>
+          <td>c++</td>
+          <td>c/c++</td>
+          <td>-</td>
+      </tr>
+      <tr>
+          <td>协议</td>
+          <td>==BSON,自定义二进制==</td>
+          <td>==类telnet(TCP/IP)==</td>
+          <td>-</td>
+      </tr>
+      <tr>
+          <td>性能</td>
+          <td>==依赖内存 (内存映射文件技术)==</td>
+          <td>==依赖内存==（纯内存）</td>
+          <td>Redis优于MongoDB</td>
+      </tr>
+      <tr>
+          <td>可操作性</td>
+          <td>丰富的数据表达,索引;最类似于关系型数据库,支持丰富的查询语句</td>
+          <td>数据类型丰富,较少的IO</td>
+          <td>-</td>
+      </tr>
+      <tr>
+          <td>内存及存储</td>
+          <td>适合大数据量存储,依赖系统虚拟内存,采用镜像文件存储;内存占用率比较高,官方建议独立部署在64位系统</td>
+          <td>Redis2.0后支持虚拟内存特性(VM) 突破物理内存限制;数据可以设置时效性,类似于memcache</td>
+          <td>不同的应用场景,各有千秋</td>
+      </tr>
+      <tr>
+          <td>可用性</td>
+          <td>支持master-slave,replicatset(内部采用paxos选举算法,自动故障恢复),auto sharding机制,对客户端屏蔽了故障转移和切片机制</td>
+          <td>依赖客户端来实现分布式读写;主从复制时,每次从节点重新连接主节点都要依赖整个快照,无增量复制;不支持auto sharding,需要依赖程序设定一致性hash机制</td>
+          <td>MongoDB优于Redis；单点问题上,MongoDB应用简单,相对用户透明,Redis比较复杂,需要客户端主动解决.(MongoDB一般使用replicasets和sharding相结合,replicasets侧重高可用性以及高可靠,sharding侧重性能,水平扩展)</td>
+      </tr>
+      <tr>
+          <td>可靠性</td>
+          <td>从1.8版本后,采用binlog方式(类似Mysql) 支持持久化</td>
+          <td>依赖快照进行持久化;AOF增强可靠性;增强性的同时,影响访问性能</td>
+          <td>mongodb在启动时，专门初始化一个线程不断循环（除非应用crash掉），用于在一定时间周期内来从defer队列中获取要持久化的数据并写入到磁盘的journal(日志)和mongofile(数据)处，当然它不是在用户添加记录时就写到磁盘上</td>
+      </tr>
+      <tr>
+          <td>一致性</td>
+          <td>==以前都版本不支持事务,靠客户端保证==  ==最新4.x的支持事务==</td>
+          <td>==支持事务,比较脆,仅能保证事务中的操作按顺序执行==</td>
+          <td>-</td>
+      </tr>
+      <tr>
+          <td>数据分析</td>
+          <td>内置数据分析功能(mapreduce)</td>
+          <td>不支持</td>
+          <td>MongoDB优于Redis</td>
+      </tr>
+      <tr>
+          <td>应用场景</td>
+          <td>==海量数据存储和访问效率提升==</td>
+          <td>==热点数据的存储==</td>
+          <td>-</td>
+      </tr>
+  </tbody>
+</table></div>
+<h2 id="知识点-mongodb安装">知识点-MongoDB安装
+</h2><h3 id="1目标-1">1.目标
+</h3><ul>
+<li><input disabled="" type="checkbox"> 掌握MongoDB的安装</li>
+</ul>
+<h3 id="2路径-1">2.路径
+</h3><ol>
+<li>Docker 环境下MongoDB安装</li>
+<li>客户端的安装使用</li>
+</ol>
+<h3 id="3讲解-1">3.讲解
+</h3><h4 id="31-docker-环境下mongodb安装">3.1 Docker 环境下MongoDB安装
+</h4><p>在Linux虚拟机中创建mongo容器，命令如下：</p>
+<pre><code class="language-bash">docker run -di --name=tensquare_mongo -p 27017:27017 mongo
+</code></pre>
+<p>在Window命令行窗口出入登录命令：</p>
+<pre><code class="language-bash">mongo 192.168.200.128
+</code></pre>
+<h4 id="32客户端的安装和使用">3.2客户端的安装和使用
+</h4><p>Mongodb有很多可视化工具，这里我们使用robomongo，可以访问官网：<a class="link" href="https://robomongo.org/"  target="_blank" rel="noopener"
+    >https://robomongo.org/</a></p>
+<p><img src="/p/mongodb/images/1559634897474.png"
+	width="1322"
+	height="549"
+	
+	loading="lazy"
+	
+		alt="1559634897474"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="240"
+		data-flex-basis="577px"
+	
+></p>
+<p>我们可以看到有两个版本Studio 3T和Robo 3T</p>
+<p>Studio 3T是一个功能很强大的收费版。。。</p>
+<p>Robo 3T前身就是Robomongo，是一个免费的可视化工具，我们使用他可以很轻松的进行Mongodb的管理。</p>
+<p>在资料中找到robo3t-1.3.1-windows-x86_64-7419c406.exe并双击安装。打开后看到以下界面：</p>
+<p><img src="/p/mongodb/images/1559635108010.png"
+	width="677"
+	height="411"
+	
+	loading="lazy"
+	
+		alt="1559635108010"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="164"
+		data-flex-basis="395px"
+	
+></p>
+<p>点击<code>Create</code>创建连接，进行如下配置即可：</p>
+<p><img src="/p/mongodb/images/1559635267915.png"
+	width="480"
+	height="340"
+	
+	loading="lazy"
+	
+		alt="1559635267915"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="141"
+		data-flex-basis="338px"
+	
+></p>
+<h3 id="4小结">4.小结
+</h3><ol>
+<li>docker环境
+<ul>
+<li>下载镜像(已经下载了)</li>
+<li>启动容器</li>
+</ul>
+</li>
+<li>客户端</li>
+</ol>
+<blockquote>
+<p>默认端口: 27017</p>
+</blockquote>
+<h2 id="知识点-常用命令">知识点-常用命令
+</h2><h3 id="1目标-2">1.目标
+</h3><ul>
+<li><input disabled="" type="checkbox"> 掌握MongoDB的常用命令</li>
+</ul>
+<h3 id="2路径-2">2.路径
+</h3><ol>
+<li>数据库</li>
+<li>集合</li>
+<li>文档</li>
+</ol>
+<h3 id="3讲解-2">3.讲解
+</h3><h4 id="31-选择和创建数据库">3.1 选择和创建数据库
+</h4><p>选择和创建数据库的语法格式：</p>
+<pre><code class="language-bash">use 数据库名称
+</code></pre>
+<p>如果数据库存在则选择该数据库，如果数据库不存在则自动创建。以下语句创建commentdb数据库：</p>
+<pre><code class="language-bash">use commentdb
+</code></pre>
+<p>查看数据库：</p>
+<pre><code class="language-bash">show dbs
+</code></pre>
+<p>查看集合,需要先选择数据库之后，才能查看该数据库的集合：</p>
+<pre><code class="language-bash">show collections
+
+</code></pre>
+<h4 id="32-插入与查询文档">3.2 插入与查询文档
+</h4><p>选择数据库后，使用集合来对文档进行操作，插入文档语法格式：</p>
+<pre><code class="language-bash">db.集合名称.insert(数据);
+
+</code></pre>
+<p>插入以下测试数据：</p>
+<pre><code class="language-bash">db.comment.insert({content:&quot;十次方课程&quot;,userid:&quot;1011&quot;})
+
+</code></pre>
+<p>查询集合的语法格式：</p>
+<pre><code class="language-bash">db.集合名称.find()
+
+db.collection.find(query, projection);
+
+projection 也为可选项，表示使用投影操作符指定返回的字段，如果忽略此选项则返回所有字段。
+</code></pre>
+<p>查询spit集合的所有文档，输入以下命令：</p>
+<pre><code class="language-bash">db.comment.find()
+
+</code></pre>
+<p>​	发现文档会有一个叫_id的字段，==这个相当于我们原来关系数据库中表的主键，当你在插入文档记录时没有指定该字段，MongoDB会自动创建，其类型是ObjectID类型==。如果我们在插入文档记录时指定该字段也可以，其类型可以是ObjectID类型，也可以是MongoDB支持的任意类型。</p>
+<p>输入以下测试语句:</p>
+<pre><code class="language-js">db.comment.insert({_id:&quot;1&quot;,content:&quot;到底为啥 出错&quot;,username:&quot;张三&quot;,userid:&quot;1012&quot;,thumbup:2020,tags:[&quot;很好&quot;,&quot;十分认同&quot;],tupuser:[{name:&quot;李大&quot;,sex:&quot;女&quot;,age:10},{name:&quot;李二&quot;,sex:&quot;男&quot;,age:42}],lastModifiedDate:new Date()});
+
+db.comment.insert({_id:&quot;2&quot;,content:&quot;加班到半夜&quot;,username:&quot;李  四&quot;,userid:&quot;1013&quot;,thumbup:1023,tags:[&quot;一般&quot;,&quot;不给力&quot;],tupuser:[{name:&quot;李二&quot;,sex:&quot;男&quot;,age:42},{name:&quot;李三&quot;,sex:&quot;女&quot;,age:12}],lastModifiedDate:new Date()});
+
+db.comment.insert({_id:&quot;3&quot;,content:&quot;手机流量超了咋办&quot;,username:&quot;王五&quot;,userid:&quot;1013&quot;,thumbup:111,tags:[&quot;很好&quot;,&quot;给力&quot;],tupuser:[{name:&quot;李三&quot;,sex:&quot;女&quot;,age:12},{name:&quot;李四&quot;,sex:&quot;男&quot;,age:17}],lastModifiedDate:new Date()});
+
+db.comment.insert({_id:&quot;4&quot;,content:&quot;坚持就是胜利&quot;,username:&quot;赵六&quot;,userid:&quot;1014&quot;,thumbup:1223,tags:[&quot;不好&quot;,&quot;说的不对&quot;],tupuser:[{name:&quot;李四&quot;,sex:&quot;男&quot;,age:17},{name:&quot;李五&quot;,sex:&quot;女&quot;,age:26}],lastModifiedDate:new Date()});
+
+db.comment.insert({_id:&quot;5&quot;,content:&quot;手机没电了啊&quot;,username:&quot;李云龙&quot;,userid:&quot;1014&quot;,thumbup:923,tags:[&quot;很好&quot;,&quot;十分认同&quot;],tupuser:[{name:&quot;李五&quot;,sex:&quot;女&quot;,age:26},{name:&quot;李六&quot;,sex:&quot;男&quot;,age:39}],lastModifiedDate:new Date()});
+
+db.comment.insert({_id:&quot;6&quot;,content:&quot;这个手机好&quot;,username:&quot;风清扬&quot;,userid:&quot;1014&quot;,thumbup:123,tags:[&quot;很好&quot;,&quot;十分认同&quot;],tupuser:[{name:&quot;李六&quot;,sex:&quot;男&quot;,age:39},{name:&quot;李七&quot;,sex:&quot;男&quot;,age:62}],lastModifiedDate:new Date()});
+</code></pre>
+<p>按一定条件来查询，比如查询userid为1013的记录，只要在find()中添加参数即可，参数也是json格式，如下：</p>
+<pre><code class="language-bash">db.comment.find({userid:'1013'})
+
+</code></pre>
+<p>只需要返回符合条件的第一条数据，我们可以使用findOne命令来实现：</p>
+<pre><code class="language-bash">db.comment.findOne({userid:'1013'})
+
+</code></pre>
+<p>返回指定条数的记录，可以在find方法后调用limit来返回结果，例如：</p>
+<pre><code class="language-bash">db.comment.find().limit(2)
+
+</code></pre>
+<h4 id="33-修改与删除文档">3.3 修改与删除文档
+</h4><p>修改文档的语法结构：</p>
+<pre><code class="language-java">db.集合名称.update(条件,修改后的数据)
+
+</code></pre>
+<p>修改_id为1的记录，点赞数为1000，输入以下语句：</p>
+<pre><code class="language-bash">db.comment.update({_id:&quot;1&quot;},{thumbup:1000})
+
+</code></pre>
+<p>执行后发现，这条文档除了thumbup字段其它字段都不见了。</p>
+<p>为了解决这个问题，我们需要使用修改器$set来实现，命令如下：</p>
+<pre><code class="language-java">db.comment.update({_id:&quot;2&quot;},{$set:{thumbup:2000}})
+
+</code></pre>
+<p>删除文档的语法结构：</p>
+<pre><code class="language-bash">db.集合名称.remove(条件)
+
+</code></pre>
+<p>以下语句可以将数据全部删除，慎用~</p>
+<pre><code class="language-bash">db.comment.remove({})
+
+</code></pre>
+<p>删除条件可以放到大括号中，例如删除thumbup为1000的数据，输入以下语句：</p>
+<pre><code class="language-bash">db.comment.remove({thumbup:1000})
+
+</code></pre>
+<p>update 更新函数</p>
+<ul>
+<li>$push : 增加一个对象到数组底部</li>
+<li>$pushAll: 增加多个对象到数组底部</li>
+<li>$pop: 从数组底部删除一个对象</li>
+<li>$pull: 如果匹配指定的值, 从数组中删除对应的对象</li>
+<li>$pullAll: 如果匹配任意的值, 从数据中删除相应的对象</li>
+<li>$addToSet: 如果不存在则增加一个值到数组</li>
+</ul>
+<h4 id="34-统计条数">3.4 统计条数
+</h4><p>统计记录条件使用count()方法。以下语句统计spit集合的记录数：</p>
+<pre><code class="language-bash">db.comment.count()
+
+</code></pre>
+<p>按条件统计 ，例如统计userid为1013的记录条数：</p>
+<pre><code class="language-bash">db.comment.count({userid:&quot;1013&quot;})
+
+</code></pre>
+<h4 id="35-模糊查询">3.5 模糊查询
+</h4><p>MongoDB的模糊查询是通过正则表达式的方式实现的。格式为：</p>
+<pre><code class="language-bash">/模糊查询字符串/
+
+</code></pre>
+<p>查询评论内容包含“流量”的所有文档，代码如下：</p>
+<pre><code class="language-bash">db.comment.find({content:/流量/})
+
+
+</code></pre>
+<p>查询评论内容中以“加班”开头的，代码如下：</p>
+<pre><code class="language-BASH">db.comment.find({content:/^加班/})
+
+
+</code></pre>
+<h4 id="36-大于-小于-不等于">3.6 大于 小于 不等于
+</h4><p>&lt;, &lt;=, &gt;, &gt;= 这个操作符也是很常用的，格式如下:</p>
+<pre><code class="language-bash">db.集合名称.find({ &quot;field&quot; : { $gt: value }}) // 大于: field &gt; value
+db.集合名称.find({ &quot;field&quot; : { $lt: value }}) // 小于: field &lt; value
+db.集合名称.find({ &quot;field&quot; : { $gte: value }}) // 大于等于: field &gt;= value
+db.集合名称.find({ &quot;field&quot; : { $lte: value }}) // 小于等于: field &lt;= value
+db.集合名称.find({ &quot;field&quot; : { $ne: value }}) // 不等于: field != value
+
+
+</code></pre>
+<p>查询评论点赞数大于1000的记录：</p>
+<pre><code class="language-bash">db.comment.find({thumbup:{$gt:1000}})
+
+
+</code></pre>
+<h4 id="37-包含与不包含">3.7 包含与不包含
+</h4><p>包含使用$in操作符</p>
+<p>查询评论集合中userid字段包含1013和1014的文档：(select * from comment where userid in(1013,1014))</p>
+<pre><code class="language-bash">db.comment.find({userid:{$in:[&quot;1013&quot;,&quot;1014&quot;]}})
+
+
+</code></pre>
+<p>不包含使用$nin操作符</p>
+<p>查询评论集合中userid字段不包含1013和1014的文档：</p>
+<pre><code class="language-bash">db.comment.find({userid:{$nin:[&quot;1013&quot;,&quot;1014&quot;]}})
+
+
+</code></pre>
+<h4 id="38-条件连接">3.8 条件连接
+</h4><p>我们如果需要查询同时满足两个以上条件，需要使用$and操作符将条件进行关联（相当于SQL的and）。格式为：</p>
+<pre><code class="language-bash">$and:[ {条件},{条件},{条件} ]
+
+
+</code></pre>
+<p>查询评论集合中thumbup大于等于1000 并且小于2000的文档：</p>
+<pre><code class="language-bash">db.comment.find({$and:[ {thumbup:{$gte:1000}} ,{thumbup:{$lt:2000} }]})
+
+
+</code></pre>
+<p>如果两个以上条件之间是或者的关系，我们使用操作符进行关联，与前面and的使用方式相同，格式为：</p>
+<pre><code class="language-bash">$or:[ {条件},{条件},{条件} ]
+
+
+</code></pre>
+<p>查询评论集合中userid为1013，或者点赞数小于2000的文档记录：</p>
+<pre><code class="language-bash">db.comment.find({$or:[ {userid:&quot;1013&quot;} ,{thumbup:{$lt:2000} }]})
+
+
+</code></pre>
+<h4 id="39-列值增长">3.9 列值增长
+</h4><p>对某列值在原有值的基础上进行增加或减少，可以使用$inc运算符：</p>
+<pre><code class="language-bash">db.comment.update({_id:&quot;2&quot;},{$inc:{thumbup:1}})
+
+
+</code></pre>
+<h3 id="4小结-1">4.小结
+</h3><ol>
+<li>语法下去过一遍就行</li>
+</ol>
+<h2 id="知识点-索引的使用">知识点-索引的使用
+</h2><h3 id="1目标-3">1.目标
+</h3><ul>
+<li>掌握索引的使用</li>
+</ul>
+<h3 id="2路径-3">2.路径
+</h3><ul>
+<li>索引简介</li>
+<li>索引基本操作</li>
+<li>索引类型</li>
+<li>索引属性</li>
+<li>索引分析</li>
+</ul>
+<h3 id="3讲解-3">3.讲解
+</h3><h4 id="31-索引简介">3.1 索引简介
+</h4><p>​	   索引支持在MongoDB中高效执行查询。没有索引，MongoDB必须执行集合扫描，即扫描集合中的每个文档，以选择与查询语句匹配的那些文档。如果查询存在适当的索引，则MongoDB可以使用该索引来限制它必须检查的文档数。索引是特殊的<a class="link" href="https://docs.mongodb.com/manual/indexes/#b-tree"  target="_blank" rel="noopener"
+    >数据结构</a>，它以易于遍历的形式存储集合数据集的一小部分。索引存储一个特定字段或一组字段的值，按该字段的值排序。索引条目的排序支持有效的相等匹配和基于范围的查询操作。另外，MongoDB可以使用索引中的顺序返回排序的结果。</p>
+<p>下图说明了使用==索引选择和排序匹配文档的查询==：</p>
+<p>​	<img src="/p/mongodb/images/index-for-sort.bakedsvg.svg"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>从根本上讲，MongoDB中的索引类似于其他数据库系统中的索引。MongoDB在<a class="link" href="https://docs.mongodb.com/manual/reference/glossary/#term-collection"  target="_blank" rel="noopener"
+    >集合</a> 级别定义索引，并支持MongoDB集合中文档的任何字段或子字段的索引。</p>
+<h4 id="32-索引基本操作">3.2 索引基本操作
+</h4><h5 id="321-创建索引">3.2.1 创建索引
+</h5><p><strong>基本语法</strong></p>
+<pre><code class="language-js">db.collection.createIndex(keys, options)
+
+</code></pre>
+<p>​	<strong>keys</strong>可写为要配置索引的字段如{&ldquo;articleid&rdquo;:1},其中，1 为指定按升序创建索引，如果你想按降序来创建索引指定为 -1 即可。但是字段不能指定为_id，因为该字段默认会创建索引。</p>
+<p>​	<strong>注意:</strong> <em>注意在 3.0.0 版本前创建索引方法为 db.collection.ensureIndex()，之后的版本使用了 db.collection.createIndex() 方法，ensureIndex() 还能用，但只是 createIndex() 的别名。</em></p>
+<p>​	<strong>options</strong>表示创建索引时的设置，这个在索引属性中单独说明：</p>
+<p><strong>ex:</strong></p>
+<pre><code class="language-js">//为articleid字段创建升序索引
+db.comment.createIndex({&quot;articleid&quot;:1})
+
+</code></pre>
+<p><strong>也可以创建多个字段的联合索引，比如：</strong></p>
+<pre><code class="language-js">//创建article升序字段和userid降序字段的联合索引
+db.comment.createIndex({&quot;articleid&quot;:1,&quot;userid&quot;:-1})
+
+</code></pre>
+<p><strong>这种索引只支持：</strong></p>
+<p>​	db.comment.find().sort({&ldquo;articleid&rdquo;:1,&ldquo;userid&rdquo;:-1})或者b.comment.find().sort({&ldquo;articleid&rdquo;:-1,&ldquo;userid&rdquo;:1})的查询使用该索引，其他情况如db.comment.find().sort({&ldquo;articleid&rdquo;:1,&ldquo;userid&rdquo;:1})则不能使用，这种情景和关系型数据库中的联合索引表现是一致的。 有关排序顺序和复合索引的更多信息，请参见 <a class="link" href="https://docs.mongodb.com/manual/tutorial/sort-results-with-indexes/"  target="_blank" rel="noopener"
+    >使用索引对查询结果进行排序</a>。</p>
+<h5 id="322-查看索引">3.2.2 查看索引
+</h5><p>查看当前数据库中该集合的所有索引</p>
+<pre><code class="language-js">db.comment.getIndexes()
+
+</code></pre>
+<p>或者</p>
+<pre><code class="language-js">db.comment.aggregate( [ { $indexStats: { } } ] )
+
+</code></pre>
+<h5 id="323-删除索引">3.2.3 删除索引
+</h5><p>删除所有索引</p>
+<pre><code class="language-js">db.comment.dropIndexes() 
+
+</code></pre>
+<p>删除指定索引</p>
+<pre><code class="language-js">db.comment.dropIndex(索引名称)
+
+</code></pre>
+<h5 id="324-修改索引">3.2.4 修改索引
+</h5><p>要修改现有索引，您需要删除并重新创建索引。<a class="link" href="https://docs.mongodb.com/manual/core/index-ttl/"  target="_blank" rel="noopener"
+    >TTL索引</a>是此规则的例外 ，可以通过<a class="link" href="https://docs.mongodb.com/manual/reference/command/collMod/#dbcmd.collMod"  target="_blank" rel="noopener"
+    ><code>collMod</code></a>命令与<a class="link" href="https://docs.mongodb.com/manual/reference/command/collMod/#index"  target="_blank" rel="noopener"
+    ><code>index</code></a>收集标志一起 修改<a class="link" href="https://docs.mongodb.com/manual/core/index-ttl/"  target="_blank" rel="noopener"
+    >TTL索引</a>。</p>
+<h4 id="33-索引类型">3.3 索引类型
+</h4><h5 id="普通索引-联合索引">普通索引, 联合索引
+</h5><p>除了上面讲到的<strong>普通索引</strong>以及<strong>联合索引</strong>外还有以下类型：</p>
+<h5 id="多键索引数组索引">多键索引（数组索引）
+</h5><p>​	 MongoDB使用<a class="link" href="https://docs.mongodb.com/manual/core/index-multikey/"  target="_blank" rel="noopener"
+    >多键索引</a>来索引存储在数组中的内容。如果您对保存数组值的字段建立索引，则MongoDB将为数组的<em>每个</em>元素创建单独的索引key键。这些<a class="link" href="https://docs.mongodb.com/manual/core/index-multikey/"  target="_blank" rel="noopener"
+    >多键索引</a>允许查询通过匹配数组的一个或多个元素来选择包含数组的文档。如果索引字段包含数组值，MongoDB会自动确定是否创建多键索引。您无需显式指定多键类型。</p>
+<p>ex：可以看到tags字段是一个数组，可以建立数组索引</p>
+<pre><code class="language-js">//所有文档中的所有元素字段都作为该索引的key
+db.comment.createIndex({&quot;tags&quot;:1})
+
+</code></pre>
+<p>​	如果该字段是一个对象数组，可以建立</p>
+<pre><code class="language-js">//对文档中的tupuser字段的age属性建立索引
+db.comment.createIndex({&quot;tupuser.age&quot;:1})
+
+</code></pre>
+<p>​	查询点赞用户年龄超过30岁的评论</p>
+<pre><code class="language-js">db.comment.find({&quot;tupuser.age&quot;:{$gt:30}}).explain()
+
+</code></pre>
+<p>​	发现该索引已经生效了</p>
+<h5 id="文本索引">文本索引
+</h5><p>​	MongoDB提供了一种<code>text</code>索引类型，该类型支持在集合中搜索字符串内容。这些文本索引不存储特定于语言的<em>停用</em>词（例如“ the”，“ a”，“ or”），并且在集合中<em>词干</em>仅存储根词。有关<a class="link" href="https://docs.mongodb.com/manual/core/index-text/"  target="_blank" rel="noopener"
+    >文本</a>索引和搜索的更多信息，请参见<a class="link" href="https://docs.mongodb.com/manual/core/index-text/"  target="_blank" rel="noopener"
+    >文本索引</a>。 <strong>一个集合最多可以有一个文本索引</strong></p>
+<pre><code class="language-js">//为username和content字段创建文本索引
+db.comment.createIndex(
+   {
+     username: &quot;text&quot;,
+     content: &quot;text&quot;
+   }
+ )
+//文本查询单个词条
+db.comment.find({$text:{$search:&quot;出错&quot;}})
+//文本查询多个词条
+db.comment.find({$text:{$search:&quot;出错 李&quot;}})
+
+</code></pre>
+<p>​	可以看到mongo的全文索引建立方式与英文的方式基本一样，是根据词（英文单词）的方式建立的， 如果一个文本里面有多个词条， 则需要按空格方式隔开，所以索引效率比较低，想要实现中文模糊搜素，可以用elasticsearch或者Sphinx，或者lucene 。</p>
+<h5 id="哈希索引">哈希索引
+</h5><p>为了支持<a class="link" href="https://docs.mongodb.com/manual/core/hashed-sharding/#sharding-hashed-sharding"  target="_blank" rel="noopener"
+    >基于散列的分片</a>，MongoDB提供了一种<a class="link" href="https://docs.mongodb.com/manual/core/index-hashed/"  target="_blank" rel="noopener"
+    >散列索引</a>类型，该索引类型对字段值的散列进行索引。这些索引在其范围内具有更随机的值分布，但<em>仅</em> 支持相等匹配，而不能支持基于范围的查询。</p>
+<pre><code class="language-js">//为articleid字段创建hash索引
+db.comment.createIndex({&quot;userid&quot;:&quot;hashed&quot;})
+
+</code></pre>
+<h4 id="34-索引属性">3.4 索引属性
+</h4><p>​	 索引属性参数列表：</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th style="text-align: left">Parameter</th>
+          <th style="text-align: left">Type</th>
+          <th style="text-align: left">Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">background</td>
+          <td style="text-align: left">Boolean</td>
+          <td style="text-align: left">建索引过程会阻塞其它数据库操作，background可指定以后台方式创建索引，即增加 &ldquo;background&rdquo; 可选参数。 &ldquo;background&rdquo; 默认值为<strong>false</strong>。</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">unique</td>
+          <td style="text-align: left">Boolean</td>
+          <td style="text-align: left">建立的索引是否唯一。指定为true创建唯一索引。默认值为<strong>false</strong>.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">name</td>
+          <td style="text-align: left">string</td>
+          <td style="text-align: left">索引的名称。如果未指定，MongoDB的通过连接索引的字段名和排序顺序生成一个索引名称。</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">dropDups</td>
+          <td style="text-align: left">Boolean</td>
+          <td style="text-align: left">**3.0+版本已废弃。**在建立唯一索引时是否删除重复记录,指定 true 创建唯一索引。默认值为 <strong>false</strong>.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">sparse</td>
+          <td style="text-align: left">Boolean</td>
+          <td style="text-align: left">对文档中不存在的字段数据不启用索引；这个参数需要特别注意，如果设置为true的话，在索引字段中不会查询出不包含对应字段的文档.。默认值为 <strong>false</strong>.</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">expireAfterSeconds</td>
+          <td style="text-align: left">integer</td>
+          <td style="text-align: left">指定一个以秒为单位的数值，完成 TTL设定，设定集合的生存时间。</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">v</td>
+          <td style="text-align: left">index version</td>
+          <td style="text-align: left">索引的版本号。默认的索引版本取决于mongod创建索引时运行的版本。</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">weights</td>
+          <td style="text-align: left">document</td>
+          <td style="text-align: left">索引权重值，数值在 1 到 99,999 之间，表示该索引相对于其他索引字段的得分权重。</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">default_language</td>
+          <td style="text-align: left">string</td>
+          <td style="text-align: left">对于文本索引，该参数决定了停用词及词干和词器的规则的列表。 默认为英语</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">language_override</td>
+          <td style="text-align: left">string</td>
+          <td style="text-align: left">对于文本索引，该参数指定了包含在文档中的字段名，语言覆盖默认的language，默认值为 language.</td>
+      </tr>
+  </tbody>
+</table></div>
+<h5 id="唯一索引">唯一索引
+</h5><p>唯一索引可确保索引字段不会存储重复值；即对索引字段实施唯一性。默认情况下， 在创建集合期间，MongoDB在<a class="link" href="https://docs.mongodb.com/manual/core/document/#document-id-field"  target="_blank" rel="noopener"
+    >_id</a>字段上创建唯一索引。</p>
+<pre><code class="language-js">//创建articleid字段的唯一索引
+db.comment.createIndex({&quot;articleid&quot;:1},{ unique: true })
+
+</code></pre>
+<p>和mysql一样，复合索引也可创建为唯一索引</p>
+<h5 id="部分索引">部分索引
+</h5><p><em>3.2版中的新功能。</em></p>
+<p><a class="link" href="https://docs.mongodb.com/manual/core/index-partial/"  target="_blank" rel="noopener"
+    >部分索引</a>仅索引集合中符合指定过滤器表达式的文档。通过索引集合中文档的子集，部分索引具有较低的存储需求，并降低了索引创建和维护的性能成本。</p>
+<p>要创建部分索引，请将该 <a class="link" href="https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex"  target="_blank" rel="noopener"
+    ><code>db.collection.createIndex()</code></a>方法与 <code>partialFilterExpression</code>选项一起使用。该<code>partialFilterExpression</code> 选项接受使用以下命令指定过滤条件的文档</p>
+<ul>
+<li>等式表达式（即或使用 运算符），<code>field: value</code><a class="link" href="https://docs.mongodb.com/manual/reference/operator/query/eq/#op._S_eq"  target="_blank" rel="noopener"
+    ><code>$eq</code></a></li>
+<li><a class="link" href="https://docs.mongodb.com/manual/reference/operator/query/exists/#op._S_exists"  target="_blank" rel="noopener"
+    ><code>$exists: true</code></a> 表达，</li>
+<li><a class="link" href="https://docs.mongodb.com/manual/reference/operator/query/gt/#op._S_gt"  target="_blank" rel="noopener"
+    ><code>$gt</code></a>，<a class="link" href="https://docs.mongodb.com/manual/reference/operator/query/gte/#op._S_gte"  target="_blank" rel="noopener"
+    ><code>$gte</code></a>，<a class="link" href="https://docs.mongodb.com/manual/reference/operator/query/lt/#op._S_lt"  target="_blank" rel="noopener"
+    ><code>$lt</code></a>，<a class="link" href="https://docs.mongodb.com/manual/reference/operator/query/lte/#op._S_lte"  target="_blank" rel="noopener"
+    ><code>$lte</code></a>表情，</li>
+<li><a class="link" href="https://docs.mongodb.com/manual/reference/operator/query/type/#op._S_type"  target="_blank" rel="noopener"
+    ><code>$type</code></a> 表达式，</li>
+<li><a class="link" href="https://docs.mongodb.com/manual/reference/operator/query/and/#op._S_and"  target="_blank" rel="noopener"
+    ><code>$and</code></a> 仅限顶级运营商</li>
+</ul>
+<p>ex:只给该集合点赞数大于900的评论的thumbup字段创建索引</p>
+<pre><code class="language-js">db.comment.createIndex(
+   { thumbup: 1},
+   { partialFilterExpression: { thumbup: { $gt: 900 } } }
+) 
+
+</code></pre>
+<p>部分索引提供了稀疏索引功能的超集，应优先于稀疏索引。</p>
+<h5 id="稀疏索引">稀疏索引
+</h5><p>稀疏索引仅包含具有索引字段的文档条目，即使索引字段包含空值也是如此。索引会跳过缺少索引字段的所有文档。索引是“稀疏的”，因为它不包括集合的所有文档。相比之下，非稀疏索引包含集合中的所有文档，为那些不包含索引字段的文档存储空值。 将sparse属性设置为true即为稀疏索引</p>
+<pre><code class="language-js">//插入一条没有tags字段的索引
+db.comment.insert({_id:&quot;6&quot;,content:&quot;这个手机好&quot;,username:&quot;风清扬&quot;,userid:&quot;1014&quot;,thumbup:123,tupuser:[{name:&quot;李六&quot;,sex:&quot;男&quot;,age:39},{name:&quot;李七&quot;,sex:&quot;男&quot;,age:62}],lastModifiedDate:new Date()});
+//删除原tags索引
+db.comment.dropIndex(&quot;tags_1&quot;)
+//创建tags字段的稀疏索引
+db.comment.createIndex({tags: 1},{ sparse: true })
+
+</code></pre>
+<h5 id="ttl指数">TTL指数
+</h5><p>TTL索引是特殊的单字段索引，MongoDB可以使用它们在一定时间后或在特定时钟时间自动从集合中删除文档。数据到期对于某些类型的信息很有用，例如机器生成的事件数据，日志和会话信息，它们仅需要在数据库中保留有限的时间。</p>
+<p>要创建TTL索引，请将该<a class="link" href="https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex"  target="_blank" rel="noopener"
+    ><code>db.collection.createIndex()</code></a> 方法与<code>expireAfterSeconds</code>选项结合使用，该方法的值（索引字段类型）是<a class="link" href="https://docs.mongodb.com/manual/reference/bson-types/#document-bson-type-date"  target="_blank" rel="noopener"
+    >日期</a>或包含<a class="link" href="https://docs.mongodb.com/manual/reference/bson-types/#document-bson-type-date"  target="_blank" rel="noopener"
+    >日期值</a>的数组。ex:</p>
+<pre><code class="language-js">//当前时间如果在lastModifiedDate的10s之后，则标记该文档过期
+db.comment.createIndex({&quot;lastModifiedDate&quot;:1},{expireAfterSeconds:10})
+
+</code></pre>
+<p>mongo后台的TTL线程会每隔60s删除一次被ttl索引标记为过期的文档</p>
+<h4 id="35-索引分析">3.5 索引分析
+</h4><pre><code class="language-js">//对查询进行分析
+db.comment.find().explain()
+
+</code></pre>
+<ul>
+<li>
+<p>作用和mysql的explain关键字一样都是用来分析执行计划的</p>
+</li>
+<li>
+<p>queryPlanner：执行计划</p>
+<ul>
+<li>winningPlan：竞争成功的计划
+<ul>
+<li>如果该计划使用了索引，会有以下参数
+<ul>
+<li>indexName：索引名称</li>
+<li>isMultiKey：是否为多键索引</li>
+<li>isUnique：是否唯一索引</li>
+<li>isSparse：是否是稀疏索引</li>
+<li>isPartial：是否是部分索引</li>
+</ul>
+</li>
+<li>如果没有以上参数，表示没有使用索引</li>
+</ul>
+</li>
+<li>rejectedPlans：竞争失败的计划</li>
+</ul>
+</li>
+</ul>
+<h3 id="4总结">4.总结
+</h3><h2 id="知识点-mongo集群搭建">知识点-mongo集群搭建	
+</h2><h3 id="1目标-4">1.目标
+</h3><ul>
+<li>了解集群原理，能够搭建出分片集群</li>
+</ul>
+<p>查看集群状态</p>
+<pre><code>db.stats()
+
+</code></pre>
+<h3 id="2路径-4">2.路径
+</h3><h3 id="3讲解-4">3.讲解
+</h3><h4 id="31-集群简介">3.1 集群简介
+</h4><p>​		mongodb集群搭建方式有三种，1、主从(官方已经不推荐)，2、副本集，3、分片。这里介绍如何通过分片sharding方式搭建mongodb集群。sharding集群方式也基于副本集，在搭建过程中，需要对分片和配置节点做副本集。最后将做好的副本集的分片加入到路由节点，构成集群。</p>
+<h4 id="32-副本集">3.2 副本集
+</h4><h5 id="321副本集角色">3.2.1副本集角色
+</h5><ol>
+<li>主节点（Primary）
+接收所有的写请求，然后把修改同步到所有Secondary。一个Replica Set只能有一个Primary节点，当Primary挂掉后，其他Secondary或者Arbiter节点会重新选举出来一个主节点。
+默认读请求也是发到Primary节点处理的，可以通过修改客户端连接配置以支持读取Secondary节点。</li>
+<li>副本节点（Secondary）
+与主节点保持同样的数据集。当主节点挂掉的时候，参与选主。</li>
+<li>仲裁者（Arbiter）
+不保有数据，不参与选主，只进行选主投票。使用Arbiter可以减轻数据存储的硬件需求，Arbiter几乎没什么大的硬件资源需求，但重要的一点是，在生产环境下它和其他数据节点不要部署在同一台机器上。</li>
+</ol>
+<h5 id="322-两种架构模式">3.2.2 两种架构模式
+</h5><ol>
+<li>PSS
+Primary + Secondary + Secondary模式，通过Primary和Secondary搭建的Replica Set
+Diagram of a 3 member replica set that consists of a primary and two secondaries.</li>
+</ol>
+<p><img src="/p/mongodb/images/242916-20180313214807697-1361550290.png"
+	width="740"
+	height="280"
+	
+	loading="lazy"
+	
+		alt="img"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="264"
+		data-flex-basis="634px"
+	
+></p>
+<p>该模式下 Replica Set节点数必须为奇数，目的是选主投票的时候要出现<strong>大多数</strong>才能进行选主决策。</p>
+<ol>
+<li>PSA
+Primary + Secondary + Arbiter模式，使用Arbiter搭建Replica Set</li>
+</ol>
+<p><img src="/p/mongodb/images/242916-20180313214821963-1134366100.png"
+	width="700"
+	height="265"
+	
+	loading="lazy"
+	
+		alt="img"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="264"
+		data-flex-basis="633px"
+	
+></p>
+<p>偶数个数据节点，加一个Arbiter构成的Replica Set</p>
+<h4 id="33-分片">3.3 分片
+</h4><p>sharding方式的集群中，有三类角色，分别是shard， config servers，router（mongos）。如下图所示。</p>
+<p>​	<img src="/p/mongodb/images/sharded-cluster-production-architecture.bakedsvg.svg"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<ul>
+<li><a class="link" href="https://docs.mongodb.com/manual/core/sharded-cluster-shards/"  target="_blank" rel="noopener"
+    >shard</a>： 分片节点，存储数据。每个分片都可以部署为<a class="link" href="https://docs.mongodb.com/manual/reference/glossary/#term-replica-set"  target="_blank" rel="noopener"
+    >副本集</a>。</li>
+<li><a class="link" href="https://docs.mongodb.com/manual/core/sharded-cluster-query-router/"  target="_blank" rel="noopener"
+    >router</a>： 路由节点，是mongo集群与外部客户端连接的入口，他提供mongos客户端，对客户端透明，让客户端感觉使用单节点数据库。</li>
+<li><a class="link" href="https://docs.mongodb.com/manual/core/sharded-cluster-config-servers/"  target="_blank" rel="noopener"
+    >config servers</a> ： 配置节点，不会存储数据，会存储元数据信息，比如片键的范围。 从MongoDB 3.4开始，必须将配置服务器部署为<a class="link" href="https://docs.mongodb.com/manual/reference/glossary/#term-replica-set"  target="_blank" rel="noopener"
+    >副本集</a>。</li>
+</ul>
+<h4 id="32-搭建集群">3.2 搭建集群
+</h4><h5 id="321-创建配置服务复本集">3.2.1 创建配置服务复本集
+</h5><pre><code class="language-sh">docker run --name configsvr0 -d mongo --configsvr --replSet &quot;rs_configsvr&quot;  --bind_ip_all
+docker run --name configsvr1 -d mongo --configsvr --replSet &quot;rs_configsvr&quot;  --bind_ip_all
+docker run --name configsvr2 -d mongo --configsvr --replSet &quot;rs_configsvr&quot;  --bind_ip_all
+
+</code></pre>
+<h5 id="322-创建分片复本集">3.2.2 创建分片复本集
+</h5><p><strong>创建分片0复制集</strong></p>
+<pre><code class="language-sh">docker run --name shardsvr00 -d mongo --shardsvr --replSet &quot;rs_shardsvr0&quot;  --bind_ip_all
+docker run --name shardsvr01 -d mongo --shardsvr --replSet &quot;rs_shardsvr0&quot;  --bind_ip_all
+docker run --name shardsvr02 -d mongo --shardsvr --replSet &quot;rs_shardsvr0&quot;  --bind_ip_all
+
+</code></pre>
+<p><strong>创建分片1复制集</strong></p>
+<pre><code class="language-sh">docker run --name shardsvr10 -d mongo --shardsvr --replSet &quot;rs_shardsvr1&quot;  --bind_ip_all
+docker run --name shardsvr11 -d mongo --shardsvr --replSet &quot;rs_shardsvr1&quot;  --bind_ip_all
+docker run --name shardsvr12 -d mongo --shardsvr --replSet &quot;rs_shardsvr1&quot;  --bind_ip_all
+
+</code></pre>
+<p>执行 docker inspect -f &lsquo;{{.Name}} - {{.NetworkSettings.IPAddress }}&rsquo; $(docker ps -aq) 得到我们刚刚启动的容器的名称和ip列表</p>
+<pre><code class="language-sh">/shardsvr12 - 172.17.0.11
+/shardsvr11 - 172.17.0.10
+/shardsvr10 - 172.17.0.9
+
+/shardsvr02 - 172.17.0.8
+/shardsvr01 - 172.17.0.7
+/shardsvr00 - 172.17.0.6
+
+/configsvr2 - 172.17.0.5
+/configsvr1 - 172.17.0.4
+/configsvr0 - 172.17.0.3
+/tensquare_mongo - 172.17.0.2
+
+</code></pre>
+<h5 id="323-初始化配置副本集和分片副本集"><strong>3.2.3 初始化配置副本集</strong>和分片副本集
+</h5><p>ps:使用<code>--configsvr</code>构建的配置容器默认的端口是<strong>27019</strong></p>
+<pre><code class="language-sh">#进入容器
+docker exec -it configsvr0 bash
+#连接configsvr0
+mongo --host 172.17.0.3 --port 27019
+#启动配置副本集
+rs.initiate(
+  {
+    _id: &quot;rs_configsvr&quot;,
+    configsvr: true,
+    members: [
+      { _id : 0, host : &quot;172.17.0.3:27019&quot; },
+      { _id : 1, host : &quot;172.17.0.4:27019&quot; },
+      { _id : 2, host : &quot;172.17.0.5:27019&quot; }
+    ]
+  }
+)
+#exit退出
+
+</code></pre>
+<p><strong>同理，以相同的方式初始化分片副本集</strong></p>
+<p>ps:使用<code>--shardsvr</code>构建的分片容器默认的端口是<strong>27018</strong></p>
+<p>初始化分片副本集0：</p>
+<pre><code class="language-sh">#连接shardsvr00
+mongo --host 172.17.0.6 --port 27018
+#初始化分片副本集0
+rs.initiate(
+  {
+    _id : &quot;rs_shardsvr0&quot;,
+    members: [
+      { _id : 0, host : &quot;172.17.0.6:27018&quot; },
+      { _id : 1, host : &quot;172.17.0.7:27018&quot; },
+      { _id : 2, host : &quot;172.17.0.8:27018&quot; }
+    ]
+  }
+)
+#exit退出
+
+</code></pre>
+<p>初始化分片副本集1:</p>
+<pre><code class="language-sh">#连接shardsvr10
+mongo --host 172.17.0.9 --port 27018
+#初始化分片副本集1
+rs.initiate(
+  {
+    _id : &quot;rs_shardsvr1&quot;,
+    members: [
+      { _id : 0, host : &quot;172.17.0.9:27018&quot; },
+      { _id : 1, host : &quot;172.17.0.10:27018&quot; },
+      { _id : 2, host : &quot;172.17.0.11:27018&quot; }
+    ]
+  }
+)
+#exit退出
+
+</code></pre>
+<h5 id="324-创建集群入口并关联配置集">3.2.4 创建集群入口并关联配置集
+</h5><p>ps:默认是mongod(分片处理模式),我们需要将起修改为mongos(路由模式),负责路由和协调操作，使得集群像一个整体的系统</p>
+<pre><code class="language-sh">#exit退出到root目录
+#创建路由实例
+docker run --name mongos0 -p 27027:27017 -d --entrypoint &quot;mongos&quot; mongo --configdb rs_configsvr/172.17.0.3:27019,172.17.0.4:27019,172.17.0.5:27019 --bind_ip_all
+
+</code></pre>
+<p>同样执行 docker inspect -f &lsquo;{{.Name}} - {{.NetworkSettings.IPAddress }}&rsquo; $(docker ps -aq) 得到容器的名称和ip的对应列表，并获得mongo0容器的ip为<code>172.17.0.12</code></p>
+<h5 id="325-在集群入口路由上挂载分片集">3.2.5 在集群入口(路由)上挂载分片集
+</h5><p>ps:容器默认的端口是27017</p>
+<pre><code class="language-sh">#进入容器
+docker exec -it mongos0 bash
+#连接mongos0
+mongo --host 172.17.0.12 --port 27017
+sh.addShard(&quot;rs_shardsvr0/172.17.0.6:27018,172.17.0.7:27018,172.17.0.8:27018&quot;)
+sh.addShard(&quot;rs_shardsvr1/172.17.0.9:27018,172.17.0.10:27018,172.17.0.11:27018&quot;)
+
+</code></pre>
+<h5 id="326-测试集群">3.2.6 测试集群
+</h5><p>进入路由容器创建commentdb数据库并启用分片</p>
+<pre><code class="language-sh">sh.enableSharding(&quot;commentdb&quot;)
+
+</code></pre>
+<p>分片方式有两种远程分片和hash分片，我们采用hash分片</p>
+<pre><code class="language-sh">#对 commentdb.comment 的 _id 字段进行哈希分片
+sh.shardCollection(&quot;commentdb.comment&quot;, {&quot;_id&quot;: &quot;hashed&quot; })
+
+</code></pre>
+<p>插入数据测试下</p>
+<pre><code class="language-sh">#使用数据库
+use commentdb
+#插入数据
+db.comment.insert({_id:&quot;1&quot;,content:&quot;到底为啥 出错&quot;,username:&quot;张三&quot;,userid:&quot;1012&quot;,thumbup:2020,tags:[&quot;很好&quot;,&quot;十分认同&quot;],tupuser:[{name:&quot;李大&quot;,sex:&quot;女&quot;,age:10},{name:&quot;李二&quot;,sex:&quot;男&quot;,age:42}],lastModifiedDate:new Date()});
+db.comment.insert({_id:&quot;2&quot;,content:&quot;加班到半夜&quot;,username:&quot;李  四&quot;,userid:&quot;1013&quot;,thumbup:1023,tags:[&quot;一般&quot;,&quot;不给力&quot;],tupuser:[{name:&quot;李二&quot;,sex:&quot;男&quot;,age:42},{name:&quot;李三&quot;,sex:&quot;女&quot;,age:12}],lastModifiedDate:new Date()});
+db.comment.insert({_id:&quot;3&quot;,content:&quot;手机流量超了咋办&quot;,username:&quot;王五&quot;,userid:&quot;1013&quot;,thumbup:111,tags:[&quot;很好&quot;,&quot;给力&quot;],tupuser:[{name:&quot;李三&quot;,sex:&quot;女&quot;,age:12},{name:&quot;李四&quot;,sex:&quot;男&quot;,age:17}],lastModifiedDate:new Date()});
+db.comment.insert({_id:&quot;4&quot;,content:&quot;坚持就是胜利&quot;,username:&quot;赵六&quot;,userid:&quot;1014&quot;,thumbup:1223,tags:[&quot;不好&quot;,&quot;说的不对&quot;],tupuser:[{name:&quot;李四&quot;,sex:&quot;男&quot;,age:17},{name:&quot;李五&quot;,sex:&quot;女&quot;,age:26}],lastModifiedDate:new Date()});
+db.comment.insert({_id:&quot;5&quot;,content:&quot;手机没电了啊&quot;,username:&quot;李云龙&quot;,userid:&quot;1014&quot;,thumbup:923,tags:[&quot;很好&quot;,&quot;十分认同&quot;],tupuser:[{name:&quot;李五&quot;,sex:&quot;女&quot;,age:26},{name:&quot;李六&quot;,sex:&quot;男&quot;,age:39}],lastModifiedDate:new Date()});
+db.comment.insert({_id:&quot;6&quot;,content:&quot;这个手机好&quot;,username:&quot;风清扬&quot;,userid:&quot;1014&quot;,thumbup:123,tags:[&quot;很好&quot;,&quot;十分认同&quot;],tupuser:[{name:&quot;李六&quot;,sex:&quot;男&quot;,age:39},{name:&quot;李七&quot;,sex:&quot;男&quot;,age:62}],lastModifiedDate:new Date()});
+
+</code></pre>
+<p>到分片数据库看下数据情况</p>
+<pre><code class="language-sh">#连接mongo
+mongo --host 172.17.0.9 --port 27018
+#选择数据库
+use commentdb
+#查看数量
+db.comment.count()
+
+</code></pre>
+<p>可以看到已经得到预期效果
+那么备份呢?(备份默认情况下不允许读取,需要执行<code>db.getMongo().setSlaveOk()</code>来允许读取)</p>
+<pre><code class="language-sh">mongo --host 172.17.0.7 --port 27018
+db.getMongo().setSlaveOk()
+db.comment.count()
+
+</code></pre>
+<h3 id="4总结-1">4.总结
+</h3><h2 id="知识点-mongo聚合查询">知识点-mongo聚合查询
+</h2><h3 id="1目标-5">1.目标
+</h3><ul>
+<li>管道查询</li>
+<li>map-reduce</li>
+</ul>
+<h3 id="2路径-5">2.路径
+</h3><h3 id="3讲解-5">3.讲解
+</h3><h4 id="31-管道查询">3.1 管道查询
+</h4><p>MongoDB的<a class="link" href="https://docs.mongodb.com/manual/core/aggregation-pipeline/"  target="_blank" rel="noopener"
+    >聚合框架</a>以数据处理管道的概念为模型。文档进入多阶段流水线，该流水线将文档转换成汇总结果。例如：</p>
+<p><img src="/p/mongodb/images/r1043-v93gf.gif"
+	width="1920"
+	height="1080"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="177"
+		data-flex-basis="426px"
+	
+></p>
+<p>在这个例子中</p>
+<pre><code class="language-js">db.orders.aggregate([
+   { $match: { status: &quot;A&quot; } },
+   { $group: { _id: &quot;$cust_id&quot;, total: { $sum: &quot;$amount&quot; } } }
+])
+
+</code></pre>
+<p><strong>第一阶段</strong>：<a class="link" href="https://docs.mongodb.com/manual/reference/operator/aggregation/match/#pipe._S_match"  target="_blank" rel="noopener"
+    ><code>$match</code></a>阶段按<code>status</code>字段过滤文档，并将<code>status</code>等于的文档传递到下一阶段<code>&quot;A&quot;</code>。</p>
+<p><strong>第二阶段</strong>：该<a class="link" href="https://docs.mongodb.com/manual/reference/operator/aggregation/group/#pipe._S_group"  target="_blank" rel="noopener"
+    ><code>$group</code></a>阶段按<code>cust_id</code>字段将文档分组，以计算每个唯一值的总和<code>cust_id</code>。</p>
+<p>最基本的管道阶段提供<em>过滤器</em>，其操作类似于查询和修改输出文档形式的<em>文档转换</em>。</p>
+<p>其他管道操作提供了用于按特定字段对文档进行分组和排序的工具，以及用于聚合包括文档数组在内的数组内容的工具。另外，管道阶段可以将<a class="link" href="https://docs.mongodb.com/manual/reference/operator/aggregation/#aggregation-expression-operators"  target="_blank" rel="noopener"
+    >运算符</a>用于诸如计算平均值或连接字符串之类的任务。</p>
+<p>管道使用MongoDB中的本机操作提供有效的数据聚合，并且是MongoDB中数据聚合的首选方法。</p>
+<p>聚合管道可以操作 <a class="link" href="https://docs.mongodb.com/manual/sharding/"  target="_blank" rel="noopener"
+    >分片集合</a>。</p>
+<p>聚合管道可以在某些阶段使用索引来提高其性能。另外，聚合管道具有内部优化阶段。有关详细信息，请参见<a class="link" href="https://docs.mongodb.com/manual/core/aggregation-pipeline/#aggregation-pipeline-operators-and-performance"  target="_blank" rel="noopener"
+    >管道运算符和索引</a>以及 <a class="link" href="https://docs.mongodb.com/manual/core/aggregation-pipeline-optimization/"  target="_blank" rel="noopener"
+    >聚合管道优化</a>。</p>
+<p>ex:获取当前点赞数大于200并统计用户的总点赞数</p>
+<pre><code class="language-js">db.comment.aggregate([
+   { $match: { thumbup: {$gt:200} } },
+   { $group: { _id: &quot;$userid&quot;, total: { $sum: &quot;$thumbup&quot; } } }
+])
+
+</code></pre>
+<h4 id="32-map-reduce">3.2 map-reduce
+</h4><p>MongoDB还提供了<a class="link" href="https://docs.mongodb.com/manual/core/map-reduce/"  target="_blank" rel="noopener"
+    >map-reduce</a>操作来执行聚合。通常，map-reduce操作有两个阶段：</p>
+<ol>
+<li><em>map</em>阶段: 处理每个文档并为每个输入文档<em>发出</em>一个或多个对象的，</li>
+<li><em>reduce</em>阶段: 以及将map操作的输出组合在一起的。</li>
+</ol>
+<blockquote>
+<p>可选地，map-reduce可以具有一个 <em>finalize</em>阶段来对结果进行最终修改。与其他聚合操作一样，map-reduce可以指定查询条件以选择输入文档以及对结果进行排序和限制。</p>
+</blockquote>
+<p>Map-reduce使用自定义JavaScript函数来执行映射和归约操作以及可选的<em>finalize</em>操作。尽管自定义JavaScript与聚合管道相比提供了极大的灵活性，但总的来说，map-reduce比聚合管道效率低下，并且复杂性更高。</p>
+<p>Map-reduce可以对分片 <a class="link" href="https://docs.mongodb.com/manual/sharding/"  target="_blank" rel="noopener"
+    >集合进行操作</a>。映射减少操作也可以输出到分片集合。有关详细信息，请参见 <a class="link" href="https://docs.mongodb.com/manual/core/map-reduce-sharded-collections/"  target="_blank" rel="noopener"
+    >Map-Reduce和分片集合</a>。</p>
+<p><img src="/p/mongodb/images/map-reduce.bakedsvg.svg"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>ex:获取当前点赞数大于200并统计用户的总点赞数</p>
+<p><img src="/p/mongodb/images/image-20200618070608408.png"
+	width="1081"
+	height="399"
+	
+	loading="lazy"
+	
+		alt="image-20200618070608408"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="270"
+		data-flex-basis="650px"
+	
+></p>
+<pre><code class="language-js">var mapFunction1 = function() {
+  emit(this.userid, this.thumbup);
+};
+var reduceFunction1 = function(keyUid, thumbupArr) {
+ return Array.sum(thumbupArr);
+};
+db.comment.mapReduce(
+  mapFunction1,
+  reduceFunction1,
+  { 
+    query: {thumbup:{$gt:200}},
+    out: &quot;thumbup_sum&quot; 
+    	}
+)
+db.thumbup_sum.find().sort({value:-1});
+
+</code></pre>
+<p>修改成我们想要的样子</p>
+<h3 id="4总结-2">4.总结
+</h3><h2 id="知识点-mongodb-driver使用">知识点-mongodb-driver使用
+</h2><h3 id="mongodb-driver">mongodb-driver
+</h3><p>​	mongodb-driver是mongo官方推出的java连接mongoDB的驱动包，相当于JDBC驱动。我们现在来使用mongodb-driver完成对Mongodb的操作。</p>
+<p>添加以下依赖：</p>
+<pre><code class="language-xml"> &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.mongodb&lt;/groupId&gt;
+            &lt;artifactId&gt;mongodb-driver&lt;/artifactId&gt;
+            &lt;version&gt;3.10.1&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;junit&lt;/groupId&gt;
+            &lt;artifactId&gt;junit&lt;/artifactId&gt;
+            &lt;version&gt;4.12&lt;/version&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+</code></pre>
+<p>使用步骤:</p>
+<ol>
+<li>创建客户端连接 mongoclient</li>
+<li>获取数据库</li>
+<li>获取集合</li>
+<li>操作集合</li>
+</ol>
+<h4 id="32-查询所有">3.2 查询所有
+</h4><pre><code class="language-java"> @Test
+    public void test1() {
+        //创建连接
+        MongoClient client = new MongoClient(&quot;192.168.184.136&quot;,27027);
+        //打开数据库
+        MongoDatabase commentdb = client.getDatabase(&quot;commentdb&quot;);
+        //获取集合
+        MongoCollection&lt;Document&gt; comment = commentdb.getCollection(&quot;comment&quot;);
+
+        //查询
+        FindIterable&lt;Document&gt; documents = comment.find();
+
+        //查询记录获取文档集合
+        for (Document document : documents) {
+            System.out.println(&quot;_id：&quot; + document.get(&quot;_id&quot;));
+            System.out.println(&quot;内容：&quot; + document.get(&quot;content&quot;));
+            System.out.println(&quot;用户ID:&quot; + document.get(&quot;userid&quot;));
+            System.out.println(&quot;点赞数：&quot; + document.get(&quot;thumbup&quot;));
+        }
+        //关闭连接
+        client.close();
+    }
+
+
+</code></pre>
+<h4 id="33根据_id查询">3.3根据_id查询
+</h4><p>每次使用都要用到MongoCollection，进行抽取：</p>
+<pre><code class="language-java">private MongoClient client;
+private MongoCollection&lt;Document&gt; comment;
+
+@Before
+public void init() {
+    //创建连接
+    client =new MongoClient(&quot;192.168.184.136&quot;,27027);
+    //打开数据库
+    MongoDatabase commentdb = client.getDatabase(&quot;commentdb&quot;);
+    //获取集合
+    comment = commentdb.getCollection(&quot;comment&quot;);
+}
+
+@After
+public void after() {
+    client.close();
+}
+
+
+</code></pre>
+<p>测试根据_id查询：</p>
+<pre><code class="language-java">@Test
+public void test2() {
+    //查询
+    FindIterable&lt;Document&gt; documents = comment.find(new BasicDBObject(&quot;_id&quot;, &quot;1&quot;));
+
+    //查询记录获取文档集合
+    for (Document document : documents) {
+        System.out.println(&quot;_id：&quot; + document.get(&quot;_id&quot;));
+        System.out.println(&quot;内容：&quot; + document.get(&quot;content&quot;));
+        System.out.println(&quot;用户ID:&quot; + document.get(&quot;userid&quot;));
+        System.out.println(&quot;点赞数：&quot; + document.get(&quot;thumbup&quot;));
+    }
+}
+
+
+</code></pre>
+<h4 id="34新增">3.4新增
+</h4><pre><code class="language-java">@Test
+public void test3() {
+    Map&lt;String, Object&gt; map = new HashMap();
+    map.put(&quot;_id&quot;, &quot;6&quot;);
+    map.put(&quot;content&quot;, &quot;很棒！&quot;);
+    map.put(&quot;userid&quot;, &quot;9999&quot;);
+    map.put(&quot;thumbup&quot;, 123);
+
+    Document document = new Document(map);
+
+    comment.insertOne(document);
+}
+
+
+</code></pre>
+<h4 id="35修改">3.5修改
+</h4><pre><code class="language-java">@Test
+public void test4() {
+    //修改的条件
+    Bson filter = new BasicDBObject(&quot;_id&quot;, &quot;6&quot;);
+    //修改的数据
+    Bson update = new BasicDBObject(&quot;$set&quot;, new Document(&quot;userid&quot;, &quot;8888&quot;));
+
+    comment.updateOne(filter, update);
+}
+
+
+</code></pre>
+<h4 id="36-删除">3.6 删除
+</h4><pre><code class="language-java">@Test
+public void test5() {
+    //删除的条件
+    Bson filter = new BasicDBObject(&quot;_id&quot;, &quot;6&quot;);
+
+    comment.deleteOne(filter);
+}
+
+
+</code></pre>
+<h3 id="4小结-2">4.小结
+</h3><ol>
+<li>mongodb-driver: mongo官方提供的一个Java操作Mongo客户端 类似jdbc驱动</li>
+<li>如果有条件, 我们使用 new BasicDbObject()
+<ul>
+<li>一个BasicDbObject就相当于语法里面的一组{}</li>
+<li>操作过程
+<ul>
+<li>创建连接</li>
+<li>获取数据库对象</li>
+<li>获取集合对象</li>
+<li>操作集合</li>
+<li>关闭连接</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>我们使用mongodb-driver有些繁琐, 项目里面使用Spring-Data-mongo, 内部就是封装了mongodb-driver</li>
+</ol>
+<h1 id="第二章-springdatamongodb">第二章-SpringDataMongoDB
+</h1><h2 id="知识点-基本crud实现">知识点-基本crud实现
+</h2><h3 id="1目标-6">1.目标
+</h3><ul>
+<li><input disabled="" type="checkbox"> 掌握文章评论环境准备</li>
+</ul>
+<h3 id="2路径-6">2.路径
+</h3><ol start="2">
+<li>开发准备环境准备</li>
+<li>基本CRUD</li>
+</ol>
+<h3 id="3讲解-6">3.讲解
+</h3><h4 id="31-开发准备">3.1 开发准备
+</h4><p>​	SpringDataMongoDB是SpringData家族成员之一，用于操作MongoDb的持久层框架，封装了底层的==mongodb-driver==。本功能使用SpringDataMongoDB进行开发</p>
+<p>步骤:</p>
+<ol>
+<li>
+<p>创建maven项目</p>
+</li>
+<li>
+<p>添加SpringDataMongoDB起步依赖</p>
+</li>
+<li>
+<p>在application.yml里面配置MongoDB</p>
+</li>
+<li>
+<p>创建pojo(和集合对应)</p>
+<ol>
+<li>@Document(collection=&ldquo;集合名称&rdquo;)</li>
+<li>@Id标记主键</li>
+<li>@CompoundIndexes({@CompoundIndex(),@CompoundIndex()})添加索引</li>
+</ol>
+</li>
+<li>
+<p>创建一个Dao接口继承MongoRepository</p>
+</li>
+</ol>
+<ul>
+<li>添加依赖：</li>
+</ul>
+<pre><code class="language-xml"> &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;2.1.4.RELEASE&lt;/version&gt;
+        &lt;relativePath/&gt;
+    &lt;/parent&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-data-mongodb&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+            &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+
+</code></pre>
+<ul>
+<li>添加配置文件：</li>
+</ul>
+<pre><code class="language-yaml">spring:
+  data:
+    mongodb:
+      host: 192.168.184.136
+      port: 27027
+      database: commentdb
+
+</code></pre>
+<ul>
+<li>创建实体类</li>
+</ul>
+<pre><code class="language-java">@Document(collection = &quot;comment&quot;)
+@CompoundIndexes({
+        @CompoundIndex(name = &quot;idx_userid&quot;, def = &quot;{'userid': 'hashed'}&quot;, background = true)
+})
+public class Comment implements Serializable {
+    @Id
+    private String _id;
+    private String articleid;
+    private String content;
+    private String userid;
+    private String parentid;
+    private Date publishdate;
+    private Integer thumbup;
+}
+
+
+</code></pre>
+<h4 id="32基本crud">3.2基本CRUD
+</h4><h5 id="321新增">3.2.1新增
+</h5><ul>
+<li>CommentService</li>
+</ul>
+<pre><code class="language-java">@Service
+public class CommentService {
+    @Autowired
+    private IdWorker idWorker;
+    @Autowired
+    private CommentRepository commentRepository;
+
+    public void add(Comment comment) {
+        String id = idWorker.nextId() + &quot;&quot;;
+        comment.set_id(id);
+        //初始化数据
+        comment.setPublishdate(new Date());
+        comment.setThumbup(0);
+        commentRepository.save(comment);
+    }
+}    
+
+
+</code></pre>
+<ul>
+<li>CommentRepository</li>
+</ul>
+<pre><code class="language-java">public interface CommentRepository extends MongoRepository&lt;Comment,String&gt;{
+
+}
+
+
+</code></pre>
+<blockquote>
+<p>在com.tensquare.article.repository包下创建</p>
+</blockquote>
+<h5 id="322删除">3.2.2删除
+</h5><p>业务:</p>
+<ol>
+<li>把所有的子评论也删除</li>
+<li>不删子评论, 只删自己</li>
+</ol>
+<ul>
+<li>CommentService</li>
+</ul>
+<pre><code class="language-java">public void deleteById(String id) {
+    commentRepository.deleteById(id);
+}
+
+
+</code></pre>
+<ul>
+<li>递归删除</li>
+</ul>
+<pre><code class="language-java">//1.查询出父id为commentid的数据做为集合A
+List&lt;Comment&gt; childList = commentDao.findByParentid(commentid);
+//2.删除id为commentid的数据
+commentDao.deleteById(commentid);
+//3.遍历集合A，递归调用deleteById(A[i]._id)
+for (Comment comment : childList) {
+    deleteById(comment.get_id());
+}
+
+
+</code></pre>
+<h5 id="323修改">3.2.3修改
+</h5><ul>
+<li>CommentService</li>
+</ul>
+<pre><code class="language-java">public void update(Comment comment) {
+    commentRepository.save(comment);
+}
+
+
+</code></pre>
+<p>这种方式的缺陷就是会覆盖原本的数据，应该只修改要修改的数据</p>
+<pre><code class="language-java">//1.查询条件
+Query query = new Query();
+query.addCriteria(new Criteria(&quot;_id&quot;).is(comment.get_id()));
+//2.修改内容
+/*Update update = new Update();
+update.inc(&quot;thumbup&quot;,1).set(&quot;content&quot;,&quot;aaaaaa&quot;);*/
+Update update = MongoUpdateUtils.attrUpdateByBean(comment);
+//3.集合名称
+mongoTemplate.updateFirst(query,update,&quot;comment&quot;);
+
+
+</code></pre>
+<p>创建一个工具类通过反射封装Update</p>
+<pre><code class="language-java">public class MongoUpdateUtils {
+    public static Update attrUpdateByBean(Object object) {
+        Update update = new Update();
+        //1.通过反射拿到属性
+        Field[] declaredFields = object.getClass().getDeclaredFields();
+        for (Field declaredField : declaredFields) {
+            try {
+                declaredField.setAccessible(true);//允许不通过get方法直接获取私有属性值
+                Object value = declaredField.get(object);
+                //2.通过get获取值如果不为空的话作为Update要修改属性
+                if(value!=null){
+                    update = update.set(declaredField.getName(),value);
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return update;
+    }
+}
+
+
+</code></pre>
+<h5 id="324查询所有">3.2.4查询所有
+</h5><ul>
+<li>CommentService</li>
+</ul>
+<pre><code class="language-java">public List&lt;Comment&gt; findAll() {
+    return commentRepository.findAll();
+}
+
+
+</code></pre>
+<h5 id="325根据id查询">3.2.5根据id查询
+</h5><ul>
+<li>CommentService</li>
+</ul>
+<pre><code class="language-java">    public Comment findById(String id) {
+        return commentRepository.findById(id).get();
+    }
+
+
+</code></pre>
+<h5 id="326-获取当前点赞数大于200并统计用户的总点赞数">3.2.6 获取当前点赞数大于200并统计用户的总点赞数
+</h5><pre><code class="language-java"> public List&lt;Map&gt; findTotalThumbupByUserId(){
+        TypedAggregation&lt;Comment&gt; commentTypedAggregation = Aggregation.newAggregation(Comment.class,
+                Aggregation.match(Criteria.where(&quot;thumbup&quot;).gt(1000)),
+                Aggregation.group(&quot;userid&quot;).sum(&quot;thumbup&quot;).as(&quot;sum&quot;)
+        );
+        AggregationResults&lt;Map&gt; aggregate = mongoTemplate.aggregate(commentTypedAggregation, mongoTemplate.getCollectionName(Comment.class), Map.class);
+        return aggregate.getMappedResults();
+    }
+
+</code></pre>
+<h5 id="327-按照点赞数排序查询前3条评论">3.2.7 按照点赞数排序，查询前3条评论
+</h5><pre><code class="language-java">public PageResult&lt;Comment&gt; findByPage(int current, int size){
+        Sort sort = Sort.by(Sort.Direction.DESC,&quot;thumbup&quot;);
+        Query query = new Query();
+        long total = mongoTemplate.count(query, Comment.class);
+        int offset = (current- 1)*size;
+        List&lt;Comment&gt; list = mongoTemplate.find(query.with(sort).limit(size).skip(offset), Comment.class, mongoTemplate.getCollectionName(Comment.class));
+        PageResult&lt;Comment&gt; pageResult = new PageResult();
+        pageResult.setCurrent(current);
+        pageResult.setData(list);
+        pageResult.setPages((int) ((total/size)+1));
+        return pageResult;
+    }
+
+</code></pre>
+<h3 id="4小结-3">4.小结
+</h3><h2 id="知识点-框架封装">知识点-框架封装
+</h2><h3 id="1目标-7">1.目标
+</h3><ul>
+<li><input disabled="" type="checkbox"> 了解如何在原有的springdata框架上封装自己的功能</li>
+<li><input disabled="" type="checkbox"> 将我们自己实现的修改功能封装进框架</li>
+<li><input disabled="" type="checkbox"> 封装分页查询功能</li>
+<li><input disabled="" type="checkbox"> 封装聚合查询功能</li>
+</ul>
+<h3 id="2路径-7">2.路径
+</h3><ul>
+<li><input disabled="" type="checkbox"> 讲解如何在原有的springdata框架上封装自己的功能</li>
+<li><input disabled="" type="checkbox"> 讲解如何将我们自己实现的修改功能封装进框架</li>
+<li><input disabled="" type="checkbox"> 讲解如何封装分页查询功能</li>
+<li><input disabled="" type="checkbox"> 讲解如何封装聚合查询功能</li>
+</ul>
+<h3 id="3讲解-7">3.讲解
+</h3><h4 id="31-在原有的springdata框架上封装自己的功能">3.1 在原有的springdata框架上封装自己的功能
+</h4><p>​	MongoRepository虽然已经封装了一些基本功能，但是在我们日常开发的过程中会发现仍然不够用，比如分页，聚合查询都需要使用mongoTepmlate，如果你是架构师，为了保证开发人员在开发过程中能够更加规范的使用框架，我们需要对框架进一步进行封装，所以我们需要对SpringDataMongoDB框架进行研究，了解MongoRepository是如何实现接口的功能，我们又该如何合理的封装一些新的功能进来。<strong>这个过程和其他的springdata框架都是类似的</strong>。</p>
+<p>​	首先找到这个类</p>
+<p><img src="/p/mongodb/images/image-20200602051144739.png"
+	width="1522"
+	height="691"
+	
+	loading="lazy"
+	
+		alt="image-20200602051144739"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="220"
+		data-flex-basis="528px"
+	
+></p>
+<p>​	随便找个方法，找到实现类</p>
+<p><img src="/p/mongodb/images/image-20200602051235179.png"
+	width="1260"
+	height="540"
+	
+	loading="lazy"
+	
+		alt="image-20200602051235179"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="233"
+		data-flex-basis="560px"
+	
+></p>
+<p>​		正是这个SimpleMongoRepository</p>
+<p><img src="/p/mongodb/images/image-20200602051323421.png"
+	width="1276"
+	height="684"
+	
+	loading="lazy"
+	
+		alt="image-20200602051323421"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="186"
+		data-flex-basis="447px"
+	
+></p>
+<p>​		那么这个实现类又是如何注册到ioc容器的呢</p>
+<p><img src="/p/mongodb/images/image-20200602051424984.png"
+	width="1900"
+	height="753"
+	
+	loading="lazy"
+	
+		alt="image-20200602051424984"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="252"
+		data-flex-basis="605px"
+	
+></p>
+<p>​			选择第一个，是个工厂类</p>
+<p><img src="/p/mongodb/images/image-20200602053416216.png"
+	width="1314"
+	height="686"
+	
+	loading="lazy"
+	
+		alt="image-20200602053416216"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="191"
+		data-flex-basis="459px"
+	
+></p>
+<p>​			那么这个工厂类又是如何工作的呢，我们ctrl+左键点击类查看</p>
+<p><img src="/p/mongodb/images/image-20200602053520826.png"
+	width="1886"
+	height="212"
+	
+	loading="lazy"
+	
+		alt="image-20200602053520826"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="889"
+		data-flex-basis="2135px"
+	
+></p>
+<p><img src="/p/mongodb/images/image-20200602053548030.png"
+	width="1677"
+	height="86"
+	
+	loading="lazy"
+	
+		alt="image-20200602053548030"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="1950"
+		data-flex-basis="4680px"
+	
+></p>
+<p>​			发现配置到了配置文件中，我们当然可以仿照它的方式也创建一个配置文件，保存自定义的工厂类，或者使用@EnableMongoRepositories注解更加方便一些，经过我们的查看，接下来要做的事很清楚了：</p>
+<ol>
+<li>
+<p>创建接口封装自定义的方法，最好将接口分开，比如分页的单独放一个接口，聚合查询单独放一个接口，基本的增删改也单独放一个接口</p>
+</li>
+<li>
+<p>创建一个接口继承所有创建的接口包括MongoRepository</p>
+</li>
+<li>
+<p>创建该接口的实现类</p>
+</li>
+<li>
+<p>在启动类上添加@EnableMongoRepositories注解，并将我们的实现类配置进来</p>
+<p>​		开始动手吧：</p>
+</li>
+</ol>
+<p>1.创建HMMongoRepository,以后这个接口就是我们要实现的接口</p>
+<pre><code class="language-java">public interface HMMongoRepository&lt;T, ID extends Serializable&gt;{
+
+}
+
+</code></pre>
+<p>2.创建该接口的实现类</p>
+<pre><code class="language-java">public class HMMongoRespositoryImpl&lt;T, ID extends Serializable&gt; extends SimpleMongoRepository&lt;T, ID&gt; implements HMMongoRepository&lt;T,ID&gt; {
+
+    private final MongoOperations mongoOperations;
+    private final MongoEntityInformation&lt;T, ID&gt; entityInformation;
+    /**
+     * Creates a new {@link SimpleMongoRepository} for the given {@link MongoEntityInformation} and {@link MongoTemplate}.
+     *
+     * @param metadata        must not be {@literal null}.
+     * @param mongoOperations must not be {@literal null}.
+     */
+    public HMMongoRespositoryImpl(MongoEntityInformation&lt;T, ID&gt; metadata, MongoOperations mongoOperations) {
+        super(metadata, mongoOperations);
+        this.entityInformation = metadata;
+        this.mongoOperations = mongoOperations;
+    }
+}
+
+</code></pre>
+<h4 id="32-将我们自己实现的修改功能封装进框架">3.2 将我们自己实现的修改功能封装进框架
+</h4><p>创建接口</p>
+<pre><code class="language-java">public interface BaseMongoRepository&lt;T,TD&gt;  extends MongoRepository&lt;T,TD&gt; {
+    public int upsert(Query query, Update update);
+    public int update(T t);
+}
+
+
+</code></pre>
+<p>将接口添加到HMMongoRepository继承列表中</p>
+<pre><code class="language-java">public interface HMMongoRepository&lt;T, ID extends Serializable&gt; extends MongoRepository&lt;T, ID&gt;,BaseMongoRepository&lt;T,ID&gt; {
+
+}
+
+</code></pre>
+<p>添加实现</p>
+<pre><code class="language-java"> @Override
+    public int upsert(Query query, Update update) {
+        return (int) mongoTemplate.upsert(query, update, entityClass).getModifiedCount();
+    }
+
+    @Override
+    public int update(T t) {
+        Query query = new Query();
+        query.addCriteria(new Criteria(&quot;_id&quot;).is(entityInformation.getId(t)));
+        Update update = MongoUpdateUtils.attrUpdateByBean(t);
+        return (int)mongoOperations.updateFirst(query,update,entityInformation.getCollectionName()).getModifiedCount();
+    }
+
+</code></pre>
+<h4 id="33-封装分页查询功能">3.3 封装分页查询功能
+</h4><p>封装一个Page接口</p>
+<pre><code class="language-java">public interface Page&lt;T&gt; {
+    
+    Page getInstance(int total, int current, int size, List&lt;T&gt; list);
+}
+
+</code></pre>
+<p>封装一个分页接口</p>
+<pre><code class="language-java">public interface PageMongoRespository&lt;T,TD&gt; {
+
+    public long count(@Nullable Query query);
+
+    public Page&lt;T&gt; findPage(Query query, int current, int size, @Nullable Sort sort, Page&lt;T&gt; page);
+}
+
+</code></pre>
+<p>添加到HMMongoRepository继承列表中,实现该方法</p>
+<pre><code class="language-java"> @Override
+    public long count(@Nullable Query query) {
+        if (query == null) query = new Query();
+        return mongoOperations.count(query, entityInformation.getJavaType());
+    }
+
+    @Override
+    public Page&lt;T&gt; findPage(Query query, int current, int size, @Nullable Sort sort, Page&lt;T&gt; page) {
+        long total = count(query);
+        int offset = (current- 1)*size;
+        List&lt;T&gt; list = mongoOperations.find(query.with(sort).limit(size).skip(offset), entityInformation.getJavaType(), entityInformation.getCollectionName());
+        return page.getInstance((int) total, current, size, list);
+    }
+
+</code></pre>
+<h4 id="34-封装聚合查询功能">3.4 封装聚合查询功能
+</h4><h5 id="341-管道查询">3.4.1 管道查询
+</h5><p>接口</p>
+<pre><code class="language-java">public interface AggregationOperationMongoDao&lt;T,TD&gt; {
+
+    public List&lt;T&gt; findAggregationOperation(List&lt;AggregationOperation&gt; aggregationOperationList);
+}
+
+</code></pre>
+<p>实现</p>
+<pre><code class="language-java">@Override
+    public List&lt;T&gt; findAggregationOperation(List&lt;AggregationOperation&gt; aggregationOperationList) {
+        Aggregation aggregation = Aggregation.newAggregation(aggregationOperationList);
+        AggregationResults&lt;T&gt; outputType = mongoOperations.aggregate(aggregation,entityInformation.getCollectionName(), entityInformation.getJavaType());
+        List&lt;T&gt; resultList = new ArrayList&lt;&gt;();
+        Iterator&lt;T&gt; iterator = outputType.iterator();
+        while (iterator.hasNext()) {
+            resultList.add(iterator.next());
+        }
+        return resultList;
+    }
+
+</code></pre>
+<h3 id="4小结-4">4.小结
+</h3><h1 id="第三章-聚合查询">第三章 聚合查询
+</h1><h2 id="0-mysql类比">0. mysql类比
+</h2><p><img src="/p/mongodb/images/image-20211127171238134.png"
+	width="484"
+	height="633"
+	
+	loading="lazy"
+	
+		alt="image-20211127171238134"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="76"
+		data-flex-basis="183px"
+	
+></p>
+<h2 id="1-聚合管道操作符">1. 聚合管道操作符
+</h2><p>pipeline &ndash; stage种类</p>
+<p>$count , $group,  $match, $project, $unwind, $limit, $skip, $sort, $sortByCount, $lookup, $out, $addFields</p>
+<h3 id="11-count">1.1 $count
+</h3><p>语法</p>
+<pre><code>{ $count: &lt;string&gt; }
+
+</code></pre>
+<p>示例</p>
+<pre><code>db.collection.aggregate( [
+   { $group: { _id: null, myCount: { $sum: 1 } } }, #这里myCount自定义，相当于mysql的select count(*) as myCount
+   { $project: { _id: 0 } }  # 返回不显示_id字段
+] )
+
+</code></pre>
+<h3 id="12--group">1.2  $group
+</h3><p>指定的表达式对文档进行分组，并将每个不同分组的文档输出到下一个阶段,$group不会输出具体的文档而只是统计信息。</p>
+<p>accumulator操作符</p>
+<p><img src="/p/mongodb/images/image-20211129134924122.png"
+	width="913"
+	height="572"
+	
+	loading="lazy"
+	
+		alt="image-20211129134924122"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="159"
+		data-flex-basis="383px"
+	
+></p>
+<p>语法</p>
+<pre><code>{ $group: { _id: &lt;expression&gt;, &lt;field1&gt;: { &lt;accumulator1&gt; : &lt;expression1&gt; }, ... } }
+
+</code></pre>
+<ul>
+<li>_id字段是必填的;但是，可以指定_id值为null来为整个输入文档计算累计值。</li>
+<li>剩余的计算字段是可选的，并使用<accumulator>运算符进行计算。</li>
+<li>_id和<accumulator>表达式可以接受任何有效的<a class="link" href="https://docs.mongodb.com/manual/meta/aggregation-quick-reference/#aggregation-expressions"  target="_blank" rel="noopener"
+    >表达式</a>。</li>
+</ul>
+<p>查询distinct values</p>
+<h3 id="13-match">1.3 $match
+</h3><p>语法</p>
+<pre><code>{ $match: { &lt;query&gt; } }
+
+</code></pre>
+<p><strong>在实际应用中尽可能将$match放在管道的前面位置</strong>。这样有两个好处：</p>
+<p>一是可以快速将不需要的文档过滤掉，以<strong>减少管道的工作量</strong>；</p>
+<p>二是如果再投射和分组之前执行$match，<strong>查询可以使用索引</strong>。</p>
+<ul>
+<li>不能在$ match查询中使用$作为聚合管道的一部分。</li>
+<li>要在$match阶段使用$text，$match阶段必须是管道的第一阶段。</li>
+<li>视图不支持文本搜索。</li>
+</ul>
+<h3 id="14-unwind">1.4 $unwind
+</h3><p>简单说就是 可以将数组拆分为单独的文档。</p>
+<p>使用语法</p>
+<pre><code>{
+  $unwind:
+    {
+      path: &lt;field path&gt;,
+      includeArrayIndex: &lt;string&gt;,  #可选,一个新字段的名称用于存放元素的数组索引。该名称不能以$开头。
+      preserveNullAndEmptyArrays: &lt;boolean&gt; #可选，default :false，若为true,如果路径为空，缺少或为空数组，则$unwind输出文档
+  } 
+}
+
+</code></pre>
+<h3 id="15-project">1.5 $project
+</h3><p>==可以利用，<code>$project</code> 对输入文档进行再次投影==</p>
+<h4 id="1-语法">1. 语法
+</h4><pre><code>{ $project: { &lt;specification(s)&gt; } }
+
+</code></pre>
+<blockquote>
+<p>specifications有以下形式：</p>
+<p><field>: &lt;1 or true&gt;  是否包含该字段，field:1/0，表示选择/不选择 field</p>
+<p>_id: &lt;0 or false&gt;    是否指定_id字段</p>
+<p><field>: <expression> 添加新字段或重置现有字段的值。 在版本3.6中更改：MongoDB 3.6添加变量REMOVE。如果表达式的计算结果为$$REMOVE，则该字段将排除在输出中</p>
+</blockquote>
+<h4 id="2-例子">2. 例子
+</h4><pre><code class="language-sql">db.person.insert([
+    {name:{firstName:'Jonathan', lastName:'Lee'}, age:18, book:{name:'玩转HTML', price: 88}},
+    {name:{firstName:'Amelie', lastName:'BNTang'}, age:17, book:{name:'玩转JavaScript', price: 99}}
+]);
+
+db.person.find();
+
+</code></pre>
+<p><img src="/p/mongodb/images/image-20230113105322790.png"
+	width="611"
+	height="512"
+	
+	loading="lazy"
+	
+		alt="image-20230113105322790"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="119"
+		data-flex-basis="286px"
+	
+></p>
+<pre><code class="language-sql">db.person.aggregate([
+    {
+        $project:{
+            _id:0,
+            clientName: '$name.firstName',
+            clientAge: '$age'
+        }
+    }
+]);
+
+</code></pre>
+<p><img src="/p/mongodb/images/image-20230113105505191.png"
+	width="446"
+	height="323"
+	
+	loading="lazy"
+	
+		alt="image-20230113105505191"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="138"
+		data-flex-basis="331px"
+	
+></p>
+<h3 id="16-lookup">1.6 $lookup
+</h3><p>相当于 sql 的 left outer join</p>
+<h2 id="2-find详解">2. find详解
+</h2><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>操作符</th>
+          <th>格式</th>
+          <th>实例</th>
+          <th>与 RDBMS where 语句比较</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>等于（=）</td>
+          <td>{<key> : {<value>}}</td>
+          <td>db.test.find( {price : 24} )</td>
+          <td>where price = 24</td>
+      </tr>
+      <tr>
+          <td>大于（&gt;）</td>
+          <td>{<key> : {$gt : <value>}}</td>
+          <td>db.test.find( {price : {$gt : 24}} )</td>
+          <td>where price &gt; 24</td>
+      </tr>
+      <tr>
+          <td>小于（&lt;）</td>
+          <td>{<key> : {$lt : <value>}}</td>
+          <td>db.test.find( {price : {$lt : 24}} )</td>
+          <td>where price &lt; 24</td>
+      </tr>
+      <tr>
+          <td>大于等于（&gt;=）</td>
+          <td>{<key> : {$gte : <value>}}</td>
+          <td>db.test.find( {price : {$gte : 24}} )</td>
+          <td>where price &gt;= 24</td>
+      </tr>
+      <tr>
+          <td>小于等于（&lt;=）</td>
+          <td>{<key> : {$lte : <value>}}</td>
+          <td>db.test.find( {price : {$lte : 24}} )</td>
+          <td>where price &lt;= 24</td>
+      </tr>
+      <tr>
+          <td>不等于（!=）</td>
+          <td>{<key> : {$ne : <value>}}</td>
+          <td>db.test.find( {price : {$ne : 24}} )</td>
+          <td>where price != 24</td>
+      </tr>
+      <tr>
+          <td>与（and）</td>
+          <td>{key01 : value01, key02 : value02, &hellip;}</td>
+          <td>db.test.find( {name : &ldquo;《MongoDB 入门教程》&rdquo;, price : 24} )</td>
+          <td>where name = &ldquo;《MongoDB 入门教程》&rdquo; and price = 24</td>
+      </tr>
+      <tr>
+          <td>或（or）</td>
+          <td>{$or : [{key01 : value01}, {key02 : value02}, &hellip;]}</td>
+          <td>db.test.find( {$or:[{name : &ldquo;《MongoDB 入门教程》&rdquo;},{price : 24}]} )</td>
+          <td>where name = &ldquo;《MongoDB 入门教程》&rdquo; or price = 24</td>
+      </tr>
+  </tbody>
+</table></div>
+<p>查询逻辑对照表</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>sql</th>
+          <th>mql</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>a = 1 AND b = 1</td>
+          <td>{a: 1, b: 1} 或 {$and : [{a:1},{b:1}]}</td>
+      </tr>
+      <tr>
+          <td>a = 1OR b = 1</td>
+          <td>{$or: [{a: 1},{b: 1}]}</td>
+      </tr>
+      <tr>
+          <td>a is NULL</td>
+          <td>{a: {$exists: false}}</td>
+      </tr>
+      <tr>
+          <td>a IN (1, 2, 3)</td>
+          <td>{a: {$in: [1, 2, 3] }}</td>
+      </tr>
+  </tbody>
+</table></div>
+<pre><code> db.test.find({age:null})
+
+</code></pre>
+<blockquote>
+<p>此语句不仅匹配出 age 为 null 的文档，其他不同类型的文档也会被查出。这是因为 null 不仅会匹配某个键值为 null 的文档，而且还会匹配不包含这个键的文档</p>
+</blockquote>
+<p>查询有三个元素的数组</p>
+<pre><code> db.test.find(
+{
+    tags:{$size:3}
+}
+)
+
+</code></pre>
+<p>limiit()函数与SQL中的作用相同, 用于限制查询结果的个数</p>
+<pre><code>db.test.find().limit(3)
+
+</code></pre>
+<p>Skip() 函数用于略过指定个数的文档，如下语句略过第一个文档，返回后两个：</p>
+<pre><code> db.test.find(
+{
+    tags:{$size:3}
+}
+)
+
+</code></pre>
+<p>sort() 函数用于对查询结果进行排序，1 是升序，-1 是降序，如下语句可将查询结果升序显示</p>
+<pre><code>db.test.find().sort({&quot;price&quot; : 1})
+
+</code></pre>
+<h2 id="3-游标">3. 游标
+</h2><h2 id="4-数组操作">4. 数组操作
+</h2><p>$all, $size, $slice, $elemMatch</p>
+<h3 id="41-all">4.1 $all
+</h3><p>查找数组中包含指定值的文档</p>
+<p>语法</p>
+<pre><code>{filed: {
+	$all: [
+		&lt;value1&gt;,
+		&lt;value2&gt;
+	]
+}}
+
+</code></pre>
+<pre><code>db.orders.find(
+{
+	&quot;books&quot;:{$all:[&quot;java&quot;, &quot;mongodb&quot;]}
+}
+)
+
+</code></pre>
+<h3 id="42-size">4.2 $size
+</h3><p>查找数组代销等于指定值的文档</p>
+<p>语法</p>
+<pre><code>{filed: {
+	$size: number
+}}
+
+</code></pre>
+<h3 id="43-slice">4.3 $slice
+</h3><p>查询数组中指定返回元素的个数</p>
+<p>语法</p>
+<pre><code>db.collect.find(
+{},filed:{$slice:number}
+)
+
+db.collect.find(
+{},
+{field:{
+	$slice:[
+		number1,
+		number2
+	]
+}})
+
+</code></pre>
+<p>number说明</p>
+<blockquote>
+<p>为正数表示返回前面指定的值的个数, 例如为1, 返回数组第一个</p>
+<p>为负数, 例如为-1, 返回数组倒数第一个</p>
+</blockquote>
+<h3 id="44-elemmatch">4.4 $elemMatch
+</h3><p>数组元素操作符</p>
+<pre><code>作用：数组值中至少一个元素满足所有指定的匹配条件
+		语法：  { &lt;field&gt;: { $elemMatch: { &lt;query1&gt;, &lt;query2&gt;, ... } } }
+		说明：  如果查询为单值查询条件，即只有&lt;query1&gt;，则无需指定$elemMatch
+
+</code></pre>
+<p>搜索子对象的多个字段时, 如果使用$elemMatch, 它表示必须是同一个子对象满足多个条件</p>
+<h2 id="50-mongodb-compass">5.0 mongodb compass
+</h2><p><a class="link" href="https://blog.csdn.net/jamin_liu_90/article/details/88017013"  target="_blank" rel="noopener"
+    >https://blog.csdn.net/jamin_liu_90/article/details/88017013</a></p>
+<h2 id="60-聚合性能分析">6.0 聚合性能分析
+</h2><pre><code>db.report.explain().aggregate()
+
+</code></pre>
+<pre><code>/* 1 */
+{
+    &quot;stages&quot; : [ 
+        {
+            &quot;$cursor&quot; : {
+                &quot;query&quot; : {
+                    &quot;formId&quot; : 5.0,
+                    &quot;userId&quot; : 1.0
+                },
+                &quot;fields&quot; : {
+                    &quot;answers&quot; : 1,
+                    &quot;formId&quot; : 1,
+                    &quot;userId&quot; : 1,
+                    &quot;_id&quot; : 1
+                },
+                &quot;queryPlanner&quot; : {
+                    &quot;plannerVersion&quot; : 1,
+                    &quot;namespace&quot; : &quot;form.report&quot;,
+                    &quot;indexFilterSet&quot; : false,
+                    &quot;parsedQuery&quot; : {
+                        &quot;$and&quot; : [ 
+                            {
+                                &quot;formId&quot; : {
+                                    &quot;$eq&quot; : 5.0
+                                }
+                            }, 
+                            {
+                                &quot;userId&quot; : {
+                                    &quot;$eq&quot; : 1.0
+                                }
+                            }
+                        ]
+                    },
+                    &quot;queryHash&quot; : &quot;8046B318&quot;,
+                    &quot;planCacheKey&quot; : &quot;8046B318&quot;,
+                    &quot;winningPlan&quot; : {
+                        &quot;stage&quot; : &quot;COLLSCAN&quot;,
+                        // 查询方式，常见的有COLLSCAN/全表扫描、IXSCAN/索引扫描、 FETCH/根据索引去检索文档、SHARD_MERGE/合并分片结果、IDHACK/针对_id进行查询
+                        &quot;filter&quot; : {
+                            &quot;$and&quot; : [ 
+                                {
+                                    &quot;formId&quot; : {
+                                        &quot;$eq&quot; : 5.0
+                                    }
+                                }, 
+                                {
+                                    &quot;userId&quot; : {
+                                        &quot;$eq&quot; : 1.0
+                                    }
+                                }
+                            ]
+                        },
+                        &quot;direction&quot; : &quot;forward&quot;
+                    },
+                    &quot;rejectedPlans&quot; : []
+                }
+            }
+        }, 
+        {
+            &quot;$unwind&quot; : {
+                &quot;path&quot; : &quot;$answers&quot;
+            }
+        }, 
+        {
+            &quot;$match&quot; : {
+                &quot;answers.id&quot; : {
+                    &quot;$eq&quot; : 64.0
+                }
+            }
+        }, 
+        {
+            &quot;$unwind&quot; : {
+                &quot;path&quot; : &quot;$answers.contents&quot;
+            }
+        }, 
+        {
+            &quot;$sort&quot; : {
+                &quot;sortKey&quot; : {
+                    &quot;answers.contents.reportTime&quot; : -1
+                },
+                &quot;limit&quot; : NumberLong(1)
+            }
+        }, 
+        {
+            &quot;$project&quot; : {
+                &quot;_id&quot; : true,
+                &quot;formId&quot; : true,
+                &quot;userId&quot; : true,
+                &quot;answers&quot; : {
+                    &quot;id&quot; : true,
+                    &quot;contents&quot; : {
+                        &quot;reportTime&quot; : true
+                    }
+                }
+            }
+        }
+    ],
+    &quot;ok&quot; : 1.0
+}
+
+</code></pre>
+<p>参数解释</p>
+<h2 id="实践">实践
+</h2><pre><code>db.report.aggregate([
+{
+    $match:{
+        formId:5,
+        userId:1
+    }
+},
+{
+    $unwind:{
+        path:&quot;$answers&quot;
+    }   
+}, 
+{
+    $match: {
+        &quot;answers.id&quot;: 1
+    }
+},
+{
+    $project: {
+        answers: 1
+    }
+},
+{
+    $unwind: {
+        path: &quot;$answers.contents&quot;
+    }
+}
+])
+
+</code></pre>
+<h1 id="第四章-文档设计">第四章 文档设计
+</h1><p>注意: mongodb 聚合管道中的数据不能超过 16mb</p>
+<h1 id="深拷贝">深拷贝
+</h1><pre><code>public Object deepClone() throws Exception {
+    Object cloneObj = null;
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    ObjectOutputStream obs = new ObjectOutputStream(out);
+    obs.writeObject(this);
+    obs.close();
+
+    ByteArrayInputStream ios = new ByteArrayInputStream(out.toByteArray());
+    ObjectInputStream ois = new ObjectInputStream(ios);
+    cloneObj = ois.readObject();
+    return cloneObj;
+}
+
+</code></pre>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/mongodb/">MongoDb</a>
+        
+            <a href="/tags/nosql/">Nosql</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

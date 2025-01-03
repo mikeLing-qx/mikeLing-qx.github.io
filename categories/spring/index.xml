@@ -1,0 +1,2246 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Spring on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/categories/spring/</link>
+        <description>Recent content in Spring on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Fri, 03 Jan 2025 19:21:43 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/categories/spring/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Spring基础</title>
+        <link>https://mikeLing-qx.github.io/p/spring%E5%9F%BA%E7%A1%80/</link>
+        <pubDate>Fri, 03 Jan 2025 19:21:43 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/spring%E5%9F%BA%E7%A1%80/</guid>
+        <description>&lt;h1 id=&#34;1-简介&#34;&gt;1. 简介
+&lt;/h1&gt;&lt;p&gt;Spring 是一个轻量级的 Java 开发框架。Spring 的核心是控制反转(IOC)和面向切面编程(AOP)。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Spring 主要有如下优点：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;1.解耦&lt;/li&gt;
+&lt;li&gt;2.支持面向切面编程&lt;/li&gt;
+&lt;li&gt;3.便于集成其他框架&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;2-ioc-控制反转&#34;&gt;2. IOC 控制反转
+&lt;/h1&gt;&lt;p&gt;​	IOC，全称 Inversion of Control，意思是&lt;strong&gt;控制反转&lt;/strong&gt;。它是 Spring 框架中的一种思想。&lt;/p&gt;
+&lt;p&gt;​	&lt;strong&gt;控制反转就是将对象的控制权从程序中的代码转移到了 Spring 的工厂，通过 Spring 的工厂完成对象的创建以及赋值。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;​	之前是我们自己 new 对象、给对象中的成员变量赋值。现在是让 Spring 来帮助我们创建对象、给成员变量赋值。&lt;/p&gt;
+&lt;h1 id=&#34;3-spring核心内容描述&#34;&gt;3. Spring核心内容描述
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;配置文件&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;​	Spring 的配置文件可以放到项目中的任意一个地方，也可以随意命名，但是建	议使用：applicationContext.xml。&lt;/p&gt;
+&lt;p&gt;​	你可以将这个配置文件看成一个装有一堆 bean 标签的容器&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;bean 标签&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Spring 工厂创建的对象，叫做 bean，所以一个 bean 标签代表一个对象。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;userService&amp;quot; class=&amp;quot;com.xxl.service.impl.UserServiceImpl&amp;quot;/&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;bean 标签中必须要有 class 属性，它的值是一个类的全限定名（包名+类名）除了 class 属性，bean 标签还可以设置 id 、name 、scope属性&lt;/p&gt;
+&lt;p&gt;name: 相当于这个 bean 的别名，可以配置多个&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; name=&amp;quot;aa,bb,cc&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot;/&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;scope: 可以控制简单对象的创建次数&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;singleton: 每次只会创建唯一⼀个简单对象，默认值&lt;/li&gt;
+&lt;li&gt;prototype 每⼀次都会创建新的对象&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot; scope=&amp;quot;singleton&amp;quot;/&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;ApplicationContext&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ApplicationContext 是 Spring 的工厂，主要用来创建对象&lt;/p&gt;
+&lt;p&gt;Spring 通过读取配置文件创建工厂。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;
+&lt;p&gt;工厂常用的方法&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// 1、获取工厂
+ApplicationContext act = new ClassPathXmlApplicationContext(&amp;quot;/applicationContext.xml&amp;quot;);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;(1). 根据id 获取对象&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;UserService userService = (UserService)act.getBean(&amp;quot;userService&amp;quot;);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(2). 根据id 和类名获取对象&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;UserService userService = (UserService)act.getBean(&amp;quot;userService&amp;quot;,UserService.class);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(3). 只根据类名获取对象&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;UserService userService = (UserService)act.getBean(UserService.class);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(4). 获取配置文件中所有 bean 标签的 id 值&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;String[] beanDefinitionNames = act.getBeanDefinitionNames();
+for (String beanDefinitionName : beanDefinitionNames) {
+    System.out.println(beanDefinitionName);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(5). 判断是否存在指定id 或者name 的bean&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;act.containsBean(&amp;quot;userService&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(6). 判断是否存在指定id 的bean&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;act.containsBeanDefinition(&amp;quot;userService&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;5&#34;&gt;
+&lt;li&gt;Spring 是如何创建对象的?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;​	工厂和反射&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Spring 配置文件中 bean 标签的 id 和类的全限定名一一对应，所以 Spring 工厂的 getBean 方法其实就是先根据 bean 的 id ==获取该类的全限定名==，然后再利用==反射==根据类的全限定名创建对象并返回。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;4-di-依赖注入&#34;&gt;4. DI 依赖注入
+&lt;/h1&gt;&lt;p&gt;DI 全称 Dependency Injection，意思是&lt;strong&gt;依赖注入&lt;/strong&gt;，它是 IOC 的具体实现。&lt;/p&gt;
+&lt;p&gt;依赖就是说我需要你，比如 Service 层依赖 Dao 层，注入就是&lt;strong&gt;赋值&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Spring 的依赖注入包含两种方式：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;set 注入：Spring 调用 Set 方法通过配置文件为成员变量赋值。&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id=&#34;1-set-注入&#34;&gt;1. set 注入
+&lt;/h2&gt;&lt;p&gt;Set 注入就是在 property 标签中为属性赋值&lt;/p&gt;
+&lt;p&gt;(1) 创建对象&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class User {
+    private String name;
+    private int age;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(2) 修改配置文件&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot;&amp;gt;
+  &amp;lt;property name=&amp;quot;name&amp;quot; value=&amp;quot;mike&amp;quot; /&amp;gt;
+  &amp;lt;property name=&amp;quot;age&amp;quot; value=&amp;quot;18&amp;quot; /&amp;gt;
+&amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-构造注入&#34;&gt;2. 构造注入
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;Spring 调用构造方法通过配置文件为成员变量赋值。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;为类添加构造方法&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class User {
+    private String name;
+    private int age;
+
+    public User(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;bean 标签中使用 constructor-arg&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean class=&amp;quot;com.xxl.model.User&amp;quot;&amp;gt;
+    &amp;lt;constructor-arg value=&amp;quot;张三&amp;quot;/&amp;gt;
+    &amp;lt;constructor-arg value=&amp;quot;18&amp;quot;/&amp;gt;
+&amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;5-bean-的生命周期&#34;&gt;5. Bean 的生命周期
+&lt;/h1&gt;&lt;h2 id=&#34;1-创建阶段&#34;&gt;1. 创建阶段
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;singleton 模式, 创建 Spring 工厂的同时创建所有单例对象&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class User {
+    String name;
+    int age;
+
+    public User() {
+        System.out.println(&amp;quot;调用User的构造方法&amp;quot;);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return &amp;quot;User{&amp;quot; +
+                &amp;quot;name=&#39;&amp;quot; + name + &#39;&#39;&#39; +
+                &amp;quot;, age=&amp;quot; + age +
+                &#39;}&#39;;
+    }
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;spring 配置文件注册bean&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot;&amp;gt;
+    &amp;lt;property name=&amp;quot;name&amp;quot; value=&amp;quot;知否君&amp;quot;/&amp;gt;
+    &amp;lt;property name=&amp;quot;age&amp;quot; value=&amp;quot;23&amp;quot;/&amp;gt;
+&amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;测试&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test
+  public void testSpring(){
+    ApplicationContext act = new ClassPathXmlApplicationContext(&amp;quot;/applicationContext.xml&amp;quot;);
+  }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E5%9F%BA%E7%A1%80/images/image-20220920104640120.png&#34;
+	width=&#34;546&#34;
+	height=&#34;184&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220920104640120&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;296&#34;
+		data-flex-basis=&#34;712px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;获取的时候才创建&lt;/strong&gt;, 只需要在 bean 标签上面添加如下属性  &amp;mdash;&amp;gt; lazy-init=&amp;ldquo;true&amp;rdquo;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot; lazy-init=&amp;quot;true&amp;quot;&amp;gt;
+    &amp;lt;property name=&amp;quot;name&amp;quot; value=&amp;quot;知否君&amp;quot;/&amp;gt;
+    &amp;lt;property name=&amp;quot;age&amp;quot; value=&amp;quot;23&amp;quot;/&amp;gt;
+&amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-初始化阶段&#34;&gt;2. 初始化阶段
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;==&lt;strong&gt;初始化方法修改了注入的值，所以初始化方法一定在注入之后执行&lt;/strong&gt;==&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;​	spring 中 bean 的初始化操作指的是在==创建对象的时候完成一些附加的功能==。bean 的初始化操作有两种实现方式：&lt;/p&gt;
+&lt;h3 id=&#34;1-实现-initializingbean-接口&#34;&gt;1. &lt;strong&gt;实现 InitializingBean 接口&lt;/strong&gt;
+&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;public class 类名 implements InitializingBean {
+    public void afterPropertiesSet(){
+       // 初始化方法操作
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;例如&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class User implements InitializingBean {
+    String name;
+    int age;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return &amp;quot;User{&amp;quot; +
+                &amp;quot;name=&#39;&amp;quot; + name + &#39;&#39;&#39; +
+                &amp;quot;, age=&amp;quot; + age +
+                &#39;}&#39;;
+    }
+
+    // 初始化操作
+    @Override
+    public void afterPropertiesSet(){
+            this.name = &amp;quot;张无忌&amp;quot;;
+            this.age = 30;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test
+    public void testSpring(){
+        ApplicationContext act = new ClassPathXmlApplicationContext(&amp;quot;/applicationContext.xml&amp;quot;);
+        Object user = act.getBean(&amp;quot;user&amp;quot;);
+        System.out.println(user);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E5%9F%BA%E7%A1%80/images/image-20220920105214213.png&#34;
+	width=&#34;386&#34;
+	height=&#34;112&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220920105214213&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;344&#34;
+		data-flex-basis=&#34;827px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;2--通过创建普通方法完成初始化&#34;&gt;2.  通过创建普通方法完成初始化
+&lt;/h3&gt;&lt;p&gt;User 类中创建一个方法&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// 初始化方法
+  public void initMethod() {
+      this.name = &amp;quot;张无忌&amp;quot;;
+  }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;在配置文件中配置 init-method 属性&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot; init-method=&amp;quot;initMethod&amp;quot; &amp;gt;
+    &amp;lt;property name=&amp;quot;name&amp;quot; value=&amp;quot;知否君&amp;quot;/&amp;gt;
+    &amp;lt;property name=&amp;quot;age&amp;quot; value=&amp;quot;23&amp;quot;/&amp;gt;
+&amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;测试&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test
+    public void testSpring(){
+        ApplicationContext act = new ClassPathXmlApplicationContext(&amp;quot;/applicationContext.xml&amp;quot;);
+        Object user = act.getBean(&amp;quot;user&amp;quot;);
+        System.out.println(user);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E5%9F%BA%E7%A1%80/images/image-20220920105411727.png&#34;
+	width=&#34;480&#34;
+	height=&#34;124&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220920105411727&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;387&#34;
+		data-flex-basis=&#34;929px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;3-销毁阶段&#34;&gt;3. 销毁阶段
+&lt;/h2&gt;&lt;p&gt;Spring 销毁对象前，会调用对象的销毁方法，完成销毁操作。&lt;/p&gt;
+&lt;p&gt;Spring 什么时候销毁所创建的对象？当 Spring 工厂关闭时，Spring 工厂会调用我们自定义的销毁方法。&lt;/p&gt;
+&lt;p&gt;两种方式:&lt;/p&gt;
+&lt;h3 id=&#34;1-disposablebean接口&#34;&gt;1. DisposableBean接口
+&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class 类名 implements DisposableBean {
+    // 销毁操作
+    @Override
+    public void destroy(){
+        // 销毁操作业务
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;2-创建普通方法&#34;&gt;2. 创建普通方法
+&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;// 销毁方法
+  public void destroyMethod() {
+     // 销毁操作业务
+  }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;配置文件中配置 destroy-method 属性&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot; destroy-method=&amp;quot;destroyMethod&amp;quot;&amp;gt;
+      &amp;lt;property name=&amp;quot;name&amp;quot; value=&amp;quot;知否君&amp;quot;/&amp;gt;
+      &amp;lt;property name=&amp;quot;age&amp;quot; value=&amp;quot;23&amp;quot;/&amp;gt;
+  &amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;6-bean-的后置处理&#34;&gt;6. Bean 的后置处理
+&lt;/h1&gt;&lt;p&gt;后置处理的流程&lt;/p&gt;
+&lt;h2 id=&#34;1实现-beanpostprocessor-接口&#34;&gt;1.实现 BeanPostProcessor 接口
+&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class BeanProcessor implements BeanPostProcessor {
+
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println(&amp;quot;后置bean：before 方法&amp;quot;);
+        return bean;
+    }
+    
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println(&amp;quot;后置bean：after 方法&amp;quot;);
+        if (bean instanceof User) {
+            User user = (User) bean;
+            user.setName(&amp;quot;亚里士多德&amp;quot;);
+            return user;
+        }
+        return bean;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-配置文件添加bean&#34;&gt;2. 配置文件添加bean
+&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;beanProcessor&amp;quot; class=&amp;quot;com.xxl.config.BeanProcessor&amp;quot;/&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;7-spring-aop&#34;&gt;7. Spring Aop
+&lt;/h1&gt;&lt;pre&gt;&lt;code&gt;Spring 的动态代理，通过代理类为原始类增加一些 额外功能
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​	AOP思想的实现一般都是基于代理模式，在JAVA中一般采用JDK动态代理模式，但是我们都知道，JDK动态代理模式只能代理接口，如果要代理类那么就不行了。因此，Spring AOP 会这样子来进行切换，==因为Spring AOP 同时支持 CGLIB、ASPECTJ、JDK动态代理，当你的真实对象有实现接口时，Spring AOP会默认采用JDK动态代理，否则采用cglib代理==。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果目标对象的实现类实现了接口，Spring AOP 将会采用 JDK 动态代理来生成 AOP 代理类；&lt;/li&gt;
+&lt;li&gt;如果目标对象的实现类没有实现接口，Spring AOP 将会采用 CGLIB 来生成 AOP 代理类——不过这个选择过程对开发者完全透明、开发者也无需关心。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;1-aop基本概念&#34;&gt;1. Aop基本概念
+&lt;/h2&gt;&lt;h3 id=&#34;1-advice-通知&#34;&gt;1. advice 通知
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Before&lt;/code&gt; 在方法被调用之前调用&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;After&lt;/code&gt; 在方法完成后调用通知，无论方法是否执行成功&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;After-returning&lt;/code&gt; ==在方法成功执行之后调用通知==&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;After-throwing&lt;/code&gt; 在方法抛出异常后调用通知&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Around&lt;/code&gt; 方法调用之==前后调用之后执行自定义的行为==&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2-切点-pointcut&#34;&gt;2. 切点 Pointcut
+&lt;/h3&gt;&lt;p&gt;​	切点在Spring AOP中确实是==对应系统中的方法==。但是这个方法是定义在切面中的方法，一般和通知一起使用，一起组成了切面。&lt;/p&gt;
+&lt;h3 id=&#34;3-连接点-joinpoint&#34;&gt;3. 连接点 JoinPoint
+&lt;/h3&gt;&lt;p&gt;比如: 方法调用、方法执行、字段设置/获取、异常处理执行、类初始化、甚至是 for 循环中的某个点&lt;/p&gt;
+&lt;p&gt;==程序执行过程中的任何时点都可以作为作为织入点, 而所有这些执行时点都是 Joint point==&lt;/p&gt;
+&lt;p&gt;Spring AOP 目前==仅支持方法执行 (method execution)==&lt;/p&gt;
+&lt;h3 id=&#34;4-切面-aspect&#34;&gt;4. 切面 Aspect
+&lt;/h3&gt;&lt;p&gt;切面就是切点和通知的集合, 一般单独作为一个类; 通知和切点共同定义了关于切面的全部内容，它是什么时候，在何时和何处完成功能。&lt;/p&gt;
+&lt;h3 id=&#34;5-引入-introduction&#34;&gt;5. 引入 introduction
+&lt;/h3&gt;&lt;p&gt;引用允许我们向现有的类添加新的方法或者属性&lt;/p&gt;
+&lt;h3 id=&#34;6-织入-weaving&#34;&gt;6. 织入 weaving
+&lt;/h3&gt;&lt;h2 id=&#34;2-使用&#34;&gt;2. 使用
+&lt;/h2&gt;&lt;p&gt;Spring 2.0 之后，Spring AOP有了两种配置方式。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;schema-based&lt;/strong&gt;：Spring 2.0 以后使用 XML 的方式来配置，使用 命名空间 &lt;code&gt;&amp;lt;aop /&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;@AspectJ 配置&lt;/strong&gt;：Spring 2.0 以后提供的注解方式。这里虽然叫做 @AspectJ，但是这个和 AspectJ 其实没啥关系。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;1-enableaspectjautoproxy&#34;&gt;1. EnableAspectJAutoProxy
+&lt;/h3&gt;&lt;p&gt;开启配置之后，所有&lt;strong&gt;在容器中&lt;/strong&gt;，&lt;strong&gt;被&lt;code&gt;@AspectJ&lt;/code&gt;注解的 bean&lt;/strong&gt; 都会被 Spring 当做是 AOP 配置类，称为一个 Aspect。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;注意: AspectJ 注解只能作用于Spring Bean 上面&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;2-配置pointcut&#34;&gt;2. 配置Pointcut
+&lt;/h3&gt;&lt;p&gt;在Spring 中, Pointcut 是用来匹配Spring 容器中所有满足指定条件的bean的方法&lt;/p&gt;
+&lt;p&gt;例如&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;execution&lt;/strong&gt;：匹配方法名&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;    // 表示的是匹配名为testExecution的方法，*代表任意返回值，(..)表示零个或多个任意参数
+    @Pointcut(&amp;quot;execution(* testExecution(..))&amp;quot;)
+    public void anyTestMethod() {}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;within&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// &amp;quot;..&amp;quot; 代表包及其子包
+	@Pointcut(&amp;quot;within(ric.study.demo.aop.svc..*)&amp;quot;)
+    public void inSvcLayer() {}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;annotation&lt;/strong&gt;：方法上具有特定的注解&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// 指定注解
+    @Pointcut(&amp;quot;@annotation(ric.study.demo.aop.HaveAop)&amp;quot;)
+    public void withAnnotation() {}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;bean(idOrNameOfBean)：匹配 bean 的名字&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// controller 层
+    @Pointcut(&amp;quot;bean(testController)&amp;quot;)
+    public void inControllerLayer() {}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;关于 Pointcut 的配置&lt;/strong&gt;, 开发企业级应用，Spring 建议你使用 &lt;code&gt;SystemArchitecture&lt;/code&gt;这种切面配置方式，即将一些公共的PointCut 配置全部写在这个一个类里面维护&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Aspect
+public class SystemArchitecture {
+
+  /**
+   * A join point is in the web layer if the method is defined
+   * in a type in the com.xyz.someapp.web package or any sub-package
+   * under that.
+   */
+  @Pointcut(&amp;quot;within(com.xyz.someapp.web..*)&amp;quot;)
+  public void inWebLayer() {}
+  
+  @Pointcut(&amp;quot;execution(* com.xyz.someapp.dao.*.*(..))&amp;quot;)
+  public void dataAccessOperation() {}
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;3-配置-advice&#34;&gt;3. 配置 Advice
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;实际开发过程当中，Aspect 类应该遵守单一职责原则，不要把所有的Advice配置全部写在一个Aspect类里面。&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Aspect
+@Component
+public class GlobalAopAdvice {
+
+    @Before(&amp;quot;ric.study.demo.aop.SystemArchitecture.dataAccessOperation()&amp;quot;)
+    public void doAccessCheck() {
+        // ... 实现代码
+    }
+
+    // 实际使用过程当中 可以像这样把Advice 和 Pointcut 合在一起，直接在Advice上面定义切入点
+    @Before(&amp;quot;execution(* ric.study.demo.dao.*.*(..))&amp;quot;)
+    public void doAccessCheck() {
+        // ... 实现代码
+    }
+
+    // 在方法
+    @AfterReturning(&amp;quot;ric.study.demo.aop.SystemArchitecture.dataAccessOperation()&amp;quot;)
+    public void doAccessCheck() {
+        // ... 实现代码
+    }
+
+    // returnVal 就是相应方法的返回值
+    @AfterReturning(
+        pointcut=&amp;quot;ric.study.demo.aop.SystemArchitecture.dataAccessOperation()&amp;quot;,
+        returning=&amp;quot;returnVal&amp;quot;)
+    public void doAccessCheck(Object returnVal) {
+        //  ... 实现代码
+    }
+
+    // 异常返回的时候
+    @AfterThrowing(&amp;quot;ric.study.demo.aop.SystemArchitecture.dataAccessOperation()&amp;quot;)
+    public void doRecoveryActions() {
+        // ... 实现代码
+    }
+
+    // 注意理解它和 @AfterReturning 之间的区别，这里会拦截正常返回和异常的情况
+    @After(&amp;quot;ric.study.demo.aop.SystemArchitecture.dataAccessOperation()&amp;quot;)
+    public void doReleaseLock() {
+        // 通常就像 finally 块一样使用，用来释放资源。
+        // 无论正常返回还是异常退出，都会被拦截到
+    }
+
+    // 这种最灵活，既能做 @Before 的事情，也可以做 @AfterReturning 的事情
+    @Around(&amp;quot;ric.study.demo.aop.SystemArchitecture.businessService()&amp;quot;)
+    public Object doBasicProfiling(ProceedingJoinPoint pjp) throws Throwable {
+       	//  target 方法执行前... 实现代码
+        Object retVal = pjp.proceed();
+        //  target 方法执行后... 实现代码
+        return retVal;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;@Before的时候，去获取方法的入参，比如进行一些日志的记录&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;可以通过 &lt;code&gt;org.aspectj.lang.JoinPoint&lt;/code&gt;来实现。上文中的&lt;code&gt;ProceedingJoinPoint&lt;/code&gt;就是其子类&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Before(&amp;quot;...&amp;quot;)
+public void logArgs(JoinPoint joinPoint) {
+    System.out.println(&amp;quot;方法执行前，打印入参：&amp;quot; + Arrays.toString(joinPoint.getArgs()));
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;方法返回参数打印&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@AfterReturning( pointcut=&amp;quot;...&amp;quot;, returning=&amp;quot;returnVal&amp;quot;)
+public void logReturnVal(Object returnVal) {
+    System.out.println(&amp;quot;方法执行后，打印返参：&amp;quot; + returnVal));
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        <item>
+        <title>Spring事务</title>
+        <link>https://mikeLing-qx.github.io/p/spring%E4%BA%8B%E5%8A%A1/</link>
+        <pubDate>Fri, 03 Jan 2025 19:21:43 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/spring%E4%BA%8B%E5%8A%A1/</guid>
+        <description>&lt;h1 id=&#34;1-spring事务的7种传播行为&#34;&gt;1. Spring事务的7种传播行为
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_REQUIRED ，==默认==的spring事务传播级别，==如果上下文中已经存在事务，那么就加入到事务中执行，如果当前上下文中不存在事务，则新建事务执行==。所以这个级别通常能满足处理大多数的业务场景。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_SUPPORTS ，==如果上下文存在事务，则支持事务加入事务，如果没有事务，则使用非事务的方式执行==。所以说，并非所有的包在transactionTemplate.execute中的代码都会有事务支持。这个通常是用来处理那些并非原子性的非核心业务逻辑操作。应用场景较少。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_MANDATORY（强制） ， ==该级别的事务要求上下文中必须要存在事务，否则就会抛出异常！==配置该方式的传播级别是有效的控制上下文调用代码遗漏添加事务控制的保证手段。比如一段代码不能单独被调用执行，但是一旦被调用，就必须有事务包含的情况，就可以使用这个传播级别。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_REQUIRES_NEW ，==每次都会新建一个事务，并且同时将上下文中的事务挂起，执行当前新建事务完成以后，上下文事务恢复再执行==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;这是一个很有用的传播级别，举一个应用场景：现在有一个发送100个红包的操作，在发送之前，要做一些系统的初始化、验证、数据记录操作，然后发送100封红包，然后再记录发送日志，发送日志要求100%的准确，如果日志不准确，那么整个父事务逻辑需要回滚。
+怎么处理整个业务需求呢？就是通过这个PROPAGATION_REQUIRES_NEW 级别的事务传播控制就可以完成。发送红包的子事务不会直接影响到父事务的提交和回滚。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_NOT_SUPPORTED ，当前级别的特点就是&lt;strong&gt;上下文中存在事务&lt;/strong&gt;，==则挂起事务，执行当前逻辑，结束后恢复上下文的事务==。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_NEVER ，该事务更严格，就抛出runtime异常，强制停止执行！&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_NESTED ，字面也可知道，nested，嵌套级别事务。该传播级别特征是，如果上下文中存在事务，则==嵌套事务==执行，如果不存在事务，则新建事务。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;还是子事务先提交，父事务再提交, 子事务是父事务的一部分，由父事务统一提交。&lt;/li&gt;
+&lt;li&gt;回滚特性
+&lt;ul&gt;
+&lt;li&gt;主事务和嵌套事务属于同一个事务&lt;/li&gt;
+&lt;li&gt;嵌套事务出错回滚不会影响到主事务&lt;/li&gt;
+&lt;li&gt;主事务回滚会将嵌套事务一起回滚了&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;2-多线程事务--二阶段提交&#34;&gt;2. 多线程事务&amp;ndash;二阶段提交
+&lt;/h1&gt;&lt;p&gt;这两个方法的两种写法, 第一种是可以正常的进行事务的提交和回滚的, 第二种执行的时候线程会一直阻塞, 不会退出, 分析原因&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;原因分析过程:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;第一种方式 是根据线程池大小来划分任务, 第二种方式是根据数据列表来划分任务,  第二种方式会出现一个线程需要处理多个事务的情况, 然而在updateStudentsTransaction 方法里面 ==事务的隔离级别  PROPAGATION_REQUIRES_NEW  会导致 线程新开任务==, ==这会导致 主线程等待子线程全部完成后再进行事务的提交或回滚==,  需要修改为 ==PROPAGATION_REQUIRES==&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;第一种
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
+    public void updateStudentWithThreadsAndTrans() throws InterruptedException {
+
+        //查询总数据
+        List&amp;lt;UserDemo&amp;gt; allUser = userMapper.selectAll();
+
+        // 线程数量
+        final int threadCount = 2;
+
+        //每个线程处理的数据量
+        final int dataPartionLength = (allUser.size() + threadCount - 1) / threadCount;
+
+        // 创建多线程处理任务
+        ExecutorService studentThreadPool = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch threadLatchs = new CountDownLatch(threadCount);
+        AtomicBoolean isError = new AtomicBoolean(false);
+        try {
+            for (int i = 0; i &amp;lt; threadCount; i++) {
+                // 每个线程处理的数据
+                List&amp;lt;UserDemo&amp;gt; threadDatas = allUser.stream()
+                        .skip((long) i * dataPartionLength).limit(dataPartionLength).collect(Collectors.toList());
+                studentThreadPool.execute(() -&amp;gt; {
+                    try {
+                        try {
+                            userService.updateStudentsTransaction(transactionManager, transactionStatusList, threadDatas);
+                        } catch (Throwable e) {
+                            isError.set(true);
+                            throw e;
+                        }finally {
+                            threadLatchs.countDown();
+                        }
+                    } catch (Exception e) {
+                        isError.set(true);
+                        throw e;
+                    }
+                });
+            }
+
+            // 倒计时锁设置超时时间 30s
+            boolean await = threadLatchs.await(30, TimeUnit.SECONDS);
+            // 判断是否超时
+            if (!await) {
+                isError.set(true);
+            }
+        } catch (Throwable e) {
+            isError.set(true);
+            throw e;
+        }
+
+        if (!transactionStatuses.isEmpty()) {
+            if (isError.get()) {
+                transactionStatuses.forEach(transactionManager::rollback);
+            } else {
+                transactionStatuses.forEach(transactionManager::commit);
+            }
+        }
+
+        System.out.println(&amp;quot;主线程完成&amp;quot;);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;第二种
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
+    public void updateStudentWithThreadsAndTrans() throws InterruptedException {
+
+        //查询总数据
+        List&amp;lt;UserDemo&amp;gt; allUser = userMapper.selectAll();
+
+        // 线程数量
+        final int threadCount = 5;
+
+        //每个线程处理的数据量
+        final int dataPartionLength = (allUser.size() + threadCount - 1) / threadCount;
+
+        ExecutorService studentThreadPool = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch threadLatchs = new CountDownLatch(threadCount);
+        AtomicBoolean isError = new AtomicBoolean(false);
+
+        // 创建CompletableFuture列表
+        List&amp;lt;CompletableFuture&amp;lt;Void&amp;gt;&amp;gt; futures = new ArrayList&amp;lt;&amp;gt;();
+
+        int batchSize = 100;
+        int size = allUser.size();
+        int batchNum = size / batchSize;
+        if (size % batchSize != 0) {
+            batchNum++;
+        }
+
+        for (int i = 0; i &amp;lt; batchNum; i++) {
+            int start = i * batchSize;
+            int end = Math.min((i + 1) * batchSize, size);
+
+            // 使用CompletableFuture执行异步任务
+            CompletableFuture&amp;lt;Void&amp;gt; future = CompletableFuture.runAsync(() -&amp;gt; {
+                try {
+                    userService.updateStudentsTransaction(transactionManager, transactionStatusList, allUser.subList(start, end));
+                } catch (Throwable e) {
+                    throw new CompletionException(e);
+                } finally {
+                    threadLatchs.countDown();
+                }
+            }, studentThreadPool).exceptionally(e -&amp;gt; {
+                isError.set(true);
+                return null;
+            });
+
+            futures.add(future);
+        }
+
+        // 等待所有任务完成
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+        if (!transactionStatusList.isEmpty()) {
+            if (isError.get()) {
+                transactionStatusList.forEach(transactionManager::rollback);
+            } else {
+                transactionStatusList.forEach(transactionManager::commit);
+            }
+        }
+
+        System.out.println(&amp;quot;主线程完成&amp;quot;);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;对于updateStudentsTransaction的调用里面是一样的代码&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;@Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
+    public void updateStudentsTransaction(PlatformTransactionManager transactionManager, List&amp;lt;TransactionStatus&amp;gt; transactionStatuses, List&amp;lt;UserDemo&amp;gt; userList) {
+        // 使用这种方式将事务状态都放在同一个事务里面
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW); // 事物隔离级别，开启新事务，这样会比较安全些。
+        TransactionStatus status = transactionManager.getTransaction(def); // 获得事务状态
+        transactionStatuses.add(status);
+
+        userList.forEach(s -&amp;gt; {
+//            if (&amp;quot;mike&amp;quot;.equals(s.getUserName())) {
+//                throw new RuntimeException(&amp;quot;故意抛出异常&amp;quot;);
+//            }
+            // 更新教师信息
+            // String teacher = s.getTeacher();
+            String newTeacher = &amp;quot;TNO_&amp;quot; + new Random().nextInt(100);
+            s.setUserName(newTeacher);
+            userMapper.updateByPrimaryKey(s);
+        });
+        System.out.println(&amp;quot;子线程：&amp;quot; + Thread.currentThread().getName());
+    }
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        <item>
+        <title>Spring_源码解析</title>
+        <link>https://mikeLing-qx.github.io/p/spring_%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</link>
+        <pubDate>Sat, 23 Nov 2024 18:07:34 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/spring_%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</guid>
+        <description>&lt;p&gt;main Q:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Spring的架构设计是怎样的?&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;有哪些核心组件&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;BeanFactory 和 ApplicationContext 的区别&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;都是容器对象, Beanfactory 提供了对bean的基本操作, 读写&lt;/li&gt;
+&lt;li&gt;ApplicationContext  具备Beanfactory  基本功能,  还有一些拓展&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;spring 的后置处理器 (是一种拓展机制)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;bean的生命周期&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;循环依赖怎么解决的&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;代理相关 (代理对象是什么时候产生的? )&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;事务, mvc 流程&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;IOC 容器初始化的流程 是怎样搞的&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Aware接口属性&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;什么是bean覆盖?  &amp;ndash;重复的bean定义  (默认策略允许 : 不同的配置文件中, 后加载的可以覆盖前面加载的)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;spirng 的 事件驱动 (观察者模式, 定义了一对多的依赖关系, 当主提对象发生变化就会通知观察对象)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Bean组件&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Bean的定义  封装成Bean定义&lt;/li&gt;
+&lt;li&gt;Bean的创建  根据Bean定义信息 通过beanFactory创建bean (工厂模式)&lt;/li&gt;
+&lt;li&gt;Bean的解析&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;other Q:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;protected 关键字&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;碎片笔记&lt;/p&gt;
+&lt;p&gt;Beans 和Core 是实现IOC和DI特性的关键&lt;/p&gt;
+&lt;p&gt;Servlet 里面包含了 ModelAndView&lt;/p&gt;
+&lt;p&gt;BeanFactory&lt;/p&gt;
+&lt;p&gt;BeanFactoryPostProcessor &amp;ndash;&amp;gt; bean定义&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;是有顺序的,  实现Order接口&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;BeanPostProcessor &amp;ndash;&amp;gt;  bean&lt;/p&gt;
+&lt;p&gt;任务:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;spring 源码阅读环境搭建&lt;/li&gt;
+&lt;li&gt;课程上完&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;流程图&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/images/image-20211108142308912.png&#34;
+	width=&#34;1293&#34;
+	height=&#34;623&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20211108142308912&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;207&#34;
+		data-flex-basis=&#34;498px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;一-refresh-方法解读&#34;&gt;一. Refresh 方法解读
+&lt;/h1&gt;&lt;h2 id=&#34;1-obtainfreshbeanfactory&#34;&gt;1. obtainFreshBeanFactory
+&lt;/h2&gt;&lt;h3 id=&#34;20-概述&#34;&gt;2.0 概述
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;作用: 用于获取一个新的BeanFactory
+流程: 该方法会解析所有spring配置文件, 将所有Spring配置文件中bean定义封装成beanDefinition 加载到beanFactory中&lt;/p&gt;
+&lt;p&gt;加载到beanFactory中 , 主要指的是三个缓存Map&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;beanDefinitionNames缓存: beanName 集合&lt;/li&gt;
+&lt;li&gt;beanDefinitionMap缓存: beanName 和 BeanDefinition 映射&lt;/li&gt;
+&lt;li&gt;aliasMap 缓存; beanName 别名映射&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;BeanDefinition接口&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;保存了我们的bean信息, 比如 指向的是哪个类, 是否是单例的, 是否懒加载, 依赖了哪些bean,&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;21-流程&#34;&gt;2.1 流程
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;刷新beanfactory,   AbstractRefreshableApplicationContext 实现&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;是否已存在, 存在则先销毁, 关闭该beanfactory&lt;/li&gt;
+&lt;li&gt;创建一个新的beanfactory
+&lt;ul&gt;
+&lt;li&gt;设置两个配置属性:  是否允许bean覆盖, 是否允许循环引用&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;加载bean到beanfactory&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;loadBeanDefinitions  (DefaultListableBeanFactory beanFactory) 加载bean到beanfactory&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;通过BeanDefinitionReader解析xml为Document&lt;/li&gt;
+&lt;li&gt;将Document注册到BeanFactory 中（这时候只是bean的一些定义，还未初始化）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;loadBeanDefinitions(XmlBeanDefinitionReader reader) 重载&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;getConfigLocations()
+&lt;ul&gt;
+&lt;li&gt;获取配置文件路径：如果 configLocations 属性不为空，则返回 configLocations 的值；否则，调用getDefaultConfigLocations() 方法。获取到配置文件路径（Spring 默认的配置路径：/WEB-INF/applicationContext.xml。）&lt;/li&gt;
+&lt;li&gt;根据配置文件路径加载 bean 定义&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;doLoadBeanDefinitions&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;根据 inputSource 和 resource 加载 XML文件，并封装成 Document。&lt;/li&gt;
+&lt;li&gt;根据返回的 Document 注册 bean 信息&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>Spring源码</title>
+        <link>https://mikeLing-qx.github.io/p/spring%E6%BA%90%E7%A0%81/</link>
+        <pubDate>Fri, 03 Nov 2023 11:21:43 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/spring%E6%BA%90%E7%A0%81/</guid>
+        <description>&lt;h1 id=&#34;1-核心组件&#34;&gt;1. 核心组件
+&lt;/h1&gt;&lt;h2 id=&#34;1-bean-组件&#34;&gt;1. Bean 组件
+&lt;/h2&gt;&lt;p&gt;Spring的&lt;strong&gt;org.springframework.beans&lt;/strong&gt; 包下的所有类主要解决了三件事：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Bean的定义 ==BeanDefinition==&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Bean的创建  ==反射创建bean对象 . user{id=&amp;quot;&amp;quot;, name=&amp;quot;&amp;quot;, 还未赋值}==&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Bean的解析  赋值和初始化&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;11-beandefinition&#34;&gt;1.1 BeanDefinition
+&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class DefaultListableBeanFactory {
+
+    // 我们的bean 信息, 就被封装成了beanDefinition, 保存到这个map 中
+	private final Map&amp;lt;String, BeanDefinition&amp;gt; beanDefinitionMap;
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-context-组件&#34;&gt;2. Context 组件
+&lt;/h2&gt;&lt;p&gt;Context在Spring的org.springframework.context包下&lt;/p&gt;
+&lt;p&gt;Context模块构建于Core和Beans模块基础之上&lt;/p&gt;
+&lt;p&gt;ApplicationContext是Context的顶级父类&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E6%BA%90%E7%A0%81/images/image-20220301145305876.png&#34;
+	width=&#34;229&#34;
+	height=&#34;35&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220301145305876&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;654&#34;
+		data-flex-basis=&#34;1570px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;上面的是懒加载的, 不会创建bean&lt;/p&gt;
+&lt;p&gt;下面的 会创建所有非懒加载的bean&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;BeanFactory 和 ApplicationContext 的区别&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ApplicationContext 继承自 BeanFactory&lt;/p&gt;
+&lt;p&gt;==Beanfactory:==  ==容器对象==, 提供了对bean的==基本操作==, 读和写, 创建==管理bean的生命周期==, 工厂模式
+==ApplicationContext:==  ==具备BeanFactory 的功能, 还有一些拓展==; 国际化操作, 后置处理器的创建&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;21-后置处理器&#34;&gt;2.1 后置处理器
+&lt;/h3&gt;&lt;p&gt;后置处理器是一种拓展机制, 贯穿Spring bean的生命周期&lt;/p&gt;
+&lt;p&gt;分为两种&lt;/p&gt;
+&lt;h4 id=&#34;1-beanfactory-后置处理器-beanfactorypostprocessor&#34;&gt;1. BeanFactory 后置处理器: BeanFactoryPostProcessor
+&lt;/h4&gt;&lt;p&gt;实现改接口, 可以再spring 的==bean 创建之前==, ==修改bean的定义属性, 修改BeanDefinition==&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E6%BA%90%E7%A0%81/images/image-20220301145838529.png&#34;
+	width=&#34;1126&#34;
+	height=&#34;412&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220301145838529&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;273&#34;
+		data-flex-basis=&#34;655px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public interface BeanFactoryPostProcessor { 
+/** 该接口只有一个方法postProcessBeanFactory，
+	方法参数是 ConfigurableListableBeanFactory，
+	通过该 参数，可以获取BeanDefinition 
+*/
+	void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException; 
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;场景&lt;/p&gt;
+&lt;p&gt;spring 配置文件&lt;/p&gt;
+&lt;p&gt;driverClassName = &amp;ldquo;${jdbc.Driver}&amp;rdquo;  在 BeanDefinition 中 是原样读到的数据, 需要 把 它改成配置文件中的数据, 就可以通过 后置处理器,  BeanPostProcessor 去完成&lt;/p&gt;
+&lt;h4 id=&#34;2-bean-后置处理器-beanpostprocessor&#34;&gt;2. Bean 后置处理器: BeanPostProcessor
+&lt;/h4&gt;&lt;p&gt;BeanPostProcessor是Spring IOC容器给我们提供的一个扩展接口&lt;/p&gt;
+&lt;p&gt;实现该接口，可以在spring容器==实例化bean之后== (此时是没有设置值的, 或者是默认值)，在执行==bean的初始化方法前后，添加一些处理逻辑==&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E6%BA%90%E7%A0%81/images/image-20220301151115416.png&#34;
+	width=&#34;1158&#34;
+	height=&#34;401&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220301151115416&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;288&#34;
+		data-flex-basis=&#34;693px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public interface BeanPostProcessor { 
+	//bean初始化方法调用前被调用 
+	Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException; 
+	//bean初始化方法调用后被调用 
+	Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException; 
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;==spring aop 代理对象就是 在after 方法进行修改==&lt;/p&gt;
+&lt;p&gt;可以实现Ordered, PriorityOrdered 接口进行执行排序&lt;/p&gt;
+&lt;p&gt;如果没有实现会按照在 xml 整配置的顺序执行&lt;/p&gt;
+&lt;h1 id=&#34;2-ioc-流程&#34;&gt;2. IOC 流程
+&lt;/h1&gt;&lt;p&gt;IOC容器&amp;ndash;&amp;gt; DefaultListableBeanFactory  map集合(单例池)&lt;/p&gt;
+&lt;p&gt;FactoryBean 创建复杂的bean对象的时候使用, getObejct 方法&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E6%BA%90%E7%A0%81/images/image-20220301164925221.png&#34;
+	width=&#34;1147&#34;
+	height=&#34;547&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220301164925221&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;209&#34;
+		data-flex-basis=&#34;503px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;循环依赖
+&amp;lt;bean id=&amp;quot;a&amp;quot; class=&amp;quot;a&amp;quot;&amp;gt; 
+    init-method = &amp;quot;init&amp;quot; 初始化方法
+	&amp;lt;property name = &amp;quot;b&amp;quot; ref=&amp;quot;b&amp;quot;&amp;gt;
+     
+&amp;lt;/bean&amp;gt;
+
+&amp;lt;bean id=&amp;quot;b&amp;quot; class=&amp;quot;b&amp;quot;&amp;gt;
+	&amp;lt;property name = &amp;quot;a&amp;quot; ref =&amp;quot;a&amp;quot;&amp;gt;
+&amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;==流程总结==&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;创建BeanFactory ==容器对象== IOC容器&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;创建BeanDefinitionReader, 加载解析Bean定义信息, 封装BeanDefinition&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;执行BeanfactoryPostProcessor&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;通过反射实例化对象&lt;/p&gt;
+&lt;p&gt;==spring事件驱动准备工作==: 创建 BeanPostProcessor, 创建多播器, 监听器&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;初始化操作&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;完整对象, 添加到容器中&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;3-bean的生命周期&#34;&gt;3. Bean的生命周期
+&lt;/h1&gt;&lt;p&gt;Bean 生命周期的整个执行过程描述如下。
+1）根据配置情况调用 Bean 构造方法或工厂方法实例化 Bean。&lt;/p&gt;
+&lt;p&gt;2）利用依赖注入完成 Bean 中所有属性值的配置注入。&lt;/p&gt;
+&lt;p&gt;3）如果 Bean 实现了 BeanNameAware 接口，则 Spring 调用 Bean 的 setBeanName() 方法传入当前Bean 的 id 值。&lt;/p&gt;
+&lt;p&gt;4）如果 Bean 实现了 BeanFactoryAware 接口，则 Spring 调用 setBeanFactory() 方法传入当前工厂实例的引用。&lt;/p&gt;
+&lt;p&gt;5）如果 Bean 实现了 ApplicationContextAware 接口，则 Spring 调用setApplicationContext() 方法传入当前 ApplicationContext 实例的引用。&lt;/p&gt;
+&lt;p&gt;6）如果 BeanPostProcessor 和 Bean 关联，则 Spring 将调用该接口的预初始化方法
+postProcessBeforeInitialzation() 对 Bean 进行加工操作&lt;/p&gt;
+&lt;p&gt;7）如果 Bean 实现了 InitializingBean 接口，则 Spring 将调用 afterPropertiesSet() 方法。&lt;/p&gt;
+&lt;p&gt;8）如果在配置文件中通过 init-method 属性==指定了初始化方法，则调用该初始化方法==。&lt;/p&gt;
+&lt;p&gt;9）如果 BeanPostProcessor 和 Bean 关联，则 Spring 将调用该接口的初始化方法
+postProcessAfterInitialization()。此时，Bean 已经可以被应用系统使用了。&lt;/p&gt;
+&lt;p&gt;10）如果在 中指定了该 Bean 的作用范围为 scope=&amp;ldquo;singleton&amp;rdquo;，则将该 Bean 放入 Spring IoC 的缓存池中，将触发 Spring 对该 Bean 的生命周期管理；如果在 中指定了该 Bean 的作用范围为scope=&amp;ldquo;prototype&amp;rdquo;，则将该 Bean 交给调用者，调用者管理该 Bean 的生命周期，Spring 不再管理该Bean。&lt;/p&gt;
+&lt;p&gt;11）如果 Bean 实现了 DisposableBean 接口，则 Spring 会调用 destory() 方法将 Spring 中的 Bean 销毁；如果在配置文件中通过 destory-method 属性指定了 Bean 的销毁方法，则 Spring 将调用该方法。&lt;/p&gt;
+&lt;h1 id=&#34;4-源码&#34;&gt;4. 源码
+&lt;/h1&gt;&lt;h2 id=&#34;1-如何创建的beanfactory-真实类型&#34;&gt;1. 如何创建的BeanFactory? (真实类型)
+&lt;/h2&gt;&lt;p&gt;obtainFreshBeanFactory&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;如果存在旧的BeanFactory 就销毁&lt;/li&gt;
+&lt;li&gt;创建新的BeanFactory (DefauListableBeanFactory)&lt;/li&gt;
+&lt;li&gt;解析xml/ 加载Bean定义, 注册Bean定义到beanFactory (不初始化)&lt;/li&gt;
+&lt;li&gt;返回新的Beanfactory&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;2-如何解析的配置文件-封装beandefinition&#34;&gt;2. 如何解析的配置文件, 封装BeanDefinition
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;解析bean 标签
+&lt;ul&gt;
+&lt;li&gt;再解析子标签&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;最后会注册到 BeanFactory 的 BeanDefinitionMap 中&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;3-实例化过程&#34;&gt;3. 实例化过程
+&lt;/h2&gt;&lt;p&gt;DefaultListableBeanFactory 中的&lt;/p&gt;
+&lt;p&gt;getBean方法 &amp;mdash; doGetBean(从缓存中拿)&amp;ndash;createBean &amp;mdash; doCreateBean(会执行一系列的流程 BeanPostProcesser)&lt;/p&gt;
+&lt;h2 id=&#34;4-factorybean&#34;&gt;4. Factorybean
+&lt;/h2&gt;&lt;p&gt;参考资料: &lt;a class=&#34;link&#34; href=&#34;https://juejin.cn/post/6844903954615107597&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://juejin.cn/post/6844903954615107597&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;FactoryBean和BeanFactory虽然名字很像，但是这两者是完全不同的两个概念&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;beanFactory &amp;mdash; spring IOC 容器&lt;/p&gt;
+&lt;p&gt;Factorybean 是一个特殊的bean&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;1-用法&#34;&gt;1. 用法
+&lt;/h3&gt;&lt;p&gt;FactoryBean的特殊之处在于它可以==向容器中注册两个Bean==，一个是==它本身==，一个是==FactoryBean.getObject()方法返回值所代表的Bean==。&lt;/p&gt;
+&lt;p&gt;代码示例&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public void preInstantiateSingletons() throws BeansException {
+	// 从容器中获取到所有的beanName
+	List&amp;lt;String&amp;gt; beanNames = new ArrayList&amp;lt;&amp;gt;(this.beanDefinitionNames);
+	for (String beanName : beanNames) {
+		RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
+		if (!bd.isAbstract() &amp;amp;&amp;amp; bd.isSingleton() &amp;amp;&amp;amp; !bd.isLazyInit()) {
+			// 在此处会根据beanName判断bean是不是一个FactoryBean，实现了FactoryBean接口的bean，会返回true
+			// 此时当beanName为customerFactoryBean时，会返回true，会进入到if语句中
+			if (isFactoryBean(beanName)) {
+				// 然后通过getBean()方法去获取或者创建单例对象
+				// 注意：在此处为beanName拼接了一个前缀：FACTORY_BEAN_PREFIX
+				// FACTORY_BEAN_PREFIX是一个常量字符串，即：&amp;amp;
+				// 所以在此时容器启动阶段，对于customerFactoryBean，应该是：getBean(&amp;quot;&amp;amp;customerFactoryBean&amp;quot;)
+				Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
+				// 下面这一段逻辑，是判断是否需要在容器启动阶段，就去实例化getObject()返回的对象，即是否调用FactoryBean的getObject()方法
+				if (bean instanceof FactoryBean) {
+					final FactoryBean&amp;lt;?&amp;gt; factory = (FactoryBean&amp;lt;?&amp;gt;) bean;
+					boolean isEagerInit;
+					if (System.getSecurityManager() != null &amp;amp;&amp;amp; factory instanceof SmartFactoryBean) {
+						isEagerInit = AccessController.doPrivileged((PrivilegedAction&amp;lt;Boolean&amp;gt;)
+										((SmartFactoryBean&amp;lt;?&amp;gt;) factory)::isEagerInit,
+								getAccessControlContext());
+					}
+					else {
+						isEagerInit = (factory instanceof SmartFactoryBean &amp;amp;&amp;amp;
+								((SmartFactoryBean&amp;lt;?&amp;gt;) factory).isEagerInit());
+					}
+					if (isEagerInit) {
+						getBean(beanName);
+					}
+				}
+			}
+		}
+	}
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;在容器启动阶段，会先通过==getBean()方法来创建CustomerFactoryBean的实例对象==。如果实现了==SmartFactoryBean接口，且isEagerInit()方法返回的是true==，那么在容器==启动阶段==，就会调用getObject()方法，向容器中注册getObject()方法返回值的对象。==否则，只有当第一次获取getObject()返回值的对象时，才会去回调getObject()方法==。&lt;/p&gt;
+&lt;p&gt;在==getBean()==中会调用到==doGetBean()==方法，下面为doGetBean()精简后的源码。从源码中我们发现，最终都会调用==getObjectForBeanInstance()==方法&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;protected Object getObjectForBeanInstance(
+		Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
+
+	if (BeanFactoryUtils.isFactoryDereference(name)) {
+		if (beanInstance instanceof NullBean) {
+			return beanInstance;
+		}
+		if (!(beanInstance instanceof FactoryBean)) {
+			throw new BeanIsNotAFactoryException(beanName, beanInstance.getClass());
+		}
+	}
+	// 如果bean不是factoryBean，那么会直接返回Bean
+	// 或者bean是factoryBean但name是以&amp;amp;特殊符号开头的,此时表示要获取FactoryBean的原生对象。
+	// 例如：如果name = &amp;amp;customerFactoryBean，那么此时会返回CustomerFactoryBean类型的bean
+	if (!(beanInstance instanceof FactoryBean) || BeanFactoryUtils.isFactoryDereference(name)) {
+		return beanInstance;
+	}
+	// 如果是FactoryBean，那么先从cache中获取，如果缓存不存在，则会去调用FactoryBean的getObject()方法。
+	Object object = null;
+	if (mbd == null) {
+		// 从缓存中获取。什么时候放入缓存的呢？在第一次调用getObject()方法时，会将返回值放入到缓存。
+		object = getCachedObjectForFactoryBean(beanName);
+	}
+	if (object == null) {
+		FactoryBean&amp;lt;?&amp;gt; factory = (FactoryBean&amp;lt;?&amp;gt;) beanInstance;
+		if (mbd == null &amp;amp;&amp;amp; containsBeanDefinition(beanName)) {
+			mbd = getMergedLocalBeanDefinition(beanName);
+		}
+		boolean synthetic = (mbd != null &amp;amp;&amp;amp; mbd.isSynthetic());
+		// 在getObjectFromFactoryBean()方法中最终会调用到getObject()方法
+		object = getObjectFromFactoryBean(factory, beanName, !synthetic);
+	}
+	return object;
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;==FactoryBean的创建流程==&lt;/p&gt;
+&lt;img src=&#34;https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/9/27/16d72cab4c659a1b~tplv-t2oaga2asx-zoom-in-crop-mark:1304:0:0:0.awebp&#34; alt=&#34;FactoryBean的创建流程&#34; style=&#34;zoom:50%;&#34; /&gt;
+&lt;h1 id=&#34;5-spring事件驱动&#34;&gt;5. Spring事件驱动
+&lt;/h1&gt;&lt;p&gt;基于观察者模式基础上改良&lt;/p&gt;
+&lt;p&gt;ApplicationEventPublisher&lt;/p&gt;
+&lt;h1 id=&#34;6-spring-循环依赖&#34;&gt;6. Spring 循环依赖
+&lt;/h1&gt;&lt;p&gt;循环依赖：一个或多个对象实例之间存在直接或间接的依赖关系，这种依赖关系构成了构成一个环形调用(闭环)&lt;/p&gt;
+&lt;p&gt;Spring 循环依赖场景&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;构造器的循环依赖&lt;/li&gt;
+&lt;li&gt;field 属性的循环依赖&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;==构造器引起的循环依赖 不能解决==&lt;/p&gt;
+&lt;p&gt;单例bean的 Setter 注入产生的循环依赖 &amp;ndash;可以解决&lt;/p&gt;
+&lt;p&gt;==&lt;strong&gt;Spring怎么解决循环依赖&lt;/strong&gt;==&lt;/p&gt;
+&lt;p&gt;Spring的循环依赖的理论依据其实是基于==Java的引用传递==，当我们==获取到对象的引用时，对象的field或者属性是可以延后设置==的(但是构造器必须是在获取引用之前)。&lt;/p&gt;
+&lt;h2 id=&#34;1-三级缓存&#34;&gt;1. 三级缓存
+&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;/** Cache of singleton objects: bean name --&amp;gt; bean instance */ 
+
+	private final Map&amp;lt;String, Object&amp;gt; singletonObjects = new ConcurrentHashMap&amp;lt;String, Object&amp;gt;(256); 
+
+/** Cache of early singleton objects: bean name --&amp;gt; bean instance */ 
+	private final Map&amp;lt;String, Object&amp;gt; earlySingletonObjects = new HashMap&amp;lt;String, Object&amp;gt;(16); 
+
+/** Cache of singleton factories: bean name --&amp;gt; ObjectFactory */
+	private final Map&amp;lt;String, ObjectFactory&amp;lt;?&amp;gt;&amp;gt; singletonFactories = new HashMap&amp;lt;String, ObjectFactory&amp;lt;?&amp;gt;&amp;gt;(16);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E6%BA%90%E7%A0%81/images/image-20220302174426919.png&#34;
+	width=&#34;1146&#34;
+	height=&#34;413&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220302174426919&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;277&#34;
+		data-flex-basis=&#34;665px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;一级缓存: spring的容器, 也就是存放完整的bean实例, 已经实例化和初始化好的实例&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;二级缓存: bean是否被AOP 切面代理&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;否: 保存半成品的bean 实例, 属性未填充&lt;/li&gt;
+&lt;li&gt;是: 保存的是代理的bean 实例beanProxy, 目标bean 还是半成品的&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;三件缓存: 存放的是 ObjectFactory, 传入的是一个匿名内部类, &lt;code&gt;objectFactory.getObject&lt;/code&gt; 最终调用的是==getEarlyBeanReference方法==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果bean 被代理,  getEarlyBeanReference则返回bean的代理对象, 如果bean未被代理, 则返回原bean 实例&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;2-解决循环依赖的流程图&#34;&gt;2. 解决循环依赖的流程图
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E6%BA%90%E7%A0%81/images/image-20220302180152075.png&#34;
+	width=&#34;486&#34;
+	height=&#34;228&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220302180152075&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;213&#34;
+		data-flex-basis=&#34;511px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E6%BA%90%E7%A0%81/images/%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E8%A7%A3%E5%86%B3.png&#34;
+	width=&#34;2747&#34;
+	height=&#34;1185&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;循环依赖解决&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;231&#34;
+		data-flex-basis=&#34;556px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;只使用一级缓存能不能解决循环依赖?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;半成品, 属性注入未完成&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;不使用二级缓存能否解决循环依赖?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;可以,但是在没有AOP的情况下, 可以直接使用 一级缓存和三级缓存解决循环依赖, 但是有AOP的话则需要二级缓存来保证, 获取到的代理对象是同一个&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;构造注入为什么不能解决循环依赖?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;解决循环依赖的本质: 将实例化对象和 初始化对象是 分割来的, 实例化不了&lt;/p&gt;
+&lt;p&gt;==&lt;strong&gt;我们先用构造函数创建一个不完整 的 bean&lt;/strong&gt;== 实例，从这句话&lt;/p&gt;
+&lt;p&gt;可以看出，构造器循环依赖是无法解决的，因为当构造器出现循环依赖，我们连 “不完整” 的 bean 实例&lt;/p&gt;
+&lt;p&gt;都构建不出来。&lt;/p&gt;
+&lt;h2 id=&#34;3-源码&#34;&gt;3. 源码
+&lt;/h2&gt;&lt;p&gt;第一步: getBean&lt;/p&gt;
+&lt;p&gt;使用getBean(java.lang.Class)从IOC中获取bean信息，实际上在IOC容器通过扫描包或加载XML后也会循环调用getBean(&amp;hellip;)进行Bean的首轮实例化。&lt;/p&gt;
+&lt;p&gt;第二步: ==doGetBean大致步骤==：&lt;/p&gt;
+&lt;p&gt;1.尝试根据beanName从缓存中获取获取bean对象&lt;/p&gt;
+&lt;p&gt;2.若获取到缓存对象则执行getObjectForBeanInstance(&amp;hellip;)后返回bean信息&lt;/p&gt;
+&lt;p&gt;3.若没有获取到缓存对象(首次创建)，则根据bean的作用域类型来采取不同方式创建bean(这里默认为单例模式)，然后再执行getObjectForBeanInstance(&amp;hellip;)后返回bean信息&lt;/p&gt;
+&lt;h1 id=&#34;7-spring-aop&#34;&gt;7. Spring Aop
+&lt;/h1&gt;&lt;p&gt;概述&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;AOP: 面向切面编程&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;用途: 日志管理, 事务管理&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;实现: 利用==代理模式==, 通过代理对象对被代理的对象增加功能&lt;/p&gt;
+&lt;p&gt;所以, 关键在于AOP 框架自动创建AOP代理对象, 代理模式分为静态代理和动态代理&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;框架&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;==AspectJ 使用静态代理==, 编译时增强, 在编译器生成代理对象&lt;/li&gt;
+&lt;li&gt;==SpringAop 使用动态代理==, 运行时增强, 在运行时, 动态生成代理对象&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;实现机制:&lt;/p&gt;
+&lt;p&gt;​		Spring AOP 底层实现机制目前有两种：JDK 动态代理、CGLIB 动态字节码生成。在阅读源码前对这两种机制的使用有个认识，有利于更好的理解源码。&lt;/p&gt;
+&lt;h2 id=&#34;1-jdk-代理和-cglib-代理&#34;&gt;1. Jdk 代理和 Cglib 代理
+&lt;/h2&gt;&lt;h2 id=&#34;2-aop&#34;&gt;2. Aop
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;哪个后置处理器 AnnotationAeareAspectAutoProxyCreator&lt;/li&gt;
+&lt;li&gt;代理对象创建的细节 BeanpostProcess的after方法中&lt;/li&gt;
+&lt;li&gt;AOP 中责任链&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&amp;lt;aop: aspecj-autoproxy  proxy-target-class = true/&amp;gt;  配置了AOP才生效;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;会往容器中加一个BeanPostProcessor&lt;/strong&gt; ==proxy-target-class = true== 则 spring生成代理对象将强制使用cgli;  false 就是接口使用jdk, 普通类使用cglib&lt;/p&gt;
+&lt;h2 id=&#34;3-责任链模式----aop中的体现&#34;&gt;3. 责任链模式 &amp;ndash; AOP中的体现
+&lt;/h2&gt;&lt;p&gt;==一个对象被多个拦截器拦截处理时, 这样干的设计模式就是为责任链模式==&lt;/p&gt;
+&lt;h2 id=&#34;4-流程总结&#34;&gt;4. 流程总结
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;源码剖析创建&lt;/strong&gt; AOP &lt;strong&gt;代理&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;AnnotationAwareAspectJAutoProxyCreator****类图&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;AnnotationAwareAspectJAutoProxyCreator 实现了几个重要的扩展接口（可能是在父类中实现）：&lt;/p&gt;
+&lt;p&gt;1）实现了 BeanPostProcessor 接口：实现了 postProcessAfterInitialization 方法。&lt;/p&gt;
+&lt;p&gt;2）实现了 InstantiationAwareBeanPostProcessor 接口：实现了postProcessBeforeInstantiation 方法。&lt;/p&gt;
+&lt;p&gt;3）实现了 SmartInstantiationAwareBeanPostProcessor 接口：实现了 predictBeanType 方法、getEarlyBeanReference 方法。&lt;/p&gt;
+&lt;p&gt;4）实现了 BeanFactoryAware 接口，实现了 setBeanFactory 方法。对于 AOP 来说，postProcessAfterInitialization 是我们重点分析的内容，因为在该方法中，会对 bean&lt;/p&gt;
+&lt;p&gt;进行代理，该方法由父类 AbstractAutoProxyCreator 实现。&lt;/p&gt;
+&lt;h1 id=&#34;8-spring-mvc-流程&#34;&gt;8. Spring mvc 流程
+&lt;/h1&gt;&lt;p&gt;问题1: Springmvc 和 Spring混合使用的时候, 会创建几个容器 (父子容器)&lt;/p&gt;
+&lt;p&gt;问题2: DispatcherServlet 初始化过程中做了什么?&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;init() &amp;ndash;&amp;gt; 创建子容器, setParent (根容器), 解析springmvc.xml, 生成了一些bean 对象: 保存地址和handlerMethod 的映射关系 mappingLookUp (mapping, handleMethod) ; urlLookUp&lt;/p&gt;
+&lt;p&gt;例子:  (&amp;quot;[GET /test/user]&amp;quot; ,  getUser)&lt;/p&gt;
+&lt;p&gt;初始化9大组件 (进行一些赋值操作)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E6%BA%90%E7%A0%81/images/image-20220307171431574.png&#34;
+	width=&#34;1011&#34;
+	height=&#34;296&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220307171431574&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;341&#34;
+		data-flex-basis=&#34;819px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;问题3: 请求的执行流程是怎样的&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;怎么根据请求url 找到controller 里面的方法
+&lt;ul&gt;
+&lt;li&gt;获取请求地址的uri, 根据uri 获取初始化过程中保存的映射关系(RequestMapiingInfo),  根据RequestMappingInfo 获取handleMethod&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;怎么设置的参数
+&lt;ul&gt;
+&lt;li&gt;根据method 里面的参数名称, 通过reuest获取到参数值Object[], 反射调用目标方法handler, invoke(bean, args[]);&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;怎么向model 设置值
+&lt;ul&gt;
+&lt;li&gt;底层就是像Request域中设置的值, request.setAttribute()&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;怎么完成视图渲染和跳转
+&lt;ul&gt;
+&lt;li&gt;通过视图解析器 解析逻辑视图 (拼接前缀后缀), 进行请求转发&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;程序的入口:&lt;/p&gt;
+&lt;p&gt;FrameworkServlet#service 方法&lt;/p&gt;
+&lt;p&gt;doService 关键方法&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E6%BA%90%E7%A0%81/images/image-20220307180852593.png&#34;
+	width=&#34;868&#34;
+	height=&#34;370&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220307180852593&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;234&#34;
+		data-flex-basis=&#34;563px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;1-servlet&#34;&gt;1. Servlet
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;生命周期: 默认情况下: 单实例 多线程的, 客户端发送一个请求到达客户端的时候才会进行创建&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;load-on-startup&amp;gt;4&amp;lt;/&amp;gt; 配置了该标签的servlet 将在服务器启动时完成实例化及初始化操作
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public interface Servlet { 
+	
+    // 只会执行一次
+    public void init(ServletConfig config) throws ServletException; 
+		
+    public ServletConfig getServletConfig(); // init-param --&amp;gt; 指定springmvc.xml 配置文件
+		
+    // 处理业务逻辑
+    public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException; 
+		
+    public String getServletInfo(); 
+    
+    public void destroy();  // 销毁
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;invocableMethod&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;returnValueHandlers 返回值处理器&lt;/p&gt;
+&lt;p&gt;resolvers&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;​	argumentResolvers  参数处理器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;2-父子容器&#34;&gt;2. 父子容器
+&lt;/h2&gt;&lt;h1 id=&#34;问题&#34;&gt;问题
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;BeanFactory 和 ApplicationContext 的区别&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;ApplicationContext 继承自 BeanFactory
+
+Beanfactory: 提供了对bean的基本操作, 读和写
+ApplicationContext:  具备BeanFactory 的功能, 还有一些拓展; 国际化操作, 后置处理器的创建
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;BeanFactory 后置处理器: BeanFactoryPostProcessor&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;实现改接口, 可以再spring 的 bean 创建之前, 修改bean的定义属性&lt;/p&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;
+&lt;p&gt;bean的生命周期&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;循环依赖怎么解决&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;代理对象 Bean 的后置处理器&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;allowBeanDefinitionOverriding = true 是否允许bean覆盖&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;同一个配置文件会报错&lt;/li&gt;
+&lt;li&gt;不同配置文件, 后加载的bean会把前面加载的bean给覆盖&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;AllowCircleRefer 是否允许循环引用&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ApplicationContextAwareProcessor 在papareBeanfactory 的时候会进行设置&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;什么是Aspectj ?&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;构建bean有哪些方法&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;xml 配置&lt;/li&gt;
+&lt;li&gt;注解&lt;/li&gt;
+&lt;li&gt;实现BeanDefinitionRegistryPostProcess 接口, 实现方法, 构建beanDefinition 添加到BeanFactory 中&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Beanfactory 后置处理器  可以通过 beanFactoryPostProcessor 和 BeanDefinitionRegistryPostProcess  接口&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;初始化事件广播器 initApplicationEnentMulticaster(); spring的事件驱动, 用到了观察者模式&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;getBean 方法 获取FactoryBean 需要在 BeanName 前面加上&amp;quot;&amp;amp;&amp;quot;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;Error:Kotlin: [Internal Error] java.lang.LinkageError: loader constraint violation: loader (instance of org/jetbrains/kotlin/cli/jvm/plugins/PluginURLClassLoader$SelfThenParentURLClassLoader) previously initiated loading for a different type with name &amp;quot;kotlin/sequences/Sequence&amp;quot;
+	at java.lang.ClassLoader.defineClass1(Native Method)
+	at
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;lamda 表达式&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;匿名内部类是局部内部类的更深入一步。
+假如只创建某类的一个对象时，就不必将该类进行命名。
+匿名内部类的前提是存在一个类或者接口，且匿名内部类是写在方法中的。
+只针对重写一个方法时使用，需要重写多个方法时不建议使用&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;new 类名或接口名(){
+    重写方法;
+}；     //注意分号
+//以上就是内部类的格式，其实这整体就相当于是new出来的一个对象
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;多线程&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;new Thread(){
+             public void run(){
+                 System.out.println(getName());
+             }
+         }.start();
+上面例子，如果去除.start()就是一个线程的匿名内部类【创建匿名内部类的同时，也会创建一个
+对象】所以上文中的.start（）就相当于调用了Thread的start方法
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        <item>
+        <title>Spring_jetcache</title>
+        <link>https://mikeLing-qx.github.io/p/spring_jetcache/</link>
+        <pubDate>Thu, 02 Nov 2023 15:08:41 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/spring_jetcache/</guid>
+        <description>&lt;p&gt;源项目文档: &lt;a class=&#34;link&#34; href=&#34;https://github.com/alibaba/jetcache/tree/master/docs/CN&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/alibaba/jetcache/tree/master/docs/CN&lt;/a&gt;&lt;/p&gt;
+&lt;h1 id=&#34;1-简介&#34;&gt;1. 简介
+&lt;/h1&gt;&lt;p&gt;JetCache是一个基于==Java的缓存系统封装==，==提供统一的API和注解来简化缓存的使用==。 JetCache提供了==比SpringCache更加强大的注解==，可以原生的支持TTL、两级缓存、分布式自动刷新，还提供了&lt;code&gt;Cache&lt;/code&gt;接口用于手工缓存操作。 当前有四个实现，&lt;code&gt;RedisCache&lt;/code&gt;、&lt;code&gt;TairCache&lt;/code&gt;（此部分未在github开源）、&lt;code&gt;CaffeineCache&lt;/code&gt;(in memory)和一个简易的&lt;code&gt;LinkedHashMapCache&lt;/code&gt;(in memory)，要添加新的实现也是非常简单的。&lt;/p&gt;
+&lt;p&gt;全部特性:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;通过统一的API访问Cache系统&lt;/li&gt;
+&lt;li&gt;通过注解实现声明式的方法缓存，支持TTL和两级缓存&lt;/li&gt;
+&lt;li&gt;通过注解创建并配置&lt;code&gt;Cache&lt;/code&gt;实例&lt;/li&gt;
+&lt;li&gt;针对所有&lt;code&gt;Cache&lt;/code&gt;实例和方法缓存的自动统计&lt;/li&gt;
+&lt;li&gt;Key的生成策略和Value的序列化策略是可以配置的&lt;/li&gt;
+&lt;li&gt;分布式缓存自动刷新，分布式锁 (2.2+)&lt;/li&gt;
+&lt;li&gt;异步Cache API (2.2+，使用Redis的lettuce客户端时)&lt;/li&gt;
+&lt;li&gt;Spring Boot支持&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;2-使用&#34;&gt;2. 使用
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;&amp;lt;dependency&amp;gt;
+	&amp;lt;groupId&amp;gt;com.alicp.jetcache&amp;lt;/groupId&amp;gt;
+	&amp;lt;artifactId&amp;gt;jetcache-starter-redis-lettuce&amp;lt;/artifactId&amp;gt;
+	&amp;lt;version&amp;gt;2.7.0&amp;lt;/version&amp;gt;
+&amp;lt;/dependency&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;启动类上加 &lt;code&gt;@EnableMethodCache&lt;/code&gt; ， &lt;code&gt;@EnableCreateCacheAnnotation&lt;/code&gt; 这两个注解, 分别激活 &lt;code&gt;@Cached&lt;/code&gt; 和 &lt;code&gt;@CreateCache&lt;/code&gt; 注解&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;配置文件&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;# 配置详情参考: https://github.com/alibaba/jetcache/blob/master/docs/CN/Config.md
+jetcache:
+    statIntervalMinutes: 1 # 统计间隔，0表示不统计
+    areaInCacheName: false
+    #hiddenPackages: zx.service.visu  # @Cached和@CreateCache自动生成name的时候，为了不让name太长，hiddenPackages指定的包名前缀被截掉
+    # @Cached和@CreateCache的area属性 local/remote
+    local:
+        default:
+            type: linkedhashmap  # tair、redis为当前支持的远程缓存；linkedhashmap、caffeine为当前支持的本地缓存类型
+            keyConvertor: fastjson2
+        mike:
+            type: caffeine
+            keyConvertor: fastjson2
+    remote:
+        default:
+            type: redis.lettuce  # tair、redis为当前支持的远程缓存；linkedhashmap、caffeine为当前支持的本地缓存类型
+            uri: redis://daheng@redis.daheng.co:6379/0?timeout=10s
+            keyConvertor: fastjson2
+            valueEncoder: java
+            valueDecoder: java
+            poolConfig:
+                minIdle: 5
+                maxIdle: 20
+                maxTotal: 50
+        mike:
+            type: redis.lettuce  # tair、redis为当前支持的远程缓存；linkedhashmap、caffeine为当前支持的本地缓存类型
+            uri: redis://daheng@redis.daheng.co:6379/3?timeout=10s
+            keyConvertor: fastjson2
+            valueEncoder: java
+            valueDecoder: java
+            poolConfig:
+                minIdle: 5
+                maxIdle: 20
+                maxTotal: 50
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public interface UserService {
+    // 添加缓存
+    @Cached(name=&amp;quot;userCache.&amp;quot;, key=&amp;quot;#userId&amp;quot;, expire = 3600)
+    User getUserById(long userId);
+
+	// 更新缓存
+    @CacheUpdate(name=&amp;quot;userCache.&amp;quot;, key=&amp;quot;#user.userId&amp;quot;, value=&amp;quot;#user&amp;quot;)
+    void updateUser(User user);
+
+	// 移除缓存
+    @CacheInvalidate(name=&amp;quot;userCache.&amp;quot;, key=&amp;quot;#userId&amp;quot;)
+    void deleteUser(long userId);
+    
+    // CacheRefresh
+    
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;==@Cache 注解==&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;属性&lt;/th&gt;
+          &lt;th&gt;默认值&lt;/th&gt;
+          &lt;th&gt;说明&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;area&lt;/td&gt;
+          &lt;td&gt;“default”&lt;/td&gt;
+          &lt;td&gt;如果在配置中配置了多个缓存area，在这里指定使用哪个area&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;name&lt;/td&gt;
+          &lt;td&gt;未定义&lt;/td&gt;
+          &lt;td&gt;指定缓存的唯一名称，不是必须的，如果没有指定，会使用类名+方法名。name会被用于远程缓存的key前缀。另外在统计中，一个简短有意义的名字会提高可读性。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;key&lt;/td&gt;
+          &lt;td&gt;未定义&lt;/td&gt;
+          &lt;td&gt;使用&lt;a class=&#34;link&#34; href=&#34;https://docs.spring.io/spring/docs/4.2.x/spring-framework-reference/html/expressions.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;SpEL&lt;/a&gt;指定key，如果没有指定会根据所有参数自动生成。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;expire&lt;/td&gt;
+          &lt;td&gt;未定义&lt;/td&gt;
+          &lt;td&gt;超时时间。如果注解上没有定义，会使用全局配置，如果此时全局配置也没有定义，则为无穷大&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;timeUnit&lt;/td&gt;
+          &lt;td&gt;TimeUnit.SECONDS&lt;/td&gt;
+          &lt;td&gt;指定expire的单位&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;cacheType&lt;/td&gt;
+          &lt;td&gt;CacheType.REMOTE&lt;/td&gt;
+          &lt;td&gt;缓存的类型，包括CacheType.REMOTE、CacheType.LOCAL、CacheType.BOTH。如果定义为BOTH，会使用LOCAL和REMOTE组合成两级缓存&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;localLimit&lt;/td&gt;
+          &lt;td&gt;未定义&lt;/td&gt;
+          &lt;td&gt;如果cacheType为LOCAL或BOTH，这个参数指定本地缓存的最大元素数量，以控制内存占用。如果注解上没有定义，会使用全局配置，如果此时全局配置也没有定义，则为100&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;localExpire&lt;/td&gt;
+          &lt;td&gt;未定义&lt;/td&gt;
+          &lt;td&gt;仅当cacheType为BOTH时适用，为内存中的Cache指定一个不一样的超时时间，通常应该小于expire&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;serialPolicy&lt;/td&gt;
+          &lt;td&gt;未定义&lt;/td&gt;
+          &lt;td&gt;指定远程缓存的序列化方式。可选值为SerialPolicy.JAVA和SerialPolicy.KRYO。如果注解上没有定义，会使用全局配置，如果此时全局配置也没有定义，则为SerialPolicy.JAVA&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;keyConvertor&lt;/td&gt;
+          &lt;td&gt;未定义&lt;/td&gt;
+          &lt;td&gt;指定KEY的转换方式，用于将复杂的KEY类型转换为缓存实现可以接受的类型，当前支持KeyConvertor.FASTJSON和KeyConvertor.NONE。NONE表示不转换，FASTJSON可以将复杂对象KEY转换成String。如果注解上没有定义，会使用全局配置。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;enabled&lt;/td&gt;
+          &lt;td&gt;true&lt;/td&gt;
+          &lt;td&gt;是否激活缓存。例如某个dao方法上加缓存注解，由于某些调用场景下不能有缓存，所以可以设置enabled为false，正常调用不会使用缓存，在需要的地方可使用CacheContext.enableCache在回调中激活缓存，缓存激活的标记在ThreadLocal上，该标记被设置后，所有enable=false的缓存都被激活&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;cacheNullValue&lt;/td&gt;
+          &lt;td&gt;false&lt;/td&gt;
+          &lt;td&gt;当方法返回值为null的时候是否要缓存&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;condition&lt;/td&gt;
+          &lt;td&gt;未定义&lt;/td&gt;
+          &lt;td&gt;使用&lt;a class=&#34;link&#34; href=&#34;https://docs.spring.io/spring/docs/4.2.x/spring-framework-reference/html/expressions.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;SpEL&lt;/a&gt;指定条件，如果表达式返回true的时候才去缓存中查询&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;postCondition&lt;/td&gt;
+          &lt;td&gt;未定义&lt;/td&gt;
+          &lt;td&gt;使用&lt;a class=&#34;link&#34; href=&#34;https://docs.spring.io/spring/docs/4.2.x/spring-framework-reference/html/expressions.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;SpEL&lt;/a&gt;指定条件，如果表达式返回true的时候才更新缓存，该评估在方法执行后进行，因此可以访问到#result&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;==@CacheRefresh注解==&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;属性&lt;/th&gt;
+          &lt;th&gt;默认值&lt;/th&gt;
+          &lt;th&gt;说明&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;refresh&lt;/td&gt;
+          &lt;td&gt;未定义&lt;/td&gt;
+          &lt;td&gt;刷新间隔&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;timeUnit&lt;/td&gt;
+          &lt;td&gt;TimeUnit.SECONDS&lt;/td&gt;
+          &lt;td&gt;时间单位&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;stopRefreshAfterLastAccess&lt;/td&gt;
+          &lt;td&gt;未定义&lt;/td&gt;
+          &lt;td&gt;指定该key多长时间没有访问就停止刷新，如果不指定会一直刷新&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;refreshLockTimeout&lt;/td&gt;
+          &lt;td&gt;60秒&lt;/td&gt;
+          &lt;td&gt;类型为BOTH/REMOTE的缓存刷新时，同时只会有一台服务器在刷新，这台服务器会在远程缓存放置一个分布式锁，此配置指定该锁的超时时间&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;​		key使用Spring的&lt;a class=&#34;link&#34; href=&#34;https://docs.spring.io/spring/docs/4.2.x/spring-framework-reference/html/expressions.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;SpEL&lt;/a&gt;脚本来指定。如果要使用参数名（比如这里的&lt;code&gt;key=&amp;quot;#userId&amp;quot;&lt;/code&gt;），项目编译设置target必须为1.8格式，并且指定javac的-parameters参数，否则就要使用&lt;code&gt;key=&amp;quot;args[0]&amp;quot;&lt;/code&gt;这样按下标访问的形式。&lt;/p&gt;
+&lt;h1 id=&#34;3-配置详解&#34;&gt;3. 配置详解
+&lt;/h1&gt;&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;jetcache:
+  statIntervalMinutes: 15
+  areaInCacheName: false
+  hidePackages: com.alibaba
+  local:
+    default:
+      type: caffeine
+      limit: 100
+      keyConvertor: fastjson2 #其他可选：fastjson/jackson
+      expireAfterWriteInMillis: 100000
+    otherArea:
+      type: linkedhashmap
+      limit: 100
+      keyConvertor: none
+      expireAfterWriteInMillis: 100000
+  remote:
+    default:
+      type: redis
+      keyConvertor: fastjson2 #其他可选：fastjson/jackson
+      broadcastChannel: projectA
+      valueEncoder: java #其他可选：kryo/kryo5
+      valueDecoder: java #其他可选：kryo/kryo5
+      poolConfig:
+        minIdle: 5
+        maxIdle: 20
+        maxTotal: 50
+      host: ${redis.host}
+      port: ${redis.port}
+    otherArea:
+      type: redis
+      keyConvertor: fastjson2 #其他可选：fastjson/jackson
+      broadcastChannel: projectA
+      valueEncoder: java #其他可选：kryo/kryo5
+      valueDecoder: java #其他可选：kryo/kryo5
+      poolConfig:
+        minIdle: 5
+        maxIdle: 20
+        maxTotal: 50
+      host: ${redis.host}
+      port: ${redis.port}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;属性&lt;/th&gt;
+          &lt;th&gt;默认值&lt;/th&gt;
+          &lt;th&gt;说明&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;jetcache.statIntervalMinutes&lt;/td&gt;
+          &lt;td&gt;0&lt;/td&gt;
+          &lt;td&gt;统计间隔，0表示不统计&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;jetcache.areaInCacheName&lt;/td&gt;
+          &lt;td&gt;true(2.6-) false(2.7+)&lt;/td&gt;
+          &lt;td&gt;jetcache-anno把cacheName作为远程缓存key前缀，2.4.3以前的版本总是把areaName加在cacheName中，因此areaName也出现在key前缀中。2.4.4以后可以配置，为了保持远程key兼容默认值为true，但是新项目的话false更合理些，2.7默认值已改为false。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;jetcache.hiddenPackages&lt;/td&gt;
+          &lt;td&gt;无&lt;/td&gt;
+          &lt;td&gt;@Cached和@CreateCache自动生成name的时候，为了不让name太长，hiddenPackages指定的包名前缀被截掉&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;jetcache.[local/remote].${area}.type&lt;/td&gt;
+          &lt;td&gt;无&lt;/td&gt;
+          &lt;td&gt;缓存类型。tair、redis为当前支持的远程缓存；linkedhashmap、caffeine为当前支持的本地缓存类型&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;jetcache.[local/remote].${area}.keyConvertor&lt;/td&gt;
+          &lt;td&gt;fastjson2&lt;/td&gt;
+          &lt;td&gt;key转换器的全局配置，2.6.5+已经支持的keyConvertor：&lt;code&gt;fastjson2&lt;/code&gt;/&lt;code&gt;jackson&lt;/code&gt;； 2.6.5-只有一个已经实现的keyConvertor：&lt;code&gt;fastjson&lt;/code&gt;。仅当使用@CreateCache且缓存类型为LOCAL时可以指定为&lt;code&gt;none&lt;/code&gt;，此时通过equals方法来识别key。方法缓存必须指定keyConvertor&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;jetcache.[local/remote].${area}.valueEncoder&lt;/td&gt;
+          &lt;td&gt;java&lt;/td&gt;
+          &lt;td&gt;序列化器的全局配置。仅remote类型的缓存需要指定，2.7+可选&lt;code&gt;java&lt;/code&gt;/&lt;code&gt;kryo&lt;/code&gt;/&lt;code&gt;kryo5&lt;/code&gt;；2.6-可选&lt;code&gt;java&lt;/code&gt;/&lt;code&gt;kryo&lt;/code&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;jetcache.[local/remote].${area}.valueDecoder&lt;/td&gt;
+          &lt;td&gt;java&lt;/td&gt;
+          &lt;td&gt;序列化器的全局配置。仅remote类型的缓存需要指定，2.7+可选&lt;code&gt;java&lt;/code&gt;/&lt;code&gt;kryo&lt;/code&gt;/&lt;code&gt;kryo5&lt;/code&gt;；2.6-可选&lt;code&gt;java&lt;/code&gt;/&lt;code&gt;kryo&lt;/code&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;jetcache.[local/remote].${area}.limit&lt;/td&gt;
+          &lt;td&gt;100&lt;/td&gt;
+          &lt;td&gt;每个缓存实例的最大元素的全局配置，仅local类型的缓存需要指定。注意是每个缓存实例的限制，而不是全部，比如这里指定100，然后用@CreateCache创建了两个缓存实例（并且注解上没有设置localLimit属性），那么每个缓存实例的限制都是100&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;jetcache.[local/remote].${area}.expireAfterWriteInMillis&lt;/td&gt;
+          &lt;td&gt;无穷大&lt;/td&gt;
+          &lt;td&gt;以毫秒为单位指定超时时间的全局配置(以前为defaultExpireInMillis)&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;jetcache.remote.${area}.broadcastChannel&lt;/td&gt;
+          &lt;td&gt;无&lt;/td&gt;
+          &lt;td&gt;==jetcahe2.7的两级缓存支持更新以后失效其他JVM中的local cache==，但多个服务共用redis同一个channel可能会造成广播风暴，需要在这里指定channel，你可以决定多个不同的服务是否共用同一个channel。如果没有指定则不开启。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;jetcache.local.${area}.expireAfterAccessInMillis&lt;/td&gt;
+          &lt;td&gt;0&lt;/td&gt;
+          &lt;td&gt;需要jetcache2.2以上，以毫秒为单位，指定多长时间没有访问，就让缓存失效，当前只有本地缓存支持。0表示不使用这个功能&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;缓存的超时时间，有多个地方指定&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;put等方法上指定了超时时间，则以此时间为准&lt;/li&gt;
+&lt;li&gt;put等方法上未指定超时时间，使用Cache实例的默认超时时间&lt;/li&gt;
+&lt;li&gt;Cache实例的默认超时时间，通过在@CreateCache和@Cached上的expire属性指定，如果没有指定，使用yml中定义的全局配置，例如@Cached(cacheType=local)使用jetcache.local.default.expireAfterWriteInMillis，如果仍未指定则是无穷大&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+</description>
+        </item>
+        <item>
+        <title>Spring_cache</title>
+        <link>https://mikeLing-qx.github.io/p/spring_cache/</link>
+        <pubDate>Mon, 06 Jun 2022 15:07:52 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/spring_cache/</guid>
+        <description>&lt;h1 id=&#34;1-入门使用&#34;&gt;1. 入门使用
+&lt;/h1&gt;&lt;p&gt;==参考资料==: &lt;a class=&#34;link&#34; href=&#34;https://juejin.cn/post/7097389644441976846&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://juejin.cn/post/7097389644441976846&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;1-enablecaching启用缓存功能&#34;&gt;1. @EnableCaching：启用缓存功能
+&lt;/h2&gt;&lt;p&gt;​	开启缓存功能，配置类中需要加上这个注解，有了这个注解之后，spring才知道你需要使用缓存的功能，其他和缓存相关的注解才会有效，spring中主要是==通过aop实现的==，通过aop来拦截需要使用缓存的方法，实现缓存的功能。&lt;/p&gt;
+&lt;h2 id=&#34;2-cacheable赋予缓存功能&#34;&gt;2. @Cacheable：赋予缓存功能
+&lt;/h2&gt;&lt;p&gt;​	@Cacheable可以==标记在一个方法上，也可以标记在一个类上==。当标记在一个方法上时表示该==方法是支持缓存的==，==当标记在一个类上时则表示该类所有的方法都是支持缓存的==。对于一个支持缓存的方法，==Spring会在其被调用后将其返回值缓存起来==，以保证下次利用同样的参数来执行该方法时可以直接从缓存中获取结果，而不需要再次执行该方法。Spring在缓存方法的返回值时是以键值对进行缓存的，值就是方法的返回结果，==至于键的话，Spring又支持两种策略，默认策略和自定义策略==，这个稍后会进行说明。需要注意的是当一个支持缓存的方法在对象==内部被调用时是不会触发缓存功能==的。@Cacheable可以指定三个属性，==value、key和condition。==&lt;/p&gt;
+&lt;h3 id=&#34;1-value-属性-指定cache名称&#34;&gt;1. value 属性: 指定cache名称
+&lt;/h3&gt;&lt;p&gt;​		value和cacheNames属性作用一样，必须指定其中一个，表示当前方法的返回值是会被缓存在哪个Cache上的，对应Cache的名称。其可以是一个Cache也可以是多个Cache，当需要指定多个Cache时其是一个数组。&lt;/p&gt;
+&lt;p&gt;​		可以将Cache想象为一个HashMap，系统中可以有很多个Cache，每个Cache有一个名字，你需要将方法的返回值放在哪个缓存中，需要通过缓存的名称来指定。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+
+@EnableCaching //@0
+@ComponentScan
+@Configuration
+public class MainConfig1 {
+
+    //@1：缓存管理器
+    @Bean
+    public CacheManager cacheManager() {
+        //创建缓存管理器(ConcurrentMapCacheManager：其内部使用ConcurrentMap实现的)，构造器用来指定缓存的名称，可以指定多个
+        ConcurrentMapCacheManager cacheManager = new ConcurrentMapCacheManager(&amp;quot;cache1&amp;quot;);
+        return cacheManager;
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;缓存管理器，类型为&lt;code&gt;CacheManager&lt;/code&gt;，&lt;code&gt;CacheManager&lt;/code&gt;这个是个接口，有好几个实现（比如使用redis、ConcurrentMap来存储缓存信息），此处我们使用&lt;code&gt;ConcurrentMapCacheManager&lt;/code&gt;，内部使用ConcurrentHashMap将缓存信息直接存储在本地jvm内存中，不过线上环境一般是集群的方式，可以通过redis实现&lt;/p&gt;
+&lt;h3 id=&#34;2-key-属性-自定义key&#34;&gt;2. key 属性: 自定义key
+&lt;/h3&gt;&lt;p&gt;​	key属性用来指定Spring缓存方法的返回结果时对应的key的，上面说了你可以将Cache理解为一个hashMap，缓存以key-&amp;gt;value的形式存储在hashmap中，value就是需要缓存值（即方法的返回值）&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;属性名称&lt;/th&gt;
+          &lt;th&gt;描述&lt;/th&gt;
+          &lt;th&gt;实例&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;methodName&lt;/td&gt;
+          &lt;td&gt;当前方法名&lt;/td&gt;
+          &lt;td&gt;#root.methodName&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;method&lt;/td&gt;
+          &lt;td&gt;当前方法&lt;/td&gt;
+          &lt;td&gt;#root.method,name&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;target&lt;/td&gt;
+          &lt;td&gt;当前被调用的对象&lt;/td&gt;
+          &lt;td&gt;#root.targetClass&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;args&lt;/td&gt;
+          &lt;td&gt;当前方法参数组成的数组&lt;/td&gt;
+          &lt;td&gt;#root.args[0]&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;caches&lt;/td&gt;
+          &lt;td&gt;当前被调用方法使用的cache&lt;/td&gt;
+          &lt;td&gt;#root.caches[0].name&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h1 id=&#34;2-问题&#34;&gt;2. 问题
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;如果项目重启, 那么会对redis 缓存有影响吗? 重新请求接口走的是缓存吗?    有影响, 不走缓存&lt;/li&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;3-demo&#34;&gt;3. demo
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;开启@EnableCaching 注解&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;==注入 cacheManager bean==&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;@Bean
+    public CacheManager cacheManager(RedisTemplate redisTemplate) {
+        // 1. 非锁方式：nonLockingRedisCacheWriter(RedisConnectionFactory connectionFactory);
+        //    有锁方式：lockingRedisCacheWriter(RedisConnectionFactory connectionFactory);
+
+        RedisCacheWriter redisCacheWriter = RedisCacheWriter
+                .nonLockingRedisCacheWriter(Objects.requireNonNull(redisTemplate.getConnectionFactory()));
+
+        //2.创建Jackson对象并传入需要序列化的对象
+        Jackson2JsonRedisSerializer&amp;lt;Object&amp;gt; serializer = new Jackson2JsonRedisSerializer&amp;lt;&amp;gt;(Object.class);
+        ObjectMapper om = new ObjectMapper();
+        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        om.activateDefaultTyping(om.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.WRAPPER_ARRAY);
+        serializer.setObjectMapper(om);
+
+        //3.传入 Jackson对象 并获取 RedisSerializationContext对象
+        RedisSerializationContext&amp;lt;Object, Object&amp;gt; serializationContext = RedisSerializationContext.fromSerializer(serializer);
+
+        //4.配置RedisCacheConfiguration
+        /*
+         * RedisCacheConfiguration.defaultCacheConfig()
+         * 设置 value 的序列化 serializeValuesWit(SerializationPari&amp;lt;?&amp;gt; valueSerializationPari)
+         * 设置 key 的序列化 serializeKeysWith(SerializationPari valueSerializationPari)
+         */
+        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofDays(1L))
+                .serializeValuesWith(serializationContext.getValueSerializationPair());
+
+        //5.创建RedisCacheManager(RedisCacheWriter redisCacheWriter, RedisCacheConfiguration redisCacheConfiguration)对象并返回
+        return new RedisCacheManager(redisCacheWriter, redisCacheConfiguration);
+
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;使用&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Cacheable(cacheNames = {&amp;quot;zxipr&amp;quot;}, key = &amp;quot;#root.methodName&amp;quot;, cacheManager = &amp;quot;cacheManager&amp;quot;)
+public List&amp;lt;PatentTrademarkApplyCountEntity&amp;gt; listPatentTrademarkApplyTimeTrend(){}
+
+@Cacheable(cacheNames = {&amp;quot;zxipr:trademark&amp;quot;}, key = &amp;quot;#root.methodName&amp;quot;, cacheManager = &amp;quot;cacheManager&amp;quot;)
+public TrademarkCountEntity countTrademarks() {}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        <item>
+        <title>Spring_面试题</title>
+        <link>https://mikeLing-qx.github.io/p/spring_%E9%9D%A2%E8%AF%95%E9%A2%98/</link>
+        <pubDate>Sun, 26 Jan 2020 15:09:30 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/spring_%E9%9D%A2%E8%AF%95%E9%A2%98/</guid>
+        <description>&lt;p&gt;69道Spring面试题和答案&lt;/p&gt;
+&lt;h2 id=&#34;spring-概述&#34;&gt;&lt;strong&gt;Spring 概述&lt;/strong&gt;
+&lt;/h2&gt;&lt;h3 id=&#34;1-什么是spring&#34;&gt;&lt;strong&gt;1. 什么是spring?&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;Spring 是个java企业级应用的开源开发框架。Spring主要用来开发Java应用，但是有些扩展是针对构建J2EE平台的web应用。Spring 框架目标是简化Java企业级应用开发，并通过POJO为基础的编程模型促进良好的编程习惯。&lt;/p&gt;
+&lt;h3 id=&#34;2-使用spring框架的好处是什么&#34;&gt;&lt;strong&gt;2. 使用Spring框架的好处是什么？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;**轻量：**Spring 是轻量的，基本的版本大约2MB。&lt;/p&gt;
+&lt;p&gt;**控制反转：**Spring通过控制反转实现了松散耦合，对象们给出它们的依赖，而不是创建或查找依赖的对象们。&lt;/p&gt;
+&lt;p&gt;**面向切面的编程(AOP)：**Spring支持面向切面的编程，并且把应用业务逻辑和系统服务分开。&lt;/p&gt;
+&lt;p&gt;**容器：**Spring 包含并管理应用中对象的生命周期和配置。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;MVC框架&lt;/strong&gt;：Spring的WEB框架是个精心设计的框架，是Web框架的一个很好的替代品。&lt;/p&gt;
+&lt;p&gt;**事务管理：**Spring 提供一个持续的事务管理接口，可以扩展到上至本地事务下至全局事务（JTA）。&lt;/p&gt;
+&lt;p&gt;**异常处理：**Spring 提供方便的API把具体技术相关的异常（比如由JDBC，Hibernate or JDO抛出的）转化为一致的unchecked 异常。&lt;/p&gt;
+&lt;h3 id=&#34;3-spring由哪些模块组成&#34;&gt;&lt;strong&gt;3. Spring由哪些模块组成?&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;以下是Spring 框架的基本模块：&lt;/p&gt;
+&lt;p&gt;Core module&lt;/p&gt;
+&lt;p&gt;Bean module&lt;/p&gt;
+&lt;p&gt;Context module&lt;/p&gt;
+&lt;p&gt;Expression Language module&lt;/p&gt;
+&lt;p&gt;JDBC module&lt;/p&gt;
+&lt;p&gt;ORM module&lt;/p&gt;
+&lt;p&gt;OXM module&lt;/p&gt;
+&lt;p&gt;Java Messaging Service(JMS) module&lt;/p&gt;
+&lt;p&gt;Transaction module&lt;/p&gt;
+&lt;p&gt;Web module&lt;/p&gt;
+&lt;p&gt;Web-Servlet module&lt;/p&gt;
+&lt;p&gt;Web-Struts module&lt;/p&gt;
+&lt;p&gt;Web-Portlet module&lt;/p&gt;
+&lt;h3 id=&#34;4-核心容器应用上下文-模块&#34;&gt;&lt;strong&gt;4. 核心容器（应用上下文) 模块。&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;这是基本的Spring模块，提供spring 框架的基础功能，BeanFactory 是 任何以spring为基础的应用的核心。Spring 框架建立在此模块之上，它使Spring成为一个容器。&lt;/p&gt;
+&lt;h3 id=&#34;5-beanfactory--beanfactory-实现举例&#34;&gt;&lt;strong&gt;5. BeanFactory – BeanFactory 实现举例。&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;Bean 工厂是工厂模式的一个实现，提供了控制反转功能，用来把应用的配置和依赖从正真的应用代码中分离。&lt;/p&gt;
+&lt;p&gt;最常用的BeanFactory 实现是XmlBeanFactory 类。&lt;/p&gt;
+&lt;h3 id=&#34;6-xmlbeanfactory&#34;&gt;&lt;strong&gt;6. XMLBeanFactory&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;最常用的就是org.springframework.beans.factory.xml.XmlBeanFactory ，它根据XML文件中的定义加载beans。该容器从XML 文件读取配置元数据并用它去创建一个完全配置的系统或应用。&lt;/p&gt;
+&lt;h3 id=&#34;7-解释aop模块&#34;&gt;&lt;strong&gt;7. 解释AOP模块&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;AOP模块用于发给我们的Spring应用做面向切面的开发， 很多支持由AOP联盟提供，这样就确保了Spring和其他AOP框架的共通性。这个模块将元数据编程引入Spring。&lt;/p&gt;
+&lt;h3 id=&#34;8-解释jdbc抽象和dao模块&#34;&gt;&lt;strong&gt;8. 解释JDBC抽象和DAO模块。&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;通过使用JDBC抽象和DAO模块，保证数据库代码的简洁，并能避免数据库资源错误关闭导致的问题，它在各种不同的数据库的错误信息之上，提供了一个统一的异常访问层。它还利用Spring的AOP 模块给Spring应用中的对象提供事务管理服务。&lt;/p&gt;
+&lt;h3 id=&#34;9-解释对象关系映射集成模块&#34;&gt;&lt;strong&gt;9. 解释对象/关系映射集成模块。&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;Spring 通过提供ORM模块，支持我们在直接JDBC之上使用一个对象/关系映射映射(ORM)工具，Spring 支持集成主流的ORM框架，如Hiberate,JDO和 iBATIS SQL Maps。Spring的事务管理同样支持以上所有ORM框架及JDBC。&lt;/p&gt;
+&lt;h3 id=&#34;10-解释web-模块&#34;&gt;&lt;strong&gt;10. 解释WEB 模块。&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;Spring的WEB模块是构建在application context 模块基础之上，提供一个适合web应用的上下文。这个模块也包括支持多种面向web的任务，如透明地处理多个文件上传请求和程序级请求参数的绑定到你的业务对象。它也有对Jakarta Struts的支持。&lt;/p&gt;
+&lt;h3 id=&#34;12-spring配置文件&#34;&gt;&lt;strong&gt;12. Spring配置文件&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;Spring配置文件是个XML 文件，这个文件包含了类信息，描述了如何配置它们，以及如何相互调用。&lt;/p&gt;
+&lt;h3 id=&#34;13-什么是spring-ioc-容器&#34;&gt;&lt;strong&gt;13. 什么是Spring IOC 容器？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;Spring IOC 负责创建对象，管理对象（通过依赖注入（DI），装配对象，配置对象，并且管理这些对象的整个生命周期。&lt;/p&gt;
+&lt;h3 id=&#34;14-ioc的优点是什么&#34;&gt;&lt;strong&gt;14. IOC的优点是什么？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;IOC 或 依赖注入把应用的代码量降到最低。它使应用容易测试，单元测试不再需要单例和JNDI查找机制。最小的代价和最小的侵入性使松散耦合得以实现。IOC容器支持加载服务时的饿汉式初始化和懒加载。&lt;/p&gt;
+&lt;h3 id=&#34;15-applicationcontext通常的实现是什么&#34;&gt;&lt;strong&gt;15. ApplicationContext通常的实现是什么?&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;**FileSystemXmlApplicationContext ：**此容器从一个XML文件中加载beans的定义，XML Bean 配置文件的全路径名必须提供给它的构造函数。&lt;/p&gt;
+&lt;p&gt;**ClassPathXmlApplicationContext：**此容器也从一个XML文件中加载beans的定义，这里，你需要正确设置classpath因为这个容器将在classpath里找bean配置。&lt;/p&gt;
+&lt;p&gt;**WebXmlApplicationContext：**此容器加载一个XML文件，此文件定义了一个WEB应用的所有bean。&lt;/p&gt;
+&lt;h3 id=&#34;16-bean-工厂和-application-contexts-有什么区别&#34;&gt;&lt;strong&gt;16. Bean 工厂和 Application contexts 有什么区别？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;Application contexts提供一种方法处理文本消息，一个通常的做法是加载文件资源（比如镜像），它们可以向注册为监听器的bean发布事件。另外，在容器或容器内的对象上执行的那些不得不由bean工厂以程序化方式处理的操作，可以在Application contexts中以声明的方式处理。Application contexts实现了MessageSource接口，该接口的实现以可插拔的方式提供获取本地化消息的方法。&lt;/p&gt;
+&lt;h3 id=&#34;17-一个spring的应用看起来象什么&#34;&gt;&lt;strong&gt;17. 一个Spring的应用看起来象什么？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;一个定义了一些功能的接口。&lt;/p&gt;
+&lt;p&gt;这实现包括属性，它的Setter ， getter 方法和函数等。&lt;/p&gt;
+&lt;p&gt;Spring AOP。&lt;/p&gt;
+&lt;p&gt;Spring 的XML 配置文件。&lt;/p&gt;
+&lt;p&gt;使用以上功能的客户端程序。&lt;/p&gt;
+&lt;h2 id=&#34;依赖注入&#34;&gt;&lt;strong&gt;依赖注入&lt;/strong&gt;
+&lt;/h2&gt;&lt;h3 id=&#34;18-什么是spring的依赖注入&#34;&gt;&lt;strong&gt;18. 什么是Spring的依赖注入？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;依赖注入，是IOC的一个方面，是个通常的概念，它有多种解释。这概念是说你不用创建对象，而只需要描述它如何被创建。你不在代码里直接组装你的组件和服务，但是要在配置文件里描述哪些组件需要哪些服务，之后一个容器（IOC容器）负责把他们组装起来。&lt;/p&gt;
+&lt;h3 id=&#34;19-有哪些不同类型的ioc依赖注入方式&#34;&gt;&lt;strong&gt;19. 有哪些不同类型的IOC（依赖注入）方式？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;**构造器依赖注入：**构造器依赖注入通过容器触发一个类的构造器来实现的，该类有一系列参数，每个参数代表一个对其他类的依赖。&lt;/p&gt;
+&lt;p&gt;**Setter方法注入：**Setter方法注入是容器通过调用无参构造器或无参static工厂 方法实例化bean之后，调用该bean的setter方法，即实现了基于setter的依赖注入。&lt;/p&gt;
+&lt;h3 id=&#34;20-哪种依赖注入方式你建议使用构造器注入还是-setter方法注入&#34;&gt;&lt;strong&gt;20. 哪种依赖注入方式你建议使用，构造器注入，还是 Setter方法注入？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;你两种依赖方式都可以使用，构造器注入和Setter方法注入。最好的解决方案是用构造器参数实现强制依赖，setter方法实现可选依赖。&lt;/p&gt;
+&lt;h2 id=&#34;spring-beans&#34;&gt;&lt;strong&gt;Spring Beans&lt;/strong&gt;
+&lt;/h2&gt;&lt;h3 id=&#34;21什么是spring-beans&#34;&gt;&lt;strong&gt;21.什么是Spring beans?&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;Spring beans 是那些形成Spring应用的主干的java对象。它们被Spring IOC容器初始化，装配，和管理。这些beans通过容器中配置的元数据创建。比如，以XML文件中&lt;bean/&gt; 的形式定义。&lt;/p&gt;
+&lt;p&gt;Spring 框架定义的beans都是单件beans。在bean tag中有个属性”singleton”，如果它被赋为TRUE，bean 就是单件，否则就是一个 prototype bean。默认是TRUE，所以所有在Spring框架中的beans 缺省都是单件。&lt;/p&gt;
+&lt;h3 id=&#34;22-一个-spring-bean-定义-包含什么&#34;&gt;&lt;strong&gt;22. 一个 Spring Bean 定义 包含什么？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;一个Spring Bean 的定义包含容器必知的所有配置元数据，包括如何创建一个bean，它的生命周期详情及它的依赖。&lt;/p&gt;
+&lt;h3 id=&#34;23-如何给spring-容器提供配置元数据&#34;&gt;&lt;strong&gt;23. 如何给Spring 容器提供配置元数据?&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;这里有三种重要的方法给Spring 容器提供配置元数据。&lt;/p&gt;
+&lt;p&gt;XML配置文件。&lt;/p&gt;
+&lt;p&gt;基于注解的配置。&lt;/p&gt;
+&lt;p&gt;基于java的配置。&lt;/p&gt;
+&lt;h3 id=&#34;24-你怎样定义类的作用域&#34;&gt;&lt;strong&gt;24. 你怎样定义类的作用域?&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;当定义一个&lt;bean&gt; 在Spring里，我们还能给这个bean声明一个作用域。它可以通过bean 定义中的scope属性来定义。如，当Spring要在需要的时候每次生产一个新的bean实例，bean的scope属性被指定为prototype。另一方面，一个bean每次使用的时候必须返回同一个实例，这个bean的scope 属性 必须设为 singleton。&lt;/p&gt;
+&lt;h3 id=&#34;25-解释spring支持的几种bean的作用域&#34;&gt;&lt;strong&gt;25. 解释Spring支持的几种bean的作用域。&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;Spring框架支持以下五种bean的作用域：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;singleton :&lt;/strong&gt; bean在每个Spring ioc 容器中只有一个实例。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;prototype&lt;/strong&gt;：一个bean的定义可以有多个实例。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;request&lt;/strong&gt;：每次http请求都会创建一个bean，该作用域仅在基于web的Spring ApplicationContext情形下有效。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;session&lt;/strong&gt;：在一个HTTP Session中，一个bean定义对应一个实例。该作用域仅在基于web的Spring ApplicationContext情形下有效。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;global-session&lt;/strong&gt;：在一个全局的HTTP Session中，一个bean定义对应一个实例。该作用域仅在基于web的Spring ApplicationContext情形下有效。&lt;/p&gt;
+&lt;p&gt;缺省的Spring bean 的作用域是Singleton.&lt;/p&gt;
+&lt;h3 id=&#34;26-spring框架中的单例bean是线程安全的吗&#34;&gt;&lt;strong&gt;26. Spring框架中的单例bean是线程安全的吗?&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;不，Spring框架中的单例bean不是线程安全的。&lt;/p&gt;
+&lt;h3 id=&#34;27-解释spring框架中bean的生命周期&#34;&gt;&lt;strong&gt;27. 解释Spring框架中bean的生命周期。&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;Spring容器 从XML 文件中读取bean的定义，并实例化bean。&lt;/p&gt;
+&lt;p&gt;Spring根据bean的定义填充所有的属性。&lt;/p&gt;
+&lt;p&gt;如果bean实现了BeanNameAware 接口，Spring 传递bean 的ID 到 setBeanName方法。&lt;/p&gt;
+&lt;p&gt;如果Bean 实现了 BeanFactoryAware 接口， Spring传递beanfactory 给setBeanFactory 方法。&lt;/p&gt;
+&lt;p&gt;如果有任何与bean相关联的BeanPostProcessors，Spring会在postProcesserBeforeInitialization()方法内调用它们。&lt;/p&gt;
+&lt;p&gt;如果bean实现IntializingBean了，调用它的afterPropertySet方法，如果bean声明了初始化方法，调用此初始化方法。&lt;/p&gt;
+&lt;p&gt;如果有BeanPostProcessors 和bean 关联，这些bean的postProcessAfterInitialization() 方法将被调用。&lt;/p&gt;
+&lt;p&gt;如果bean实现了 DisposableBean，它将调用destroy()方法。&lt;/p&gt;
+&lt;h3 id=&#34;28-哪些是重要的bean生命周期方法-你能重载它们吗&#34;&gt;&lt;strong&gt;28. 哪些是重要的bean生命周期方法？ 你能重载它们吗？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;有两个重要的bean 生命周期方法，第一个是setup ， 它是在容器加载bean的时候被调用。第二个方法是 teardown 它是在容器卸载类的时候被调用。&lt;/p&gt;
+&lt;p&gt;The bean 标签有两个重要的属性（init-method和destroy-method）。用它们你可以自己定制初始化和注销方法。它们也有相应的注解（@PostConstruct和@PreDestroy）。&lt;/p&gt;
+&lt;h3 id=&#34;29-什么是spring的内部bean&#34;&gt;&lt;strong&gt;29. 什么是Spring的内部bean？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;当一个bean仅被用作另一个bean的属性时，它能被声明为一个内部bean，为了定义inner bean，在Spring 的 基于XML的 配置元数据中，可以在 &lt;property/&gt;或 &lt;constructor-arg/&gt; 元素内使用&lt;bean/&gt; 元素，内部bean通常是匿名的，它们的Scope一般是prototype。&lt;/p&gt;
+&lt;h3 id=&#34;30-在-spring中如何注入一个java集合&#34;&gt;&lt;strong&gt;30. 在 Spring中如何注入一个java集合？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;Spring提供以下几种集合的配置元素：&lt;/p&gt;
+&lt;p&gt;&lt;list&gt;类型用于注入一列值，允许有相同的值。&lt;/p&gt;
+&lt;p&gt;&lt;set&gt; 类型用于注入一组值，不允许有相同的值。&lt;/p&gt;
+&lt;p&gt;&lt;map&gt; 类型用于注入一组键值对，键和值都可以为任意类型。&lt;/p&gt;
+&lt;p&gt;&lt;props&gt;类型用于注入一组键值对，键和值都只能为String类型。&lt;/p&gt;
+&lt;h3 id=&#34;31-什么是bean装配&#34;&gt;&lt;strong&gt;31. 什么是bean装配?&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;装配，或bean 装配是指在Spring 容器中把bean组装到一起，前提是容器需要知道bean的依赖关系，如何通过依赖注入来把它们装配到一起。&lt;/p&gt;
+&lt;h3 id=&#34;32-什么是bean的自动装配&#34;&gt;&lt;strong&gt;32. 什么是bean的自动装配？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;Spring 容器能够自动装配相互合作的bean，这意味着容器不需要&lt;constructor-arg&gt;和&lt;property&gt;配置，能通过Bean工厂自动处理bean之间的协作。&lt;/p&gt;
+&lt;h3 id=&#34;33-解释不同方式的自动装配-&#34;&gt;&lt;strong&gt;33. 解释不同方式的自动装配 。&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;有五种自动装配的方式，可以用来指导Spring容器用自动装配方式来进行依赖注入。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;no&lt;/strong&gt;：默认的方式是不进行自动装配，通过显式设置ref 属性来进行装配。&lt;/p&gt;
+&lt;p&gt;**byName：**通过参数名 自动装配，Spring容器在配置文件中发现bean的autowire属性被设置成byname，之后容器试图匹配、装配和该bean的属性具有相同名字的bean。&lt;/p&gt;
+&lt;p&gt;**byType:：**通过参数类型自动装配，Spring容器在配置文件中发现bean的autowire属性被设置成byType，之后容器试图匹配、装配和该bean的属性具有相同类型的bean。如果有多个bean符合条件，则抛出错误。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;constructor：这个方式类似于&lt;/strong&gt;byType， 但是要提供给构造器参数，如果没有确定的带参数的构造器参数类型，将会抛出异常。&lt;/p&gt;
+&lt;p&gt;**autodetect：**首先尝试使用constructor来自动装配，如果无法工作，则使用byType方式。&lt;/p&gt;
+&lt;h3 id=&#34;34自动装配有哪些局限性-&#34;&gt;&lt;strong&gt;34.自动装配有哪些局限性 ?&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;自动装配的局限性是：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;重写&lt;/strong&gt;： 你仍需用 &lt;constructor-arg&gt;和 &lt;property&gt; 配置来定义依赖，意味着总要重写自动装配。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;基本数据类型&lt;/strong&gt;：你不能自动装配简单的属性，如基本数据类型，String字符串，和类。&lt;/p&gt;
+&lt;p&gt;**模糊特性：**自动装配不如显式装配精确，如果有可能，建议使用显式装配。&lt;/p&gt;
+&lt;h3 id=&#34;35-你可以在spring中注入一个null-和一个空字符串吗&#34;&gt;&lt;strong&gt;35. 你可以在Spring中注入一个null 和一个空字符串吗？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;可以。&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id=&#34;spring注解&#34;&gt;&lt;strong&gt;Spring注解&lt;/strong&gt;
+&lt;/h2&gt;&lt;h3 id=&#34;36-什么是基于java的spring注解配置-给一些注解的例子&#34;&gt;&lt;strong&gt;36. 什么是基于Java的Spring注解配置? 给一些注解的例子.&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;基于Java的配置，允许你在少量的Java注解的帮助下，进行你的大部分Spring配置而非通过XML文件。&lt;/p&gt;
+&lt;p&gt;以@Configuration 注解为例，它用来标记类可以当做一个bean的定义，被Spring IOC容器使用。另一个例子是@Bean注解，它表示此方法将要返回一个对象，作为一个bean注册进Spring应用上下文。&lt;/p&gt;
+&lt;h3 id=&#34;37-什么是基于注解的容器配置&#34;&gt;&lt;strong&gt;37. 什么是基于注解的容器配置?&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;相对于XML文件，注解型的配置依赖于通过字节码元数据装配组件，而非尖括号的声明。&lt;/p&gt;
+&lt;p&gt;开发者通过在相应的类，方法或属性上使用注解的方式，直接组件类中进行配置，而不是使用xml表述bean的装配关系。&lt;/p&gt;
+&lt;h3 id=&#34;38-怎样开启注解装配&#34;&gt;&lt;strong&gt;38. 怎样开启注解装配？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;注解装配在默认情况下是不开启的，为了使用注解装配，我们必须在Spring配置文件中配置 &lt;a class=&#34;link&#34; href=&#34;context:annotation-config/&#34; &gt;context:annotation-config/&lt;/a&gt;元素。&lt;/p&gt;
+&lt;h3 id=&#34;39-required-注解&#34;&gt;&lt;strong&gt;39. @Required 注解&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;这个注解表明bean的属性必须在配置的时候设置，通过一个bean定义的显式的属性值或通过自动装配，若@Required注解的bean属性未被设置，容器将抛出BeanInitializationException。&lt;/p&gt;
+&lt;h3 id=&#34;40-autowired-注解&#34;&gt;&lt;strong&gt;40. @Autowired 注解&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;@Autowired 注解提供了更细粒度的控制，包括在何处以及如何完成自动装配。它的用法和@Required一样，修饰setter方法、构造器、属性或者具有任意名称和/或多个参数的PN方法。&lt;/p&gt;
+&lt;h3 id=&#34;41-qualifier-注解&#34;&gt;&lt;strong&gt;41. @Qualifier 注解&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;当有多个相同类型的bean却只有一个需要自动装配时，将@Qualifier 注解和@Autowire 注解结合使用以消除这种混淆，指定需要装配的确切的bean。&lt;/p&gt;
+&lt;h2 id=&#34;spring数据访问&#34;&gt;&lt;strong&gt;Spring数据访问&lt;/strong&gt;
+&lt;/h2&gt;&lt;h3 id=&#34;42在spring框架中如何更有效地使用jdbc&#34;&gt;&lt;strong&gt;42.在Spring框架中如何更有效地使用JDBC?&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;使用SpringJDBC 框架，资源管理和错误处理的代价都会被减轻。所以开发者只需写statements 和 queries从数据存取数据，JDBC也可以在Spring框架提供的模板类的帮助下更有效地被使用，这个模板叫JdbcTemplate （例子见这里&lt;a class=&#34;link&#34; href=&#34;http://examples.javacodegeeks.com/enterprise-java/spring/jdbc/spring-jdbctemplate-example/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;here&lt;/a&gt;）&lt;/p&gt;
+&lt;h3 id=&#34;43-jdbctemplate&#34;&gt;&lt;strong&gt;43. JdbcTemplate&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;JdbcTemplate 类提供了很多便利的方法解决诸如把数据库数据转变成基本数据类型或对象，执行写好的或可调用的数据库操作语句，提供自定义的数据错误处理。&lt;/p&gt;
+&lt;h3 id=&#34;44-spring对dao的支持&#34;&gt;&lt;strong&gt;44. Spring对DAO的支持&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;Spring对数据访问对象（DAO）的支持旨在简化它和数据访问技术如JDBC，Hibernate or JDO 结合使用。这使我们可以方便切换持久层。编码时也不用担心会捕获每种技术特有的异常。&lt;/p&gt;
+&lt;h3 id=&#34;45-使用spring通过什么方式访问hibernate&#34;&gt;&lt;strong&gt;45. 使用Spring通过什么方式访问Hibernate?&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;在Spring中有两种方式访问Hibernate：&lt;/p&gt;
+&lt;p&gt;控制反转 Hibernate Template和 Callback。&lt;/p&gt;
+&lt;p&gt;继承 HibernateDAOSupport提供一个AOP 拦截器。&lt;/p&gt;
+&lt;h3 id=&#34;46-spring支持的orm&#34;&gt;&lt;strong&gt;46. Spring支持的ORM&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;Spring支持以下ORM：&lt;/p&gt;
+&lt;p&gt;Hibernate&lt;/p&gt;
+&lt;p&gt;iBatis&lt;/p&gt;
+&lt;p&gt;JPA (Java Persistence API)&lt;/p&gt;
+&lt;p&gt;TopLink&lt;/p&gt;
+&lt;p&gt;JDO (Java Data Objects)&lt;/p&gt;
+&lt;p&gt;OJB&lt;/p&gt;
+&lt;h3 id=&#34;47如何通过hibernatedaosupport将spring和hibernate结合起来&#34;&gt;&lt;strong&gt;47.如何通过HibernateDaoSupport将Spring和Hibernate结合起来？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;用Spring的 SessionFactory 调用 LocalSessionFactory。集成过程分三步：&lt;/p&gt;
+&lt;p&gt;配置the Hibernate SessionFactory。&lt;/p&gt;
+&lt;p&gt;继承HibernateDaoSupport实现一个DAO。&lt;/p&gt;
+&lt;p&gt;在AOP支持的事务中装配。&lt;/p&gt;
+&lt;h3 id=&#34;48-spring支持的事务管理类型&#34;&gt;&lt;strong&gt;48. Spring支持的事务管理类型&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;Spring支持两种类型的事务管理：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;编程式事务管理&lt;/strong&gt;：这意味你通过编程的方式管理事务，给你带来极大的灵活性，但是难维护。&lt;/p&gt;
+&lt;p&gt;**声明式事务管理：**这意味着你可以将业务代码和事务管理分离，你只需用注解和XML配置来管理事务。&lt;/p&gt;
+&lt;h3 id=&#34;49-spring框架的事务管理有哪些优点&#34;&gt;&lt;strong&gt;49. Spring框架的事务管理有哪些优点？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;它为不同的事务API 如 JTA，JDBC，Hibernate，JPA 和JDO，提供一个不变的编程模式。&lt;/p&gt;
+&lt;p&gt;它为编程式事务管理提供了一套简单的API而不是一些复杂的事务API如&lt;/p&gt;
+&lt;p&gt;它支持声明式事务管理。&lt;/p&gt;
+&lt;p&gt;它和Spring各种数据访问抽象层很好得集成。&lt;/p&gt;
+&lt;h3 id=&#34;50-你更倾向用那种事务管理类型&#34;&gt;&lt;strong&gt;50. 你更倾向用那种事务管理类型？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;大多数Spring框架的用户选择声明式事务管理，因为它对应用代码的影响最小，因此更符合一个无侵入的轻量级容器的思想。声明式事务管理要优于编程式事务管理，虽然比编程式事务管理（这种方式允许你通过代码控制事务）少了一点灵活性。&lt;/p&gt;
+&lt;h2 id=&#34;spring面向切面编程aop&#34;&gt;&lt;strong&gt;Spring面向切面编程（AOP）&lt;/strong&gt;
+&lt;/h2&gt;&lt;h3 id=&#34;51-解释aop&#34;&gt;&lt;strong&gt;51. 解释AOP&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;面向切面的编程，或AOP， 是一种编程技术，允许程序模块化横向切割关注点，或横切典型的责任划分，如日志和事务管理。&lt;/p&gt;
+&lt;h3 id=&#34;52-aspect-切面&#34;&gt;&lt;strong&gt;52. Aspect 切面&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;AOP核心就是切面，它将多个类的通用行为封装成可重用的模块，该模块含有一组API提供横切功能。比如，一个日志模块可以被称作日志的AOP切面。根据需求的不同，一个应用程序可以有若干切面。&lt;strong&gt;在Spring AOP中，切面通过带有@Aspect注解的类实现&lt;/strong&gt;。&lt;/p&gt;
+&lt;h3 id=&#34;52-在spring-aop-中关注点和横切关注的区别是什么&#34;&gt;&lt;strong&gt;52. 在Spring AOP 中，关注点和横切关注的区别是什么？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;关注点是应用中一个模块的行为，一个关注点可能会被定义成一个我们想实现的一个功能。
+横切关注点是一个关注点，此关注点是整个应用都会使用的功能，并影响整个应用，比如日志，安全和数据传输，几乎应用的每个模块都需要的功能。因此这些都属于横切关注点。&lt;/p&gt;
+&lt;h3 id=&#34;54-连接点&#34;&gt;&lt;strong&gt;54. 连接点&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;连接点代表一个应用程序的某个位置，在这个位置我们可以插入一个AOP切面，它实际上是个应用程序执行Spring AOP的位置。&lt;/p&gt;
+&lt;h3 id=&#34;55-通知&#34;&gt;&lt;strong&gt;55. 通知&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;通知是个在方法执行前或执行后要做的动作，实际上是程序执行时要通过SpringAOP框架触发的代码段。&lt;/p&gt;
+&lt;p&gt;Spring切面可以应用五种类型的通知：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;before&lt;/strong&gt;：前置通知，在一个方法执行前被调用。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;after:&lt;/strong&gt; 在方法执行之后调用的通知，无论方法执行是否成功。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;after-returning:&lt;/strong&gt; 仅当方法成功完成后执行的通知。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;after-throwing:&lt;/strong&gt; 在方法抛出异常退出时执行的通知。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;around:&lt;/strong&gt; 在方法执行之前和之后调用的通知。&lt;/p&gt;
+&lt;h3 id=&#34;56-切点&#34;&gt;&lt;strong&gt;56. 切点&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;切入点是一个或一组连接点，通知将在这些位置执行。可以通过表达式或匹配的方式指明切入点。&lt;/p&gt;
+&lt;h3 id=&#34;57-什么是引入&#34;&gt;&lt;strong&gt;57. 什么是引入?&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;引入允许我们在已存在的类中增加新的方法和属性。&lt;/p&gt;
+&lt;h3 id=&#34;58-什么是目标对象&#34;&gt;&lt;strong&gt;58. 什么是目标对象?&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;被一个或者多个切面所通知的对象。它通常是一个代理对象。也指被通知（advised）对象。&lt;/p&gt;
+&lt;h3 id=&#34;59-什么是代理&#34;&gt;&lt;strong&gt;59. 什么是代理?&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;代理是通知目标对象后创建的对象。从客户端的角度看，代理对象和目标对象是一样的。&lt;/p&gt;
+&lt;h3 id=&#34;60-有几种不同类型的自动代理&#34;&gt;&lt;strong&gt;60. 有几种不同类型的自动代理？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;BeanNameAutoProxyCreator&lt;/p&gt;
+&lt;p&gt;DefaultAdvisorAutoProxyCreator&lt;/p&gt;
+&lt;p&gt;Metadata autoproxying&lt;/p&gt;
+&lt;h3 id=&#34;61-什么是织入什么是织入应用的不同点&#34;&gt;&lt;strong&gt;61. 什么是织入。什么是织入应用的不同点？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;织入是将切面和到其他应用类型或对象连接或创建一个被通知对象的过程。&lt;/p&gt;
+&lt;p&gt;织入可以在编译时，加载时，或运行时完成。&lt;/p&gt;
+&lt;h3 id=&#34;62-解释基于xml-schema方式的切面实现&#34;&gt;&lt;strong&gt;62. 解释基于XML Schema方式的切面实现。&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;在这种情况下，切面由常规类以及基于XML的配置实现。&lt;/p&gt;
+&lt;h3 id=&#34;63-解释基于注解的切面实现&#34;&gt;&lt;strong&gt;63. 解释基于注解的切面实现&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;在这种情况下(基于@AspectJ的实现)，涉及到的切面声明的风格与带有java5标注的普通java类一致。&lt;/p&gt;
+&lt;h2 id=&#34;spring-的mvc&#34;&gt;&lt;strong&gt;Spring 的MVC&lt;/strong&gt;
+&lt;/h2&gt;&lt;h3 id=&#34;64-什么是spring的mvc框架&#34;&gt;&lt;strong&gt;64. 什么是Spring的MVC框架？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;Spring 配备构建Web 应用的全功能MVC框架。Spring可以很便捷地和其他MVC框架集成，如Struts，Spring 的MVC框架用控制反转把业务对象和控制逻辑清晰地隔离。它也允许以声明的方式把请求参数和业务对象绑定。&lt;/p&gt;
+&lt;h3 id=&#34;65-dispatcherservlet&#34;&gt;&lt;strong&gt;65. DispatcherServlet&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;Spring的MVC框架是围绕DispatcherServlet来设计的，它用来处理所有的HTTP请求和响应。&lt;/p&gt;
+&lt;h3 id=&#34;66-webapplicationcontext&#34;&gt;&lt;strong&gt;66. WebApplicationContext&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;WebApplicationContext 继承了ApplicationContext 并增加了一些WEB应用必备的特有功能，它不同于一般的ApplicationContext ，因为它能处理主题，并找到被关联的servlet。&lt;/p&gt;
+&lt;h3 id=&#34;67-什么是spring-mvc框架的控制器&#34;&gt;&lt;strong&gt;67. 什么是Spring MVC框架的控制器？&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;控制器提供一个访问应用程序的行为，此行为通常通过服务接口实现。控制器解析用户输入并将其转换为一个由视图呈现给用户的模型。Spring用一个非常抽象的方式实现了一个控制层，允许用户创建多种用途的控制器。&lt;/p&gt;
+&lt;h3 id=&#34;68-controller-注解&#34;&gt;&lt;strong&gt;68. @Controller 注解&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;该注解表明该类扮演控制器的角色，Spring不需要你继承任何其他控制器基类或引用Servlet API。&lt;/p&gt;
+&lt;h3 id=&#34;69-requestmapping-注解&#34;&gt;&lt;strong&gt;69. @RequestMapping 注解&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;该注解是用来映射一个URL到一个类或一个特定的方处理法上。&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

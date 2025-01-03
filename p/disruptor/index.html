@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="1. 概述 \u200b 传统阻塞的队列使用锁保证线程安全，而锁通过操作系统内核上下文切换实现，会暂停线程去等待 锁，直到锁释放。\n\u200b\t执行这样的上下文切换，会丢失之前保存的数据和指令。由于消费者和生产者之间的速度差异，队 列总是接近满或者空的状态，这种状态会导致高水平的写入争用。\n">
+<title>Disruptor</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/disruptor/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Disruptor">
+<meta property='og:description' content="1. 概述 \u200b 传统阻塞的队列使用锁保证线程安全，而锁通过操作系统内核上下文切换实现，会暂停线程去等待 锁，直到锁释放。\n\u200b\t执行这样的上下文切换，会丢失之前保存的数据和指令。由于消费者和生产者之间的速度差异，队 列总是接近满或者空的状态，这种状态会导致高水平的写入争用。\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/disruptor/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='并发编程' /><meta property='article:published_time' content='2022-03-23T18:14:03&#43;08:00'/><meta property='article:modified_time' content='2022-03-23T18:14:03&#43;08:00'/>
+<meta name="twitter:title" content="Disruptor">
+<meta name="twitter:description" content="1. 概述 \u200b 传统阻塞的队列使用锁保证线程安全，而锁通过操作系统内核上下文切换实现，会暂停线程去等待 锁，直到锁释放。\n\u200b\t执行这样的上下文切换，会丢失之前保存的数据和指令。由于消费者和生产者之间的速度差异，队 列总是接近满或者空的状态，这种状态会导致高水平的写入争用。\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-概述">1. 概述</a></li>
+    <li><a href="#2-核心概念">2. 核心概念</a>
+      <ul>
+        <li><a href="#1-ringbuffer">1. RingBuffer</a></li>
+        <li><a href="#2-sequence">2. Sequence</a></li>
+        <li><a href="#3-sequencer">3. Sequencer</a></li>
+        <li><a href="#4-sequence-barrier">4. <strong>Sequence Barrier</strong></a></li>
+        <li><a href="#5-wait-strategy">5. Wait Strategy</a></li>
+        <li><a href="#6-event">6. Event</a></li>
+        <li><a href="#7-eventhandler">7. EventHandler</a></li>
+        <li><a href="#8-producer">8. Producer</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-disruptor-入门">3. Disruptor 入门</a>
+      <ul>
+        <li><a href="#1-创建事件">1. 创建事件</a></li>
+        <li><a href="#2-定义事件工厂">2. 定义事件工厂</a></li>
+        <li><a href="#3-定义事件处理的-handler">3. 定义事件处理的 handler</a></li>
+        <li><a href="#4-等待策略">4. 等待策略</a></li>
+        <li><a href="#5-启动disruptor">5. 启动Disruptor</a></li>
+        <li><a href="#6--使用translators发布事件">6.  使用Translators发布事件</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-高性能原理">4. 高性能原理</a>
+      <ul>
+        <li><a href="#0-mesi-协议">0. MESI 协议</a></li>
+        <li><a href="#1-缓存行">1. 缓存行</a></li>
+        <li><a href="#2-伪共享">2. 伪共享</a></li>
+        <li><a href="#3-无锁设计">3. 无锁设计</a>
+          <ul>
+            <li><a href="#1-cas-比较与交换">1. CAS 比较与交换</a></li>
+            <li><a href="#2-disruptor-的无锁设计">2. Disruptor 的无锁设计</a></li>
+            <li><a href="#3-环形数组">3. 环形数组</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#5-等待策略">5. 等待策略</a></li>
+    <li><a href="#6-生产和消费模式">6. 生产和消费模式</a>
+      <ul>
+        <li><a href="#1-单生产者生产数据">1. 单生产者生产数据</a></li>
+        <li><a href="#2-多生产者生产数据">2. 多生产者生产数据</a></li>
+        <li><a href="#3-多生产者消费数据">3. 多生产者消费数据</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-高级使用">7. 高级使用</a>
+      <ul>
+        <li><a href="#1-单一写者模式">1. 单一写者模式</a></li>
+        <li><a href="#2-串行消费">2. 串行消费</a></li>
+        <li><a href="#3-菱形消费">3. 菱形消费</a></li>
+        <li><a href="#4-链式并行">4. 链式并行</a></li>
+        <li><a href="#5-相互隔离">5. 相互隔离</a></li>
+        <li><a href="#6-航道模式">6. 航道模式</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" >
+                并发编程
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/disruptor/">Disruptor</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 23, 2022</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 13 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="1-概述">1. 概述
+</h1><p>​    传统阻塞的队列使用锁保证线程安全，而锁通过操作系统内核上下文切换实现，会暂停线程去等待 锁，直到锁释放。</p>
+<p>​	执行这样的上下文切换，会丢失之前保存的数据和指令。由于消费者和生产者之间的速度差异，队 列总是接近满或者空的状态，这种状态会导致高水平的写入争用。</p>
+<p>==传统队列的==</p>
+<p><img src="/p/disruptor/images/image-20240812093605620.png"
+	width="912"
+	height="378"
+	
+	loading="lazy"
+	
+		alt="image-20240812093605620"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="241"
+		data-flex-basis="579px"
+	
+></p>
+<p>Disruptor其实就像一个队列一样，用于在不同的线程之间迁移数据，但是Disruptor也实现了一些</p>
+<p>其他队列没有的特性，如：</p>
+<ul>
+<li>同一个“事件”可以有多个消费者，==消费者之间既可以并行处理，也可以相互依赖形成处理的先后次序==(形成一个依赖图)；</li>
+<li>预分配用于存储事件内容的内存空间；</li>
+<li>针对极高的性能目标而实现的极度优化和无锁的设计；</li>
+</ul>
+<h1 id="2-核心概念">2. 核心概念
+</h1><h2 id="1-ringbuffer">1. RingBuffer
+</h2><p>Disruptor中的数据结构，用于存储生产者生产的数据</p>
+<blockquote>
+<p>环形的缓冲区，曾经 RingBuffer 是 Disruptor 中的最主要的对象，但从3.0版本开始，其职责被简化为仅仅负责对通过 Disruptor 进行交换的数据（事件）进行存储和更新。在一些更高级的应 用场景中，Ring Buffer 可以由用户的自定义实现来完全替代。</p>
+</blockquote>
+<h2 id="2-sequence">2. Sequence
+</h2><p>序号，在Disruptor框架中，任何地方都有序号</p>
+<blockquote>
+<p>==生产者生产的数据放在RingBuffer中的哪个位置，消费者应该消费哪个位置的数据==，RingBuffer中</p>
+<p>的某个位置的数据是什么，这些==都是由这个序号来决定的==。这个序号可以简单的理解为一个AtomicLong</p>
+<p>类型的变量。==其使用了padding的方法去消除缓存的伪共享问题==。</p>
+</blockquote>
+<h2 id="3-sequencer">3. Sequencer
+</h2><p>序号生成器，这个类主要是用来协调生产者的</p>
+<blockquote>
+<p>在生产者生产数据的时候，Sequencer会产生一个可用的序号（Sequence），然后生产者就就知道</p>
+<p>数据放在环形队列的那个位置了。</p>
+<p>==Sequencer是Disruptor的真正核心，此接口有两个实现类 SingleProducerSequencer、 MultiProducerSequencer== ，它们定义在生产者和消费者之间快速、正确地传递数据的并发算法。</p>
+</blockquote>
+<h2 id="4-sequence-barrier">4. <strong>Sequence Barrier</strong>
+</h2><p>序号屏障</p>
+<blockquote>
+<p>我们都知道，消费者在消费数据的时候，需要知道消费哪个位置的数据。消费者总不能自己想取哪</p>
+<p>个数据消费，就取哪个数据消费吧。这个SequencerBarrier起到的就是这样一个“栅栏”般的阻隔作用。</p>
+<p>你消费者想消费数据，得，我告诉你一个序号（Sequence），你去消费那个位置上的数据。要是没有数</p>
+<p>据，就好好等着吧</p>
+</blockquote>
+<h2 id="5-wait-strategy">5. Wait Strategy
+</h2><p>Wait Strategy决定了==一个消费者怎么等待生产者==将事件（Event）放入Disruptor中。</p>
+<blockquote>
+<p>设想一种这样的情景：生产者生产的非常慢，而消费者消费的非常快。那么必然会出现数据不够的</p>
+<p>情况，这个时候消费者怎么进行等待呢？WaitStrategy就是为了解决问题而诞生的。</p>
+</blockquote>
+<h2 id="6-event">6. Event
+</h2><p>​	从生产者到消费者传递的数据叫做Event。它不是一个被 Disruptor 定义的特定类型，而是由</p>
+<p>Disruptor 的使用者定义并指定</p>
+<h2 id="7-eventhandler">7. EventHandler
+</h2><p>​	Disruptor 定义的事件处理接口，由用户实现，用于处理事件，是 Consumer 的真正实现。</p>
+<h2 id="8-producer">8. Producer
+</h2><p>​	即生产者，只是泛指调用 Disruptor 发布事件的用户代码，Disruptor 没有定义特定接口或类型。</p>
+<h1 id="3-disruptor-入门">3. Disruptor 入门
+</h1><p>添加依赖</p>
+<pre><code class="language-xml">&lt;dependency&gt;
+	&lt;groupId&gt;com.lmax&lt;/groupId&gt;
+	&lt;artifactId&gt;disruptor&lt;/artifactId&gt;
+	&lt;version&gt;3.4.2&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<ul>
+<li>Event 事件</li>
+<li>EventFactory 事件工厂</li>
+<li>EventHandler 事件消费者</li>
+<li>wait strategy 等待策略</li>
+</ul>
+<h2 id="1-创建事件">1. 创建事件
+</h2><blockquote>
+<p>首先创建一个 LongEvent 类，这个类将会被放入环形队列中作为消息内容。</p>
+<p>事件(Event)就是通过 Disruptor 进行交换的数据类型。</p>
+</blockquote>
+<pre><code class="language-java">public class LongEvent {
+    private long value;
+
+    public void set(long value) {
+        this.value = value;
+    }
+
+    public long getValue() {
+        return value;
+    }
+
+}
+</code></pre>
+<h2 id="2-定义事件工厂">2. 定义事件工厂
+</h2><p>==为了使用Disruptor的内存预分配event，我们需要定义一个EventFactory==</p>
+<ul>
+<li>
+<p>事件工厂(Event Factory)定义了==如何实例化前面第1步中定义的事件(Event)==，需要实现接口 com.lmax.disruptor.EventFactory<T>。</p>
+</li>
+<li>
+<p>Disruptor 通过 EventFactory 在 RingBuffer 中预创建 Event 的实例。</p>
+</li>
+<li>
+<p>一个 Event 实例实际上被用作一个“数据槽”，发布者发布前，先从 RingBuffer 获得一个 Event 的实</p>
+</li>
+</ul>
+<p>例，然后往 Event 实例中填充数据，之后再发布到 RingBuffer 中，之后由 Consumer 获得该 Event 实</p>
+<p>例并从中读取数据</p>
+<pre><code class="language-java">public class LongEventFactory implements EventFactory&lt;LongEvent&gt; {
+    public LongEvent newInstance() {
+        return new LongEvent();
+    }
+}
+</code></pre>
+<h2 id="3-定义事件处理的-handler">3. 定义事件处理的 handler
+</h2><p>为了让消费者处理这些事件，所以我们这里定义一个事件处理器，负责打印event</p>
+<p>通过实现接口 com.lmax.disruptor.EventHandler<T> 定义事件处理的具体实现。</p>
+<pre><code class="language-java">public class LongEventHandler implements EventHandler&lt;LongEvent&gt; {
+    public void onEvent(LongEvent event, long sequence, boolean endOfBatch) {
+        CommonUtils.calculation();
+        //  System.out.println(&quot;consumer:&quot; + Thread.currentThread().getName() + &quot; Event: value=&quot; + event.getValue() + &quot;,sequence=&quot; + sequence + &quot;,endOfBatch=&quot; + endOfBatch);
+    }
+}
+</code></pre>
+<h2 id="4-等待策略">4. 等待策略
+</h2><p>Disruptor 定义了 com.lmax.disruptor.WaitStrategy 接口用于抽象 Consumer 如何等待新事件， 这是策略模式的应用</p>
+<pre><code>WaitStrategy YIELDING_WAIT = new YieldingWaitStrategy();
+</code></pre>
+<h2 id="5-启动disruptor">5. 启动Disruptor
+</h2><p>RingBuffer 必须是2的n次方</p>
+<pre><code class="language-java">public static void main(String[] args) {
+        // 指定事件工厂
+        LongEventFactory factory = new LongEventFactory();
+
+        // 指定 ring buffer字节大小, 必须是2的N次方
+        int bufferSize = 1024;
+
+        //单线程模式，获取额外的性能
+        Disruptor&lt;LongEvent&gt; disruptor = new Disruptor&lt;LongEvent&gt;(factory,
+                bufferSize, Executors.defaultThreadFactory(),
+                ProducerType.SINGLE,
+                new YieldingWaitStrategy());
+
+        //设置事件业务处理器---消费者
+        disruptor.handleEventsWith(new LongEventHandler());
+
+        //启动disruptor线程
+        disruptor.start();
+        // 获取 ring buffer环，用于接取生产者生产的事件
+        RingBuffer&lt;LongEvent&gt; ringBuffer = disruptor.getRingBuffer();
+
+        //为 ring buffer指定事件生产者
+        LongEventProducerWithTranslator producer = new LongEventProducerWithTranslator(ringBuffer);
+        //循环遍历
+        for (int i = 0; i &lt; 100; i++) {
+            //获取一个随机数
+            long value = (long) ((Math.random() * 1000000) + 1);
+            //发布数据
+            producer.onData(value);
+        }
+        //停止disruptor线程
+        disruptor.shutdown();
+    }
+</code></pre>
+<h2 id="6--使用translators发布事件">6.  使用Translators发布事件
+</h2><blockquote>
+<p>由于加入了丰富的Lambda风格的API，可以用来帮组开发人员简化流 程。所以在3.0版本后==首选使用Event Publisher/Event Translator来发布事件==</p>
+</blockquote>
+<ul>
+<li><strong>Event Publisher</strong> 负责将事件发布到 Disruptor 的 <code>RingBuffer</code> 中。它的主要任务是将新的事件放入 <code>RingBuffer</code> 中，以供消费者线程进行处理。</li>
+<li><strong>Event Translator</strong> 是一个用于将外部数据转换为 Disruptor 事件的接口。它负责将传入的数据转换为 Disruptor 内部的事件对象，并将其放入 <code>RingBuffer</code> 中进行处理。</li>
+<li><code>EventTranslator</code> 是一个接口，通常通过实现 <code>EventTranslatorOneArg</code>, <code>EventTranslatorTwoArg</code>, 或 <code>EventTranslatorThreeArg</code> 接口来创建。不同的接口支持不同数量的参数传递。</li>
+<li>在发布事件时，==Event Publisher 会使用 Event Translator 来进行数据转换==。</li>
+</ul>
+<pre><code>public class LongEventProducerWithTranslator {
+    private final RingBuffer&lt;LongEvent&gt; ringBuffer;
+
+    public LongEventProducerWithTranslator(RingBuffer&lt;LongEvent&gt; ringBuffer) {
+        this.ringBuffer = ringBuffer;
+    }
+
+    private static final EventTranslatorOneArg&lt;LongEvent, Long&gt; TRANSLATOR =
+            new EventTranslatorOneArg&lt;LongEvent, Long&gt;() {
+                public void translateTo(LongEvent event, long sequence, Long data) {
+                    event.set(data);
+                }
+            };
+
+    public void onData(Long data) {
+        ringBuffer.publishEvent(TRANSLATOR, data);
+    }
+}
+</code></pre>
+<h1 id="4-高性能原理">4. 高性能原理
+</h1><ul>
+<li>引入环形的数组结构：数组元素不会被回收，避免频繁的GC，</li>
+<li>无锁的设计：采用CAS无锁方式，保证线程的安全性</li>
+<li>属性填充：通过添加额外的无用信息，避免伪共享问题</li>
+<li>元素位置的定位：采用跟一致性哈希一样的方式，一个索引，进行自增</li>
+</ul>
+<p><img src="/p/disruptor/images/image-20240812182506385.png"
+	width="781"
+	height="400"
+	
+	loading="lazy"
+	
+		alt="image-20240812182506385"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="195"
+		data-flex-basis="468px"
+	
+></p>
+<h2 id="0-mesi-协议">0. MESI 协议
+</h2><p>​	 <strong>MESI 协议</strong>（Modified, Exclusive, Shared, Invalid）是一种缓存一致性协议，用于确保多核处理器系统中的缓存数据的一致性。它确保各个核心的缓存中保存的数据保持同步，避免数据冲突和不一致。下面是 MESI 协议的四种状态及其简单解释：</p>
+<ul>
+<li><strong>Modified（修改）</strong>：数据在该缓存中是修改过的，并且是唯一的拷贝。其他缓存没有这块数据。这个缓存中的数据已被更改，但尚未写回主内存。</li>
+<li><strong>Exclusive（独占）</strong>：数据在该缓存中是唯一的拷贝，并且与主内存中的数据一致。该缓存中的数据没有被修改。</li>
+<li><strong>Shared（共享）</strong>：数据可能存在于一个或多个缓存中，并且与主内存中的数据一致。这意味着其他缓存也有这块数据的拷贝。</li>
+<li><strong>Invalid（无效）</strong>：数据在该缓存中是无效的，不可靠。缓存中的数据可能已被其他缓存修改或更新，不能再使用。</li>
+</ul>
+<p>==类比解释==</p>
+<p>想象你和你的朋友在一个图书馆里读书，你们都有一个笔记本记录书中的内容。这就像是缓存的工作，每个人都有自己的“缓存”（笔记本）。</p>
+<ol>
+<li><strong>Modified（修改）</strong>：
+<ul>
+<li>你在笔记本上写下了一些新的笔记，并且这些笔记是你自己写的，没有别人写过。你笔记本上的内容与图书馆的原书（主内存）不一致，因为你做了修改。</li>
+</ul>
+</li>
+<li><strong>Exclusive（独占）</strong>：
+<ul>
+<li>你有一本独特的书，只有你拥有。这本书的内容完全和图书馆的原书一致，没有人修改过它。</li>
+</ul>
+</li>
+<li><strong>Shared（共享）</strong>：
+<ul>
+<li>你和你的朋友都有相同的笔记内容，你们都在各自的笔记本上记录了这些内容。这些内容和图书馆的原书一致，但有多个人都有这些笔记。</li>
+</ul>
+</li>
+<li><strong>Invalid（无效）</strong>：
+<ul>
+<li>你发现你的笔记本上有一些过时的内容，这些内容已经不再准确了，因为图书馆的原书已经更新了，你的笔记需要更新</li>
+</ul>
+</li>
+</ol>
+<h2 id="1-缓存行">1. 缓存行
+</h2><blockquote>
+<p>缓存行（Cache Line）是现代计算机体系结构中缓存的基本单位。它是处理器缓存（如 L1、L2、L3 缓存）中的一个数据块，用于提高内存访问的效率。</p>
+</blockquote>
+<p>处理器缓存中的数据块，通常大小为 64 字节</p>
+<h2 id="2-伪共享">2. 伪共享
+</h2><pre><code>当多个==线程操作的变量位于同一个缓存行中时，即使这些变量并不相互干扰，也可能导致性能问题==。这种现象称为伪共享。伪共享会导致==处理器频繁地更新缓存行，增加缓存一致性协议的开销，从而降低性能==。 
+</code></pre>
+<p>​	 解决伪共享的一种方法是将每个线程的变量放在不同的缓存行中，从而避免它们位于同一个缓存行中。另一个方法是==使用缓存行填充技术==，将==相关的数据放置在缓存行的不同部分==。</p>
+<h2 id="3-无锁设计">3. 无锁设计
+</h2><ul>
+<li>
+<p>在多线程竞争下，加锁、释放锁会导致比较多的上下文切换和调度延时，引起性能问题，而且在上 下文切换的时候，cpu之前缓存的指令和数据都将失效，对性能有很大的损失，用户态的锁虽然避 免了这些问题，但是其实它们只是在没有真实的竞争时才有效。</p>
+</li>
+<li>
+<p>一个线程持有锁会导致其它所有需要此锁的线程挂起直至该锁释放。</p>
+</li>
+<li>
+<p>如果一个优先级高的线程等待一个优先级低的线程释放锁会导致导致优先级反转(Priority</p>
+<p>Inversion)，引起性能风险。</p>
+</li>
+</ul>
+<h3 id="1-cas-比较与交换">1. CAS 比较与交换
+</h3><p>CAS的语义是“我认为V的值应该为A，如果是，那么将V的值更新为B，  否则不修改并告诉V的值实际为多少”, 乐观锁 技术，当多个线程尝试使用CAS同时更新同一 个变量时，只有其中一个线程能更新变量的值，而其它线程都失败，失败的线程并不会被挂起，而是被 告知这次竞争中失败，并可以再次尝试</p>
+<p><img src="/p/disruptor/images/image-20240813094611390.png"
+	width="719"
+	height="400"
+	
+	loading="lazy"
+	
+		alt="image-20240813094611390"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="179"
+		data-flex-basis="431px"
+	
+></p>
+<h3 id="2-disruptor-的无锁设计">2. Disruptor 的无锁设计
+</h3><p>多线程环境下，多个生产者通过do/while循环的条件CAS，来判断每次申请的空间是否已经被其他 生产者占据。假如已经被占据，该函数会返回失败，While循环重新执行，申请写入空间。</p>
+<pre><code>do {
+    current = cursor.get();
+    next = current + n;
+    if (!hasAvailableCapacity(gatingSequences, n, current)) {
+    	throw InsufficientCapacityException.INSTANCE;
+	}
+}
+while (!cursor.compareAndSet(current, next));
+//next 类比于ArrayBlockQueue的数组索引index
+return next;
+</code></pre>
+<h3 id="3-环形数组">3. 环形数组
+</h3><p>​	为数组预先分配内存，使得数组对象一直存在, 这样就 不需要花大量的时间用于垃圾回收。  数组的大小为2的n次方，这样==元素定位可以通过位运算效率会更高==</p>
+<h1 id="5-等待策略">5. 等待策略
+</h1><ul>
+<li>BlockingWaitStrategy</li>
+</ul>
+<blockquote>
+<p>Disruptor的==默认策略==是BlockingWaitStrategy，在BlockingWaitStrategy内部是使用锁和condition 来控制线程的唤醒 ==BlockingWaitStrategy是最低效的策略==，==但其对CPU的消耗最小并且在各种不同部署环境中能提供 更加一致的性能表现==。</p>
+</blockquote>
+<ul>
+<li>SleepingWaitStrategy</li>
+</ul>
+<blockquote>
+<p>SleepingWaitStrategy 的性能表现跟 BlockingWaitStrategy 差不多，对 CPU 的消耗也类似，但其 对生产者线程的影响最小，通过使用 LockSupport.parkNanos(1) 来实现循环等待，适合用于异步日志</p>
+</blockquote>
+<ul>
+<li>YieldingWaitStrategy</li>
+</ul>
+<blockquote>
+<p>YieldingWaitStrategy是可以使用在低延迟系统的策略之一，YieldingWaitStrategy将自旋以等待序 列增加到适当的值。在循环体内，将调用 Thread.yield() 以允许其他排队的线程运行。在要求极高性 能且事件处理线数小于 CPU 逻辑核心数的场景中，推荐使用此策略；</p>
+</blockquote>
+<ul>
+<li>BusySpinWaitStrategy</li>
+</ul>
+<blockquote>
+<p>性能最好，适合用于低延迟的系统，在要求极高性能且事件处理线程数小于CPU逻辑核心数的场景 中，推荐使用此策略；</p>
+</blockquote>
+<ul>
+<li>PhasedBackoffWaitStrategy</li>
+</ul>
+<p>自旋 + yield + 自定义策略，CPU资源紧缺，吞吐量和延迟并不的场景。</p>
+<h1 id="6-生产和消费模式">6. 生产和消费模式
+</h1><p>==在Disruptor中生产者分为单生产者和多生产者，而消费者并没有区分==</p>
+<ul>
+<li>
+<p>单生产者情况下，就是普通的生产者向RingBuffer中放置数据，消费者获取最大可消费的位置，并 进行消费。</p>
+</li>
+<li>
+<p>多生产者时候，又多出了一个跟RingBuffer同样大小的Buffer，==称为AvailableBuffer==。 在多生产者中，每个生产者==首先通过CAS竞争获取可以写的空间，然后再进行慢慢往里放数据==，如 果正好这个时候消费者要消费数据，那么==每个消费者都需要获取最大可消费的下标==，这个下标是在 AvailableBuffer进行获取得到的最长连续的序列下标。</p>
+</li>
+</ul>
+<h2 id="1-单生产者生产数据">1. 单生产者生产数据
+</h2><ol>
+<li>
+<p>申请写入m个元素；</p>
+</li>
+<li>
+<p>若是有m个元素可以入，则返回最大的序列号。这儿主要判断是否会覆盖未读的元素；</p>
+</li>
+<li>
+<p>若是返回的正确，则生产者开始写入元素。</p>
+</li>
+</ol>
+<p><img src="/p/disruptor/images/image-20240813175746936.png"
+	width="609"
+	height="822"
+	
+	loading="lazy"
+	
+		alt="image-20240813175746936"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="74"
+		data-flex-basis="177px"
+	
+></p>
+<h2 id="2-多生产者生产数据">2. 多生产者生产数据
+</h2><p>​	多个生产者的情况下，会遇到“如何防止多个线程重复写同一个元素”的问题。Disruptor的解决方法 是，==每个线程获取不同的一段数组空间进行操作==。这个通过CAS很容易达到。==只需要在分配元素的时候，通过CAS判断一下这段空间是否已经分配出去==即可。</p>
+<p>但是会遇到一个新问题：</p>
+<p>==如何防止读取的时候，读到还未写的元素==。Disruptor在多个生产者的情况</p>
+<p>下，引入了一个与Ring Buffer大小相同的buffer：==available Buffer。当某个位置写入成功的时候，便把 availble Buffer相应的位置置位，标记为写入成功。读取的时候，会遍历available Buffer，来判断元素 是否已经就绪==。</p>
+<ol>
+<li>
+<p>申请写入m个元素；</p>
+</li>
+<li>
+<p>若是有m个元素可以写入，则返回最大的序列号。每个生产者会被分配一段独享的空间；</p>
+</li>
+<li>
+<p>生产者写入元素，写入元素的同时设置available Buffer里面相应的位置，以标记自己哪些位置是已 经写入成功的。</p>
+</li>
+</ol>
+<p>如下图所示，Writer1和Writer2两个线程写入数组，都申请可写的数组空间。Writer1被分配了下 标3到下表5的空间，Writer2被分配了下标6到下标9的空间。</p>
+<p>Writer1写入下标3位置的元素，同时把available Buffer相应位置置位，标记已经写入成功，往后 移一位，开始写下标4位置的元素。Writer2同样的方式。最终都写入完成。</p>
+<p><img src="/p/disruptor/images/image-20240813180738850.png"
+	width="1112"
+	height="812"
+	
+	loading="lazy"
+	
+		alt="image-20240813180738850"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="136"
+		data-flex-basis="328px"
+	
+></p>
+<h2 id="3-多生产者消费数据">3. 多生产者消费数据
+</h2><p>​    假设三个生产者在写中，==还没有置位AvailableBuffer，那么消费者可获取的消费下标只能获取到 6==然后等生产者都写OK后，通知到消费者，消费者继续重复上面的步骤</p>
+<p>==消费流程==</p>
+<ol>
+<li>
+<p>申请读取到序号n；</p>
+</li>
+<li>
+<p>若writer cursor &gt;= n，这时仍然无法确定连续可读的最大下标。从reader cursor开始读取</p>
+</li>
+</ol>
+<p>available Buffer，一直查到第一个不可用的元素，然后返回最大连续可读元素的位置；</p>
+<ol start="3">
+<li>消费者读取元素</li>
+</ol>
+<blockquote>
+<p>如下图所示，读线程读到下标为2的元素，三个线程Writer1/Writer2/Writer3正在向RingBuffer相</p>
+<p>应位置写数据，==写线程被分配到的最大元素下标是11==。</p>
+<p>==读线程申请读取到下标从3到11的元素，判断writer cursor&gt;=11。然后开始读取 availableBuffer，从3开始，往后读取，发现下标为7的元素没有生产成功，于是WaitFor(11)返回 6==。</p>
+<p>然后，消费者读取下标从3到6共计4个元素。 ==也就是只能读到写线程最小的下标==</p>
+</blockquote>
+<h1 id="7-高级使用">7. 高级使用
+</h1><h2 id="1-单一写者模式">1. 单一写者模式
+</h2><blockquote>
+<p>在并发系统中==提高性能最好的方式之一就是单一写者原则==，对Disruptor也是适用的。如果在你的代</p>
+<p>码中仅仅有一个事件生产者，那么可以设置为单一生产者模式来提高系统的性能。</p>
+</blockquote>
+<p><img src="/p/disruptor/images/image-20240813182722192.png"
+	width="849"
+	height="430"
+	
+	loading="lazy"
+	
+		alt="image-20240813182722192"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="197"
+		data-flex-basis="473px"
+	
+></p>
+<h2 id="2-串行消费">2. 串行消费
+</h2><blockquote>
+<p>比如：现在触发一个注册Event，需要有一个Handler来存储信息，一个Hanlder来发邮件等等</p>
+</blockquote>
+<p><img src="/p/disruptor/images/image-20240813182837661.png"
+	width="993"
+	height="188"
+	
+	loading="lazy"
+	
+		alt="image-20240813182837661"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="528"
+		data-flex-basis="1267px"
+	
+></p>
+<pre><code class="language-java">/**
+* 串行依次执行
+* &lt;br/&gt;
+* p --&gt; c11 --&gt; c21
+* @param disruptor
+*/
+public static void serial(Disruptor&lt;LongEvent&gt; disruptor){
+	disruptor.handleEventsWith(new C11EventHandler()).then(new
+		C21EventHandler());
+	disruptor.start();
+}
+</code></pre>
+<h2 id="3-菱形消费">3. 菱形消费
+</h2><p><img src="/p/disruptor/images/image-20240813182938505.png"
+	width="950"
+	height="391"
+	
+	loading="lazy"
+	
+		alt="image-20240813182938505"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="242"
+		data-flex-basis="583px"
+	
+></p>
+<pre><code class="language-java">public static void diamond(Disruptor&lt;LongEvent&gt; disruptor){
+	disruptor.handleEventsWith(new C11EventHandler(),new
+	C12EventHandler()).then(new C21EventHandler());
+	disruptor.start();
+}
+</code></pre>
+<h2 id="4-链式并行">4. 链式并行
+</h2><p><img src="/p/disruptor/images/image-20240813183002057.png"
+	width="1018"
+	height="439"
+	
+	loading="lazy"
+	
+		alt="image-20240813183002057"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="231"
+		data-flex-basis="556px"
+	
+></p>
+<pre><code class="language-java">public static void chain(Disruptor&lt;LongEvent&gt; disruptor){
+	disruptor.handleEventsWith(new C11EventHandler()).then(new
+	C12EventHandler());
+	disruptor.handleEventsWith(new C21EventHandler()).then(new
+	C22EventHandler());
+	disruptor.start();
+}
+</code></pre>
+<h2 id="5-相互隔离">5. 相互隔离
+</h2><p><img src="/p/disruptor/images/image-20240813190405817.png"
+	width="1036"
+	height="451"
+	
+	loading="lazy"
+	
+		alt="image-20240813190405817"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="229"
+		data-flex-basis="551px"
+	
+></p>
+<pre><code class="language-java">public static void parallelWithPool(Disruptor&lt;LongEvent&gt; disruptor){
+	disruptor.handleEventsWithWorkerPool(new C11EventHandler(),new
+C11EventHandler());
+	disruptor.handleEventsWithWorkerPool(new C21EventHandler(),new
+C21EventHandler());
+	disruptor.start();
+}
+</code></pre>
+<h2 id="6-航道模式">6. 航道模式
+</h2><pre><code class="language-java">/**
+* 串行依次执行,同时C11，C21分别有2个实例
+* &lt;br/&gt;
+* p --&gt; c11 --&gt; c21
+* @param disruptor
+*/
+public static void serialWithPool(Disruptor&lt;LongEvent&gt; disruptor){
+	disruptor.handleEventsWithWorkerPool(new C11EventHandler(),new
+		C11EventHandler()).then(new C21EventHandler(),new C21EventHandler());
+	disruptor.start();
+}
+</code></pre>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">并发编程</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/forkjoin/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">ForkJoin</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/completeablefuture/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CompleteableFuture</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

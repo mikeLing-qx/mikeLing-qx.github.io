@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
-        <title>Pages on mikeLing</title>
+        <title>Pages on lexqinMike</title>
         <link>https://mikeLing-qx.github.io/page/</link>
-        <description>Recent content in Pages on mikeLing</description>
+        <description>Recent content in Pages on lexqinMike</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>LexqinMike</copyright>
@@ -14,27 +14,6 @@
         
         <guid>https://mikeLing-qx.github.io/archives/</guid>
         <description></description>
-        </item>
-        <item>
-        <title>Links</title>
-        <link>https://mikeLing-qx.github.io/links/</link>
-        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-        
-        <guid>https://mikeLing-qx.github.io/links/</guid>
-        <description>&lt;p&gt;To use this feature, add &lt;code&gt;links&lt;/code&gt; section to frontmatter.&lt;/p&gt;
-&lt;p&gt;This page&amp;rsquo;s frontmatter:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;links:
-  - title: GitHub
-    description: GitHub is the world&#39;s largest software development platform.
-    website: https://github.com
-    image: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
-  - title: TypeScript
-    description: TypeScript is a typed superset of JavaScript that compiles to plain JavaScript.
-    website: https://www.typescriptlang.org
-    image: ts-logo-128.jpg
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;code&gt;image&lt;/code&gt; field accepts both local and external images.&lt;/p&gt;
-</description>
         </item>
         <item>
         <title>Search</title>
@@ -50,7 +29,7 @@
         <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
         
         <guid>https://mikeLing-qx.github.io/%E5%85%B3%E4%BA%8E/</guid>
-        <description>&lt;p&gt;This is a test page for i18n support.&lt;/p&gt;
+        <description>&lt;p&gt;​	这里记录了我在从事开发工作以来, 在不断的探索和学习中记录的一些技术文档, 偶尔我也会谈论一些技术以外的话题。 希望这里能给你带来一些启发与动力。&lt;/p&gt;
 </description>
         </item>
         

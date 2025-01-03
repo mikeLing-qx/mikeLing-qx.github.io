@@ -1,0 +1,856 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>分布式锁 on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/</link>
+        <description>Recent content in 分布式锁 on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Wed, 03 Aug 2022 19:53:40 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>分布式锁</title>
+        <link>https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/</link>
+        <pubDate>Wed, 03 Aug 2022 19:53:40 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/</guid>
+        <description>&lt;h1 id=&#34;分布式锁&#34;&gt;分布式锁
+&lt;/h1&gt;&lt;h2 id=&#34;学习目标&#34;&gt;学习目标
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;什么是分布式&lt;/li&gt;
+&lt;li&gt;什么是锁&lt;/li&gt;
+&lt;li&gt;什么是分布式锁&lt;/li&gt;
+&lt;li&gt;分布式锁的使用场景-为什么要使用分布式锁&lt;/li&gt;
+&lt;li&gt;分布式锁需要具备哪些功能/条件&lt;/li&gt;
+&lt;li&gt;分布式锁的解决方案&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;1-分布式锁介绍&#34;&gt;1 分布式锁介绍
+&lt;/h2&gt;&lt;h3 id=&#34;11-什么是分布式&#34;&gt;1.1 什么是分布式
+&lt;/h3&gt;&lt;p&gt;一个大型的系统往往被分为几个子系统来做，一个子系统可以部署在一台机器的多个 JVM(java虚拟机) 上，也可以部署在多台机器上。但是每一个系统不是独立的，不是完全独立的。需要相互通信，共同实现业务功能。&lt;/p&gt;
+&lt;p&gt;一句话来说：分布式就是通过计算机网络将后端工作分布到多台主机上，多个主机一起协同完成工作。&lt;/p&gt;
+&lt;h3 id=&#34;12-什么是锁--作用安全&#34;&gt;1.2 什么是锁&amp;ndash;作用安全
+&lt;/h3&gt;&lt;p&gt;现实生活中，当我们需要保护一样东西的时候，就会使用锁。例如门锁，车锁等等。很多时候可能许多人会共用这些资源，就会有很多个钥匙。但是有些时候我们希望使用的时候是独自不受打扰的，那么就会在使用的时候从里面反锁，等使用完了再从里面解锁。这样其他人就可以继续使用了。&lt;/p&gt;
+&lt;p&gt;JAVA程序中，当存在多个线程可以同时改变某个变量（可变共享变量）时，就需要对变量或代码块做同步，使其在修改这种变量时能够线性执行消除并发修改变量，而同步的本质是通过锁来实现的。如 Java 中 synchronize 是在对象头设置标记，Lock 接口的实现类基本上都只是某一个 volitile 修饰的 int 型变量其保证每个线程都能拥有对该 int 的可见性和原子修改&lt;/p&gt;
+&lt;h3 id=&#34;14-什么是分布式锁&#34;&gt;1.4 什么是分布式锁
+&lt;/h3&gt;&lt;p&gt;任何一个分布式系统都无法同时满足一致性（Consistency）、可用性（Availability）和分区容错性（Partition tolerance），最多只能同时满足两项。CAP&lt;/p&gt;
+&lt;p&gt;当在分布式模型下，数据只有一份（或有限制），此时需要利用锁的技术控制某一时刻修改数据的进程数。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;分布式锁&lt;/strong&gt;: 在分布式环境下，多个程序/线程都需要对某一份(或有限制)的数据进行修改时，针对程序进行控制，保证同一时间节点下，只有一个程序/线程对数据进行操作的技术。&lt;/p&gt;
+&lt;h3 id=&#34;15-分布式锁的真实使用场景&#34;&gt;1.5 分布式锁的真实使用场景
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;场景一：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/1.png&#34;
+	width=&#34;1036&#34;
+	height=&#34;702&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;147&#34;
+		data-flex-basis=&#34;354px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;场景二：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/2.png&#34;
+	width=&#34;1221&#34;
+	height=&#34;619&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;197&#34;
+		data-flex-basis=&#34;473px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;15-分布式锁的执行流程&#34;&gt;1.5 分布式锁的执行流程
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/3.png&#34;
+	width=&#34;1182&#34;
+	height=&#34;624&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;3&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;189&#34;
+		data-flex-basis=&#34;454px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;16-分布式锁具备的条件&#34;&gt;1.6 分布式锁具备的条件
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;互斥性&lt;/strong&gt;：同一时刻只能有一个服务(或应用)访问资源，特殊情况下有读写锁&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;原子性&lt;/strong&gt;：一致性要求保证加锁和解锁的行为是原子性的&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;安全性&lt;/strong&gt;：锁只能被持有该锁的服务(或应用)释放&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;容错性&lt;/strong&gt;：在持有锁的服务崩溃时，锁仍能得到释放避免死锁&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;可重用性&lt;/strong&gt;：同一个客户端获得锁后可递归调用&amp;mdash;重入锁和不可重入锁&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;公平性&lt;/strong&gt;：看业务是否需要公平，避免饿死&amp;ndash;公平锁和非公平锁&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;支持阻塞和非阻塞&lt;/strong&gt;：和 ReentrantLock 一样支持 lock 和 trylock 以及 tryLock(long timeOut)&amp;mdash;阻塞锁和非阻塞锁==PS:::自选锁==&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;高可用&lt;/strong&gt;：获取锁和释放锁 要高可用&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;高性能&lt;/strong&gt;：获取锁和释放锁的性能要好&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;持久性&lt;/strong&gt;：锁按业务需要自动续约/自动延期&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;2分布式锁的解决方案&#34;&gt;2.分布式锁的解决方案
+&lt;/h2&gt;&lt;h3 id=&#34;21-数据库实现分布式锁&#34;&gt;2.1 数据库实现分布式锁
+&lt;/h3&gt;&lt;h4 id=&#34;211-基于数据库表实现&#34;&gt;2.1.1 基于数据库表实现
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;准备工作&lt;/strong&gt;：创建tb_program表，用于记录当前哪个程序正在使用数据&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;CREATE TABLE `tb_program` (
+  `program_no` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT &#39;程序的编号&#39;
+  PRIMARY KEY (`program_no`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;实现步骤：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;程序访问数据时，将程序的编号（insert）存入tb_program表；&lt;/li&gt;
+&lt;li&gt;当insert成功，代表该程序获得了锁，即可执行逻辑；&lt;/li&gt;
+&lt;li&gt;当program_no相同的其他程序进行insert是，由于主键冲突会导致insert失败，则代表获取锁失败；&lt;/li&gt;
+&lt;li&gt;获取锁成功的程序在逻辑执行完以后，删除该数据,代表释放锁。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;212-基于数据库的排他锁实现&#34;&gt;2.1.2 基于数据库的排他锁实现
+&lt;/h4&gt;&lt;p&gt;除了可以通过增删操作数据表中的记录以外，其实还可以借助数据中自带的锁来实现分布式的锁。我们还用刚刚创建的那张数据库表，基于MySql的InnoDB引擎(MYSQL的引擎种类)可以通过数据库的排他锁来实现分布式锁。&lt;/p&gt;
+&lt;p&gt;实现步骤：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;在查询语句后面增加&lt;code&gt;for update&lt;/code&gt;，数据库会在查询过程中给数据库表增加排他锁。当某条记录被加上排他锁之后，其他线程无法再在该行记录上增加排他锁&lt;/li&gt;
+&lt;li&gt;获得排它锁的线程即可获得分布式锁，执行方法的业务逻辑&lt;/li&gt;
+&lt;li&gt;执行完方法之后，再通过&lt;code&gt;connection.commit();&lt;/code&gt;操作来释放锁。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;实现代码&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;pom.xml&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;
+&amp;lt;project xmlns=&amp;quot;http://maven.apache.org/POM/4.0.0&amp;quot;
+         xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot;
+         xsi:schemaLocation=&amp;quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&amp;quot;&amp;gt;
+    &amp;lt;modelVersion&amp;gt;4.0.0&amp;lt;/modelVersion&amp;gt;
+
+    &amp;lt;groupId&amp;gt;com.itheima&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;mysql-demo&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;1.0-SNAPSHOT&amp;lt;/version&amp;gt;
+
+    &amp;lt;!--依赖包--&amp;gt;
+    &amp;lt;dependencies&amp;gt;
+      
+        &amp;lt;!-- MySql --&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;mysql&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;mysql-connector-java&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;5.1.32&amp;lt;/version&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+
+        &amp;lt;!-- Test dependencies --&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;junit&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;junit&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;4.12&amp;lt;/version&amp;gt;
+            &amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+    &amp;lt;/dependencies&amp;gt;
+&amp;lt;/project&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Book&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Book {
+
+    // 图书ID
+    private Integer id;
+    // 图书名称
+    private String name;
+    // 图书价格
+    private Float price;
+    // 图书图片
+    private String pic;
+    // 图书描述
+    private String desc;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;BookDao&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public interface BookDao {
+
+    /**
+     * 查询所有的book数据
+     * @return
+     */
+    List&amp;lt;Book&amp;gt; queryBookList(String name) throws Exception;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;BookDaoImpl实现类&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class BookDaoImpl implements BookDao {
+
+    /***
+     * 查询数据库数据
+     * @return
+     * @throws Exception
+     */
+    public List&amp;lt;Book&amp;gt; queryBookList(String name) throws Exception{
+
+        // 数据库链接
+        Connection connection = null;
+        // 预编译statement
+        PreparedStatement preparedStatement = null;
+        // 结果集
+        ResultSet resultSet = null;
+        // 图书列表
+        List&amp;lt;Book&amp;gt; list = new ArrayList&amp;lt;Book&amp;gt;();
+
+        try {
+            // 加载数据库驱动
+            Class.forName(&amp;quot;com.mysql.jdbc.Driver&amp;quot;);
+            // 连接数据库
+            connection = DriverManager.getConnection(&amp;quot;jdbc:mysql://39.108.189.37:3306/lucene&amp;quot;, &amp;quot;ybbmysql&amp;quot;, &amp;quot;ybbmysql&amp;quot;);
+            //关闭自动提交
+            connection.setAutoCommit(false);
+            // SQL语句
+            String sql = &amp;quot;SELECT * FROM book where id = 1 for update&amp;quot;;
+            // 创建preparedStatement
+            preparedStatement = connection.prepareStatement(sql);
+            // 获取结果集
+            resultSet = preparedStatement.executeQuery();
+            // 结果集解析
+            while (resultSet.next()) {
+                Book book = new Book();
+                book.setId(resultSet.getInt(&amp;quot;id&amp;quot;));
+                book.setName(resultSet.getString(&amp;quot;name&amp;quot;));
+                list.add(book);
+            }
+            System.out.println(name + &amp;quot;执行了for update&amp;quot;);
+            System.out.println(&amp;quot;结果为:&amp;quot; + list);
+            //锁行后休眠5秒
+            Thread.sleep(5000);
+
+            //休眠结束释放
+            connection.commit();
+            System.out.println(name + &amp;quot;结束&amp;quot;);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;测试类&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Test {
+
+    private BookDao bookDao = new BookDaoImpl();
+
+    @org.junit.Test
+    public void testLock() throws Exception  {
+        new Thread(new LockRunner(&amp;quot;线程1&amp;quot;)).start();
+        new Thread(new LockRunner(&amp;quot;线程2&amp;quot;)).start();
+        new Thread(new LockRunner(&amp;quot;线程3&amp;quot;)).start();
+        new Thread(new LockRunner(&amp;quot;线程4&amp;quot;)).start();
+        new Thread(new LockRunner(&amp;quot;线程5&amp;quot;)).start();
+        Thread.sleep(200000L);
+    }
+
+    class LockRunner implements Runnable {
+
+        private String name;
+
+        public LockRunner(String name) {
+            this.name = name;
+        }
+
+        public void run() {
+            try {
+                bookDao.queryBookList(name);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;执行结果&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/10.png&#34;
+	width=&#34;870&#34;
+	height=&#34;370&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;10&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;235&#34;
+		data-flex-basis=&#34;564px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;213-优点及缺点&#34;&gt;2.1.3 优点及缺点
+&lt;/h4&gt;&lt;p&gt;**优点：**简单，方便，快速实现&lt;/p&gt;
+&lt;p&gt;**缺点：**基于数据库，开销比较大，对数据库性能可能会存在影响，服务数量比较多的情况下，数据库也要做集群，使用数据库加锁，锁状态不能同步到其他机器上面，使用insert的方式有一个同步的过程，如果访问从机是可以加到锁的。&lt;/p&gt;
+&lt;h3 id=&#34;22-redis实现分布式锁&#34;&gt;2.2 Redis实现分布式锁
+&lt;/h3&gt;&lt;h4 id=&#34;221-基于-redis-的-setnxexpire-getset方法做分布式锁&#34;&gt;2.2.1 基于 REDIS 的 SETNX()、EXPIRE() 、GETSET()方法做分布式锁
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;实现原理&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;setnx():setnx 的含义就是 SET if Not Exists，其主要有两个参数 setnx(key, value)。该方法是原子的，如果 key 不存在，则设置当前 key 成功，返回 1；如果当前 key 已经存在，则设置当前 key 失败，返回 0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;expire():expire 设置过期时间，要注意的是 setnx 命令不能设置 key 的超时时间，只能通过 expire() 来对 key 设置。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;getset():这个命令主要有两个参数 getset(key，newValue)。该方法是原子的，对 key 设置 newValue 这个值，并且返回 key 原来的旧值。假设 key 原来是不存在的，那么多次执行这个命令，会出现下边的效果：
+
+getset(key, “value1”) 返回 null 此时 key 的值会被设置为 value1
+getset(key, “value2”) 返回 value1 此时 key 的值会被设置为 value2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;实现流程&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/7.png&#34;
+	width=&#34;812&#34;
+	height=&#34;610&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;133&#34;
+		data-flex-basis=&#34;319px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;setnx(lockkey, 当前时间+过期超时时间)，如果返回 1，则获取锁成功；如果返回 0 则没有获取到锁。&lt;/li&gt;
+&lt;li&gt;get(lockkey) 获取值 oldExpireTime ，并将这个 value 值与当前的系统时间进行比较，如果小于当前系统时间，则认为这个锁已经超时，可以允许别的请求重新获取。&lt;/li&gt;
+&lt;li&gt;计算 newExpireTime = 当前时间+过期超时时间，然后 getset(lockkey, newExpireTime) 会返回当前 lockkey 的值currentExpireTime。判断 currentExpireTime 与 oldExpireTime 是否相等，如果相等，说明当前 getset 设置成功，获取到了锁。如果不相等，说明这个锁又被别的请求获取走了，那么当前请求可以直接返回失败，或者继续重试。&lt;/li&gt;
+&lt;li&gt;在获取到锁之后，当前线程可以开始自己的业务处理，当处理完毕后，比较自己的处理时间和对于锁设置的超时时间，如果小于锁设置的超时时间，则直接执行 delete 释放锁；如果大于锁设置的超时时间，则不需要再锁进行处理。
+&lt;ol&gt;
+&lt;li&gt;思路: 如果处理时间大于锁设置的超时时间, 需要先去拿到锁的预期的超时时间 和现在的锁的超时时间, 如果不一致, 说明业务处理超时的时候 锁被别的程序获取了, 所以这次的操作只能进行rollback&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;在Linux虚拟机中创建redis容器&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;docker run -di &amp;ndash;name=tensquare_redis -p 6379:6379 redis&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;代码实现&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;pom.xml文件&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;
+&amp;lt;project xmlns=&amp;quot;http://maven.apache.org/POM/4.0.0&amp;quot; xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot;
+         xsi:schemaLocation=&amp;quot;http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd&amp;quot;&amp;gt;
+    &amp;lt;modelVersion&amp;gt;4.0.0&amp;lt;/modelVersion&amp;gt;
+    
+     &amp;lt;groupId&amp;gt;com.itheima&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;redis&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;0.0.1-SNAPSHOT&amp;lt;/version&amp;gt;
+    &amp;lt;name&amp;gt;redis&amp;lt;/name&amp;gt;
+    &amp;lt;description&amp;gt;redis实现分布式锁测试&amp;lt;/description&amp;gt;
+    &amp;lt;parent&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-parent&amp;lt;/artifactId&amp;gt;
+        &amp;lt;version&amp;gt;2.1.4.RELEASE&amp;lt;/version&amp;gt;
+        &amp;lt;relativePath/&amp;gt; &amp;lt;!-- lookup parent from repository --&amp;gt;
+    &amp;lt;/parent&amp;gt;
+   
+
+    &amp;lt;properties&amp;gt;
+        &amp;lt;java.version&amp;gt;1.8&amp;lt;/java.version&amp;gt;
+    &amp;lt;/properties&amp;gt;
+
+    &amp;lt;dependencies&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-data-redis&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-web&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt;
+            &amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt;
+            &amp;lt;exclusions&amp;gt;
+                &amp;lt;exclusion&amp;gt;
+                    &amp;lt;groupId&amp;gt;org.junit.vintage&amp;lt;/groupId&amp;gt;
+                    &amp;lt;artifactId&amp;gt;junit-vintage-engine&amp;lt;/artifactId&amp;gt;
+                &amp;lt;/exclusion&amp;gt;
+            &amp;lt;/exclusions&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+    &amp;lt;/dependencies&amp;gt;
+
+    &amp;lt;build&amp;gt;
+        &amp;lt;plugins&amp;gt;
+            &amp;lt;plugin&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-boot-maven-plugin&amp;lt;/artifactId&amp;gt;
+            &amp;lt;/plugin&amp;gt;
+        &amp;lt;/plugins&amp;gt;
+    &amp;lt;/build&amp;gt;
+
+&amp;lt;/project&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;RedisUtil工具类&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Component
+public class RedisUtil {
+    //定义默认超时时间:单位毫秒
+    private static final Integer LOCK_TIME_OUT = 10000;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    /**
+     * 外部调用加锁方法
+     */
+    public Boolean tryLock(String key, Long timeout) throws Exception{
+
+        //获取当前系统时间设置为开始时间
+        Long startTime = System.currentTimeMillis();
+
+        //设置返回默认值-false:加锁失败
+        boolean flag = false;
+
+        //死循环获取锁:1.获取锁成功退出 2.获取锁超时退出
+        while(true){
+            //判断是否超时
+            if((System.currentTimeMillis() - startTime) &amp;gt;= timeout){
+                break;
+            }else{
+                //获取锁
+                flag = lock(key);
+                //判断是否获取成功
+                if(flag){
+                    break;
+                }else{
+                    //休息0.1秒重试,降低服务压力
+                    Thread.sleep(100);
+                }
+            }
+        }
+        return flag;
+    }
+
+    /**
+     * 加锁实现
+     * @param key
+     * @return
+     */
+    private Boolean lock(String key){
+        return (Boolean) stringRedisTemplate.execute((RedisCallback) redisConnection -&amp;gt; {
+            //获取当前系统时间
+            Long time = System.currentTimeMillis();
+
+            //设置锁超时时间
+            Long timeout = time + LOCK_TIME_OUT + 1;
+
+            //setnx加锁并获取解锁结果
+            Boolean result = redisConnection.setNX(key.getBytes(), String.valueOf(timeout).getBytes());
+
+            //加锁成功返回true
+            if(result){
+                return true;
+            }
+
+            //加锁失败判断锁是否超时
+            if(checkLock(key, timeout)){
+                //getset设置值成功后,会返回旧的锁有效时间
+                byte[] newtime = redisConnection.getSet(key.getBytes(), String.valueOf(timeout).getBytes());
+                if(time &amp;gt; Long.valueOf(new String(newtime))){
+                    return true;
+                }
+            }
+            //默认加锁失败
+            return false;
+        });
+
+    }
+
+    /**
+     * 释放锁
+     */
+    public Boolean release(String key){
+        return (Boolean) stringRedisTemplate.execute((RedisCallback) redisConnection -&amp;gt; {
+            Long del = redisConnection.del(key.getBytes());
+            if (del &amp;gt; 0){
+                return true;
+            }
+            return false;
+        });
+    }
+
+    /**
+     * 判断锁是否超时
+     */
+    private Boolean checkLock(String key, Long timeout){
+
+        return (Boolean) stringRedisTemplate.execute((RedisCallback) redisConnection -&amp;gt; {
+            //获取锁的超时时间
+            byte[] bytes = redisConnection.get(key.getBytes());
+
+            try {
+                //判断锁的有效时间是否大与当前时间
+                if(timeout &amp;gt; Long.valueOf(new String(bytes))){
+                    return true;
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                return false;
+            }
+            return false;
+        });
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;RedisController测试类&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@RestController
+@RequestMapping(value = &amp;quot;/redis&amp;quot;)
+public class RedisController {
+
+    @Autowired
+    private RedisUtil redisUtil;
+
+    /**
+     * 获取锁
+     * @return
+     */
+    @GetMapping(value = &amp;quot;/lock/{name}&amp;quot;)
+    public String lock(@PathVariable(value = &amp;quot;name&amp;quot;)String name) throws Exception{
+        Boolean result = redisUtil.tryLock(name, 3000L);
+        if(result){
+            return &amp;quot;获取锁成功&amp;quot;;
+        }
+        return &amp;quot;获取锁失败&amp;quot;;
+    }
+
+    /**
+     * 释放锁
+     * @param name
+     */
+    @GetMapping(value = &amp;quot;/unlock/{name}&amp;quot;)
+    public String unlock(@PathVariable(value = &amp;quot;name&amp;quot;)String name){
+        Boolean result = redisUtil.release(name);
+        if(result){
+            return &amp;quot;释放锁成功&amp;quot;;
+        }
+        return &amp;quot;释放锁失败&amp;quot;;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;222-redis锁的key键如何选择&#34;&gt;2.2.2 redis锁的key键如何选择
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;如果锁的key是一个定值，意味着所有加锁的线程访问同一把锁，效率非常低下&lt;/li&gt;
+&lt;li&gt;所以锁的key最好不要是定值而是和业务相关的
+&lt;ul&gt;
+&lt;li&gt;ex：
+&lt;ul&gt;
+&lt;li&gt;业务逻辑是和商品相关的，加锁的目的是为了保证商品数据修改的原子性&lt;/li&gt;
+&lt;li&gt;锁的key应该是和商品id相关联&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;锁得名称应该如何设计
+&lt;ul&gt;
+&lt;li&gt;应该是和当前的服务还有业务逻辑相关联的
+&lt;ul&gt;
+&lt;li&gt;ex：
+&lt;ul&gt;
+&lt;li&gt;商品服务下的商品加锁：锁的key可以设计为=&amp;gt;shop:mer:ID:1&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;223-优点及缺点&#34;&gt;2.2.3 优点及缺点
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;优点&lt;/strong&gt;：性能极高&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;缺点&lt;/strong&gt;：失效时间设置没有定值。设置的失效时间太短，方法没等执行完锁就自动释放了，那么就会产生并发问题。如果设置的时间太长，如果加锁的服务奔溃了，其他获取锁的线程就可能要平白的多等一段时间，用户体验会降低。&lt;/p&gt;
+&lt;h3 id=&#34;23-zookeeper实现分布式锁&#34;&gt;2.3 zookeeper实现分布式锁
+&lt;/h3&gt;&lt;h4 id=&#34;231-zookeeper-锁相关基础知识&#34;&gt;2.3.1 zookeeper 锁相关基础知识
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;zookeeper 一般由多个节点构成（单数），采用 zab 一致性协议。因此可以将 zk 看成一个单点结构，对其修改数据其内部自动将所有节点数据进行修改而后才提供查询服务。&lt;/li&gt;
+&lt;li&gt;zookeeper  的数据以目录树的形式，每个目录称为 znode， znode 中可存储数据（一般不超过 1M），还可以在其中增加子节点。&lt;/li&gt;
+&lt;li&gt;子节点有三种类型。序列化节点，每在该节点下增加一个节点自动给该节点的名称上自增。临时节点，一旦创建这个 znode 的客户端与服务器失去联系，这个 znode 也将自动删除。最后就是普通节点。&lt;/li&gt;
+&lt;li&gt;Watch 机制，client 可以监控每个节点的变化，当产生变化会给 client 产生一个事件。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;232-zookeeper-分布式锁的原理&#34;&gt;2.3.2 zookeeper 分布式锁的原理
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;获取和释放锁原理&lt;/strong&gt;：利用临时节点与 watch 机制。每个锁占用一个普通节点 /lock，当需要获取锁时在 /lock 目录下创建一个临时节点，创建成功则表示获取锁成功，失败则 watch/lock 节点，有删除操作后再去争锁。临时节点好处在于当进程挂掉后能自动上锁的节点自动删除即取消锁。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;获取锁的顺序原理&lt;/strong&gt;：上锁为创建临时有序节点，每个上锁的节点均能创建节点成功，只是其序号不同。只有序号最小的可以拥有锁，如果这个节点序号不是最小的则 watch 序号比本身小的前一个节点 (公平锁)。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;232-zookeeper实现分布式锁流程&#34;&gt;2.3.2 zookeeper实现分布式锁流程
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;简易流程&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/5.jpg&#34;
+	width=&#34;600&#34;
+	height=&#34;245&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;5&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;244&#34;
+		data-flex-basis=&#34;587px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;获取锁流程：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;先有一个锁根节点，lockRootNode，这可以是一个永久的节点&lt;/li&gt;
+&lt;li&gt;客户端获取锁，先在 lockRootNode 下创建一个顺序的临时节点，保证客户端断开连接，节点也自动删除&lt;/li&gt;
+&lt;li&gt;调用 lockRootNode 父节点的 getChildren() 方法，获取所有的节点，并从小到大排序，如果创建的最小的节点是当前节点，则返回 true,获取锁成功，否则，关注比自己序号小的节点的释放动作(exist watch)，这样可以保证每一个客户端只需要关注一个节点，不需要关注所有的节点，避免羊群效应。&lt;/li&gt;
+&lt;li&gt;如果有节点释放操作，重复步骤 3&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;释放锁流程：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;只需要删除步骤 2 中创建的节点即可&lt;/p&gt;
+&lt;h4 id=&#34;232-优点及缺点&#34;&gt;2.3.2 优点及缺点
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;优点：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;客户端如果出现宕机故障的话，锁可以马上释放&lt;/li&gt;
+&lt;li&gt;可以实现阻塞式锁，通过 watcher 监听，实现起来也比较简单&lt;/li&gt;
+&lt;li&gt;集群模式，稳定性比较高&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;缺点：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;一旦网络有任何的抖动，Zookeeper 就会认为客户端已经宕机，就会断掉连接，其他客户端就可以获取到锁。&lt;/li&gt;
+&lt;li&gt;性能不高，因为每次在创建锁和释放锁的过程中，都要动态创建、销毁临时节点来实现锁功能。ZK 中创建和删除节点只能通过 Leader 服务器来执行，然后将数据同步到所有的 Follower 机器上。(zookeeper对外提供服务的只有leader)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;24-consul实现分布式锁eurekaregister保存服务的ip-端口-服务列表&#34;&gt;2.4 consul实现分布式锁(eureka/Register:保存服务的IP 端口 服务列表)
+&lt;/h3&gt;&lt;h4 id=&#34;241-实现原理及流程&#34;&gt;2.4.1 实现原理及流程
+&lt;/h4&gt;&lt;p&gt;基于Consul注册中心的Key/Value存储来实现分布式锁以及信号量的方法主要利用Key/Value存储API中的acquire和release操作来实现。acquire和release操作是类似Check-And-Set的操作：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;acquire操作只有当锁不存在持有者时才会返回true，并且set设置的Value值，同时执行操作的session会持有对该Key的锁，否则就返回false
+
+release操作则是使用指定的session来释放某个Key的锁，如果指定的session无效，那么会返回false，否则就会set设置Value值，并返回true
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;实现流程&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/6.png&#34;
+	width=&#34;1402&#34;
+	height=&#34;1374&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;6&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;102&#34;
+		data-flex-basis=&#34;244px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;实现步骤：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;客户端创建会话session，得到sessionId；&lt;/li&gt;
+&lt;li&gt;使用acquire设置value的值，若acquire结果为false，代表获取锁失败；&lt;/li&gt;
+&lt;li&gt;acquire结果为true，代表获取锁成功，客户端执行业务逻辑；&lt;/li&gt;
+&lt;li&gt;客户端业务逻辑执行完成后，执行release操作释放锁；&lt;/li&gt;
+&lt;li&gt;销毁当前session，客户端连接断开。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;代码&lt;/strong&gt;:&lt;/p&gt;
+&lt;p&gt;docker安装consul&lt;/p&gt;
+&lt;p&gt;下载镜像&lt;/p&gt;
+&lt;p&gt;docker pull consul&lt;/p&gt;
+&lt;p&gt;开启容器&lt;/p&gt;
+&lt;p&gt;docker run -p 8500:8500/tcp consul agent -server -ui -bootstrap-expect=1 -client=0.0.0.0&lt;/p&gt;
+&lt;p&gt;启动consul命令: consul agent -dev&lt;/p&gt;
+&lt;p&gt;pom.xml文件&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;
+&amp;lt;project xmlns=&amp;quot;http://maven.apache.org/POM/4.0.0&amp;quot; xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot;
+         xsi:schemaLocation=&amp;quot;http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd&amp;quot;&amp;gt;
+    &amp;lt;modelVersion&amp;gt;4.0.0&amp;lt;/modelVersion&amp;gt;
+    &amp;lt;parent&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-parent&amp;lt;/artifactId&amp;gt;
+        &amp;lt;version&amp;gt;2.2.5.RELEASE&amp;lt;/version&amp;gt;
+        &amp;lt;relativePath/&amp;gt; &amp;lt;!-- lookup parent from repository --&amp;gt;
+    &amp;lt;/parent&amp;gt;
+    &amp;lt;groupId&amp;gt;com.example&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;demo-consul&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;0.0.1-SNAPSHOT&amp;lt;/version&amp;gt;
+    &amp;lt;name&amp;gt;demo-consul&amp;lt;/name&amp;gt;
+    &amp;lt;description&amp;gt;Demo project for Spring Boot&amp;lt;/description&amp;gt;
+
+    &amp;lt;properties&amp;gt;
+        &amp;lt;java.version&amp;gt;1.8&amp;lt;/java.version&amp;gt;
+        &amp;lt;spring-cloud.version&amp;gt;Hoxton.SR3&amp;lt;/spring-cloud.version&amp;gt;
+    &amp;lt;/properties&amp;gt;
+
+    &amp;lt;dependencies&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-web&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.cloud&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-cloud-starter-consul-discovery&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt;
+            &amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt;
+            &amp;lt;exclusions&amp;gt;
+                &amp;lt;exclusion&amp;gt;
+                    &amp;lt;groupId&amp;gt;org.junit.vintage&amp;lt;/groupId&amp;gt;
+                    &amp;lt;artifactId&amp;gt;junit-vintage-engine&amp;lt;/artifactId&amp;gt;
+                &amp;lt;/exclusion&amp;gt;
+            &amp;lt;/exclusions&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+    &amp;lt;/dependencies&amp;gt;
+
+    &amp;lt;dependencyManagement&amp;gt;
+        &amp;lt;dependencies&amp;gt;
+            &amp;lt;dependency&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework.cloud&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-cloud-dependencies&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;${spring-cloud.version}&amp;lt;/version&amp;gt;
+                &amp;lt;type&amp;gt;pom&amp;lt;/type&amp;gt;
+                &amp;lt;scope&amp;gt;import&amp;lt;/scope&amp;gt;
+            &amp;lt;/dependency&amp;gt;
+        &amp;lt;/dependencies&amp;gt;
+    &amp;lt;/dependencyManagement&amp;gt;
+
+    &amp;lt;build&amp;gt;
+        &amp;lt;plugins&amp;gt;
+            &amp;lt;plugin&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-boot-maven-plugin&amp;lt;/artifactId&amp;gt;
+            &amp;lt;/plugin&amp;gt;
+        &amp;lt;/plugins&amp;gt;
+    &amp;lt;/build&amp;gt;
+
+&amp;lt;/project&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class ConsulUtil {
+
+    private ConsulClient consulClient;
+
+    private String sessionId = null;
+
+    /**
+     * 构造函数
+     */
+    public ConsulUtil(ConsulClient consulClient) {
+        this.consulClient = consulClient;
+    }
+
+    /**
+     * 创建session
+     */
+    private String createSession(String name, Integer ttl){
+        NewSession newSession = new NewSession();
+        //设置锁有效时长
+        newSession.setTtl(ttl + &amp;quot;s&amp;quot;);
+        //设置锁名字
+        newSession.setName(name);
+        String value = consulClient.sessionCreate(newSession, null).getValue();
+        return value;
+    }
+
+    /**
+     * 获取锁
+     */
+    public Boolean lock(String name, Integer ttl){
+        //定义获取标识
+        Boolean flag = false;
+        //创建session
+        sessionId = createSession(name, ttl);
+        //死循环获取锁
+        while (true){
+            //执行acquire操作
+            PutParams putParams = new PutParams();
+            putParams.setAcquireSession(sessionId);
+            flag = consulClient.setKVValue(name, &amp;quot;local&amp;quot; + System.currentTimeMillis(), putParams).getValue();
+            if(flag){
+                break;
+            }
+        }
+        return flag;
+    }
+
+    /**
+     * 释放锁
+     */
+    public Boolean release(String name){
+        //执行acquire操作
+        PutParams putParams = new PutParams();
+        putParams.setReleaseSession(sessionId);
+        Boolean value = consulClient.setKVValue(name, &amp;quot;local&amp;quot; + System.currentTimeMillis(), putParams).getValue();
+        return value;
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;测试代码:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@SpringBootTest
+class DemoApplicationTests {
+
+    @Test
+    public void testLock() throws Exception  {
+         LoggerContext loggerContext= (LoggerContext) LoggerFactory.getILoggerFactory();
+        //设置全局日志级别
+        ch.qos.logback.classic.Logger logger=loggerContext.getLogger(&amp;quot;root&amp;quot;);
+        logger.setLevel(Level.toLevel(&amp;quot;info&amp;quot;));
+        new Thread(new LockRunner(&amp;quot;线程1&amp;quot;)).start();
+        new Thread(new LockRunner(&amp;quot;线程2&amp;quot;)).start();
+        new Thread(new LockRunner(&amp;quot;线程3&amp;quot;)).start();
+        new Thread(new LockRunner(&amp;quot;线程4&amp;quot;)).start();
+        new Thread(new LockRunner(&amp;quot;线程5&amp;quot;)).start();
+        Thread.sleep(200000L);
+    }
+
+    class LockRunner implements Runnable {
+
+        private String name;
+
+        public LockRunner(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public void run() {
+            ConsulUtil lock = new ConsulUtil(new ConsulClient());
+            try {
+                if (lock.lock(&amp;quot;test&amp;quot;, 10)) {
+
+                    System.out.println(name + &amp;quot;获取到了锁&amp;quot;);
+                    //持有锁5秒
+                    Thread.sleep(5000);
+                    //释放锁
+                    lock.release(&amp;quot;test&amp;quot;);
+                    System.out.println(name + &amp;quot;释放了锁&amp;quot;);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;结果&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/8.png&#34;
+	width=&#34;1812&#34;
+	height=&#34;523&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;8&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;346&#34;
+		data-flex-basis=&#34;831px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/9.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;979&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;9&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;196&#34;
+		data-flex-basis=&#34;470px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;242-优点及缺点&#34;&gt;2.4.2 优点及缺点
+&lt;/h4&gt;&lt;p&gt;**优点：**基于consul注册中心即可实现分布式锁，实现简单、方便、快捷&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;缺点：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;lock delay&lt;/strong&gt;：consul实现分布式锁存在延迟，一个节点释放锁了，另一个节点不能立马拿到锁。需要等待lock delay时间后才可以拿到锁。&lt;/li&gt;
+&lt;li&gt;高负载的场景下，不能及时的续约，导致session timeout, 其他节点拿到锁。&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

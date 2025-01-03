@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="1. wsl安装k3s 遇到问题\n[System has not been booted with systemd as init system (PID 1). Can&rsquo;t operate]\n参考资料\nhttps://askubuntu.com/questions/1379425/system-has-not-been-booted-with-systemd-as-init-system-pid-1-cant-operate\nKubernetes介绍：https://www.cnblogs.com/weicunqi/p/14892207.html 资源管理：https://www.cnblogs.com/weicunqi/p/14894122.html 实战入门：https://www.cnblogs.com/weicunqi/p/14894249.html\n">
+<title>K8s入门</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/k8s%E5%85%A5%E9%97%A8/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="K8s入门">
+<meta property='og:description' content="1. wsl安装k3s 遇到问题\n[System has not been booted with systemd as init system (PID 1). Can&rsquo;t operate]\n参考资料\nhttps://askubuntu.com/questions/1379425/system-has-not-been-booted-with-systemd-as-init-system-pid-1-cant-operate\nKubernetes介绍：https://www.cnblogs.com/weicunqi/p/14892207.html 资源管理：https://www.cnblogs.com/weicunqi/p/14894122.html 实战入门：https://www.cnblogs.com/weicunqi/p/14894249.html\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/k8s%E5%85%A5%E9%97%A8/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='K8S' /><meta property='article:published_time' content='2024-07-14T17:44:10&#43;08:00'/><meta property='article:modified_time' content='2024-07-14T17:44:10&#43;08:00'/>
+<meta name="twitter:title" content="K8s入门">
+<meta name="twitter:description" content="1. wsl安装k3s 遇到问题\n[System has not been booted with systemd as init system (PID 1). Can&rsquo;t operate]\n参考资料\nhttps://askubuntu.com/questions/1379425/system-has-not-been-booted-with-systemd-as-init-system-pid-1-cant-operate\nKubernetes介绍：https://www.cnblogs.com/weicunqi/p/14892207.html 资源管理：https://www.cnblogs.com/weicunqi/p/14894122.html 实战入门：https://www.cnblogs.com/weicunqi/p/14894249.html\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-wsl安装k3s">1. wsl安装k3s</a></li>
+    <li><a href="#2-minikube-window安装">2. minikube window安装</a></li>
+    <li><a href="#3-kube-命令">3. kube 命令</a></li>
+    <li><a href="#4-pod">4. pod</a>
+      <ul>
+        <li><a href="#0-特点">0. 特点</a></li>
+        <li><a href="#1-镜像拉取策略">1. 镜像拉取策略</a></li>
+        <li><a href="#2-生命周期行为">2. 生命周期行为</a>
+          <ul>
+            <li><a href="#1-初始化容器-init-container-">1. 初始化容器（ init container ）</a></li>
+            <li><a href="#2-容器探测">2. 容器探测</a></li>
+          </ul>
+        </li>
+        <li><a href="#3-健康检查">3. 健康检查</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-pod-控制器">5. pod 控制器</a>
+      <ul>
+        <li><a href="#1-replicaset控制器">1. ReplicaSet控制器</a></li>
+        <li><a href="#2-deployment-控制器">2. Deployment 控制器</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-数据存储">6. 数据存储</a>
+      <ul>
+        <li><a href="#1-emptydir">1. emptydir</a></li>
+        <li><a href="#2-hostpath">2. hostpath</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-service">7. service</a>
+      <ul>
+        <li><a href="#1-clusterip">1. clusterIp</a></li>
+        <li><a href="#2-nodeport">2. NodePort</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/k8s/" >
+                K8S
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/k8s%E5%85%A5%E9%97%A8/">K8s入门</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jul 14, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 9 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="1-wsl安装k3s">1. wsl安装k3s
+</h1><p>遇到问题</p>
+<blockquote>
+<p>[System has not been booted with systemd as init system (PID 1). Can&rsquo;t operate]</p>
+</blockquote>
+<p>参考资料</p>
+<blockquote>
+<p><a class="link" href="https://askubuntu.com/questions/1379425/system-has-not-been-booted-with-systemd-as-init-system-pid-1-cant-operate"  target="_blank" rel="noopener"
+    >https://askubuntu.com/questions/1379425/system-has-not-been-booted-with-systemd-as-init-system-pid-1-cant-operate</a></p>
+<p>Kubernetes介绍：https://www.cnblogs.com/weicunqi/p/14892207.html
+资源管理：https://www.cnblogs.com/weicunqi/p/14894122.html
+实战入门：https://www.cnblogs.com/weicunqi/p/14894249.html</p>
+</blockquote>
+<h1 id="2-minikube-window安装">2. minikube window安装
+</h1><pre><code>New-Item -Path 'c:\' -Name 'minikube' -ItemType Directory -Force
+Invoke-WebRequest -OutFile 'c:\minikube\minikube.exe' -Uri 'https://github.com/kubernetes/minikube/releases/latest/download/minikube-windows-amd64.exe' -UseBasicParsing
+
+$oldPath = [Environment]::GetEnvironmentVariable('Path', [EnvironmentVariableTarget]::Machine)
+if ($oldPath.Split(';') -inotcontains 'C:\minikube'){
+  [Environment]::SetEnvironmentVariable('Path', $('{0};C:\minikube' -f $oldPath), [EnvironmentVariableTarget]::Machine)
+}
+</code></pre>
+<p>控制台</p>
+<pre><code>minikube dashboard
+</code></pre>
+<p>测试pod</p>
+<pre><code>kubectl create deployment hello-minikube --image=kicbase/echo-server:1.0
+kubectl expose deployment hello-minikube --type=NodePort --port=8080
+
+kubectl get services hello-minikube
+
+minikube service hello-minikube
+
+kubectl port-forward service/hello-minikube 7080:8080
+</code></pre>
+<h1 id="3-kube-命令">3. kube 命令
+</h1><p>nginx-pod</p>
+<pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.12
+        ports:
+        - containerPort: 80
+</code></pre>
+<p>副本数量</p>
+<p>==spec.replicas==是可以选字段，指定期望的pod数量，默认是1。</p>
+<p>==.spec.selector==是可选字段，用来==指定 label selector ，圈定Deployment管理的pod范围==。如果被</p>
+<p>指定， .spec.selector 必须匹配 .spec.template.metadata.labels，否则它将被API拒绝。如果</p>
+<p>.spec.selector 没有被指定， .spec.selector.matchLabels 默认是.spec.template.metadata.labels。</p>
+<p>==在Pod的template跟.spec.template不同或者数量超过了.spec.replicas规定的数量的情况下, Deployment会杀掉label跟selector不同的Pod==</p>
+<p>Pod模板，.spec.template 是 .spec中唯一要求的字段</p>
+<p>.spec.template.spec.restartPolicy 可以设置为 Always , 如果不指定的话这就是默认配置。</p>
+<ol>
+<li>创建pod</li>
+</ol>
+<pre><code>kubectl get pods -o wide -w
+kubectl apply -f nginx-pod.yml
+</code></pre>
+<ol start="2">
+<li>删除pod</li>
+</ol>
+<pre><code>kubectl delete pod nginx-deployment-f77774fc5-cgs82
+# 查看Pod详情
+kubectl get pods -o wide
+
+它会重新拉起来
+</code></pre>
+<ol start="3">
+<li>查看创建过程</li>
+</ol>
+<pre><code>kubectl describe pod nginx-deployment
+</code></pre>
+<ol start="4">
+<li>查看pod 的详细信息</li>
+</ol>
+<pre><code>kubectl describe pod nginx
+</code></pre>
+<h1 id="4-pod">4. pod
+</h1><h2 id="0-特点">0. 特点
+</h2><p>​		Pod中封装着应用的容器（有的情况下是好几个容器），==存储、独立的网络IP==，管理容器如何运行</p>
+<p>的策略选项。Pod代表着部署的一个单位：kubernetes中应用的一个实例，可能由一个或者多个容器组</p>
+<p>合在一起共享资源。</p>
+<p>==<strong>网络</strong>==</p>
+<p>==每一个Pod都会被指派一个唯一的Ip地址==，在Pod中的==每一个容器共享网络命名空间==，包括==Ip地址和 网络端口。在同一个Pod中的容器可以同locahost进行互相通信==。当Pod中的容器需要与Pod外的实体进 行通信时，则需要通过端口等共享的网络资源。</p>
+<p>==<strong>存储</strong>==</p>
+<p>Pod能够被指定共享存储卷的集合，在Pod中所有的容器能够访问共享存储卷，允许这些容器共享 数据。存储卷也允许在一个Pod持久化数据，以防止其中的容器需要被重启。</p>
+<h2 id="1-镜像拉取策略">1. 镜像拉取策略
+</h2><p>pod的镜像拉取策略分为三种：</p>
+<blockquote>
+<p>always（总是从官方下载镜像）</p>
+<p>never（从不下载镜像）</p>
+<p>ifnotpresent（如果本地没有镜像就从官方下载镜像）。</p>
+</blockquote>
+<h2 id="2-生命周期行为">2. 生命周期行为
+</h2><h3 id="1-初始化容器-init-container-">1. 初始化容器（ init container ）
+</h3><p>即应用程序的主容器启动之前要运行的容器，常用于为主容器 执行一些预置操作，它们具有两种典型特征。</p>
+<ol>
+<li>
+<p>初始化容器必须运行完成直至结束，若某初始化容器运行失败，那么 kubernetes 需要重启它直到 成功完成。（注意：如果 pod 的 spec.restartPolicy 字段值为“ Never ”，那么运行失败的初始化 容器不会被重启。）</p>
+</li>
+<li>
+<p>每个初始化容器都==必须按定义的顺序串行运行==。</p>
+</li>
+</ol>
+<h3 id="2-容器探测">2. 容器探测
+</h3><blockquote>
+<p>容器探测（ container probe ）是 Pod 对象生命周期中的一项重要的日常任务，它是 kubelet 对</p>
+<p>容器周期性执行的健康状态诊断，诊断操作由容器的处理器（ handler ）进行定义。</p>
+<p>Kubernetes 支持三种处理器用于 Pod 探测：</p>
+</blockquote>
+<ol>
+<li>ExecAction ：在容器内执行指定命令，并根据其返回的状态码进行诊断的操作称为 Exec 探测，</li>
+</ol>
+<p>状态码为 0 表示成功，否则即为不健康状态。</p>
+<ol start="2">
+<li>TCPSocketAction ：通过与容器的某 TCP 端口尝试建立连接进行诊断，端口能够成功打开即为正</li>
+</ol>
+<p>常，否则为不健康状态。</p>
+<ol start="3">
+<li>HTTPGetAction ：通过向容器 IP 地址的某指定端口的指定 path 发起 HTTP GET 请求进行诊断，</li>
+</ol>
+<p>响应码为 2xx 或 3xx 时即为成功，否则为失败。</p>
+<blockquote>
+<p>任何一种探测方式都可能存在三种结果： “Success”（成功） 、 “Failure”（失败） 、 “Unknown”</p>
+<p>（未知） ，只有 success 表示成功通过检测。</p>
+</blockquote>
+<h2 id="3-健康检查">3. 健康检查
+</h2><ol>
+<li>存活探测 ==<strong>应用是否活着</strong>==</li>
+<li>就绪探测 ==用<strong>是否准备好为请求提供服务</strong>==</li>
+</ol>
+<ul>
+<li>Liveness探测和Readiness探测是两种Health Check机制,如果不特意配置,Kubernetes将对两种探</li>
+</ul>
+<p>测采取相同的默认行为,即通过判断容器启动进程的返回值是否为零来判断探测是否成功。</p>
+<ul>
+<li>
+<p>两种探测的配置方法完全一样,支持的配置参数也一样。</p>
+</li>
+<li>
+<p>不同之处在于探测失败后的行为:Liveness 探测是重启容器;Readiness探测则是将容器设置为不可用,不接收Service转发的请求。</p>
+</li>
+<li>
+<p>Liveness探测和Readiness探测是独立执行的,二者之间没有依赖,所以可以单独使用,也可以同时使用。</p>
+</li>
+<li>
+<p>用Liveness探测判断容器是否需要重启以实现自愈;用Readiness探测判断容器是否已经准备好 对外提供服务</p>
+</li>
+</ul>
+<h1 id="5-pod-控制器">5. pod 控制器
+</h1><blockquote>
+<p>​	Pod控制器是用于实现管理pod的中间层，确保pod资源符合预期的状态，pod的资源出现故障时， 会尝试 进行重启，当根据重启策略无效，则会重新新建pod的资源。 创建为具体的控制器对象之后，每个控制器均通过 API Server 提供的接口持续监控相关资源对象 的当前状态，并在因故障、更新或其他原因导致系统状态发生变化时，尝试让资源的当前状态想期望状 态迁移和逼近。</p>
+</blockquote>
+<p>一个 Pod 控制器资源至少应该包含三个基本的组成部分：</p>
+<ul>
+<li>标签选择器：匹配并关联 Pod 资源对象，并据此完成受其管控的 Pod 资源计数。</li>
+<li>期望的副本数：期望在集群中精确运行着的 Pod 资源的对象量。</li>
+<li>Pod模板：用于新建 Pod 资源对象的 Pod 模板资源。</li>
+</ul>
+<p>常见的控制器</p>
+<ul>
+<li>ReplicaSet: 代用户创建指定数量的 pod 副本数量，确保 pod 副本数量符合预期状态，并且支持滚动式自动扩容和缩容功能</li>
+<li>Deployment: 工作在 ReplicaSet 之上，用于管理无状态应用，目前来说最好的控制器。支持滚动更新和回滚功能，还提供声明式配置。</li>
+<li>DaemonSet: 用于确保集群中的每一个节点只运行特定的 pod 副本，常用于实现系统级后台任务。比如 ELK 服务</li>
+</ul>
+<h2 id="1-replicaset控制器">1. ReplicaSet控制器
+</h2><p>示例</p>
+<pre><code>vi nginx-rs.yml
+
+</code></pre>
+<pre><code class="language-yml">apiVersion: apps/v1   # api版本定义
+kind: ReplicaSet       # 定义资源类型为ReplicaSet
+metadata:
+  name: nginx-rs       # ReplicaSet的名称
+  namespace: default  # 命名空间
+spec:                 # ReplicaSet的规格定义
+  replicas: 2         # 定义副本数量为2个
+  selector:           # 标签选择器，定义匹配Pod的标签
+    matchLabels:
+      app: nginx
+  template:           # Pod的模板定义
+    metadata:         # Pod的元数据定义
+      name: nginx-pod # 自定义Pod的名称
+      labels:         # 定义Pod的标签
+        app: nginx    #定义Pod的标签，需要和上面的标签选择器内匹配规则中定义的标签一致，可以多出其他标签
+    spec:             # Pod的规格定义
+      containers:     # 容器定义
+      - name: nginx  # 容器名称
+        image: nginx:1.12  # 容器镜像
+        imagePullPolicy: IfNotPresent  # 拉取镜像的规则
+        ports:         # 暴露端口
+        - name: http   # 端口名称
+          containerPort: 80  # 容器端口
+
+</code></pre>
+<p>创建rs 控制器</p>
+<pre><code class="language-shell">kubectl apply -f nginx-rs.yaml
+
+</code></pre>
+<p>查看 rs 控制器</p>
+<pre><code>kubectl get rs
+
+</code></pre>
+<p>==更新控制器一般来说都是修改配置文件 然后再apply==</p>
+<p>扩缩容, 使用scale 命令, (==用于临时的处理==), 永久的还是要使用配置文件</p>
+<pre><code>kubectl scale replicasets nginx-rs --replicas=4
+
+</code></pre>
+<p>删除rs 控制器,  数 cascade=false 设置不删除pod</p>
+<pre><code>kubectl delete replicasets nginx-rs --cascade=false
+
+</code></pre>
+<h2 id="2-deployment-控制器">2. Deployment 控制器
+</h2><pre><code>vi nginx-deployment.yml
+
+</code></pre>
+<pre><code>yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+
+</code></pre>
+<p>更新策略</p>
+<ul>
+<li>滚动更新: 滚动更新是==默认的更新策略==，==它在删除一些旧版本的Pod的同时补充创建一些新的Pod，更新期间 服务不会中断==。</li>
+</ul>
+<blockquote>
+<p>滚动更新期间，应用升级期间还要确保可用的Pod对象数量不低于某些阈值。确保可以持续处理客 户端请求。变动的方式和Pod对象的数量范围将通过==spec.strategy.roollingUpdata.maxSurge和 spec.strategy.roollingUpdata.maxunavailable两个属性协同进行定义。两个参数用法如下：</p>
+<ul>
+<li>
+<p>maxSurge：指定升级期间存在的总Pod对象数量最多以超出期望值的个数，其值可以为0或者正整 数，也可以是一个期望值的百分比：例如如果期望值是3，当前的属性值为1，则表示Pod对象的总 数不能超过4个。</p>
+</li>
+<li>
+<p>maxUnavailable：升级期间正常可用的Pod副本数（包括新旧版本）最多不能低于期望的个数、其 值可以是0或者正整数。也可以是一个期望值的百分比，默认值为1；该值意味着如果期望值是3， 那么在升级期间至少要有两个Pod对象处于正常提供服务的状态</p>
+</li>
+</ul>
+</blockquote>
+<p>==查看pod的版本号==</p>
+<pre><code>kubectl get pods -o custom-columns=Name:metadata.name,Image:spec.containers[0].image 
+
+</code></pre>
+<ul>
+<li>重建更新: 先删除所有的Pod再根据新的模板创建新的Pod，中间会导致服务的不可用，用户要 么使用的是新版本，要么就是旧版本</li>
+</ul>
+<p>执行回滚</p>
+<pre><code>kubectl rollout undo deployment/nginx-deployment
+
+</code></pre>
+<p>==回滚只能在最近的两个版本之间回滚, 如果想要回滚到指定的节点需要加版本==</p>
+<pre><code>kubectl rollout history deployment/nginx-deployment --revision=1
+
+</code></pre>
+<h1 id="6-数据存储">6. 数据存储
+</h1><p>通过命令 <code>kubectl explain pod.spec</code> 可以查看 当前 kubernetes 版本支持的存储卷类型</p>
+<h2 id="1-emptydir">1. emptydir
+</h2><blockquote>
+<p>emptyDir 存储卷是 Pod 对象生命周期中的一个临时目录，类似于 Docker 上的 “docker 挂载</p>
+<p>卷” ，在 Pod 对象启动时即被创建，而在 Pod 对象被移除时会被一并删除（永久删除）。</p>
+</blockquote>
+<p>==<strong>一个容器崩溃了不会导致数据的丢失，因为容器的崩溃并不移除</strong> Pod==。</p>
+<h2 id="2-hostpath">2. hostpath
+</h2><p>半持久化, 需要配合nfs 使用</p>
+<h1 id="7-service">7. service
+</h1><blockquote>
+<p>Kubernetes service 定义了这样一种抽象：一个 Pod 的逻辑分组，一种可以访问它们的策略 ——</p>
+<p>通常称为微服务。这一组 pod 能够被 Service 访问到，通常是通过 Label selector</p>
+</blockquote>
+<p>Service 资源基于标签选择器将一组 Pod 定义成一个逻辑组合，并通过自己的 IP 地址和端口调度代理请求至组内的 Pod 对象之上，如下图所示，它向客户端隐藏了真实的、处理用户请求的 Pod 资源， 使得客户端的请求看上去就像是由 Service 直接处理并响应一样。 service 的 ip 也被称作为 cluster-ip</p>
+<p><img src="/p/k8s%E5%85%A5%E9%97%A8/images/image-20240805122647839.png"
+	width="781"
+	height="242"
+	
+	loading="lazy"
+	
+		alt="image-20240805122647839"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="322"
+		data-flex-basis="774px"
+	
+></p>
+<p>Service能够提供负载均衡的能力，但是在使用上有以下限制：</p>
+<p><strong>只提供4层负载均衡能力，而没有7层功能，但有时我们可能需要更多的匹配规则来转发请求，这点上4层负载均衡是不支持的</strong></p>
+<ul>
+<li>客户端只需要访问 Service 的 IP，==Kubernetes 则负责建立和维护 Service 与 Pod 的映射关系==。</li>
+<li>无论后端 Pod 如何变化，对客户端不会有任何影响，因为 Service 没有变</li>
+</ul>
+<p>service 的 类型</p>
+<ul>
+<li>
+<p><strong>Clusterlp</strong>：默认类型，自动分配一个仅 Cluster 内部可以访问的虚拟 IP</p>
+</li>
+<li>
+<p><strong>NodePort</strong>：在 ClusterIP 基础上为 Service 在每台机器上绑定一个端口，这样就可以通过： NodePort 来访问该服务</p>
+</li>
+<li>
+<p><strong>LoadBalancer</strong>：在 NodePort 的基础上，借助 cloud provider 创建一个外部负载均衡器，并将请求转发到：NodePort</p>
+</li>
+<li>
+<p><strong>ExternalName</strong>：把集群外部的服务引入到集群内部来，在集群内部直接使用。没有任何类型代理</p>
+<p>被创建，这只有kubernetes 1.7或更高版本的 kube-dns 才支持</p>
+</li>
+</ul>
+<h2 id="1-clusterip">1. clusterIp
+</h2><p>类型为ClusterIP的service，这个service有一个Cluster-IP，其实就一个VIP，具体实现原理依靠</p>
+<p>kubeproxy组件，通过iptables或是ipvs实现。</p>
+<p>==注意：这种类型的service只能在集群内访问==</p>
+<h2 id="2-nodeport">2. NodePort
+</h2><blockquote>
+<p>NodePort的最主要功能是进行外网访问，我们是不能通过访问 8000 端口访问的，他是内网端</p>
+<p>口，外网访问需要访问映射出来的端口 8000:31337/TCP 这里映射出来的 nodeport 是 31337 ，</p>
+<p>还可以通过指定 nodePort 来指定端口，要求端口必须大于30000</p>
+</blockquote>
+<p><img src="/p/k8s%E5%85%A5%E9%97%A8/images/image-20240805123055409.png"
+	width="871"
+	height="595"
+	
+	loading="lazy"
+	
+		alt="image-20240805123055409"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="146"
+		data-flex-basis="351px"
+	
+></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/k8s/">K8S</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

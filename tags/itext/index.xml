@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Itext on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/tags/itext/</link>
+        <description>Recent content in Itext on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Wed, 09 Nov 2022 19:21:43 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/tags/itext/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Itext</title>
+        <link>https://mikeLing-qx.github.io/p/itext/</link>
+        <pubDate>Wed, 09 Nov 2022 19:21:43 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/itext/</guid>
+        <description>&lt;p&gt;参考资料&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;思路拓展: model 用thymeleaf 转 html 再转 pdf &lt;a class=&#34;link&#34; href=&#34;https://zhuanlan.zhihu.com/p/378852796&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://zhuanlan.zhihu.com/p/378852796&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Itext 上手: &lt;a class=&#34;link&#34; href=&#34;https://github.com/CuteXiaoKe/iText7-examples&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/CuteXiaoKe/iText7-examples&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;视图模型&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/images/image-20220505145802605.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220505145802605&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;1-itext入门&#34;&gt;1. Itext入门
+&lt;/h1&gt;&lt;p&gt;maven&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;&amp;lt;dependency&amp;gt;
+	&amp;lt;groupId&amp;gt;com.itextpdf&amp;lt;/groupId&amp;gt;
+	&amp;lt;artifactId&amp;gt;itext7-core&amp;lt;/artifactId&amp;gt;
+	&amp;lt;version&amp;gt;7.2.1&amp;lt;/version&amp;gt;
+&amp;lt;/dependency&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;1-生成pdf&#34;&gt;1. 生成pdf
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;第 1 步：创建一个 PdfWriter 对象
+
+第 2 步：创建一个 PdfDocument 对象
+
+第 3 步：添加一个空页面 
+PdfDocument类的addNewPage()方法用于在 PDF 文档中创建一个空白页面
+
+第 4 步：创建一个 Document 对象
+
+步骤 5：关闭文档
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;import com.itextpdf.kernel.pdf.PdfDocument; 
+import com.itextpdf.kernel.pdf.PdfWriter; 
+import com.itextpdf.layout.Document;  
+public class create_PDF {    
+   public static void main(String args[]) throws Exception { 
+        // 1、Creating a PdfWriter 
+        String dest = &amp;quot;C:/itextExamples/sample.pdf&amp;quot;; 
+        PdfWriter writer = new PdfWriter(dest);
+
+        // 2、Creating a PdfDocument  
+        PdfDocument pdfDoc = new PdfDocument(writer);
+
+        // 3、Adding an empty page 
+        pdfDoc.addNewPage(); 
+
+        // 4、Creating a Document   
+        Document document = new Document(pdfDoc); 
+
+        // 5、Closing the document 
+        document.close();
+        System.out.println(&amp;quot;PDF Created&amp;quot;);  
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-字体设置&#34;&gt;2. 字体设置
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.cnblogs.com/jiangxiaoxi/p/14055188.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;itext使用包含特殊字符的字体——制作字体不求人&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;普通职员（办公室/写字楼工作人员）
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;中文默认不输出, 需要对Document 设置字体&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# 常用字体程序及对应编码
+STSong-Light       ==&amp;gt; UniGB-UCS2-H
+HeiseiKakuGo-W5    ==&amp;gt; UniJIS-UCS2-H
+HeiseiMin-W3       ==&amp;gt; UniJIS-UCS2-H
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt; public static void fun2() throws Exception{  //font-asian中文包
+        PdfDocument pdfDocument = new PdfDocument(new PdfWriter(dest2));
+        Document document = new Document(pdfDocument);
+
+        PdfFont font = PdfFontFactory.createFont(&amp;quot;STSong-Light&amp;quot;,&amp;quot;UniGB-UCS2-H&amp;quot;);
+        document.setFont(font);
+
+        Paragraph paragraph = new Paragraph(&amp;quot;hello 瓜田李下&amp;quot;);
+        document.add(paragraph);
+
+        document.close();
+    }
+
+    public static void fun3() throws Exception{  //系统中文包
+        PdfDocument pdfDocument = new PdfDocument(new PdfWriter(dest3));
+        Document document = new Document(pdfDocument);
+
+        PdfFont font = PdfFontFactory.createFont(&amp;quot;./fonts/simkai.ttf&amp;quot;);
+        document.setFont(font);
+
+        Paragraph paragraph = new Paragraph(&amp;quot;hello 瓜田李下&amp;quot;);
+        document.add(paragraph);
+
+        document.close();
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;3-添加空白页&#34;&gt;3. 添加空白页
+&lt;/h2&gt;&lt;p&gt;添加第二页为空白页, 立即刷新后再继续&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;pdf.addNewPage(2).flush();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;4-div-paragraph&#34;&gt;4. Div, Paragraph
+&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;	Div div = new Div();
+    div.setWidth(UnitValue.createPercentValue(100));
+    div.setHeight(UnitValue.createPercentValue(100));
+    div.setHorizontalAlignment(HorizontalAlignment.CENTER);
+    Paragraph p1 = new Paragraph();
+    p1.setHorizontalAlignment(HorizontalAlignment.CENTER);
+    p1.setMaxWidth(UnitValue.createPercentValue(75));
+    p1.setMarginTop(180f);
+    p1.setCharacterSpacing(0.4f);
+    Style large = new Style();
+    large.setFontSize(22);
+    large.setFontColor(GenoColor.getThemeColor());
+    p1.add(new Text(&amp;quot;尊敬的 &amp;quot;).addStyle(large));
+    ...
+    Paragraph p2 = new Paragraph();
+    ...
+    div.add(p1);
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;整块的内容用Div包裹，这里整块包裹的好处是什么？一方面排版分明成体系，另一方面若需求是整块的内容必须在同一个版面，你可以对Div设置&lt;code&gt;div.setKeepTogether(true);&lt;/code&gt;，尽量保证若整块的内容超出了一页，那这块内容会自动整块出现在下一页，上一页剩下的就留白了&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;可以看到&lt;code&gt;Div&lt;/code&gt;，&lt;code&gt;Paragraph&lt;/code&gt;可以设置很多属性，实际上我们常用的组件除了这两种，还有&lt;code&gt;Table&lt;/code&gt;，&lt;code&gt;Cell&lt;/code&gt;，&lt;code&gt;List&lt;/code&gt;，他们大部分的属性都是一样的，只是&lt;strong&gt;部分属性只在部分组件起效果&lt;/strong&gt;，所以当你设置某个属性没起效果也不用奇怪&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Paragraph&lt;code&gt;需要**特别注意的一点**，想要**段落文字居中**，不要用&lt;/code&gt;setHorizontalAlignment(HorizontalAlignment.CENTER);&lt;code&gt;这是组件的居中对段落无效，甚至对段落里你放&lt;/code&gt;Text&lt;code&gt;也无效，需要改用&lt;/code&gt;setTextAlignment(TextAlignment.CENTER);&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Paragraph&lt;/code&gt;段落的行距也是个高频问题，这里给出官方我看到的解释，参考&lt;code&gt;https://itextpdf.com/en/resources/books/itext-7-building-blocks/chapter-4-adding-abstractelement-objects-part-1&lt;/code&gt;，搜关键字&lt;code&gt;setFixedLeading&lt;/code&gt;，我的理解该方法设值行高绝对值，官方解释是&lt;strong&gt;两行文字中间基线之间的距离&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;如果想了解详细的什么属性哪里能起作用哪里不行，请访问该&lt;a class=&#34;link&#34; href=&#34;https://link.juejin.cn?target=https%3A%2F%2Fitextpdf.com%2Fen%2Fresources%2Fbooks%2Fitext-7-building-blocks%2Fabstractelement-methods&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;地址&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;5-table&#34;&gt;5. Table
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;useAllAvailableWidth&lt;/code&gt;表示页面有多宽，我就有多宽&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;table.startNewRow();&lt;/code&gt;表示新起一行，table每画一行都要新起一行&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;同样table内容需要居中，和段落一样，请设置&lt;code&gt;new Cell().setTextAlignment(TextAlignment.CENTER)&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;每个table中cell都有默认高度，会比实际输入字体高些，此时设置&lt;code&gt;setHeight&lt;/code&gt;，若更大没有问题，若&lt;strong&gt;高度小于或接近字体大小&lt;/strong&gt;文字可能就消失了，若想让&lt;strong&gt;Cell高度更接近文字高度&lt;/strong&gt;，请设置&lt;code&gt;Cell&lt;/code&gt;的&lt;code&gt;padding&lt;/code&gt;，即&lt;code&gt;cell.setPadding(-2)&lt;/code&gt;，设置负值即可&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;6-tab-t&#34;&gt;6. Tab, \t
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;itext7中如果要表示段落前的空格，不能使用&lt;code&gt;\t&lt;/code&gt;，但换行可以使用&lt;code&gt;\n&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;实现Tab 的方式&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;\u00a0&lt;/code&gt;符号，大概7、8个该符号可表示tab，可能不是很准确&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;p1.setFirstLineIndent(24)&lt;/code&gt;，表示段落前留多少空，需要知道一个字多大，设置成两倍就行&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;Tab&lt;/code&gt;也是集成&lt;code&gt;AbstractElement&lt;/code&gt;的组件，通过以下方式也可实现相同的效果&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;pre&gt;&lt;code&gt;p2.add(new Tab());
+  p2.addTabStops(new TabStop(20, TabAlignment.LEFT));
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;​&lt;/p&gt;
+&lt;h2 id=&#34;7-换页&#34;&gt;7. 换页
+&lt;/h2&gt;&lt;p&gt;我常用的换页方法为如下，该方法可保证立即换页&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;doc.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;当然&lt;code&gt;PdfDocument&lt;/code&gt;有&lt;code&gt;addNewPage&lt;/code&gt;其实也可以用，但有时候你没把握好刷新时间可能导致某些混乱&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

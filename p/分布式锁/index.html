@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="分布式锁 学习目标 什么是分布式 什么是锁 什么是分布式锁 分布式锁的使用场景-为什么要使用分布式锁 分布式锁需要具备哪些功能/条件 分布式锁的解决方案 1 分布式锁介绍 1.1 什么是分布式 一个大型的系统往往被分为几个子系统来做，一个子系统可以部署在一台机器的多个 JVM(java虚拟机) 上，也可以部署在多台机器上。但是每一个系统不是独立的，不是完全独立的。需要相互通信，共同实现业务功能。\n">
+<title>分布式锁</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="分布式锁">
+<meta property='og:description' content="分布式锁 学习目标 什么是分布式 什么是锁 什么是分布式锁 分布式锁的使用场景-为什么要使用分布式锁 分布式锁需要具备哪些功能/条件 分布式锁的解决方案 1 分布式锁介绍 1.1 什么是分布式 一个大型的系统往往被分为几个子系统来做，一个子系统可以部署在一台机器的多个 JVM(java虚拟机) 上，也可以部署在多台机器上。但是每一个系统不是独立的，不是完全独立的。需要相互通信，共同实现业务功能。\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='分布式锁' /><meta property='article:tag' content='分布式' /><meta property='article:tag' content='并发编程' /><meta property='article:published_time' content='2022-08-03T19:53:40&#43;08:00'/><meta property='article:modified_time' content='2022-08-03T19:53:40&#43;08:00'/>
+<meta name="twitter:title" content="分布式锁">
+<meta name="twitter:description" content="分布式锁 学习目标 什么是分布式 什么是锁 什么是分布式锁 分布式锁的使用场景-为什么要使用分布式锁 分布式锁需要具备哪些功能/条件 分布式锁的解决方案 1 分布式锁介绍 1.1 什么是分布式 一个大型的系统往往被分为几个子系统来做，一个子系统可以部署在一台机器的多个 JVM(java虚拟机) 上，也可以部署在多台机器上。但是每一个系统不是独立的，不是完全独立的。需要相互通信，共同实现业务功能。\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#分布式锁">分布式锁</a>
+      <ul>
+        <li><a href="#学习目标">学习目标</a></li>
+        <li><a href="#1-分布式锁介绍">1 分布式锁介绍</a>
+          <ul>
+            <li><a href="#11-什么是分布式">1.1 什么是分布式</a></li>
+            <li><a href="#12-什么是锁--作用安全">1.2 什么是锁&ndash;作用安全</a></li>
+            <li><a href="#14-什么是分布式锁">1.4 什么是分布式锁</a></li>
+            <li><a href="#15-分布式锁的真实使用场景">1.5 分布式锁的真实使用场景</a></li>
+            <li><a href="#15-分布式锁的执行流程">1.5 分布式锁的执行流程</a></li>
+            <li><a href="#16-分布式锁具备的条件">1.6 分布式锁具备的条件</a></li>
+          </ul>
+        </li>
+        <li><a href="#2分布式锁的解决方案">2.分布式锁的解决方案</a>
+          <ul>
+            <li><a href="#21-数据库实现分布式锁">2.1 数据库实现分布式锁</a>
+              <ul>
+                <li><a href="#211-基于数据库表实现">2.1.1 基于数据库表实现</a></li>
+                <li><a href="#212-基于数据库的排他锁实现">2.1.2 基于数据库的排他锁实现</a></li>
+                <li><a href="#213-优点及缺点">2.1.3 优点及缺点</a></li>
+              </ul>
+            </li>
+            <li><a href="#22-redis实现分布式锁">2.2 Redis实现分布式锁</a>
+              <ul>
+                <li><a href="#221-基于-redis-的-setnxexpire-getset方法做分布式锁">2.2.1 基于 REDIS 的 SETNX()、EXPIRE() 、GETSET()方法做分布式锁</a></li>
+                <li><a href="#222-redis锁的key键如何选择">2.2.2 redis锁的key键如何选择</a></li>
+                <li><a href="#223-优点及缺点">2.2.3 优点及缺点</a></li>
+              </ul>
+            </li>
+            <li><a href="#23-zookeeper实现分布式锁">2.3 zookeeper实现分布式锁</a>
+              <ul>
+                <li><a href="#231-zookeeper-锁相关基础知识">2.3.1 zookeeper 锁相关基础知识</a></li>
+                <li><a href="#232-zookeeper-分布式锁的原理">2.3.2 zookeeper 分布式锁的原理</a></li>
+                <li><a href="#232-zookeeper实现分布式锁流程">2.3.2 zookeeper实现分布式锁流程</a></li>
+                <li><a href="#232-优点及缺点">2.3.2 优点及缺点</a></li>
+              </ul>
+            </li>
+            <li><a href="#24-consul实现分布式锁eurekaregister保存服务的ip-端口-服务列表">2.4 consul实现分布式锁(eureka/Register:保存服务的IP 端口 服务列表)</a>
+              <ul>
+                <li><a href="#241-实现原理及流程">2.4.1 实现原理及流程</a></li>
+                <li><a href="#242-优点及缺点">2.4.2 优点及缺点</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" >
+                分布式锁
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">分布式锁</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Aug 03, 2022</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 13 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="分布式锁">分布式锁
+</h1><h2 id="学习目标">学习目标
+</h2><ul>
+<li>什么是分布式</li>
+<li>什么是锁</li>
+<li>什么是分布式锁</li>
+<li>分布式锁的使用场景-为什么要使用分布式锁</li>
+<li>分布式锁需要具备哪些功能/条件</li>
+<li>分布式锁的解决方案</li>
+</ul>
+<h2 id="1-分布式锁介绍">1 分布式锁介绍
+</h2><h3 id="11-什么是分布式">1.1 什么是分布式
+</h3><p>一个大型的系统往往被分为几个子系统来做，一个子系统可以部署在一台机器的多个 JVM(java虚拟机) 上，也可以部署在多台机器上。但是每一个系统不是独立的，不是完全独立的。需要相互通信，共同实现业务功能。</p>
+<p>一句话来说：分布式就是通过计算机网络将后端工作分布到多台主机上，多个主机一起协同完成工作。</p>
+<h3 id="12-什么是锁--作用安全">1.2 什么是锁&ndash;作用安全
+</h3><p>现实生活中，当我们需要保护一样东西的时候，就会使用锁。例如门锁，车锁等等。很多时候可能许多人会共用这些资源，就会有很多个钥匙。但是有些时候我们希望使用的时候是独自不受打扰的，那么就会在使用的时候从里面反锁，等使用完了再从里面解锁。这样其他人就可以继续使用了。</p>
+<p>JAVA程序中，当存在多个线程可以同时改变某个变量（可变共享变量）时，就需要对变量或代码块做同步，使其在修改这种变量时能够线性执行消除并发修改变量，而同步的本质是通过锁来实现的。如 Java 中 synchronize 是在对象头设置标记，Lock 接口的实现类基本上都只是某一个 volitile 修饰的 int 型变量其保证每个线程都能拥有对该 int 的可见性和原子修改</p>
+<h3 id="14-什么是分布式锁">1.4 什么是分布式锁
+</h3><p>任何一个分布式系统都无法同时满足一致性（Consistency）、可用性（Availability）和分区容错性（Partition tolerance），最多只能同时满足两项。CAP</p>
+<p>当在分布式模型下，数据只有一份（或有限制），此时需要利用锁的技术控制某一时刻修改数据的进程数。</p>
+<p><strong>分布式锁</strong>: 在分布式环境下，多个程序/线程都需要对某一份(或有限制)的数据进行修改时，针对程序进行控制，保证同一时间节点下，只有一个程序/线程对数据进行操作的技术。</p>
+<h3 id="15-分布式锁的真实使用场景">1.5 分布式锁的真实使用场景
+</h3><p><strong>场景一：</strong></p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/1.png"
+	width="1036"
+	height="702"
+	
+	loading="lazy"
+	
+		alt="1"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="147"
+		data-flex-basis="354px"
+	
+></p>
+<p><strong>场景二：</strong></p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/2.png"
+	width="1221"
+	height="619"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="197"
+		data-flex-basis="473px"
+	
+></p>
+<h3 id="15-分布式锁的执行流程">1.5 分布式锁的执行流程
+</h3><p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/3.png"
+	width="1182"
+	height="624"
+	
+	loading="lazy"
+	
+		alt="3"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="189"
+		data-flex-basis="454px"
+	
+></p>
+<h3 id="16-分布式锁具备的条件">1.6 分布式锁具备的条件
+</h3><ul>
+<li><strong>互斥性</strong>：同一时刻只能有一个服务(或应用)访问资源，特殊情况下有读写锁</li>
+<li><strong>原子性</strong>：一致性要求保证加锁和解锁的行为是原子性的</li>
+<li><strong>安全性</strong>：锁只能被持有该锁的服务(或应用)释放</li>
+<li><strong>容错性</strong>：在持有锁的服务崩溃时，锁仍能得到释放避免死锁</li>
+<li><strong>可重用性</strong>：同一个客户端获得锁后可递归调用&mdash;重入锁和不可重入锁</li>
+<li><strong>公平性</strong>：看业务是否需要公平，避免饿死&ndash;公平锁和非公平锁</li>
+<li><strong>支持阻塞和非阻塞</strong>：和 ReentrantLock 一样支持 lock 和 trylock 以及 tryLock(long timeOut)&mdash;阻塞锁和非阻塞锁==PS:::自选锁==</li>
+<li><strong>高可用</strong>：获取锁和释放锁 要高可用</li>
+<li><strong>高性能</strong>：获取锁和释放锁的性能要好</li>
+<li><strong>持久性</strong>：锁按业务需要自动续约/自动延期</li>
+</ul>
+<h2 id="2分布式锁的解决方案">2.分布式锁的解决方案
+</h2><h3 id="21-数据库实现分布式锁">2.1 数据库实现分布式锁
+</h3><h4 id="211-基于数据库表实现">2.1.1 基于数据库表实现
+</h4><p><strong>准备工作</strong>：创建tb_program表，用于记录当前哪个程序正在使用数据</p>
+<pre><code class="language-sql">CREATE TABLE `tb_program` (
+  `program_no` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '程序的编号'
+  PRIMARY KEY (`program_no`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+</code></pre>
+<p>实现步骤：</p>
+<ol>
+<li>程序访问数据时，将程序的编号（insert）存入tb_program表；</li>
+<li>当insert成功，代表该程序获得了锁，即可执行逻辑；</li>
+<li>当program_no相同的其他程序进行insert是，由于主键冲突会导致insert失败，则代表获取锁失败；</li>
+<li>获取锁成功的程序在逻辑执行完以后，删除该数据,代表释放锁。</li>
+</ol>
+<h4 id="212-基于数据库的排他锁实现">2.1.2 基于数据库的排他锁实现
+</h4><p>除了可以通过增删操作数据表中的记录以外，其实还可以借助数据中自带的锁来实现分布式的锁。我们还用刚刚创建的那张数据库表，基于MySql的InnoDB引擎(MYSQL的引擎种类)可以通过数据库的排他锁来实现分布式锁。</p>
+<p>实现步骤：</p>
+<ol>
+<li>在查询语句后面增加<code>for update</code>，数据库会在查询过程中给数据库表增加排他锁。当某条记录被加上排他锁之后，其他线程无法再在该行记录上增加排他锁</li>
+<li>获得排它锁的线程即可获得分布式锁，执行方法的业务逻辑</li>
+<li>执行完方法之后，再通过<code>connection.commit();</code>操作来释放锁。</li>
+</ol>
+<p><strong>实现代码</strong></p>
+<p>pom.xml</p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
+         xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;groupId&gt;com.itheima&lt;/groupId&gt;
+    &lt;artifactId&gt;mysql-demo&lt;/artifactId&gt;
+    &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+
+    &lt;!--依赖包--&gt;
+    &lt;dependencies&gt;
+      
+        &lt;!-- MySql --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;mysql&lt;/groupId&gt;
+            &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+            &lt;version&gt;5.1.32&lt;/version&gt;
+        &lt;/dependency&gt;
+
+        &lt;!-- Test dependencies --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;junit&lt;/groupId&gt;
+            &lt;artifactId&gt;junit&lt;/artifactId&gt;
+            &lt;version&gt;4.12&lt;/version&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/project&gt;
+</code></pre>
+<p>Book</p>
+<pre><code class="language-java">public class Book {
+
+    // 图书ID
+    private Integer id;
+    // 图书名称
+    private String name;
+    // 图书价格
+    private Float price;
+    // 图书图片
+    private String pic;
+    // 图书描述
+    private String desc;
+}
+</code></pre>
+<p>BookDao</p>
+<pre><code class="language-java">public interface BookDao {
+
+    /**
+     * 查询所有的book数据
+     * @return
+     */
+    List&lt;Book&gt; queryBookList(String name) throws Exception;
+}
+</code></pre>
+<p>BookDaoImpl实现类</p>
+<pre><code class="language-java">public class BookDaoImpl implements BookDao {
+
+    /***
+     * 查询数据库数据
+     * @return
+     * @throws Exception
+     */
+    public List&lt;Book&gt; queryBookList(String name) throws Exception{
+
+        // 数据库链接
+        Connection connection = null;
+        // 预编译statement
+        PreparedStatement preparedStatement = null;
+        // 结果集
+        ResultSet resultSet = null;
+        // 图书列表
+        List&lt;Book&gt; list = new ArrayList&lt;Book&gt;();
+
+        try {
+            // 加载数据库驱动
+            Class.forName(&quot;com.mysql.jdbc.Driver&quot;);
+            // 连接数据库
+            connection = DriverManager.getConnection(&quot;jdbc:mysql://39.108.189.37:3306/lucene&quot;, &quot;ybbmysql&quot;, &quot;ybbmysql&quot;);
+            //关闭自动提交
+            connection.setAutoCommit(false);
+            // SQL语句
+            String sql = &quot;SELECT * FROM book where id = 1 for update&quot;;
+            // 创建preparedStatement
+            preparedStatement = connection.prepareStatement(sql);
+            // 获取结果集
+            resultSet = preparedStatement.executeQuery();
+            // 结果集解析
+            while (resultSet.next()) {
+                Book book = new Book();
+                book.setId(resultSet.getInt(&quot;id&quot;));
+                book.setName(resultSet.getString(&quot;name&quot;));
+                list.add(book);
+            }
+            System.out.println(name + &quot;执行了for update&quot;);
+            System.out.println(&quot;结果为:&quot; + list);
+            //锁行后休眠5秒
+            Thread.sleep(5000);
+
+            //休眠结束释放
+            connection.commit();
+            System.out.println(name + &quot;结束&quot;);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+}
+</code></pre>
+<p>测试类</p>
+<pre><code class="language-java">public class Test {
+
+    private BookDao bookDao = new BookDaoImpl();
+
+    @org.junit.Test
+    public void testLock() throws Exception  {
+        new Thread(new LockRunner(&quot;线程1&quot;)).start();
+        new Thread(new LockRunner(&quot;线程2&quot;)).start();
+        new Thread(new LockRunner(&quot;线程3&quot;)).start();
+        new Thread(new LockRunner(&quot;线程4&quot;)).start();
+        new Thread(new LockRunner(&quot;线程5&quot;)).start();
+        Thread.sleep(200000L);
+    }
+
+    class LockRunner implements Runnable {
+
+        private String name;
+
+        public LockRunner(String name) {
+            this.name = name;
+        }
+
+        public void run() {
+            try {
+                bookDao.queryBookList(name);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+}
+</code></pre>
+<p>执行结果</p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/10.png"
+	width="870"
+	height="370"
+	
+	loading="lazy"
+	
+		alt="10"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="235"
+		data-flex-basis="564px"
+	
+></p>
+<h4 id="213-优点及缺点">2.1.3 优点及缺点
+</h4><p>**优点：**简单，方便，快速实现</p>
+<p>**缺点：**基于数据库，开销比较大，对数据库性能可能会存在影响，服务数量比较多的情况下，数据库也要做集群，使用数据库加锁，锁状态不能同步到其他机器上面，使用insert的方式有一个同步的过程，如果访问从机是可以加到锁的。</p>
+<h3 id="22-redis实现分布式锁">2.2 Redis实现分布式锁
+</h3><h4 id="221-基于-redis-的-setnxexpire-getset方法做分布式锁">2.2.1 基于 REDIS 的 SETNX()、EXPIRE() 、GETSET()方法做分布式锁
+</h4><p><strong>实现原理</strong>：</p>
+<pre><code>setnx():setnx 的含义就是 SET if Not Exists，其主要有两个参数 setnx(key, value)。该方法是原子的，如果 key 不存在，则设置当前 key 成功，返回 1；如果当前 key 已经存在，则设置当前 key 失败，返回 0
+</code></pre>
+<pre><code>expire():expire 设置过期时间，要注意的是 setnx 命令不能设置 key 的超时时间，只能通过 expire() 来对 key 设置。
+</code></pre>
+<pre><code>getset():这个命令主要有两个参数 getset(key，newValue)。该方法是原子的，对 key 设置 newValue 这个值，并且返回 key 原来的旧值。假设 key 原来是不存在的，那么多次执行这个命令，会出现下边的效果：
+
+getset(key, “value1”) 返回 null 此时 key 的值会被设置为 value1
+getset(key, “value2”) 返回 value1 此时 key 的值会被设置为 value2
+</code></pre>
+<p><strong>实现流程</strong>：</p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/7.png"
+	width="812"
+	height="610"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="133"
+		data-flex-basis="319px"
+	
+></p>
+<ol>
+<li>setnx(lockkey, 当前时间+过期超时时间)，如果返回 1，则获取锁成功；如果返回 0 则没有获取到锁。</li>
+<li>get(lockkey) 获取值 oldExpireTime ，并将这个 value 值与当前的系统时间进行比较，如果小于当前系统时间，则认为这个锁已经超时，可以允许别的请求重新获取。</li>
+<li>计算 newExpireTime = 当前时间+过期超时时间，然后 getset(lockkey, newExpireTime) 会返回当前 lockkey 的值currentExpireTime。判断 currentExpireTime 与 oldExpireTime 是否相等，如果相等，说明当前 getset 设置成功，获取到了锁。如果不相等，说明这个锁又被别的请求获取走了，那么当前请求可以直接返回失败，或者继续重试。</li>
+<li>在获取到锁之后，当前线程可以开始自己的业务处理，当处理完毕后，比较自己的处理时间和对于锁设置的超时时间，如果小于锁设置的超时时间，则直接执行 delete 释放锁；如果大于锁设置的超时时间，则不需要再锁进行处理。
+<ol>
+<li>思路: 如果处理时间大于锁设置的超时时间, 需要先去拿到锁的预期的超时时间 和现在的锁的超时时间, 如果不一致, 说明业务处理超时的时候 锁被别的程序获取了, 所以这次的操作只能进行rollback</li>
+</ol>
+</li>
+</ol>
+<p><strong>在Linux虚拟机中创建redis容器</strong></p>
+<p>docker run -di &ndash;name=tensquare_redis -p 6379:6379 redis</p>
+<p><strong>代码实现</strong></p>
+<p>pom.xml文件</p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+    
+     &lt;groupId&gt;com.itheima&lt;/groupId&gt;
+    &lt;artifactId&gt;redis&lt;/artifactId&gt;
+    &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+    &lt;name&gt;redis&lt;/name&gt;
+    &lt;description&gt;redis实现分布式锁测试&lt;/description&gt;
+    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;2.1.4.RELEASE&lt;/version&gt;
+        &lt;relativePath/&gt; &lt;!-- lookup parent from repository --&gt;
+    &lt;/parent&gt;
+   
+
+    &lt;properties&gt;
+        &lt;java.version&gt;1.8&lt;/java.version&gt;
+    &lt;/properties&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-data-redis&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+            &lt;exclusions&gt;
+                &lt;exclusion&gt;
+                    &lt;groupId&gt;org.junit.vintage&lt;/groupId&gt;
+                    &lt;artifactId&gt;junit-vintage-engine&lt;/artifactId&gt;
+                &lt;/exclusion&gt;
+            &lt;/exclusions&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+
+&lt;/project&gt;
+</code></pre>
+<p>RedisUtil工具类</p>
+<pre><code class="language-java">@Component
+public class RedisUtil {
+    //定义默认超时时间:单位毫秒
+    private static final Integer LOCK_TIME_OUT = 10000;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    /**
+     * 外部调用加锁方法
+     */
+    public Boolean tryLock(String key, Long timeout) throws Exception{
+
+        //获取当前系统时间设置为开始时间
+        Long startTime = System.currentTimeMillis();
+
+        //设置返回默认值-false:加锁失败
+        boolean flag = false;
+
+        //死循环获取锁:1.获取锁成功退出 2.获取锁超时退出
+        while(true){
+            //判断是否超时
+            if((System.currentTimeMillis() - startTime) &gt;= timeout){
+                break;
+            }else{
+                //获取锁
+                flag = lock(key);
+                //判断是否获取成功
+                if(flag){
+                    break;
+                }else{
+                    //休息0.1秒重试,降低服务压力
+                    Thread.sleep(100);
+                }
+            }
+        }
+        return flag;
+    }
+
+    /**
+     * 加锁实现
+     * @param key
+     * @return
+     */
+    private Boolean lock(String key){
+        return (Boolean) stringRedisTemplate.execute((RedisCallback) redisConnection -&gt; {
+            //获取当前系统时间
+            Long time = System.currentTimeMillis();
+
+            //设置锁超时时间
+            Long timeout = time + LOCK_TIME_OUT + 1;
+
+            //setnx加锁并获取解锁结果
+            Boolean result = redisConnection.setNX(key.getBytes(), String.valueOf(timeout).getBytes());
+
+            //加锁成功返回true
+            if(result){
+                return true;
+            }
+
+            //加锁失败判断锁是否超时
+            if(checkLock(key, timeout)){
+                //getset设置值成功后,会返回旧的锁有效时间
+                byte[] newtime = redisConnection.getSet(key.getBytes(), String.valueOf(timeout).getBytes());
+                if(time &gt; Long.valueOf(new String(newtime))){
+                    return true;
+                }
+            }
+            //默认加锁失败
+            return false;
+        });
+
+    }
+
+    /**
+     * 释放锁
+     */
+    public Boolean release(String key){
+        return (Boolean) stringRedisTemplate.execute((RedisCallback) redisConnection -&gt; {
+            Long del = redisConnection.del(key.getBytes());
+            if (del &gt; 0){
+                return true;
+            }
+            return false;
+        });
+    }
+
+    /**
+     * 判断锁是否超时
+     */
+    private Boolean checkLock(String key, Long timeout){
+
+        return (Boolean) stringRedisTemplate.execute((RedisCallback) redisConnection -&gt; {
+            //获取锁的超时时间
+            byte[] bytes = redisConnection.get(key.getBytes());
+
+            try {
+                //判断锁的有效时间是否大与当前时间
+                if(timeout &gt; Long.valueOf(new String(bytes))){
+                    return true;
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                return false;
+            }
+            return false;
+        });
+    }
+}
+</code></pre>
+<p>RedisController测试类</p>
+<pre><code class="language-java">@RestController
+@RequestMapping(value = &quot;/redis&quot;)
+public class RedisController {
+
+    @Autowired
+    private RedisUtil redisUtil;
+
+    /**
+     * 获取锁
+     * @return
+     */
+    @GetMapping(value = &quot;/lock/{name}&quot;)
+    public String lock(@PathVariable(value = &quot;name&quot;)String name) throws Exception{
+        Boolean result = redisUtil.tryLock(name, 3000L);
+        if(result){
+            return &quot;获取锁成功&quot;;
+        }
+        return &quot;获取锁失败&quot;;
+    }
+
+    /**
+     * 释放锁
+     * @param name
+     */
+    @GetMapping(value = &quot;/unlock/{name}&quot;)
+    public String unlock(@PathVariable(value = &quot;name&quot;)String name){
+        Boolean result = redisUtil.release(name);
+        if(result){
+            return &quot;释放锁成功&quot;;
+        }
+        return &quot;释放锁失败&quot;;
+    }
+}
+</code></pre>
+<h4 id="222-redis锁的key键如何选择">2.2.2 redis锁的key键如何选择
+</h4><ul>
+<li>如果锁的key是一个定值，意味着所有加锁的线程访问同一把锁，效率非常低下</li>
+<li>所以锁的key最好不要是定值而是和业务相关的
+<ul>
+<li>ex：
+<ul>
+<li>业务逻辑是和商品相关的，加锁的目的是为了保证商品数据修改的原子性</li>
+<li>锁的key应该是和商品id相关联</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>锁得名称应该如何设计
+<ul>
+<li>应该是和当前的服务还有业务逻辑相关联的
+<ul>
+<li>ex：
+<ul>
+<li>商品服务下的商品加锁：锁的key可以设计为=&gt;shop:mer:ID:1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="223-优点及缺点">2.2.3 优点及缺点
+</h4><p><strong>优点</strong>：性能极高</p>
+<p><strong>缺点</strong>：失效时间设置没有定值。设置的失效时间太短，方法没等执行完锁就自动释放了，那么就会产生并发问题。如果设置的时间太长，如果加锁的服务奔溃了，其他获取锁的线程就可能要平白的多等一段时间，用户体验会降低。</p>
+<h3 id="23-zookeeper实现分布式锁">2.3 zookeeper实现分布式锁
+</h3><h4 id="231-zookeeper-锁相关基础知识">2.3.1 zookeeper 锁相关基础知识
+</h4><ul>
+<li>zookeeper 一般由多个节点构成（单数），采用 zab 一致性协议。因此可以将 zk 看成一个单点结构，对其修改数据其内部自动将所有节点数据进行修改而后才提供查询服务。</li>
+<li>zookeeper  的数据以目录树的形式，每个目录称为 znode， znode 中可存储数据（一般不超过 1M），还可以在其中增加子节点。</li>
+<li>子节点有三种类型。序列化节点，每在该节点下增加一个节点自动给该节点的名称上自增。临时节点，一旦创建这个 znode 的客户端与服务器失去联系，这个 znode 也将自动删除。最后就是普通节点。</li>
+<li>Watch 机制，client 可以监控每个节点的变化，当产生变化会给 client 产生一个事件。</li>
+</ul>
+<h4 id="232-zookeeper-分布式锁的原理">2.3.2 zookeeper 分布式锁的原理
+</h4><ul>
+<li>
+<p><strong>获取和释放锁原理</strong>：利用临时节点与 watch 机制。每个锁占用一个普通节点 /lock，当需要获取锁时在 /lock 目录下创建一个临时节点，创建成功则表示获取锁成功，失败则 watch/lock 节点，有删除操作后再去争锁。临时节点好处在于当进程挂掉后能自动上锁的节点自动删除即取消锁。</p>
+</li>
+<li>
+<p><strong>获取锁的顺序原理</strong>：上锁为创建临时有序节点，每个上锁的节点均能创建节点成功，只是其序号不同。只有序号最小的可以拥有锁，如果这个节点序号不是最小的则 watch 序号比本身小的前一个节点 (公平锁)。</p>
+</li>
+</ul>
+<h4 id="232-zookeeper实现分布式锁流程">2.3.2 zookeeper实现分布式锁流程
+</h4><p><strong>简易流程</strong></p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/5.jpg"
+	width="600"
+	height="245"
+	
+	loading="lazy"
+	
+		alt="5"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="244"
+		data-flex-basis="587px"
+	
+></p>
+<p><strong>获取锁流程：</strong></p>
+<ol>
+<li>先有一个锁根节点，lockRootNode，这可以是一个永久的节点</li>
+<li>客户端获取锁，先在 lockRootNode 下创建一个顺序的临时节点，保证客户端断开连接，节点也自动删除</li>
+<li>调用 lockRootNode 父节点的 getChildren() 方法，获取所有的节点，并从小到大排序，如果创建的最小的节点是当前节点，则返回 true,获取锁成功，否则，关注比自己序号小的节点的释放动作(exist watch)，这样可以保证每一个客户端只需要关注一个节点，不需要关注所有的节点，避免羊群效应。</li>
+<li>如果有节点释放操作，重复步骤 3</li>
+</ol>
+<p><strong>释放锁流程：</strong></p>
+<p>只需要删除步骤 2 中创建的节点即可</p>
+<h4 id="232-优点及缺点">2.3.2 优点及缺点
+</h4><p><strong>优点：</strong></p>
+<ul>
+<li>客户端如果出现宕机故障的话，锁可以马上释放</li>
+<li>可以实现阻塞式锁，通过 watcher 监听，实现起来也比较简单</li>
+<li>集群模式，稳定性比较高</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>一旦网络有任何的抖动，Zookeeper 就会认为客户端已经宕机，就会断掉连接，其他客户端就可以获取到锁。</li>
+<li>性能不高，因为每次在创建锁和释放锁的过程中，都要动态创建、销毁临时节点来实现锁功能。ZK 中创建和删除节点只能通过 Leader 服务器来执行，然后将数据同步到所有的 Follower 机器上。(zookeeper对外提供服务的只有leader)</li>
+</ul>
+<h3 id="24-consul实现分布式锁eurekaregister保存服务的ip-端口-服务列表">2.4 consul实现分布式锁(eureka/Register:保存服务的IP 端口 服务列表)
+</h3><h4 id="241-实现原理及流程">2.4.1 实现原理及流程
+</h4><p>基于Consul注册中心的Key/Value存储来实现分布式锁以及信号量的方法主要利用Key/Value存储API中的acquire和release操作来实现。acquire和release操作是类似Check-And-Set的操作：</p>
+<pre><code>acquire操作只有当锁不存在持有者时才会返回true，并且set设置的Value值，同时执行操作的session会持有对该Key的锁，否则就返回false
+
+release操作则是使用指定的session来释放某个Key的锁，如果指定的session无效，那么会返回false，否则就会set设置Value值，并返回true
+</code></pre>
+<p><strong>实现流程</strong></p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/6.png"
+	width="1402"
+	height="1374"
+	
+	loading="lazy"
+	
+		alt="6"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="102"
+		data-flex-basis="244px"
+	
+></p>
+<p><strong>实现步骤：</strong></p>
+<ol>
+<li>客户端创建会话session，得到sessionId；</li>
+<li>使用acquire设置value的值，若acquire结果为false，代表获取锁失败；</li>
+<li>acquire结果为true，代表获取锁成功，客户端执行业务逻辑；</li>
+<li>客户端业务逻辑执行完成后，执行release操作释放锁；</li>
+<li>销毁当前session，客户端连接断开。</li>
+</ol>
+<p><strong>代码</strong>:</p>
+<p>docker安装consul</p>
+<p>下载镜像</p>
+<p>docker pull consul</p>
+<p>开启容器</p>
+<p>docker run -p 8500:8500/tcp consul agent -server -ui -bootstrap-expect=1 -client=0.0.0.0</p>
+<p>启动consul命令: consul agent -dev</p>
+<p>pom.xml文件</p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+         xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;2.2.5.RELEASE&lt;/version&gt;
+        &lt;relativePath/&gt; &lt;!-- lookup parent from repository --&gt;
+    &lt;/parent&gt;
+    &lt;groupId&gt;com.example&lt;/groupId&gt;
+    &lt;artifactId&gt;demo-consul&lt;/artifactId&gt;
+    &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+    &lt;name&gt;demo-consul&lt;/name&gt;
+    &lt;description&gt;Demo project for Spring Boot&lt;/description&gt;
+
+    &lt;properties&gt;
+        &lt;java.version&gt;1.8&lt;/java.version&gt;
+        &lt;spring-cloud.version&gt;Hoxton.SR3&lt;/spring-cloud.version&gt;
+    &lt;/properties&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-starter-consul-discovery&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+            &lt;exclusions&gt;
+                &lt;exclusion&gt;
+                    &lt;groupId&gt;org.junit.vintage&lt;/groupId&gt;
+                    &lt;artifactId&gt;junit-vintage-engine&lt;/artifactId&gt;
+                &lt;/exclusion&gt;
+            &lt;/exclusions&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;dependencyManagement&gt;
+        &lt;dependencies&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-cloud-dependencies&lt;/artifactId&gt;
+                &lt;version&gt;${spring-cloud.version}&lt;/version&gt;
+                &lt;type&gt;pom&lt;/type&gt;
+                &lt;scope&gt;import&lt;/scope&gt;
+            &lt;/dependency&gt;
+        &lt;/dependencies&gt;
+    &lt;/dependencyManagement&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+
+&lt;/project&gt;
+</code></pre>
+<pre><code class="language-java">public class ConsulUtil {
+
+    private ConsulClient consulClient;
+
+    private String sessionId = null;
+
+    /**
+     * 构造函数
+     */
+    public ConsulUtil(ConsulClient consulClient) {
+        this.consulClient = consulClient;
+    }
+
+    /**
+     * 创建session
+     */
+    private String createSession(String name, Integer ttl){
+        NewSession newSession = new NewSession();
+        //设置锁有效时长
+        newSession.setTtl(ttl + &quot;s&quot;);
+        //设置锁名字
+        newSession.setName(name);
+        String value = consulClient.sessionCreate(newSession, null).getValue();
+        return value;
+    }
+
+    /**
+     * 获取锁
+     */
+    public Boolean lock(String name, Integer ttl){
+        //定义获取标识
+        Boolean flag = false;
+        //创建session
+        sessionId = createSession(name, ttl);
+        //死循环获取锁
+        while (true){
+            //执行acquire操作
+            PutParams putParams = new PutParams();
+            putParams.setAcquireSession(sessionId);
+            flag = consulClient.setKVValue(name, &quot;local&quot; + System.currentTimeMillis(), putParams).getValue();
+            if(flag){
+                break;
+            }
+        }
+        return flag;
+    }
+
+    /**
+     * 释放锁
+     */
+    public Boolean release(String name){
+        //执行acquire操作
+        PutParams putParams = new PutParams();
+        putParams.setReleaseSession(sessionId);
+        Boolean value = consulClient.setKVValue(name, &quot;local&quot; + System.currentTimeMillis(), putParams).getValue();
+        return value;
+    }
+</code></pre>
+<p>测试代码:</p>
+<pre><code class="language-java">@SpringBootTest
+class DemoApplicationTests {
+
+    @Test
+    public void testLock() throws Exception  {
+         LoggerContext loggerContext= (LoggerContext) LoggerFactory.getILoggerFactory();
+        //设置全局日志级别
+        ch.qos.logback.classic.Logger logger=loggerContext.getLogger(&quot;root&quot;);
+        logger.setLevel(Level.toLevel(&quot;info&quot;));
+        new Thread(new LockRunner(&quot;线程1&quot;)).start();
+        new Thread(new LockRunner(&quot;线程2&quot;)).start();
+        new Thread(new LockRunner(&quot;线程3&quot;)).start();
+        new Thread(new LockRunner(&quot;线程4&quot;)).start();
+        new Thread(new LockRunner(&quot;线程5&quot;)).start();
+        Thread.sleep(200000L);
+    }
+
+    class LockRunner implements Runnable {
+
+        private String name;
+
+        public LockRunner(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public void run() {
+            ConsulUtil lock = new ConsulUtil(new ConsulClient());
+            try {
+                if (lock.lock(&quot;test&quot;, 10)) {
+
+                    System.out.println(name + &quot;获取到了锁&quot;);
+                    //持有锁5秒
+                    Thread.sleep(5000);
+                    //释放锁
+                    lock.release(&quot;test&quot;);
+                    System.out.println(name + &quot;释放了锁&quot;);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+}
+</code></pre>
+<p>结果</p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/8.png"
+	width="1812"
+	height="523"
+	
+	loading="lazy"
+	
+		alt="8"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="346"
+		data-flex-basis="831px"
+	
+></p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/9.png"
+	width="1920"
+	height="979"
+	
+	loading="lazy"
+	
+		alt="9"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="196"
+		data-flex-basis="470px"
+	
+></p>
+<h4 id="242-优点及缺点">2.4.2 优点及缺点
+</h4><p>**优点：**基于consul注册中心即可实现分布式锁，实现简单、方便、快捷</p>
+<p><strong>缺点：</strong></p>
+<ul>
+<li><strong>lock delay</strong>：consul实现分布式锁存在延迟，一个节点释放锁了，另一个节点不能立马拿到锁。需要等待lock delay时间后才可以拿到锁。</li>
+<li>高负载的场景下，不能及时的续约，导致session timeout, 其他节点拿到锁。</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">分布式锁</a>
+        
+            <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+        
+            <a href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">并发编程</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">分布式事务</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

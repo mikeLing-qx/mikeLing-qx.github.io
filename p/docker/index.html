@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="1 docker 1.1 简介 Docker 是一个开源的应用容器引擎，让开发者可以打包他们的应用以及依赖包到一个可移植的容器中，然后发布到任何流行的Linux机器上，也可以实现虚拟化，容器是完全使用沙箱机制，相互之间不会有任何接口。 ==可以把它当成轻量级的虚拟机==吧（虽然一个是完全虚拟化，一个是操作系统层虚拟化）\n">
+<title>Docker</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/docker/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Docker">
+<meta property='og:description' content="1 docker 1.1 简介 Docker 是一个开源的应用容器引擎，让开发者可以打包他们的应用以及依赖包到一个可移植的容器中，然后发布到任何流行的Linux机器上，也可以实现虚拟化，容器是完全使用沙箱机制，相互之间不会有任何接口。 ==可以把它当成轻量级的虚拟机==吧（虽然一个是完全虚拟化，一个是操作系统层虚拟化）\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/docker/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='docker' /><meta property='article:published_time' content='2023-02-23T15:43:32&#43;08:00'/><meta property='article:modified_time' content='2023-02-23T15:43:32&#43;08:00'/>
+<meta name="twitter:title" content="Docker">
+<meta name="twitter:description" content="1 docker 1.1 简介 Docker 是一个开源的应用容器引擎，让开发者可以打包他们的应用以及依赖包到一个可移植的容器中，然后发布到任何流行的Linux机器上，也可以实现虚拟化，容器是完全使用沙箱机制，相互之间不会有任何接口。 ==可以把它当成轻量级的虚拟机==吧（虽然一个是完全虚拟化，一个是操作系统层虚拟化）\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-docker">1 docker</a>
+      <ul>
+        <li><a href="#11-简介">1.1 简介</a></li>
+        <li><a href="#12-构成">1.2 构成</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-docker入门">2 docker入门</a>
+      <ul>
+        <li><a href="#11-目录挂载">1.1 目录挂载</a></li>
+        <li><a href="#12-复制文件">1.2 复制文件</a></li>
+        <li><a href="#13-部署应用">1.3 部署应用</a></li>
+        <li><a href="#21-环境准备">2.1 环境准备</a></li>
+        <li><a href="#22-安装docker">2.2 安装docker</a></li>
+        <li><a href="#23-docker-安装-mysql">2.3 docker 安装 mysql</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-docker常用命令">3 docker常用命令</a></li>
+    <li><a href="#4-docker-安装-redis">4 docker 安装 redis</a></li>
+    <li><a href="#5-docker-命令自动补全">5. docker 命令自动补全</a></li>
+    <li><a href="#6-docker-compose">6. docker-compose</a>
+      <ul>
+        <li><a href="#1-智慧城市">1. 智慧城市</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-日志">7. 日志</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/docker/" >
+                Docker
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/docker/">Docker</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Feb 23, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 7 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="1-docker">1 docker
+</h1><h2 id="11-简介">1.1 简介
+</h2><p>Docker 是一个开源的应用容器引擎，让开发者可以打包他们的应用以及依赖包到一个可移植的容器中，然后发布到任何流行的<a class="link" href="https://baike.baidu.com/item/Linux"  target="_blank" rel="noopener"
+    >Linux</a>机器上，也可以实现虚拟化，容器是完全使用沙箱机制，相互之间不会有任何接口。  ==可以把它当成轻量级的虚拟机==吧（虽然一个是完全虚拟化，一个是操作系统层虚拟化）</p>
+<h2 id="12-构成">1.2 构成
+</h2><p>​	Docker组成</p>
+<blockquote>
+<p>仓库 (Repository)</p>
+<p>镜像 (Image)   阿里云镜像: <a class="link" href="http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo"  target="_blank" rel="noopener"
+    >http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo</a></p>
+<p>容器 (container)</p>
+</blockquote>
+<h1 id="2-docker入门">2 docker入门
+</h1><h2 id="11-目录挂载">1.1 目录挂载
+</h2><p>==将宿主机中的目录与容器内的目录进行映射==</p>
+<p>创建容器 添加-v参数 后边为   宿主机目录:容器目录</p>
+<pre><code>docker run -id --name=c3 -v /opt/:/usr/local/myhtml centos
+</code></pre>
+<p>如果你共享的是多级的目录，可能会出现权限不足的提示。</p>
+<p>这是因为CentOS7中的安全模块selinux把权限禁掉了，我们需要添加参数  &ndash;privileged=true  来解决挂载的目录没有权限的问题</p>
+<pre><code>docker run -id --privileged=true --name=c4 -v /opt/:/usr/local/myhtml centos
+</code></pre>
+<pre><code>创建文件 touch a.txt 或者vim
+查看文件 cat a.txt
+输入内容 echo 123 &gt; a.txt
+</code></pre>
+<h2 id="12-复制文件">1.2 复制文件
+</h2><pre><code>docker cp 需要拷贝的文件或目录 容器名称:容器目录
+例如：docker cp 1.txt c2:/root
+</code></pre>
+<h2 id="13-部署应用">1.3 部署应用
+</h2><p>创建mysql容器</p>
+<pre><code class="language-properties">docker run -di --name mysql -p 33306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql:5.7
+</code></pre>
+<p>-p 代表==端口映射==，格式为  宿主机映射端口:容器运行端口</p>
+<p>-e 代表添加环境变量  MYSQL_ROOT_PASSWORD是root用户的登陆密码</p>
+<h2 id="21-环境准备">2.1 环境准备
+</h2><pre><code>准备vmware 和 Centos7以上版本; linux内核版本推荐 3.10 
+</code></pre>
+<p>查看linux内核版本</p>
+<pre><code>uname -a
+</code></pre>
+<p>查看linux版本</p>
+<pre><code>cat /etc/redhat-release 
+</code></pre>
+<h2 id="22-安装docker">2.2 安装docker
+</h2><ol>
+<li>更新yum包 (只是为了排除系统环境影响; ==<strong>不要用于生产环境; 仅限在本地玩</strong>==)</li>
+</ol>
+<pre><code>yum update
+
+</code></pre>
+<ol start="2">
+<li>安装需要的软件包</li>
+</ol>
+<pre><code>yum install -y yum-utils device-mapper-persistent-data lvm2
+
+</code></pre>
+<ol start="3">
+<li>设置yum 源 (docker 仓库地址)</li>
+</ol>
+<pre><code>yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+</code></pre>
+<ol start="4">
+<li>查看仓库所有docker版本</li>
+</ol>
+<pre><code>yum list docker-ce --showduplicates | sort -r
+
+</code></pre>
+<p><img src="/p/docker/images/%E6%9F%A5%E7%9C%8Bdocker%E7%89%88%E6%9C%AC.png"
+	width="640"
+	height="340"
+	
+	loading="lazy"
+	
+		alt="查看docker版本"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="188"
+		data-flex-basis="451px"
+	
+></p>
+<ol start="5">
+<li>安装所需的版本</li>
+</ol>
+<pre><code>yum install docker-ce-版本号
+
+例如: yum install docker-ce-17.12.1.ce
+
+</code></pre>
+<ol start="6">
+<li>启动docker 并加入开机启动</li>
+</ol>
+<pre><code>systemctl start docker
+systemctl enable docker
+
+</code></pre>
+<ol start="7">
+<li>验证是否安装成功</li>
+</ol>
+<pre><code>docker version
+
+</code></pre>
+<p><img src="/p/docker/images/%E9%AA%8C%E8%AF%81docker%E6%98%AF%E5%90%A6%E5%AE%89%E8%A3%85%E6%88%90%E5%8A%9F.png"
+	width="494"
+	height="446"
+	
+	loading="lazy"
+	
+		alt="验证docker是否安装成功"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="110"
+		data-flex-basis="265px"
+	
+></p>
+<h2 id="23-docker-安装-mysql">2.3 docker 安装 mysql
+</h2><ol start="0">
+<li>查看可用的mysql版本</li>
+</ol>
+<pre><code>docker search mysql
+
+</code></pre>
+<ol>
+<li>拉取mysql镜像 (默认拉取的是最新版本latest)</li>
+</ol>
+<pre><code>docker pull mysql
+
+</code></pre>
+<ol start="2">
+<li>运行mysql容器</li>
+</ol>
+<pre><code>docker run -p 3306:3306 --name mysql-test -v /opt/docker_v/mysql/conf:/etc/mysql/conf.d -e MYSQL_ROOT_PASSWORD=root -d imageID
+
+</code></pre>
+<p>参数说明</p>
+<blockquote>
+<p>-i  运行 ; -d 创建</p>
+<p>-p 端口映射; 映射容器服务的3306端口到宿主机的3306端口上;  外部主机可以直接通过 <strong>宿主机ip:3306</strong> 访问到 MySQL 的服务</p>
+<p>-v /opt/docker_v/mysql/conf:/etc/mysql/conf.d：将主机/opt/docker_v/mysql/conf目录挂载到容器的/etc/mysql/conf.d</p>
+<p>-e  (添加环境变量) MYSQL_ROOT_PASSWORD=root：==初始化root用户的密码==</p>
+<p>-d: 后台运行容器，并返回容器ID
+imageID: mysql镜像ID</p>
+</blockquote>
+<ol start="3">
+<li>进入mysql 容器</li>
+</ol>
+<pre><code>docker exec -it mysql-test bash
+
+</code></pre>
+<ol start="4">
+<li>查看mysql容器信息</li>
+</ol>
+<pre><code>docker inspect mysql-test
+
+</code></pre>
+<ol start="5">
+<li>查看容器</li>
+</ol>
+<pre><code>docker ps  (查看正在运行的容器)
+docker ps -a (查看所有的容器)
+
+</code></pre>
+<p><img src="/p/docker/images/%E6%9F%A5%E7%9C%8B%E6%AD%A3%E5%9C%A8%E8%BF%90%E8%A1%8C%E7%9A%84%E5%AE%B9%E5%99%A8.png"
+	width="1077"
+	height="91"
+	
+	loading="lazy"
+	
+		alt="查看正在运行的容器"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="1183"
+		data-flex-basis="2840px"
+	
+></p>
+<h1 id="3-docker常用命令">3 docker常用命令
+</h1><ul>
+<li>docker start/stop
+<ul>
+<li>id/name 启动/停止某个容器</li>
+</ul>
+</li>
+<li>docker attach  id
+<ul>
+<li>进入某个容器(使用attach退出后容器也跟着停止运行)</li>
+</ul>
+</li>
+<li>docker exec -it  id
+<ul>
+<li>启动一个伪终端以交互式的方式进入某个容器（使用exit退出后容器不停止运行）</li>
+<li>ctrl + d 退出容器</li>
+</ul>
+</li>
+<li>docker rm id/name
+<ul>
+<li>删除某个容器</li>
+</ul>
+</li>
+<li>docker rmi id/name
+<ul>
+<li>删除某个镜像</li>
+</ul>
+</li>
+<li>docker run &ndash;name test -ti ubuntu /bin/bash
+<ul>
+<li>复制ubuntu容器并且重命名为test且运行，然后以伪终端交互式方式进入容器，运行bash</li>
+</ul>
+</li>
+<li>docker build -t soar/centos:7.1 .
+<ul>
+<li>通过当前目录下的Dockerfile创建一个名为soar/centos:7.1的镜像</li>
+</ul>
+</li>
+<li>docker run -d -p 2222:22 &ndash;name test soar/centos:7.1
+<ul>
+<li>以镜像soar/centos:7.1创建名为test的容器，并以后台模式运行，并做端口映射到宿主机2222端口，P参数重启容器宿主机端口会发生改变</li>
+</ul>
+</li>
+<li>日志查看  docker logs {containerId}</li>
+<li>docker  volume prune</li>
+<li>查看日志 docker logs -f {}</li>
+<li>推送镜像 docker 地址 用户名/镜像名:tag   私服可以忽略用户名</li>
+<li>推送私服需要https, 使用http需要 配置ip+端口</li>
+<li>清理未使用的容器  docker container prune</li>
+</ul>
+<p><img src="/p/docker/images/image-20240724153201187.png"
+	width="1293"
+	height="660"
+	
+	loading="lazy"
+	
+		alt="image-20240724153201187"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="195"
+		data-flex-basis="470px"
+	
+></p>
+<h1 id="4-docker-安装-redis">4 docker 安装 redis
+</h1><ol>
+<li>配置镜像仓库 ustc</li>
+</ol>
+<blockquote>
+<p>vi /etc/docker/daemon.json  (不存在就手动创建)</p>
+</blockquote>
+<pre><code>{
+	&quot;registry-mirrors&quot;: [&quot;https://docker.mirrors.ustc.edu.cn&quot;]
+}
+
+</code></pre>
+<p>配置完成后需要重启docker 服务</p>
+<pre><code>systemctl restart docker.service
+systemctl enable docker
+
+</code></pre>
+<p>查找所需的版本</p>
+<p><a class="link" href="https://hub.docker.com/_/redis?tab=tags&amp;page=1&amp;ordering=last_updated"  target="_blank" rel="noopener"
+    >https://hub.docker.com/_/redis?tab=tags&page=1&ordering=last_updated</a></p>
+<p>这里下载最新的</p>
+<pre><code>docker pull redis:latest
+
+</code></pre>
+<p>docker 安装redis</p>
+<pre><code>docker run -itd --name redis-test  -p 6379:6379 redis
+
+</code></pre>
+<p><img src="/p/docker/images/%E5%AE%89%E8%A3%85redis.png"
+	width="707"
+	height="142"
+	
+	loading="lazy"
+	
+		alt="安装redis"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="497"
+		data-flex-basis="1194px"
+	
+></p>
+<h1 id="5-docker-命令自动补全">5. docker 命令自动补全
+</h1><pre><code class="language-shell">sudo mkdir -p /etc/bash_completion.d/
+sudo docker completion bash &gt; /etc/bash_completion.d/docker
+
+# 激活
+source /etc/bash_completion
+source /etc/bash_completion.d/docker
+
+</code></pre>
+<h1 id="6-docker-compose">6. docker-compose
+</h1><h2 id="1-智慧城市">1. 智慧城市
+</h2><pre><code>[root@host-19-112-71-8 xiaopin]# cat docker-compose-prod.yml
+networks:
+  zs_network:
+    external: true
+
+version: '3.0'
+services:
+  smartcites_prod:
+    hostname: smartcites_prod
+    container_name: smartcites_prod
+    privileged: true
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    build:
+      context: smartcity-admin
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 9980:9980
+    environment:
+      - JAVA_OPTS=-Xmx512M -Xms512M
+    volumes:
+      - ./data/mountEnterpriseImportTemp.xlsx:/app/smartcity/uploadPath/download/template/mountEnterpriseImportTemp.xlsx
+      - ./data/uploadPath:/app/smartcity/uploadPath
+      - ./data/smartcity-logs:/app/smartcity/logs 
+    extra_hosts:
+      - xtbg.digitalgd.com.cn:210.76.73.80
+      - xtbg.zfsg.gd.gov.cn:157.122.49.24
+      #- xtbg.gdzwfw.gov.cn:157.122.49.24
+      - xtbg.gdzwfw.gov.cn:19.15.0.77
+      - yzh.gdgov.cn:19.15.18.170
+      - yzh.zszwfw.cn:19.112.202.181
+    networks:
+      zs_network:
+        ipv4_address: 192.168.88.10
+
+  epidemicapi:
+    hostname: epidemicapi_prod
+    container_name: epidemicapi_prod
+    privileged: true
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    build:
+      context: epidemicapi
+      dockerfile: Dockerfile
+    restart: always
+    #ports:
+    #  - 9983:9983
+    environment:
+      - JAVA_OPTS=-Xmx512M -Xms512M
+    networks:
+      zs_network:
+        ipv4_address: 192.168.88.11
+
+</code></pre>
+<p>这是一个 Docker Compose 配置文件，用于定义和启动多个 Docker 容器服务。以下是配置文件的详细介绍：</p>
+<p><code>version: '3.0'</code></p>
+<p>指定了 Docker Compose 文件的版本。在这个版本下，你可以使用一些版本 3 的特性来配置服务。</p>
+<p><code>networks</code></p>
+<p>定义了一个名为 <code>zs_network</code> 的外部网络。<code>external: true</code> 表示该网络已经存在，不会由 Docker Compose 创建。</p>
+<p><code>services</code></p>
+<p>定义了两个服务 <code>smartcites_prod</code> 和 <code>epidemicapi</code>。每个服务的配置如下：</p>
+<p><code>smartcites_prod</code></p>
+<ul>
+<li>
+<p><strong><code>hostname</code></strong>: 设置容器的主机名为 <code>smartcites_prod</code>。</p>
+</li>
+<li>
+<p><strong><code>container_name</code></strong>: 设置容器的名称为 <code>smartcites_prod</code>。</p>
+</li>
+<li>
+<p><strong><code>privileged</code></strong>: 给容器提供特权模式，允许容器进行一些特权操作。</p>
+</li>
+<li>
+<p><strong><code>ulimits</code></strong>: 设置容器的资源限制，包括进程数（<code>nproc</code>）和文件句柄数（<code>nofile</code>）。</p>
+</li>
+<li>
+<dl>
+<dt><code>build</code></dt>
+<dd>
+<p>定义构建容器的上下文和 Dockerfile 的路径。</p>
+</dd>
+</dl>
+<ul>
+<li><strong><code>context</code></strong>: 构建上下文的路径为 <code>smartcity-admin</code>。</li>
+<li><strong><code>dockerfile</code></strong>: Dockerfile 的路径为 <code>Dockerfile</code>。</li>
+</ul>
+</li>
+<li>
+<p><strong><code>restart</code></strong>: 设置容器在崩溃后自动重启（<code>always</code>）。</p>
+</li>
+<li>
+<p><strong><code>ports</code></strong>: 映射主机的端口 <code>9980</code> 到容器的端口 <code>9980</code>。</p>
+</li>
+<li>
+<p><strong><code>environment</code></strong>: 设置环境变量，这里定义了 Java 虚拟机的内存选项。</p>
+</li>
+<li>
+<dl>
+<dt><code>volumes</code></dt>
+<dd>
+<p>映射主机的目录或文件到容器中。</p>
+</dd>
+</dl>
+<ul>
+<li><strong><code>./data/mountEnterpriseImportTemp.xlsx</code></strong>: 映射到容器的 <code>/app/smartcity/uploadPath/download/template/mountEnterpriseImportTemp.xlsx</code>。</li>
+<li><strong><code>./data/uploadPath</code></strong>: 映射到容器的 <code>/app/smartcity/uploadPath</code>。</li>
+<li><strong><code>./data/smartcity-logs</code></strong>: 映射到容器的 <code>/app/smartcity/logs</code>。</li>
+</ul>
+</li>
+<li>
+<p><strong><code>extra_hosts</code></strong>: 添加额外的主机名和 IP 地址映射。</p>
+</li>
+<li>
+<p><strong><code>networks</code></strong>: 连接到 <code>zs_network</code> 网络，并分配静态 IP 地址 <code>192.168.88.10</code>。</p>
+</li>
+</ul>
+<p><code>epidemicapi</code></p>
+<ul>
+<li>
+<p><strong><code>hostname</code></strong>: 设置容器的主机名为 <code>epidemicapi_prod</code>。</p>
+</li>
+<li>
+<p><strong><code>container_name</code></strong>: 设置容器的名称为 <code>epidemicapi_prod</code>。</p>
+</li>
+<li>
+<p><strong><code>privileged</code></strong>: 给容器提供特权模式。</p>
+</li>
+<li>
+<p><strong><code>ulimits</code></strong>: 设置容器的资源限制。</p>
+</li>
+<li>
+<dl>
+<dt><code>build</code></dt>
+<dd>
+<p>定义构建容器的上下文和 Dockerfile 的路径。</p>
+</dd>
+</dl>
+<ul>
+<li><strong><code>context</code></strong>: 构建上下文的路径为 <code>epidemicapi</code>。</li>
+<li><strong><code>dockerfile</code></strong>: Dockerfile 的路径为 <code>Dockerfile</code>。</li>
+</ul>
+</li>
+<li>
+<p><strong><code>restart</code></strong>: 设置容器在崩溃后自动重启（<code>always</code>）。</p>
+</li>
+<li>
+<p><strong><code>environment</code></strong>: 设置 Java 虚拟机的内存选项。</p>
+</li>
+<li>
+<p><strong><code>networks</code></strong>: 连接到 <code>zs_network</code> 网络，并分配静态 IP 地址 <code>192.168.88.11</code>。</p>
+</li>
+</ul>
+<p>总结</p>
+<p>这个配置文件用于定义两个服务 <code>smartcites_prod</code> 和 <code>epidemicapi</code>，并将它们连接到一个名为 <code>zs_network</code> 的网络。它配置了容器的资源限制、自动重启策略、端口映射、环境变量和卷挂载等。</p>
+<pre><code>docker logs --since 2024-09-13T16:13:00 
+
+docker logs --since 2024-09-23T09:55:00 -f smartcites_prod &gt; logs.txt
+
+</code></pre>
+<h1 id="7-日志">7. 日志
+</h1><p>Docker 容器的日志是由容器内运行的应用程序和其底层操作系统产生的。当应用程序或系统组件将信息输出到标准输出（stdout）或标准错误（stderr）时，这些输出被捕获并存储为日志。Docker 提供了一种机制来捕获这些输出，并允许用户通过 Docker 命令行界面（CLI）或其他工具来访问这些日志。</p>
+<p>以下是 Docker 容器日志的来源和处理方式的详细说明：</p>
+<ol>
+<li><strong>应用程序输出</strong>：
+<ul>
+<li>容器中的应用程序通常会向标准输出（stdout）和标准错误（stderr）打印信息。这些可以是应用程序日志、错误消息、状态更新等。</li>
+</ul>
+</li>
+<li><strong>容器启动脚本或入口点</strong>：
+<ul>
+<li>Docker 容器可以配置一个入口点（entrypoint）或启动脚本，这些脚本可能会产生日志信息。</li>
+</ul>
+</li>
+<li><strong>操作系统</strong>：
+<ul>
+<li>容器内的操作系统也会生成日志，尤其是与系统服务和内核相关的日志。</li>
+</ul>
+</li>
+<li><strong>Docker 守护进程</strong>：
+<ul>
+<li>Docker 守护进程本身也会产生日志，记录容器的创建、启动、停止等事件。</li>
+</ul>
+</li>
+<li><strong>日志驱动</strong>：
+<ul>
+<li>Docker 使用所谓的“日志驱动”来控制日志的捕获、存储和传输。默认的日志驱动是 <code>json-file</code>，它将日志以 JSON 格式写入文件。其他日志驱动包括 <code>syslog</code>、<code>journald</code>、<code>gelf</code> 等，它们可以将日志发送到不同的目标。</li>
+</ul>
+</li>
+<li><strong>日志文件</strong>：
+<ul>
+<li>默认情况下，Docker 将每个容器的日志文件存储在宿主机的 <code>/var/lib/docker/containers//</code> 目录下，文件名为 <code>-json.log</code>。这些文件包含了容器的日志数据。</li>
+</ul>
+</li>
+<li><strong>实时日志查看</strong>：
+<ul>
+<li>用户可以使用 <code>docker logs</code> 命令来查看容器的日志。这个命令从 Docker 守护进程获取日志数据，而不是直接从文件系统读取日志文件。</li>
+</ul>
+</li>
+<li><strong>日志管理</strong>：
+<ul>
+<li>除了使用 <code>docker logs</code> 命令，用户还可以配置日志轮转、远程日志存储或日志分析工具来管理和分析日志数据。</li>
+</ul>
+</li>
+<li><strong>日志配置</strong>：
+<ul>
+<li>在 Docker 容器运行时，可以通过设置环境变量或使用 Docker Compose 文件中的日志配置选项来配置日志行为。</li>
+</ul>
+</li>
+</ol>
+<p>通过这些机制，Docker 确保容器的日志可以被有效地捕获、存储和检索，从而帮助用户监控和调试容器化应用程序。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/docker/">Docker</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

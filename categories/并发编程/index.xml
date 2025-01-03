@@ -1,0 +1,917 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>并发编程 on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/categories/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/</link>
+        <description>Recent content in 并发编程 on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Sat, 03 Sep 2022 18:14:03 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/categories/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>ForkJoin</title>
+        <link>https://mikeLing-qx.github.io/p/forkjoin/</link>
+        <pubDate>Sat, 03 Sep 2022 18:14:03 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/forkjoin/</guid>
+        <description>&lt;blockquote&gt;
+&lt;p&gt;java RecursiveTask 类中的示例 为什么是f1.fork, f2.compute, + f1. join 而不是 f1.fork, f2.fork?&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;class Fibonacci extends RecursiveTask&amp;lt;Integer&amp;gt; {
+
+    final int n;
+
+    Fibonacci(int n) {
+        this.n = n;
+    }
+
+    protected Integer compute() {
+        if (n &amp;lt;= 1) {
+            return n;
+        }
+        Fibonacci f1 = new Fibonacci(n - 1);
+        f1.fork();
+        Fibonacci f2 = new Fibonacci(n - 2);
+        return f2.compute() + f1.join();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;两种方式的具体执行差异：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;f1.fork(); f2.compute() + f1.join();&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这是通常推荐的正确使用方式。在这种做法中，f1被放入ForkJoinPool以异步执行；然后当前线程执行f2.compute()方法，这是个阻塞调用，并等待其完成；最后，调用f1.join()获取结果，如果此时f1已经计算完成，join()立即返回，否则会等待f1计算完毕。这样f1和f2都有并发执行的机会，可以充分利用CPU资源。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;f1.fork(); f2.fork(); f1.join() + f2.join();&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;在这种情况下，f1和f2都被放入ForkJoinPool以异步执行，然后当前线程没有进行任何计算，而是等待f1和f2结束，意味着f1和f2都得等待一个可用的线程去执行，如果ForkJoinPool中没有空闲线程或其线程数已达上限，那么f2会被阻塞在队列中等待。这消除了一部分并发性，相比第一种方式可能性能更低一些。&lt;/p&gt;
+&lt;p&gt;所以，基于以上解说，第一种方式更被推荐，能更有效利用多核CPU并发计算的优势。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
+
+public class RecursiveTaskTest {
+
+    static class Fibonacci extends RecursiveTask&amp;lt;Integer&amp;gt; {
+
+        final int n;
+
+        Fibonacci(int n) { this.n = n; }
+
+        protected Integer compute() {
+            if (n &amp;lt;= 1)
+                return n;
+            Fibonacci f1 = new Fibonacci(n - 1);
+            f1.fork();
+            Fibonacci f2 = new Fibonacci(n - 2);
+            return f2.compute() + f1.join();
+        }
+    }
+
+    static class Fibonacci2 extends RecursiveTask&amp;lt;Integer&amp;gt; {
+
+        final int n;
+
+        Fibonacci2(int n) { this.n = n; }
+
+        protected Integer compute() {
+            if (n &amp;lt;= 1)
+                return n;
+            Fibonacci2 f1 = new Fibonacci2(n - 1);
+            Fibonacci2 f2 = new Fibonacci2(n - 2);
+            f1.fork();
+            f2.fork();
+            return f1.join() + f2.join();
+        }
+    }
+
+    public static void main(String[] args) {
+        int n = 30;
+
+        long start1 = System.currentTimeMillis();
+        Fibonacci fib = new Fibonacci(n);
+        Integer result1 = new ForkJoinPool().invoke(fib);
+        long end1 = System.currentTimeMillis();
+        System.out.println(&amp;quot;Method1 result: &amp;quot; + result1 + &amp;quot;. Time: &amp;quot; + (end1 - start1) + &amp;quot;ms&amp;quot;);
+
+        long start2 = System.currentTimeMillis();
+        Fibonacci2 fib2 = new Fibonacci2(n);
+        Integer result2 = new ForkJoinPool().invoke(fib2);
+        long end2 = System.currentTimeMillis();
+        System.out.println(&amp;quot;Method2 result: &amp;quot; + result2 + &amp;quot;. Time: &amp;quot; + (end2 - start2) + &amp;quot;ms&amp;quot;);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        <item>
+        <title>CompleteableFuture</title>
+        <link>https://mikeLing-qx.github.io/p/completeablefuture/</link>
+        <pubDate>Fri, 03 Jun 2022 18:12:07 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/completeablefuture/</guid>
+        <description>&lt;h1 id=&#34;1-概述&#34;&gt;1. 概述
+&lt;/h1&gt;&lt;p&gt;常见lamda 函数式接口:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/completeablefuture/images/image-20221222102339817.png&#34;
+	width=&#34;560&#34;
+	height=&#34;205&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221222102339817&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;273&#34;
+		data-flex-basis=&#34;655px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;runAsync：异步执行没有返回值；
+supplyAsync：异步执行有返回值；
+thenApply：继续执行当前线程future完成的函数，不需要阻塞等待其处理完成；
+thenApplyAsync：在不同线程池异步地应用参数中的函数；
+thenCompose：用于多个彼此依赖的futrue进行串联起来, 串行
+thenCombine：并联起两个独立的future，注意，这些future都是在长时间计算都完成以后, 并行关系 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;每个变种函数的第三个方法也许会发现里面都有一个 ==Executor 类型的参数==，用于指定线程池&lt;/p&gt;
+&lt;p&gt;如果没有指定线程池，那自然就会有一个默认的线程池，也就是 ForkJoinPool&lt;/p&gt;
+&lt;p&gt;ForkJoinPool 的线程数默认是==CPU 的核心数==&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;不要所有业务共用一个线程池&lt;/strong&gt;，因为，一旦有任务执行一些很慢的 I/O 操作，就会导致线程池中所有线程都阻塞在 I/O 操作上，从而造成线程饥饿，进而影响整个系统的性能&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Jdk9 升级内容&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;添加了新的工厂方法&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;支持延迟和超时处理&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;orTimeout()
+completeOnTimeout()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;2-类结构&#34;&gt;2. 类结构
+&lt;/h1&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/completeablefuture/images/image-20221222102610060.png&#34;
+	width=&#34;475&#34;
+	height=&#34;173&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221222102610060&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;274&#34;
+		data-flex-basis=&#34;658px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;1-future&#34;&gt;1. Future
+&lt;/h2&gt;&lt;p&gt;实现了 Future 接口，那就具有 Future 接口的相关特性，请脑补 Future 那少的可怜的 5 个方法，这里不再赘述，具体请查看 不会用Java Future，我怀疑你泡茶没我快&lt;/p&gt;
+&lt;h2 id=&#34;2-completionstage&#34;&gt;2. CompletionStage
+&lt;/h2&gt;&lt;p&gt;CompletionStage 这个接口还是挺陌生的，中文直译过来是【竣工阶段】，如果将烧水泡茶比喻成一项大工程，他们的竣工阶段体现是不一样的&lt;/p&gt;
+&lt;h1 id=&#34;3-线程关系&#34;&gt;3. 线程关系
+&lt;/h1&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/completeablefuture/images/image-20221222105010286.png&#34;
+	width=&#34;618&#34;
+	height=&#34;133&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221222105010286&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;464&#34;
+		data-flex-basis=&#34;1115px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;单看线程1 或单看线程 2 就是一种串行关系，做完一步之后做下一步&lt;/li&gt;
+&lt;li&gt;一起看线程1 和 线程 2，它们彼此就是并行关系，两个线程做的事彼此独立互补干扰&lt;/li&gt;
+&lt;li&gt;泡茶就是线程1 和 线程 2 的汇总/组合，也就是线程 1 和 线程 2 都完成之后才能到这个阶段（当然也存在线程1 或 线程 2 任意一个线程竣工就可以开启下一阶段的场景）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;CompletionStage 所有函数都是用于描述任务的时序关系&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/completeablefuture/images/image-20221222105056465.png&#34;
+	width=&#34;463&#34;
+	height=&#34;255&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221222105056465&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;181&#34;
+		data-flex-basis=&#34;435px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;4-completeablefutute-方法总览&#34;&gt;4. CompleteableFutute 方法总览
+&lt;/h1&gt;&lt;h2 id=&#34;0-常用api-概述&#34;&gt;0. 常用api 概述
+&lt;/h2&gt;&lt;p&gt;参考资料: &lt;a class=&#34;link&#34; href=&#34;https://blog.51cto.com/zhangzhixi/5626288&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://blog.51cto.com/zhangzhixi/5626288&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;==提交任务==：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;supplyAsync 需要返回值时使用&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;runAsync&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;==接力处理==：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;thenRun thenRunAsync&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;thenAccept thenAcceptAsync&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;thenApply thenApplyAsync&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;handle handleAsync&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;applyToEither applyToEitherAsync&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;acceptEither acceptEitherAsync&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;runAfterEither runAfterEitherAsync&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;thenCombine thenCombineAsync&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;thenAcceptBoth thenAcceptBothAsync&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;==获取结果==：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;join 阻塞等待，不会抛异常&lt;/li&gt;
+&lt;li&gt;get 阻塞等待，会抛异常&lt;/li&gt;
+&lt;li&gt;complete(T value) 不阻塞，如果任务已完成，返回处理结果。如果没完成，则返回传参value。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;==总结分类==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;带run的方法，无入参，无返回值。&lt;/li&gt;
+&lt;li&gt;带accept的方法，有入参，无返回值。&lt;/li&gt;
+&lt;li&gt;带supply的方法，无入参，有返回值。&lt;/li&gt;
+&lt;li&gt;带apply的方法，有入参，有返回值。&lt;/li&gt;
+&lt;li&gt;带handle的方法，有入参，有返回值，并且带异常处理。&lt;/li&gt;
+&lt;li&gt;以Async结尾的方法，都是异步的，否则是同步的。&lt;/li&gt;
+&lt;li&gt;以Either结尾的方法，只需完成任意一个。&lt;/li&gt;
+&lt;li&gt;以Both/Combine结尾的方法，必须所有都完成&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;completeExceptionally(Throwable ex) 不阻塞，如果任务已完成，返回处理结果。如果没完成，抛异常。&lt;/p&gt;
+&lt;h2 id=&#34;1-串行关系&#34;&gt;1. 串行关系
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;then&lt;/code&gt; 直译【然后】，也就是表示下一步，所以通常是一种串行关系体现, then 后面的单词（比如 run /apply/accept）就是上面说的函数式接口中的抽象方法名称了，它的作用和那几个函数式接口的作用是一样一样滴&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// run 是没有返回值的 
+CompletableFuture&amp;lt;Void&amp;gt; thenRun(Runnable action)
+CompletableFuture&amp;lt;Void&amp;gt; thenRunAsync(Runnable action)
+CompletableFuture&amp;lt;Void&amp;gt; thenRunAsync(Runnable action, Executor executor)
+  
+&amp;lt;U&amp;gt; CompletableFuture&amp;lt;U&amp;gt; thenApply(Function&amp;lt;? super T,? extends U&amp;gt; fn)
+&amp;lt;U&amp;gt; CompletableFuture&amp;lt;U&amp;gt; thenApplyAsync(Function&amp;lt;? super T,? extends U&amp;gt; fn)
+&amp;lt;U&amp;gt; CompletableFuture&amp;lt;U&amp;gt; thenApplyAsync(Function&amp;lt;? super T,? extends U&amp;gt; fn, Executor executor)
+  
+CompletableFuture&amp;lt;Void&amp;gt; thenAccept(Consumer&amp;lt;? super T&amp;gt; action) 
+CompletableFuture&amp;lt;Void&amp;gt; thenAcceptAsync(Consumer&amp;lt;? super T&amp;gt; action)
+CompletableFuture&amp;lt;Void&amp;gt; thenAcceptAsync(Consumer&amp;lt;? super T&amp;gt; action, Executor executor)
+  
+&amp;lt;U&amp;gt; CompletableFuture&amp;lt;U&amp;gt; thenCompose(Function&amp;lt;? super T, ? extends CompletionStage&amp;lt;U&amp;gt;&amp;gt; fn)  
+&amp;lt;U&amp;gt; CompletableFuture&amp;lt;U&amp;gt; thenComposeAsync(Function&amp;lt;? super T, ? extends CompletionStage&amp;lt;U&amp;gt;&amp;gt; fn)
+&amp;lt;U&amp;gt; CompletableFuture&amp;lt;U&amp;gt; thenComposeAsync(Function&amp;lt;? super T, ? extends CompletionStage&amp;lt;U&amp;gt;&amp;gt; fn, Executor executor)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-聚合关系-and&#34;&gt;2. 聚合关系 and
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;combine... with...&lt;/code&gt; 和 &lt;code&gt;both...and...&lt;/code&gt; 都是要求两者都满足，也就是 and 的关系了&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;&amp;lt;U,V&amp;gt; CompletableFuture&amp;lt;V&amp;gt; thenCombine(CompletionStage&amp;lt;? extends U&amp;gt; other, BiFunction&amp;lt;? super T,? super U,? extends V&amp;gt; fn)
+&amp;lt;U,V&amp;gt; CompletableFuture&amp;lt;V&amp;gt; thenCombineAsync(CompletionStage&amp;lt;? extends U&amp;gt; other, BiFunction&amp;lt;? super T,? super U,? extends V&amp;gt; fn)
+&amp;lt;U,V&amp;gt; CompletableFuture&amp;lt;V&amp;gt; thenCombineAsync(CompletionStage&amp;lt;? extends U&amp;gt; other, BiFunction&amp;lt;? super T,? super U,? extends V&amp;gt; fn, Executor executor)
+
+&amp;lt;U&amp;gt; CompletableFuture&amp;lt;Void&amp;gt; thenAcceptBoth(CompletionStage&amp;lt;? extends U&amp;gt; other, BiConsumer&amp;lt;? super T, ? super U&amp;gt; action)
+&amp;lt;U&amp;gt; CompletableFuture&amp;lt;Void&amp;gt; thenAcceptBothAsync(CompletionStage&amp;lt;? extends U&amp;gt; other, BiConsumer&amp;lt;? super T, ? super U&amp;gt; action)
+&amp;lt;U&amp;gt; CompletableFuture&amp;lt;Void&amp;gt; thenAcceptBothAsync( CompletionStage&amp;lt;? extends U&amp;gt; other, BiConsumer&amp;lt;? super T, ? super U&amp;gt; action, Executor executor)
+  
+CompletableFuture&amp;lt;Void&amp;gt; runAfterBoth(CompletionStage&amp;lt;?&amp;gt; other, Runnable action)
+CompletableFuture&amp;lt;Void&amp;gt; runAfterBothAsync(CompletionStage&amp;lt;?&amp;gt; other, Runnable action)
+CompletableFuture&amp;lt;Void&amp;gt; runAfterBothAsync(CompletionStage&amp;lt;?&amp;gt; other, Runnable action, Executor executor)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;3-or或-关系&#34;&gt;3. or或 关系
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;Either...or...&lt;/code&gt; 表示两者中的一个，自然也就是 Or 的体现了&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;&amp;lt;U&amp;gt; CompletableFuture&amp;lt;U&amp;gt; applyToEither(CompletionStage&amp;lt;? extends T&amp;gt; other, Function&amp;lt;? super T, U&amp;gt; fn)
+&amp;lt;U&amp;gt; CompletableFuture&amp;lt;U&amp;gt; applyToEitherAsync(、CompletionStage&amp;lt;? extends T&amp;gt; other, Function&amp;lt;? super T, U&amp;gt; fn)
+&amp;lt;U&amp;gt; CompletableFuture&amp;lt;U&amp;gt; applyToEitherAsync(CompletionStage&amp;lt;? extends T&amp;gt; other, Function&amp;lt;? super T, U&amp;gt; fn, Executor executor)
+
+CompletableFuture&amp;lt;Void&amp;gt; acceptEither(CompletionStage&amp;lt;? extends T&amp;gt; other, Consumer&amp;lt;? super T&amp;gt; action)
+CompletableFuture&amp;lt;Void&amp;gt; acceptEitherAsync(CompletionStage&amp;lt;? extends T&amp;gt; other, Consumer&amp;lt;? super T&amp;gt; action)
+CompletableFuture&amp;lt;Void&amp;gt; acceptEitherAsync(CompletionStage&amp;lt;? extends T&amp;gt; other, Consumer&amp;lt;? super T&amp;gt; action, Executor executor)
+
+CompletableFuture&amp;lt;Void&amp;gt; runAfterEither(CompletionStage&amp;lt;?&amp;gt; other, Runnable action)
+CompletableFuture&amp;lt;Void&amp;gt; runAfterEitherAsync(CompletionStage&amp;lt;?&amp;gt; other, Runnable action)
+CompletableFuture&amp;lt;Void&amp;gt; runAfterEitherAsync(CompletionStage&amp;lt;?&amp;gt; other, Runnable action, Executor executor)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;4-异常处理&#34;&gt;4. 异常处理
+&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;CompletableFuture&amp;lt;T&amp;gt; exceptionally(Function&amp;lt;Throwable, ? extends T&amp;gt; fn)
+CompletableFuture&amp;lt;T&amp;gt; exceptionallyAsync(Function&amp;lt;Throwable, ? extends T&amp;gt; fn)
+CompletableFuture&amp;lt;T&amp;gt; exceptionallyAsync(Function&amp;lt;Throwable, ? extends T&amp;gt; fn, Executor executor)
+        
+CompletableFuture&amp;lt;T&amp;gt; whenComplete(BiConsumer&amp;lt;? super T, ? super Throwable&amp;gt; action)
+CompletableFuture&amp;lt;T&amp;gt; whenCompleteAsync(BiConsumer&amp;lt;? super T, ? super Throwable&amp;gt; action)
+CompletableFuture&amp;lt;T&amp;gt; whenCompleteAsync(BiConsumer&amp;lt;? super T, ? super Throwable&amp;gt; action, Executor executor)
+        
+       
+&amp;lt;U&amp;gt; CompletableFuture&amp;lt;U&amp;gt; handle(BiFunction&amp;lt;? super T, Throwable, ? extends U&amp;gt; fn)
+&amp;lt;U&amp;gt; CompletableFuture&amp;lt;U&amp;gt; handleAsync(BiFunction&amp;lt;? super T, Throwable, ? extends U&amp;gt; fn)
+&amp;lt;U&amp;gt; CompletableFuture&amp;lt;U&amp;gt; handleAsync(BiFunction&amp;lt;? super T, Throwable, ? extends U&amp;gt; fn, Executor executor)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;==exceptionally 和 whenComplete, handle 的区别==&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/completeablefuture/images/image-20221222112307270.png&#34;
+	width=&#34;519&#34;
+	height=&#34;241&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221222112307270&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;215&#34;
+		data-flex-basis=&#34;516px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;5-性能&#34;&gt;5. 性能
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;任务巨多, 如何保证性能&lt;/li&gt;
+&lt;li&gt;如何观察任务的调度情况 (存在线程复用的情况)
+&lt;ol&gt;
+&lt;li&gt;可以使用线程池. 设置核心线程数为0, 线程存活时间为0, 保证每个任务都在新线程上执行&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;​&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Disruptor</title>
+        <link>https://mikeLing-qx.github.io/p/disruptor/</link>
+        <pubDate>Wed, 23 Mar 2022 18:14:03 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/disruptor/</guid>
+        <description>&lt;h1 id=&#34;1-概述&#34;&gt;1. 概述
+&lt;/h1&gt;&lt;p&gt;​    传统阻塞的队列使用锁保证线程安全，而锁通过操作系统内核上下文切换实现，会暂停线程去等待 锁，直到锁释放。&lt;/p&gt;
+&lt;p&gt;​	执行这样的上下文切换，会丢失之前保存的数据和指令。由于消费者和生产者之间的速度差异，队 列总是接近满或者空的状态，这种状态会导致高水平的写入争用。&lt;/p&gt;
+&lt;p&gt;==传统队列的==&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/disruptor/images/image-20240812093605620.png&#34;
+	width=&#34;912&#34;
+	height=&#34;378&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240812093605620&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;241&#34;
+		data-flex-basis=&#34;579px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;Disruptor其实就像一个队列一样，用于在不同的线程之间迁移数据，但是Disruptor也实现了一些&lt;/p&gt;
+&lt;p&gt;其他队列没有的特性，如：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;同一个“事件”可以有多个消费者，==消费者之间既可以并行处理，也可以相互依赖形成处理的先后次序==(形成一个依赖图)；&lt;/li&gt;
+&lt;li&gt;预分配用于存储事件内容的内存空间；&lt;/li&gt;
+&lt;li&gt;针对极高的性能目标而实现的极度优化和无锁的设计；&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;2-核心概念&#34;&gt;2. 核心概念
+&lt;/h1&gt;&lt;h2 id=&#34;1-ringbuffer&#34;&gt;1. RingBuffer
+&lt;/h2&gt;&lt;p&gt;Disruptor中的数据结构，用于存储生产者生产的数据&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;环形的缓冲区，曾经 RingBuffer 是 Disruptor 中的最主要的对象，但从3.0版本开始，其职责被简化为仅仅负责对通过 Disruptor 进行交换的数据（事件）进行存储和更新。在一些更高级的应 用场景中，Ring Buffer 可以由用户的自定义实现来完全替代。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;2-sequence&#34;&gt;2. Sequence
+&lt;/h2&gt;&lt;p&gt;序号，在Disruptor框架中，任何地方都有序号&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;==生产者生产的数据放在RingBuffer中的哪个位置，消费者应该消费哪个位置的数据==，RingBuffer中&lt;/p&gt;
+&lt;p&gt;的某个位置的数据是什么，这些==都是由这个序号来决定的==。这个序号可以简单的理解为一个AtomicLong&lt;/p&gt;
+&lt;p&gt;类型的变量。==其使用了padding的方法去消除缓存的伪共享问题==。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;3-sequencer&#34;&gt;3. Sequencer
+&lt;/h2&gt;&lt;p&gt;序号生成器，这个类主要是用来协调生产者的&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;在生产者生产数据的时候，Sequencer会产生一个可用的序号（Sequence），然后生产者就就知道&lt;/p&gt;
+&lt;p&gt;数据放在环形队列的那个位置了。&lt;/p&gt;
+&lt;p&gt;==Sequencer是Disruptor的真正核心，此接口有两个实现类 SingleProducerSequencer、 MultiProducerSequencer== ，它们定义在生产者和消费者之间快速、正确地传递数据的并发算法。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;4-sequence-barrier&#34;&gt;4. &lt;strong&gt;Sequence Barrier&lt;/strong&gt;
+&lt;/h2&gt;&lt;p&gt;序号屏障&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;我们都知道，消费者在消费数据的时候，需要知道消费哪个位置的数据。消费者总不能自己想取哪&lt;/p&gt;
+&lt;p&gt;个数据消费，就取哪个数据消费吧。这个SequencerBarrier起到的就是这样一个“栅栏”般的阻隔作用。&lt;/p&gt;
+&lt;p&gt;你消费者想消费数据，得，我告诉你一个序号（Sequence），你去消费那个位置上的数据。要是没有数&lt;/p&gt;
+&lt;p&gt;据，就好好等着吧&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;5-wait-strategy&#34;&gt;5. Wait Strategy
+&lt;/h2&gt;&lt;p&gt;Wait Strategy决定了==一个消费者怎么等待生产者==将事件（Event）放入Disruptor中。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;设想一种这样的情景：生产者生产的非常慢，而消费者消费的非常快。那么必然会出现数据不够的&lt;/p&gt;
+&lt;p&gt;情况，这个时候消费者怎么进行等待呢？WaitStrategy就是为了解决问题而诞生的。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;6-event&#34;&gt;6. Event
+&lt;/h2&gt;&lt;p&gt;​	从生产者到消费者传递的数据叫做Event。它不是一个被 Disruptor 定义的特定类型，而是由&lt;/p&gt;
+&lt;p&gt;Disruptor 的使用者定义并指定&lt;/p&gt;
+&lt;h2 id=&#34;7-eventhandler&#34;&gt;7. EventHandler
+&lt;/h2&gt;&lt;p&gt;​	Disruptor 定义的事件处理接口，由用户实现，用于处理事件，是 Consumer 的真正实现。&lt;/p&gt;
+&lt;h2 id=&#34;8-producer&#34;&gt;8. Producer
+&lt;/h2&gt;&lt;p&gt;​	即生产者，只是泛指调用 Disruptor 发布事件的用户代码，Disruptor 没有定义特定接口或类型。&lt;/p&gt;
+&lt;h1 id=&#34;3-disruptor-入门&#34;&gt;3. Disruptor 入门
+&lt;/h1&gt;&lt;p&gt;添加依赖&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;dependency&amp;gt;
+	&amp;lt;groupId&amp;gt;com.lmax&amp;lt;/groupId&amp;gt;
+	&amp;lt;artifactId&amp;gt;disruptor&amp;lt;/artifactId&amp;gt;
+	&amp;lt;version&amp;gt;3.4.2&amp;lt;/version&amp;gt;
+&amp;lt;/dependency&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;Event 事件&lt;/li&gt;
+&lt;li&gt;EventFactory 事件工厂&lt;/li&gt;
+&lt;li&gt;EventHandler 事件消费者&lt;/li&gt;
+&lt;li&gt;wait strategy 等待策略&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;1-创建事件&#34;&gt;1. 创建事件
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;首先创建一个 LongEvent 类，这个类将会被放入环形队列中作为消息内容。&lt;/p&gt;
+&lt;p&gt;事件(Event)就是通过 Disruptor 进行交换的数据类型。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class LongEvent {
+    private long value;
+
+    public void set(long value) {
+        this.value = value;
+    }
+
+    public long getValue() {
+        return value;
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-定义事件工厂&#34;&gt;2. 定义事件工厂
+&lt;/h2&gt;&lt;p&gt;==为了使用Disruptor的内存预分配event，我们需要定义一个EventFactory==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;事件工厂(Event Factory)定义了==如何实例化前面第1步中定义的事件(Event)==，需要实现接口 com.lmax.disruptor.EventFactory&lt;T&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Disruptor 通过 EventFactory 在 RingBuffer 中预创建 Event 的实例。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;一个 Event 实例实际上被用作一个“数据槽”，发布者发布前，先从 RingBuffer 获得一个 Event 的实&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;例，然后往 Event 实例中填充数据，之后再发布到 RingBuffer 中，之后由 Consumer 获得该 Event 实&lt;/p&gt;
+&lt;p&gt;例并从中读取数据&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class LongEventFactory implements EventFactory&amp;lt;LongEvent&amp;gt; {
+    public LongEvent newInstance() {
+        return new LongEvent();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;3-定义事件处理的-handler&#34;&gt;3. 定义事件处理的 handler
+&lt;/h2&gt;&lt;p&gt;为了让消费者处理这些事件，所以我们这里定义一个事件处理器，负责打印event&lt;/p&gt;
+&lt;p&gt;通过实现接口 com.lmax.disruptor.EventHandler&lt;T&gt; 定义事件处理的具体实现。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class LongEventHandler implements EventHandler&amp;lt;LongEvent&amp;gt; {
+    public void onEvent(LongEvent event, long sequence, boolean endOfBatch) {
+        CommonUtils.calculation();
+        //  System.out.println(&amp;quot;consumer:&amp;quot; + Thread.currentThread().getName() + &amp;quot; Event: value=&amp;quot; + event.getValue() + &amp;quot;,sequence=&amp;quot; + sequence + &amp;quot;,endOfBatch=&amp;quot; + endOfBatch);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;4-等待策略&#34;&gt;4. 等待策略
+&lt;/h2&gt;&lt;p&gt;Disruptor 定义了 com.lmax.disruptor.WaitStrategy 接口用于抽象 Consumer 如何等待新事件， 这是策略模式的应用&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;WaitStrategy YIELDING_WAIT = new YieldingWaitStrategy();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;5-启动disruptor&#34;&gt;5. 启动Disruptor
+&lt;/h2&gt;&lt;p&gt;RingBuffer 必须是2的n次方&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public static void main(String[] args) {
+        // 指定事件工厂
+        LongEventFactory factory = new LongEventFactory();
+
+        // 指定 ring buffer字节大小, 必须是2的N次方
+        int bufferSize = 1024;
+
+        //单线程模式，获取额外的性能
+        Disruptor&amp;lt;LongEvent&amp;gt; disruptor = new Disruptor&amp;lt;LongEvent&amp;gt;(factory,
+                bufferSize, Executors.defaultThreadFactory(),
+                ProducerType.SINGLE,
+                new YieldingWaitStrategy());
+
+        //设置事件业务处理器---消费者
+        disruptor.handleEventsWith(new LongEventHandler());
+
+        //启动disruptor线程
+        disruptor.start();
+        // 获取 ring buffer环，用于接取生产者生产的事件
+        RingBuffer&amp;lt;LongEvent&amp;gt; ringBuffer = disruptor.getRingBuffer();
+
+        //为 ring buffer指定事件生产者
+        LongEventProducerWithTranslator producer = new LongEventProducerWithTranslator(ringBuffer);
+        //循环遍历
+        for (int i = 0; i &amp;lt; 100; i++) {
+            //获取一个随机数
+            long value = (long) ((Math.random() * 1000000) + 1);
+            //发布数据
+            producer.onData(value);
+        }
+        //停止disruptor线程
+        disruptor.shutdown();
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;6--使用translators发布事件&#34;&gt;6.  使用Translators发布事件
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;由于加入了丰富的Lambda风格的API，可以用来帮组开发人员简化流 程。所以在3.0版本后==首选使用Event Publisher/Event Translator来发布事件==&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Event Publisher&lt;/strong&gt; 负责将事件发布到 Disruptor 的 &lt;code&gt;RingBuffer&lt;/code&gt; 中。它的主要任务是将新的事件放入 &lt;code&gt;RingBuffer&lt;/code&gt; 中，以供消费者线程进行处理。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Event Translator&lt;/strong&gt; 是一个用于将外部数据转换为 Disruptor 事件的接口。它负责将传入的数据转换为 Disruptor 内部的事件对象，并将其放入 &lt;code&gt;RingBuffer&lt;/code&gt; 中进行处理。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;EventTranslator&lt;/code&gt; 是一个接口，通常通过实现 &lt;code&gt;EventTranslatorOneArg&lt;/code&gt;, &lt;code&gt;EventTranslatorTwoArg&lt;/code&gt;, 或 &lt;code&gt;EventTranslatorThreeArg&lt;/code&gt; 接口来创建。不同的接口支持不同数量的参数传递。&lt;/li&gt;
+&lt;li&gt;在发布事件时，==Event Publisher 会使用 Event Translator 来进行数据转换==。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;public class LongEventProducerWithTranslator {
+    private final RingBuffer&amp;lt;LongEvent&amp;gt; ringBuffer;
+
+    public LongEventProducerWithTranslator(RingBuffer&amp;lt;LongEvent&amp;gt; ringBuffer) {
+        this.ringBuffer = ringBuffer;
+    }
+
+    private static final EventTranslatorOneArg&amp;lt;LongEvent, Long&amp;gt; TRANSLATOR =
+            new EventTranslatorOneArg&amp;lt;LongEvent, Long&amp;gt;() {
+                public void translateTo(LongEvent event, long sequence, Long data) {
+                    event.set(data);
+                }
+            };
+
+    public void onData(Long data) {
+        ringBuffer.publishEvent(TRANSLATOR, data);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;4-高性能原理&#34;&gt;4. 高性能原理
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;引入环形的数组结构：数组元素不会被回收，避免频繁的GC，&lt;/li&gt;
+&lt;li&gt;无锁的设计：采用CAS无锁方式，保证线程的安全性&lt;/li&gt;
+&lt;li&gt;属性填充：通过添加额外的无用信息，避免伪共享问题&lt;/li&gt;
+&lt;li&gt;元素位置的定位：采用跟一致性哈希一样的方式，一个索引，进行自增&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/disruptor/images/image-20240812182506385.png&#34;
+	width=&#34;781&#34;
+	height=&#34;400&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240812182506385&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;195&#34;
+		data-flex-basis=&#34;468px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;0-mesi-协议&#34;&gt;0. MESI 协议
+&lt;/h2&gt;&lt;p&gt;​	 &lt;strong&gt;MESI 协议&lt;/strong&gt;（Modified, Exclusive, Shared, Invalid）是一种缓存一致性协议，用于确保多核处理器系统中的缓存数据的一致性。它确保各个核心的缓存中保存的数据保持同步，避免数据冲突和不一致。下面是 MESI 协议的四种状态及其简单解释：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Modified（修改）&lt;/strong&gt;：数据在该缓存中是修改过的，并且是唯一的拷贝。其他缓存没有这块数据。这个缓存中的数据已被更改，但尚未写回主内存。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Exclusive（独占）&lt;/strong&gt;：数据在该缓存中是唯一的拷贝，并且与主内存中的数据一致。该缓存中的数据没有被修改。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Shared（共享）&lt;/strong&gt;：数据可能存在于一个或多个缓存中，并且与主内存中的数据一致。这意味着其他缓存也有这块数据的拷贝。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Invalid（无效）&lt;/strong&gt;：数据在该缓存中是无效的，不可靠。缓存中的数据可能已被其他缓存修改或更新，不能再使用。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;==类比解释==&lt;/p&gt;
+&lt;p&gt;想象你和你的朋友在一个图书馆里读书，你们都有一个笔记本记录书中的内容。这就像是缓存的工作，每个人都有自己的“缓存”（笔记本）。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Modified（修改）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;你在笔记本上写下了一些新的笔记，并且这些笔记是你自己写的，没有别人写过。你笔记本上的内容与图书馆的原书（主内存）不一致，因为你做了修改。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Exclusive（独占）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;你有一本独特的书，只有你拥有。这本书的内容完全和图书馆的原书一致，没有人修改过它。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Shared（共享）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;你和你的朋友都有相同的笔记内容，你们都在各自的笔记本上记录了这些内容。这些内容和图书馆的原书一致，但有多个人都有这些笔记。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Invalid（无效）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;你发现你的笔记本上有一些过时的内容，这些内容已经不再准确了，因为图书馆的原书已经更新了，你的笔记需要更新&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;1-缓存行&#34;&gt;1. 缓存行
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;缓存行（Cache Line）是现代计算机体系结构中缓存的基本单位。它是处理器缓存（如 L1、L2、L3 缓存）中的一个数据块，用于提高内存访问的效率。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;处理器缓存中的数据块，通常大小为 64 字节&lt;/p&gt;
+&lt;h2 id=&#34;2-伪共享&#34;&gt;2. 伪共享
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;当多个==线程操作的变量位于同一个缓存行中时，即使这些变量并不相互干扰，也可能导致性能问题==。这种现象称为伪共享。伪共享会导致==处理器频繁地更新缓存行，增加缓存一致性协议的开销，从而降低性能==。 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​	 解决伪共享的一种方法是将每个线程的变量放在不同的缓存行中，从而避免它们位于同一个缓存行中。另一个方法是==使用缓存行填充技术==，将==相关的数据放置在缓存行的不同部分==。&lt;/p&gt;
+&lt;h2 id=&#34;3-无锁设计&#34;&gt;3. 无锁设计
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;在多线程竞争下，加锁、释放锁会导致比较多的上下文切换和调度延时，引起性能问题，而且在上 下文切换的时候，cpu之前缓存的指令和数据都将失效，对性能有很大的损失，用户态的锁虽然避 免了这些问题，但是其实它们只是在没有真实的竞争时才有效。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;一个线程持有锁会导致其它所有需要此锁的线程挂起直至该锁释放。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果一个优先级高的线程等待一个优先级低的线程释放锁会导致导致优先级反转(Priority&lt;/p&gt;
+&lt;p&gt;Inversion)，引起性能风险。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;1-cas-比较与交换&#34;&gt;1. CAS 比较与交换
+&lt;/h3&gt;&lt;p&gt;CAS的语义是“我认为V的值应该为A，如果是，那么将V的值更新为B，  否则不修改并告诉V的值实际为多少”, 乐观锁 技术，当多个线程尝试使用CAS同时更新同一 个变量时，只有其中一个线程能更新变量的值，而其它线程都失败，失败的线程并不会被挂起，而是被 告知这次竞争中失败，并可以再次尝试&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/disruptor/images/image-20240813094611390.png&#34;
+	width=&#34;719&#34;
+	height=&#34;400&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240813094611390&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;179&#34;
+		data-flex-basis=&#34;431px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;2-disruptor-的无锁设计&#34;&gt;2. Disruptor 的无锁设计
+&lt;/h3&gt;&lt;p&gt;多线程环境下，多个生产者通过do/while循环的条件CAS，来判断每次申请的空间是否已经被其他 生产者占据。假如已经被占据，该函数会返回失败，While循环重新执行，申请写入空间。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;do {
+    current = cursor.get();
+    next = current + n;
+    if (!hasAvailableCapacity(gatingSequences, n, current)) {
+    	throw InsufficientCapacityException.INSTANCE;
+	}
+}
+while (!cursor.compareAndSet(current, next));
+//next 类比于ArrayBlockQueue的数组索引index
+return next;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;3-环形数组&#34;&gt;3. 环形数组
+&lt;/h3&gt;&lt;p&gt;​	为数组预先分配内存，使得数组对象一直存在, 这样就 不需要花大量的时间用于垃圾回收。  数组的大小为2的n次方，这样==元素定位可以通过位运算效率会更高==&lt;/p&gt;
+&lt;h1 id=&#34;5-等待策略&#34;&gt;5. 等待策略
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;BlockingWaitStrategy&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Disruptor的==默认策略==是BlockingWaitStrategy，在BlockingWaitStrategy内部是使用锁和condition 来控制线程的唤醒 ==BlockingWaitStrategy是最低效的策略==，==但其对CPU的消耗最小并且在各种不同部署环境中能提供 更加一致的性能表现==。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;SleepingWaitStrategy&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;SleepingWaitStrategy 的性能表现跟 BlockingWaitStrategy 差不多，对 CPU 的消耗也类似，但其 对生产者线程的影响最小，通过使用 LockSupport.parkNanos(1) 来实现循环等待，适合用于异步日志&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;YieldingWaitStrategy&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;YieldingWaitStrategy是可以使用在低延迟系统的策略之一，YieldingWaitStrategy将自旋以等待序 列增加到适当的值。在循环体内，将调用 Thread.yield() 以允许其他排队的线程运行。在要求极高性 能且事件处理线数小于 CPU 逻辑核心数的场景中，推荐使用此策略；&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;BusySpinWaitStrategy&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;性能最好，适合用于低延迟的系统，在要求极高性能且事件处理线程数小于CPU逻辑核心数的场景 中，推荐使用此策略；&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;PhasedBackoffWaitStrategy&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;自旋 + yield + 自定义策略，CPU资源紧缺，吞吐量和延迟并不的场景。&lt;/p&gt;
+&lt;h1 id=&#34;6-生产和消费模式&#34;&gt;6. 生产和消费模式
+&lt;/h1&gt;&lt;p&gt;==在Disruptor中生产者分为单生产者和多生产者，而消费者并没有区分==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;单生产者情况下，就是普通的生产者向RingBuffer中放置数据，消费者获取最大可消费的位置，并 进行消费。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;多生产者时候，又多出了一个跟RingBuffer同样大小的Buffer，==称为AvailableBuffer==。 在多生产者中，每个生产者==首先通过CAS竞争获取可以写的空间，然后再进行慢慢往里放数据==，如 果正好这个时候消费者要消费数据，那么==每个消费者都需要获取最大可消费的下标==，这个下标是在 AvailableBuffer进行获取得到的最长连续的序列下标。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;1-单生产者生产数据&#34;&gt;1. 单生产者生产数据
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;申请写入m个元素；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;若是有m个元素可以入，则返回最大的序列号。这儿主要判断是否会覆盖未读的元素；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;若是返回的正确，则生产者开始写入元素。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/disruptor/images/image-20240813175746936.png&#34;
+	width=&#34;609&#34;
+	height=&#34;822&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240813175746936&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;74&#34;
+		data-flex-basis=&#34;177px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;2-多生产者生产数据&#34;&gt;2. 多生产者生产数据
+&lt;/h2&gt;&lt;p&gt;​	多个生产者的情况下，会遇到“如何防止多个线程重复写同一个元素”的问题。Disruptor的解决方法 是，==每个线程获取不同的一段数组空间进行操作==。这个通过CAS很容易达到。==只需要在分配元素的时候，通过CAS判断一下这段空间是否已经分配出去==即可。&lt;/p&gt;
+&lt;p&gt;但是会遇到一个新问题：&lt;/p&gt;
+&lt;p&gt;==如何防止读取的时候，读到还未写的元素==。Disruptor在多个生产者的情况&lt;/p&gt;
+&lt;p&gt;下，引入了一个与Ring Buffer大小相同的buffer：==available Buffer。当某个位置写入成功的时候，便把 availble Buffer相应的位置置位，标记为写入成功。读取的时候，会遍历available Buffer，来判断元素 是否已经就绪==。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;申请写入m个元素；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;若是有m个元素可以写入，则返回最大的序列号。每个生产者会被分配一段独享的空间；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;生产者写入元素，写入元素的同时设置available Buffer里面相应的位置，以标记自己哪些位置是已 经写入成功的。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;如下图所示，Writer1和Writer2两个线程写入数组，都申请可写的数组空间。Writer1被分配了下 标3到下表5的空间，Writer2被分配了下标6到下标9的空间。&lt;/p&gt;
+&lt;p&gt;Writer1写入下标3位置的元素，同时把available Buffer相应位置置位，标记已经写入成功，往后 移一位，开始写下标4位置的元素。Writer2同样的方式。最终都写入完成。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/disruptor/images/image-20240813180738850.png&#34;
+	width=&#34;1112&#34;
+	height=&#34;812&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240813180738850&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;136&#34;
+		data-flex-basis=&#34;328px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;3-多生产者消费数据&#34;&gt;3. 多生产者消费数据
+&lt;/h2&gt;&lt;p&gt;​    假设三个生产者在写中，==还没有置位AvailableBuffer，那么消费者可获取的消费下标只能获取到 6==然后等生产者都写OK后，通知到消费者，消费者继续重复上面的步骤&lt;/p&gt;
+&lt;p&gt;==消费流程==&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;申请读取到序号n；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;若writer cursor &amp;gt;= n，这时仍然无法确定连续可读的最大下标。从reader cursor开始读取&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;available Buffer，一直查到第一个不可用的元素，然后返回最大连续可读元素的位置；&lt;/p&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;消费者读取元素&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;如下图所示，读线程读到下标为2的元素，三个线程Writer1/Writer2/Writer3正在向RingBuffer相&lt;/p&gt;
+&lt;p&gt;应位置写数据，==写线程被分配到的最大元素下标是11==。&lt;/p&gt;
+&lt;p&gt;==读线程申请读取到下标从3到11的元素，判断writer cursor&amp;gt;=11。然后开始读取 availableBuffer，从3开始，往后读取，发现下标为7的元素没有生产成功，于是WaitFor(11)返回 6==。&lt;/p&gt;
+&lt;p&gt;然后，消费者读取下标从3到6共计4个元素。 ==也就是只能读到写线程最小的下标==&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;7-高级使用&#34;&gt;7. 高级使用
+&lt;/h1&gt;&lt;h2 id=&#34;1-单一写者模式&#34;&gt;1. 单一写者模式
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;在并发系统中==提高性能最好的方式之一就是单一写者原则==，对Disruptor也是适用的。如果在你的代&lt;/p&gt;
+&lt;p&gt;码中仅仅有一个事件生产者，那么可以设置为单一生产者模式来提高系统的性能。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/disruptor/images/image-20240813182722192.png&#34;
+	width=&#34;849&#34;
+	height=&#34;430&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240813182722192&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;197&#34;
+		data-flex-basis=&#34;473px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;2-串行消费&#34;&gt;2. 串行消费
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;比如：现在触发一个注册Event，需要有一个Handler来存储信息，一个Hanlder来发邮件等等&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/disruptor/images/image-20240813182837661.png&#34;
+	width=&#34;993&#34;
+	height=&#34;188&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240813182837661&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;528&#34;
+		data-flex-basis=&#34;1267px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;/**
+* 串行依次执行
+* &amp;lt;br/&amp;gt;
+* p --&amp;gt; c11 --&amp;gt; c21
+* @param disruptor
+*/
+public static void serial(Disruptor&amp;lt;LongEvent&amp;gt; disruptor){
+	disruptor.handleEventsWith(new C11EventHandler()).then(new
+		C21EventHandler());
+	disruptor.start();
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;3-菱形消费&#34;&gt;3. 菱形消费
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/disruptor/images/image-20240813182938505.png&#34;
+	width=&#34;950&#34;
+	height=&#34;391&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240813182938505&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;242&#34;
+		data-flex-basis=&#34;583px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public static void diamond(Disruptor&amp;lt;LongEvent&amp;gt; disruptor){
+	disruptor.handleEventsWith(new C11EventHandler(),new
+	C12EventHandler()).then(new C21EventHandler());
+	disruptor.start();
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;4-链式并行&#34;&gt;4. 链式并行
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/disruptor/images/image-20240813183002057.png&#34;
+	width=&#34;1018&#34;
+	height=&#34;439&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240813183002057&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;231&#34;
+		data-flex-basis=&#34;556px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public static void chain(Disruptor&amp;lt;LongEvent&amp;gt; disruptor){
+	disruptor.handleEventsWith(new C11EventHandler()).then(new
+	C12EventHandler());
+	disruptor.handleEventsWith(new C21EventHandler()).then(new
+	C22EventHandler());
+	disruptor.start();
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;5-相互隔离&#34;&gt;5. 相互隔离
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/disruptor/images/image-20240813190405817.png&#34;
+	width=&#34;1036&#34;
+	height=&#34;451&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240813190405817&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;229&#34;
+		data-flex-basis=&#34;551px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public static void parallelWithPool(Disruptor&amp;lt;LongEvent&amp;gt; disruptor){
+	disruptor.handleEventsWithWorkerPool(new C11EventHandler(),new
+C11EventHandler());
+	disruptor.handleEventsWithWorkerPool(new C21EventHandler(),new
+C21EventHandler());
+	disruptor.start();
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;6-航道模式&#34;&gt;6. 航道模式
+&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;/**
+* 串行依次执行,同时C11，C21分别有2个实例
+* &amp;lt;br/&amp;gt;
+* p --&amp;gt; c11 --&amp;gt; c21
+* @param disruptor
+*/
+public static void serialWithPool(Disruptor&amp;lt;LongEvent&amp;gt; disruptor){
+	disruptor.handleEventsWithWorkerPool(new C11EventHandler(),new
+		C11EventHandler()).then(new C21EventHandler(),new C21EventHandler());
+	disruptor.start();
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

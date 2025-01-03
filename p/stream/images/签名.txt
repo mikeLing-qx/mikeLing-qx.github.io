@@ -1,0 +1,19 @@
+
+
+    @Test
+    public void testDemo01() throws Exception {
+       Long unixTime = System.currentTimeMillis();
+        Integer nonce = (int)(Math.random()*10000000)+1;
+    
+        // 计算签名
+        String signTxt = new StringBuffer()
+                .append(unixTime)
+                .append(nonce)
+                .append(Md5Utils.calculationMd5(APPID + SECRET_KEY, UTF8))
+                .toString();
+        String signid = Md5Utils.calculationMd5(signTxt, UTF8);
+        System.out.println(unixTime);
+        System.out.println(nonce);
+        System.out.println(signid);
+    
+    }

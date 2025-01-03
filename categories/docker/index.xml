@@ -1,0 +1,534 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Docker on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/categories/docker/</link>
+        <description>Recent content in Docker on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Thu, 23 Feb 2023 15:43:32 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/categories/docker/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Docker</title>
+        <link>https://mikeLing-qx.github.io/p/docker/</link>
+        <pubDate>Thu, 23 Feb 2023 15:43:32 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/docker/</guid>
+        <description>&lt;h1 id=&#34;1-docker&#34;&gt;1 docker
+&lt;/h1&gt;&lt;h2 id=&#34;11-简介&#34;&gt;1.1 简介
+&lt;/h2&gt;&lt;p&gt;Docker 是一个开源的应用容器引擎，让开发者可以打包他们的应用以及依赖包到一个可移植的容器中，然后发布到任何流行的&lt;a class=&#34;link&#34; href=&#34;https://baike.baidu.com/item/Linux&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Linux&lt;/a&gt;机器上，也可以实现虚拟化，容器是完全使用沙箱机制，相互之间不会有任何接口。  ==可以把它当成轻量级的虚拟机==吧（虽然一个是完全虚拟化，一个是操作系统层虚拟化）&lt;/p&gt;
+&lt;h2 id=&#34;12-构成&#34;&gt;1.2 构成
+&lt;/h2&gt;&lt;p&gt;​	Docker组成&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;仓库 (Repository)&lt;/p&gt;
+&lt;p&gt;镜像 (Image)   阿里云镜像: &lt;a class=&#34;link&#34; href=&#34;http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;容器 (container)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;2-docker入门&#34;&gt;2 docker入门
+&lt;/h1&gt;&lt;h2 id=&#34;11-目录挂载&#34;&gt;1.1 目录挂载
+&lt;/h2&gt;&lt;p&gt;==将宿主机中的目录与容器内的目录进行映射==&lt;/p&gt;
+&lt;p&gt;创建容器 添加-v参数 后边为   宿主机目录:容器目录&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;docker run -id --name=c3 -v /opt/:/usr/local/myhtml centos
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;如果你共享的是多级的目录，可能会出现权限不足的提示。&lt;/p&gt;
+&lt;p&gt;这是因为CentOS7中的安全模块selinux把权限禁掉了，我们需要添加参数  &amp;ndash;privileged=true  来解决挂载的目录没有权限的问题&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;docker run -id --privileged=true --name=c4 -v /opt/:/usr/local/myhtml centos
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;创建文件 touch a.txt 或者vim
+查看文件 cat a.txt
+输入内容 echo 123 &amp;gt; a.txt
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;12-复制文件&#34;&gt;1.2 复制文件
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;docker cp 需要拷贝的文件或目录 容器名称:容器目录
+例如：docker cp 1.txt c2:/root
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;13-部署应用&#34;&gt;1.3 部署应用
+&lt;/h2&gt;&lt;p&gt;创建mysql容器&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;docker run -di --name mysql -p 33306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql:5.7
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;-p 代表==端口映射==，格式为  宿主机映射端口:容器运行端口&lt;/p&gt;
+&lt;p&gt;-e 代表添加环境变量  MYSQL_ROOT_PASSWORD是root用户的登陆密码&lt;/p&gt;
+&lt;h2 id=&#34;21-环境准备&#34;&gt;2.1 环境准备
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;准备vmware 和 Centos7以上版本; linux内核版本推荐 3.10 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;查看linux内核版本&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;uname -a
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;查看linux版本&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;cat /etc/redhat-release 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;22-安装docker&#34;&gt;2.2 安装docker
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;更新yum包 (只是为了排除系统环境影响; ==&lt;strong&gt;不要用于生产环境; 仅限在本地玩&lt;/strong&gt;==)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;yum update
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;安装需要的软件包&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;yum install -y yum-utils device-mapper-persistent-data lvm2
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;设置yum 源 (docker 仓库地址)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;查看仓库所有docker版本&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;yum list docker-ce --showduplicates | sort -r
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/docker/images/%E6%9F%A5%E7%9C%8Bdocker%E7%89%88%E6%9C%AC.png&#34;
+	width=&#34;640&#34;
+	height=&#34;340&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;查看docker版本&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;188&#34;
+		data-flex-basis=&#34;451px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ol start=&#34;5&#34;&gt;
+&lt;li&gt;安装所需的版本&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;yum install docker-ce-版本号
+
+例如: yum install docker-ce-17.12.1.ce
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;6&#34;&gt;
+&lt;li&gt;启动docker 并加入开机启动&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;systemctl start docker
+systemctl enable docker
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;7&#34;&gt;
+&lt;li&gt;验证是否安装成功&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;docker version
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/docker/images/%E9%AA%8C%E8%AF%81docker%E6%98%AF%E5%90%A6%E5%AE%89%E8%A3%85%E6%88%90%E5%8A%9F.png&#34;
+	width=&#34;494&#34;
+	height=&#34;446&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;验证docker是否安装成功&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;110&#34;
+		data-flex-basis=&#34;265px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;23-docker-安装-mysql&#34;&gt;2.3 docker 安装 mysql
+&lt;/h2&gt;&lt;ol start=&#34;0&#34;&gt;
+&lt;li&gt;查看可用的mysql版本&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;docker search mysql
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol&gt;
+&lt;li&gt;拉取mysql镜像 (默认拉取的是最新版本latest)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;docker pull mysql
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;运行mysql容器&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;docker run -p 3306:3306 --name mysql-test -v /opt/docker_v/mysql/conf:/etc/mysql/conf.d -e MYSQL_ROOT_PASSWORD=root -d imageID
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;参数说明&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;-i  运行 ; -d 创建&lt;/p&gt;
+&lt;p&gt;-p 端口映射; 映射容器服务的3306端口到宿主机的3306端口上;  外部主机可以直接通过 &lt;strong&gt;宿主机ip:3306&lt;/strong&gt; 访问到 MySQL 的服务&lt;/p&gt;
+&lt;p&gt;-v /opt/docker_v/mysql/conf:/etc/mysql/conf.d：将主机/opt/docker_v/mysql/conf目录挂载到容器的/etc/mysql/conf.d&lt;/p&gt;
+&lt;p&gt;-e  (添加环境变量) MYSQL_ROOT_PASSWORD=root：==初始化root用户的密码==&lt;/p&gt;
+&lt;p&gt;-d: 后台运行容器，并返回容器ID
+imageID: mysql镜像ID&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;进入mysql 容器&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;docker exec -it mysql-test bash
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;查看mysql容器信息&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;docker inspect mysql-test
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;5&#34;&gt;
+&lt;li&gt;查看容器&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;docker ps  (查看正在运行的容器)
+docker ps -a (查看所有的容器)
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/docker/images/%E6%9F%A5%E7%9C%8B%E6%AD%A3%E5%9C%A8%E8%BF%90%E8%A1%8C%E7%9A%84%E5%AE%B9%E5%99%A8.png&#34;
+	width=&#34;1077&#34;
+	height=&#34;91&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;查看正在运行的容器&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;1183&#34;
+		data-flex-basis=&#34;2840px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;3-docker常用命令&#34;&gt;3 docker常用命令
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;docker start/stop
+&lt;ul&gt;
+&lt;li&gt;id/name 启动/停止某个容器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;docker attach  id
+&lt;ul&gt;
+&lt;li&gt;进入某个容器(使用attach退出后容器也跟着停止运行)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;docker exec -it  id
+&lt;ul&gt;
+&lt;li&gt;启动一个伪终端以交互式的方式进入某个容器（使用exit退出后容器不停止运行）&lt;/li&gt;
+&lt;li&gt;ctrl + d 退出容器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;docker rm id/name
+&lt;ul&gt;
+&lt;li&gt;删除某个容器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;docker rmi id/name
+&lt;ul&gt;
+&lt;li&gt;删除某个镜像&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;docker run &amp;ndash;name test -ti ubuntu /bin/bash
+&lt;ul&gt;
+&lt;li&gt;复制ubuntu容器并且重命名为test且运行，然后以伪终端交互式方式进入容器，运行bash&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;docker build -t soar/centos:7.1 .
+&lt;ul&gt;
+&lt;li&gt;通过当前目录下的Dockerfile创建一个名为soar/centos:7.1的镜像&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;docker run -d -p 2222:22 &amp;ndash;name test soar/centos:7.1
+&lt;ul&gt;
+&lt;li&gt;以镜像soar/centos:7.1创建名为test的容器，并以后台模式运行，并做端口映射到宿主机2222端口，P参数重启容器宿主机端口会发生改变&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;日志查看  docker logs {containerId}&lt;/li&gt;
+&lt;li&gt;docker  volume prune&lt;/li&gt;
+&lt;li&gt;查看日志 docker logs -f {}&lt;/li&gt;
+&lt;li&gt;推送镜像 docker 地址 用户名/镜像名:tag   私服可以忽略用户名&lt;/li&gt;
+&lt;li&gt;推送私服需要https, 使用http需要 配置ip+端口&lt;/li&gt;
+&lt;li&gt;清理未使用的容器  docker container prune&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/docker/images/image-20240724153201187.png&#34;
+	width=&#34;1293&#34;
+	height=&#34;660&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240724153201187&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;195&#34;
+		data-flex-basis=&#34;470px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;4-docker-安装-redis&#34;&gt;4 docker 安装 redis
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;配置镜像仓库 ustc&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;vi /etc/docker/daemon.json  (不存在就手动创建)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;{
+	&amp;quot;registry-mirrors&amp;quot;: [&amp;quot;https://docker.mirrors.ustc.edu.cn&amp;quot;]
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;配置完成后需要重启docker 服务&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;systemctl restart docker.service
+systemctl enable docker
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;查找所需的版本&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://hub.docker.com/_/redis?tab=tags&amp;amp;page=1&amp;amp;ordering=last_updated&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://hub.docker.com/_/redis?tab=tags&amp;page=1&amp;ordering=last_updated&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;这里下载最新的&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;docker pull redis:latest
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;docker 安装redis&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;docker run -itd --name redis-test  -p 6379:6379 redis
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/docker/images/%E5%AE%89%E8%A3%85redis.png&#34;
+	width=&#34;707&#34;
+	height=&#34;142&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;安装redis&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;497&#34;
+		data-flex-basis=&#34;1194px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;5-docker-命令自动补全&#34;&gt;5. docker 命令自动补全
+&lt;/h1&gt;&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;sudo mkdir -p /etc/bash_completion.d/
+sudo docker completion bash &amp;gt; /etc/bash_completion.d/docker
+
+# 激活
+source /etc/bash_completion
+source /etc/bash_completion.d/docker
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;6-docker-compose&#34;&gt;6. docker-compose
+&lt;/h1&gt;&lt;h2 id=&#34;1-智慧城市&#34;&gt;1. 智慧城市
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;[root@host-19-112-71-8 xiaopin]# cat docker-compose-prod.yml
+networks:
+  zs_network:
+    external: true
+
+version: &#39;3.0&#39;
+services:
+  smartcites_prod:
+    hostname: smartcites_prod
+    container_name: smartcites_prod
+    privileged: true
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    build:
+      context: smartcity-admin
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 9980:9980
+    environment:
+      - JAVA_OPTS=-Xmx512M -Xms512M
+    volumes:
+      - ./data/mountEnterpriseImportTemp.xlsx:/app/smartcity/uploadPath/download/template/mountEnterpriseImportTemp.xlsx
+      - ./data/uploadPath:/app/smartcity/uploadPath
+      - ./data/smartcity-logs:/app/smartcity/logs 
+    extra_hosts:
+      - xtbg.digitalgd.com.cn:210.76.73.80
+      - xtbg.zfsg.gd.gov.cn:157.122.49.24
+      #- xtbg.gdzwfw.gov.cn:157.122.49.24
+      - xtbg.gdzwfw.gov.cn:19.15.0.77
+      - yzh.gdgov.cn:19.15.18.170
+      - yzh.zszwfw.cn:19.112.202.181
+    networks:
+      zs_network:
+        ipv4_address: 192.168.88.10
+
+  epidemicapi:
+    hostname: epidemicapi_prod
+    container_name: epidemicapi_prod
+    privileged: true
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    build:
+      context: epidemicapi
+      dockerfile: Dockerfile
+    restart: always
+    #ports:
+    #  - 9983:9983
+    environment:
+      - JAVA_OPTS=-Xmx512M -Xms512M
+    networks:
+      zs_network:
+        ipv4_address: 192.168.88.11
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;这是一个 Docker Compose 配置文件，用于定义和启动多个 Docker 容器服务。以下是配置文件的详细介绍：&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;version: &#39;3.0&#39;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;指定了 Docker Compose 文件的版本。在这个版本下，你可以使用一些版本 3 的特性来配置服务。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;networks&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;定义了一个名为 &lt;code&gt;zs_network&lt;/code&gt; 的外部网络。&lt;code&gt;external: true&lt;/code&gt; 表示该网络已经存在，不会由 Docker Compose 创建。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;services&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;定义了两个服务 &lt;code&gt;smartcites_prod&lt;/code&gt; 和 &lt;code&gt;epidemicapi&lt;/code&gt;。每个服务的配置如下：&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;smartcites_prod&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;hostname&lt;/code&gt;&lt;/strong&gt;: 设置容器的主机名为 &lt;code&gt;smartcites_prod&lt;/code&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;container_name&lt;/code&gt;&lt;/strong&gt;: 设置容器的名称为 &lt;code&gt;smartcites_prod&lt;/code&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;privileged&lt;/code&gt;&lt;/strong&gt;: 给容器提供特权模式，允许容器进行一些特权操作。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;ulimits&lt;/code&gt;&lt;/strong&gt;: 设置容器的资源限制，包括进程数（&lt;code&gt;nproc&lt;/code&gt;）和文件句柄数（&lt;code&gt;nofile&lt;/code&gt;）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;dl&gt;
+&lt;dt&gt;&lt;code&gt;build&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;
+&lt;p&gt;定义构建容器的上下文和 Dockerfile 的路径。&lt;/p&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;context&lt;/code&gt;&lt;/strong&gt;: 构建上下文的路径为 &lt;code&gt;smartcity-admin&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;dockerfile&lt;/code&gt;&lt;/strong&gt;: Dockerfile 的路径为 &lt;code&gt;Dockerfile&lt;/code&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;restart&lt;/code&gt;&lt;/strong&gt;: 设置容器在崩溃后自动重启（&lt;code&gt;always&lt;/code&gt;）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;ports&lt;/code&gt;&lt;/strong&gt;: 映射主机的端口 &lt;code&gt;9980&lt;/code&gt; 到容器的端口 &lt;code&gt;9980&lt;/code&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;environment&lt;/code&gt;&lt;/strong&gt;: 设置环境变量，这里定义了 Java 虚拟机的内存选项。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;dl&gt;
+&lt;dt&gt;&lt;code&gt;volumes&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;
+&lt;p&gt;映射主机的目录或文件到容器中。&lt;/p&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;./data/mountEnterpriseImportTemp.xlsx&lt;/code&gt;&lt;/strong&gt;: 映射到容器的 &lt;code&gt;/app/smartcity/uploadPath/download/template/mountEnterpriseImportTemp.xlsx&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;./data/uploadPath&lt;/code&gt;&lt;/strong&gt;: 映射到容器的 &lt;code&gt;/app/smartcity/uploadPath&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;./data/smartcity-logs&lt;/code&gt;&lt;/strong&gt;: 映射到容器的 &lt;code&gt;/app/smartcity/logs&lt;/code&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;extra_hosts&lt;/code&gt;&lt;/strong&gt;: 添加额外的主机名和 IP 地址映射。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;networks&lt;/code&gt;&lt;/strong&gt;: 连接到 &lt;code&gt;zs_network&lt;/code&gt; 网络，并分配静态 IP 地址 &lt;code&gt;192.168.88.10&lt;/code&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;epidemicapi&lt;/code&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;hostname&lt;/code&gt;&lt;/strong&gt;: 设置容器的主机名为 &lt;code&gt;epidemicapi_prod&lt;/code&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;container_name&lt;/code&gt;&lt;/strong&gt;: 设置容器的名称为 &lt;code&gt;epidemicapi_prod&lt;/code&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;privileged&lt;/code&gt;&lt;/strong&gt;: 给容器提供特权模式。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;ulimits&lt;/code&gt;&lt;/strong&gt;: 设置容器的资源限制。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;dl&gt;
+&lt;dt&gt;&lt;code&gt;build&lt;/code&gt;&lt;/dt&gt;
+&lt;dd&gt;
+&lt;p&gt;定义构建容器的上下文和 Dockerfile 的路径。&lt;/p&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;context&lt;/code&gt;&lt;/strong&gt;: 构建上下文的路径为 &lt;code&gt;epidemicapi&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;dockerfile&lt;/code&gt;&lt;/strong&gt;: Dockerfile 的路径为 &lt;code&gt;Dockerfile&lt;/code&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;restart&lt;/code&gt;&lt;/strong&gt;: 设置容器在崩溃后自动重启（&lt;code&gt;always&lt;/code&gt;）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;environment&lt;/code&gt;&lt;/strong&gt;: 设置 Java 虚拟机的内存选项。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;code&gt;networks&lt;/code&gt;&lt;/strong&gt;: 连接到 &lt;code&gt;zs_network&lt;/code&gt; 网络，并分配静态 IP 地址 &lt;code&gt;192.168.88.11&lt;/code&gt;。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;总结&lt;/p&gt;
+&lt;p&gt;这个配置文件用于定义两个服务 &lt;code&gt;smartcites_prod&lt;/code&gt; 和 &lt;code&gt;epidemicapi&lt;/code&gt;，并将它们连接到一个名为 &lt;code&gt;zs_network&lt;/code&gt; 的网络。它配置了容器的资源限制、自动重启策略、端口映射、环境变量和卷挂载等。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;docker logs --since 2024-09-13T16:13:00 
+
+docker logs --since 2024-09-23T09:55:00 -f smartcites_prod &amp;gt; logs.txt
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;7-日志&#34;&gt;7. 日志
+&lt;/h1&gt;&lt;p&gt;Docker 容器的日志是由容器内运行的应用程序和其底层操作系统产生的。当应用程序或系统组件将信息输出到标准输出（stdout）或标准错误（stderr）时，这些输出被捕获并存储为日志。Docker 提供了一种机制来捕获这些输出，并允许用户通过 Docker 命令行界面（CLI）或其他工具来访问这些日志。&lt;/p&gt;
+&lt;p&gt;以下是 Docker 容器日志的来源和处理方式的详细说明：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;应用程序输出&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;容器中的应用程序通常会向标准输出（stdout）和标准错误（stderr）打印信息。这些可以是应用程序日志、错误消息、状态更新等。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;容器启动脚本或入口点&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;Docker 容器可以配置一个入口点（entrypoint）或启动脚本，这些脚本可能会产生日志信息。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;操作系统&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;容器内的操作系统也会生成日志，尤其是与系统服务和内核相关的日志。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Docker 守护进程&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;Docker 守护进程本身也会产生日志，记录容器的创建、启动、停止等事件。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;日志驱动&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;Docker 使用所谓的“日志驱动”来控制日志的捕获、存储和传输。默认的日志驱动是 &lt;code&gt;json-file&lt;/code&gt;，它将日志以 JSON 格式写入文件。其他日志驱动包括 &lt;code&gt;syslog&lt;/code&gt;、&lt;code&gt;journald&lt;/code&gt;、&lt;code&gt;gelf&lt;/code&gt; 等，它们可以将日志发送到不同的目标。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;日志文件&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;默认情况下，Docker 将每个容器的日志文件存储在宿主机的 &lt;code&gt;/var/lib/docker/containers//&lt;/code&gt; 目录下，文件名为 &lt;code&gt;-json.log&lt;/code&gt;。这些文件包含了容器的日志数据。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;实时日志查看&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;用户可以使用 &lt;code&gt;docker logs&lt;/code&gt; 命令来查看容器的日志。这个命令从 Docker 守护进程获取日志数据，而不是直接从文件系统读取日志文件。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;日志管理&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;除了使用 &lt;code&gt;docker logs&lt;/code&gt; 命令，用户还可以配置日志轮转、远程日志存储或日志分析工具来管理和分析日志数据。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;日志配置&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;在 Docker 容器运行时，可以通过设置环境变量或使用 Docker Compose 文件中的日志配置选项来配置日志行为。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;通过这些机制，Docker 确保容器的日志可以被有效地捕获、存储和检索，从而帮助用户监控和调试容器化应用程序。&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

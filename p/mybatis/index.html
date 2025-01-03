@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="1. 拦截器 参考资料: https://www.cnblogs.com/monkeydai/p/16625918.html\n==Mybatis拦截器应用场景==\nSql摘要统计/监控 动态分页 多租户 脱敏 加解密 使用场景是什么, 支持自定义加解密处理器 可以通过注解@ScheField 指定不同的加解密 方式, 默认方式为DefaultSecureHandler 返回原字符串, , 注解上也可以配置自定义的加解密处理器,继承 SecureFiledHandler, 里面有两抽象方法, encrypt 和decrypt 需要把加解密处理器注入到spring中, 在调用的时候会通过class 去获取实例, 通过反射去执行相关的加解密方法 同时并不是所有的查询和插入操作都走拦截器只有在 mapper 类上有 @SecureMapper 注解时才走 对接中山密评的. 因为sdk的调用不允许多线程, 因此创建PasswordSdkManager, 里面一个固定大小的线程池, 把sdk实例, 创放到Threadlocal 中, 通过config.properties 动态加载配置(不通过spring管理PasswordSdkManager) WcspSdkHandler 密码处理器中, 通过 PasswordSdkManager.submitTask(new Callable() {..}) 调用sdk 获取加解密的数据, 但是在这里sdk调用的耗时比较长, 已经严重影响到了性能 现在我的疑问是: 在结果处理 或者 参数处理的时候, 如何提高性能 使用Methodhandle来替换反射调用, 比传统的反射更加灵活, 性能更高 使用redis 缓存 定位到问题就是调用第三方sdk 的时候耗时较长 多线程 ? &ndash; 在listDecrypt 和 listEncrypt 进行处理 可不可以集成为spring-boot-starter ? 具体使用步骤\n">
+<title>Mybatis</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/mybatis/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Mybatis">
+<meta property='og:description' content="1. 拦截器 参考资料: https://www.cnblogs.com/monkeydai/p/16625918.html\n==Mybatis拦截器应用场景==\nSql摘要统计/监控 动态分页 多租户 脱敏 加解密 使用场景是什么, 支持自定义加解密处理器 可以通过注解@ScheField 指定不同的加解密 方式, 默认方式为DefaultSecureHandler 返回原字符串, , 注解上也可以配置自定义的加解密处理器,继承 SecureFiledHandler, 里面有两抽象方法, encrypt 和decrypt 需要把加解密处理器注入到spring中, 在调用的时候会通过class 去获取实例, 通过反射去执行相关的加解密方法 同时并不是所有的查询和插入操作都走拦截器只有在 mapper 类上有 @SecureMapper 注解时才走 对接中山密评的. 因为sdk的调用不允许多线程, 因此创建PasswordSdkManager, 里面一个固定大小的线程池, 把sdk实例, 创放到Threadlocal 中, 通过config.properties 动态加载配置(不通过spring管理PasswordSdkManager) WcspSdkHandler 密码处理器中, 通过 PasswordSdkManager.submitTask(new Callable() {..}) 调用sdk 获取加解密的数据, 但是在这里sdk调用的耗时比较长, 已经严重影响到了性能 现在我的疑问是: 在结果处理 或者 参数处理的时候, 如何提高性能 使用Methodhandle来替换反射调用, 比传统的反射更加灵活, 性能更高 使用redis 缓存 定位到问题就是调用第三方sdk 的时候耗时较长 多线程 ? &ndash; 在listDecrypt 和 listEncrypt 进行处理 可不可以集成为spring-boot-starter ? 具体使用步骤\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/mybatis/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Mybatis' /><meta property='article:tag' content='ORM' /><meta property='article:published_time' content='2022-11-10T14:55:11&#43;08:00'/><meta property='article:modified_time' content='2022-11-10T14:55:11&#43;08:00'/>
+<meta name="twitter:title" content="Mybatis">
+<meta name="twitter:description" content="1. 拦截器 参考资料: https://www.cnblogs.com/monkeydai/p/16625918.html\n==Mybatis拦截器应用场景==\nSql摘要统计/监控 动态分页 多租户 脱敏 加解密 使用场景是什么, 支持自定义加解密处理器 可以通过注解@ScheField 指定不同的加解密 方式, 默认方式为DefaultSecureHandler 返回原字符串, , 注解上也可以配置自定义的加解密处理器,继承 SecureFiledHandler, 里面有两抽象方法, encrypt 和decrypt 需要把加解密处理器注入到spring中, 在调用的时候会通过class 去获取实例, 通过反射去执行相关的加解密方法 同时并不是所有的查询和插入操作都走拦截器只有在 mapper 类上有 @SecureMapper 注解时才走 对接中山密评的. 因为sdk的调用不允许多线程, 因此创建PasswordSdkManager, 里面一个固定大小的线程池, 把sdk实例, 创放到Threadlocal 中, 通过config.properties 动态加载配置(不通过spring管理PasswordSdkManager) WcspSdkHandler 密码处理器中, 通过 PasswordSdkManager.submitTask(new Callable() {..}) 调用sdk 获取加解密的数据, 但是在这里sdk调用的耗时比较长, 已经严重影响到了性能 现在我的疑问是: 在结果处理 或者 参数处理的时候, 如何提高性能 使用Methodhandle来替换反射调用, 比传统的反射更加灵活, 性能更高 使用redis 缓存 定位到问题就是调用第三方sdk 的时候耗时较长 多线程 ? &ndash; 在listDecrypt 和 listEncrypt 进行处理 可不可以集成为spring-boot-starter ? 具体使用步骤\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-拦截器">1. 拦截器</a></li>
+    <li><a href="#2-mybatis-执行过程">2. mybatis 执行过程</a></li>
+    <li><a href="#3-mybatis-主要成员">3. mybatis 主要成员</a>
+      <ul>
+        <li><a href="#configuration">Configuration</a></li>
+        <li><a href="#sqlsession">SqlSession</a></li>
+        <li><a href="#executor">Executor</a></li>
+        <li><a href="#statementhandler">StatementHandler</a></li>
+        <li><a href="#parameterhandler">ParameterHandler</a></li>
+        <li><a href="#resultsethandler">ResultSetHandler</a></li>
+        <li><a href="#typehandler">TypeHandler</a></li>
+        <li><a href="#mappedstatement">MappedStatement</a></li>
+        <li><a href="#sqlsource">SqlSource</a></li>
+        <li><a href="#boundsql">BoundSql</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-常用-sql">3. 常用 sql</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/mybatis/" >
+                Mybatis
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/mybatis/">Mybatis</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Nov 10, 2022</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 11 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="1-拦截器">1. 拦截器
+</h1><blockquote>
+<p>参考资料: <a class="link" href="https://www.cnblogs.com/monkeydai/p/16625918.html"  target="_blank" rel="noopener"
+    >https://www.cnblogs.com/monkeydai/p/16625918.html</a></p>
+</blockquote>
+<p>==Mybatis拦截器应用场景==</p>
+<ul>
+<li>Sql摘要统计/监控</li>
+<li>动态分页</li>
+<li>多租户</li>
+<li>脱敏</li>
+<li>加解密
+<ul>
+<li>使用场景是什么, 支持自定义加解密处理器</li>
+<li>可以通过注解@ScheField 指定不同的加解密 方式, 默认方式为DefaultSecureHandler 返回原字符串, , 注解上也可以配置自定义的加解密处理器,继承 SecureFiledHandler, 里面有两抽象方法, encrypt 和decrypt</li>
+<li>需要把加解密处理器注入到spring中, 在调用的时候会通过class 去获取实例, 通过反射去执行相关的加解密方法</li>
+<li>同时并不是所有的查询和插入操作都走拦截器只有在 mapper 类上有 @SecureMapper 注解时才走</li>
+<li>对接中山密评的. 因为sdk的调用不允许多线程, 因此创建PasswordSdkManager, 里面一个固定大小的线程池, 把sdk实例, 创放到Threadlocal 中,</li>
+<li>通过config.properties 动态加载配置(不通过spring管理PasswordSdkManager)</li>
+<li>WcspSdkHandler 密码处理器中, 通过 PasswordSdkManager.submitTask(new Callable<String>() {..}) 调用sdk 获取加解密的数据, 但是在这里sdk调用的耗时比较长, 已经严重影响到了性能</li>
+<li>现在我的疑问是: 在结果处理 或者 参数处理的时候, 如何提高性能
+<ul>
+<li>使用Methodhandle来替换反射调用, 比传统的反射更加灵活, 性能更高</li>
+<li>使用redis 缓存</li>
+<li>定位到问题就是调用第三方sdk 的时候耗时较长
+<ul>
+<li>多线程 ?  &ndash; 在listDecrypt 和 listEncrypt 进行处理</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>可不可以集成为spring-boot-starter ? 具体使用步骤</p>
+<ol>
+<li></li>
+</ol>
+</blockquote>
+<ul>
+<li>冗余字段新增</li>
+</ul>
+<pre><code>mybatis拦截器的密文处理器
+现在因为, 密码sdk是不允许多线程调用的,
+我的设想是创建一个固定大小的线程池, 核心线程数等于最大线程数, 线程初始化的时候同时实例化密码sdk对象, 把它放到线程ThreadLocal中, 这样是否可以解决 密码sdk是不允许多线程调用的 线程安全问题?
+
+如果可以提供代码参考示例, 使用
+
+密码sdk实例的创建如下
+​```LightDataService ldService = LightDataService.getInstance(TENANT_ID, APPID, params, SECRET);```
+
+这是我的完整密文处理器
+
+​```@Component
+public class WcspSdkHandler extends SecureFieldHandler {
+
+    private final String TENANT_ID = &quot;xj4xq38bzxtscgh9&quot;;
+    private final String APPID = &quot;35a06ef5d23c46b38504d49eb6153b35&quot;;
+    private final String SECRET = &quot;C20D60D04D9CE7E2D95B1C35ACD49445&quot;;
+
+    private final static HashMap&lt;String, Object&gt; params = new HashMap&lt;&gt;();
+
+    static {
+        params.put(CryptoServicePlatform.INIT_PARAM_URL, &quot;https://wcsp.k8s.dev:32443&quot;);
+        params.put(CryptoServicePlatform.INIT_PARAM_WORKDIR, &quot;E:\\develop\\zs-ipr-secret\\&quot;);
+    }
+
+    @Override
+    String encrypt(String data2Encrypt) {
+        String encData;
+        try {
+            LightDataService ldService = LightDataService.getInstance(TENANT_ID, APPID, params, SECRET);
+            encData = Data.toBase64String(ldService.encrypt(Data.fromUTF8String(data2Encrypt)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return encData;
+    }
+
+    @Override
+    String decrypt(String data2Decrypt) {
+        String decData;
+        try {
+            LightDataService ldService = LightDataService.getInstance(TENANT_ID, APPID, params, SECRET);
+            decData = Data.toUTF8String(ldService.decrypt(Data.fromBase64String(data2Decrypt)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return decData;
+    }
+}```
+
+</code></pre>
+<p>==mybatis interceptor==</p>
+<p>只需要写一个类,然后继承mybatis的Interceptor方法,然后==使用@Intercepts注解==说明需要拦截的类和方法即可.可以在@Intercepts中==配置多个类和方法==,用于拦截多个方法.然后把我们定义的类定义到mybatis的配置文件的<plugins><plugin>元素中 或者 添加到 sqlSessionFactoryList .</p>
+<p>　　mybatis在解析配置文件的时候会自动的为我们生成代理,拦截我们需要拦截的方法.</p>
+<p>　　mybatis中==只能拦截下面类中的方法,其他的都不会进行拦截==</p>
+<ul>
+<li>Executor 执行器(update, query, flushStatements, commit, rollback, getTransaction, close, isClosed)
+<ul>
+<li>insert、update和delete这三种操作在数据库层面都是对数据进行修改，所以在Executor接口中，MyBatis只定义了一个update方法用来执行这三种操作</li>
+<li></li>
+</ul>
+</li>
+<li>ParameterHandler 参数处理器 (getParameterObject, setParameters)</li>
+<li>ResultSetHandler 结果处理器(handleResultSets, handleOutputParameters)</li>
+<li>StatementHandler  sql 语法构建器(prepare, parameterize, batch, update, query)</li>
+</ul>
+<p>常见的mybatis 用法</p>
+<pre><code>// 大家经常见到的mybatis的用法
+public static void main(String[] args) throws IOException {
+        SqlSession session = null;
+        try {
+            // ①：加载Mybatis配置文件
+            InputStream inputStream = Resources.getResourceAsStream(&quot;mybatis-config.xml&quot;);
+            // ②：构建SqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+            // ③：获取SqlSession并获取代理对象查询
+            session = sqlSessionFactory.openSession();
+            ProductDao mapper = session.getMapper(ProductDao.class);
+            System.out.println(mapper.findById(100001L));
+        } finally {
+            if (!ObjectUtils.isEmpty(session)) {
+                session.close();
+            }
+        }
+    }
+</code></pre>
+<p>demo</p>
+<pre><code>/**
+ * @author Duansg
+ * @date 2022-10-08 11:45 下午
+ */
+@Intercepts(value = {
+    @Signature(type = Executor.class, method = &quot;query&quot;,
+            args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class}),
+    @Signature(type = Executor.class, method = &quot;query&quot;,
+            args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class})}
+)
+public class ExampleInterceptor implements Interceptor {
+    @Override
+    public Object intercept(Invocation invocation) throws Throwable {
+
+        System.err.println(&quot;晓断测试Interceptor&quot;);
+        return invocation.proceed();
+    }
+
+    @Override
+    public Object plugin(Object target) {
+        return Plugin.wrap(target, this);
+    }
+
+    @Override
+    public void setProperties(Properties properties) {
+        System.err.println(&quot;晓断测试Interceptor-Properties&quot; + JSON.toJSONString(properties));
+    }
+}
+</code></pre>
+<p>==添加到 sqlSessionFactoryList==</p>
+<pre><code class="language-java">@Configuration
+@AutoConfigureAfter(PageHelperAutoConfiguration.class)
+public class MyBatisConfig {
+    @Autowired
+    private List&lt;SqlSessionFactory&gt; sqlSessionFactoryList;
+
+    @PostConstruct
+    public void addMyInterceptor() {
+        MybatisInterceptor e = new MybatisInterceptor();
+        for (SqlSessionFactory sqlSessionFactory : sqlSessionFactoryList) {
+            sqlSessionFactory.getConfiguration().addInterceptor(e);
+        }
+    }
+}
+</code></pre>
+<p>​	Interceptor拦截器的实现需要实现Mybatis提供的Interceptor接口，并重写其中的三个方法：</p>
+<ol>
+<li>intercept：拦截方法，用于在执行SQL语句前后进行处理。</li>
+<li>plugin：用于生成代理对象，将拦截器应用到Mybatis中。</li>
+<li>setProperties：用于设置拦截器的属性。</li>
+</ol>
+<p>==拦截器的执行顺序==</p>
+<p>Executor首先执行的是没有问题的。ParameterHandler -&gt; ResultHandler 的先后顺序也没有问题</p>
+<ul>
+<li>如果你拦截的是StatementHandler.query()方法，那么顺序是Executor -&gt; ParameterHandler -&gt; StatementHandler -&gt; ResultHandler。</li>
+<li>如果你拦截的是StatementHandler.prepare()方法，那么顺序是Executor -&gt; StatementHandler-&gt; ParameterHandler -&gt; ResultHandler</li>
+</ul>
+<pre><code>通过注解的方式
+必须要加类上的注解, 不然不生效
+
+1. 测试各种情况下的拦截
+   a. 只更新指定的加密字段
+   b. 更新非加密字段
+   c. sql 
+   	a. 单String
+   	b. List&lt;String&gt;
+   	c. 多String
+   	d. Map
+   	e. Bean对象
+</code></pre>
+<h1 id="2-mybatis-执行过程">2. mybatis 执行过程
+</h1><p><img src="/p/mybatis/images/image-20240301101525801.png"
+	width="972"
+	height="762"
+	
+	loading="lazy"
+	
+		alt="image-20240301101525801"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="127"
+		data-flex-basis="306px"
+	
+></p>
+<p><img src="/p/mybatis/images/image-20240301110649360.png"
+	width="767"
+	height="945"
+	
+	loading="lazy"
+	
+		alt="image-20240301110649360"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="81"
+		data-flex-basis="194px"
+	
+></p>
+<h1 id="3-mybatis-主要成员">3. mybatis 主要成员
+</h1><h2 id="configuration">Configuration
+</h2><p>MyBatis所有的<strong>配置信息</strong>都保存在Configuration对象中，配置文件中的大部分配置都会 存储到该类中</p>
+<h2 id="sqlsession">SqlSession
+</h2><p>作为MyBatis工作的主要顶层API，<strong>表示和数据库交互时的会话，完成必要数据库增删改查功能</strong></p>
+<p>根据statement id，在mybatis配置对象<strong>configuration</strong>中获取到对应的<strong>mappedstatement</strong>对象，然后调用执行器来执行具体操作</p>
+<p>sqlSession虽然叫程序和数据库之间的SQL会话，但是它并没有具体去执行sql语句，最终的sql语句的执行是由执行器Executor执行的，而==SqlSession的作用只是创建了MappedStatement对象以及调用执行器去执行SQL,他的commit、rollback方法同样最终都是调用的执行器Executor的对应的方法==</p>
+<h2 id="executor">Executor
+</h2><p>MyBatis执行器，是MyBatis调度的核心，<strong>负责sql语句的生成和查询缓存的维护</strong></p>
+<ol>
+<li>根据传递的参数，完成sql语句的动态解析，生成BoundSql对象，供StatementHandler使用</li>
+<li>为查询创建缓存，以提高性能</li>
+<li>创建JDBC的Statement链接对象，传递给StatementHandler对象，返回List查询结果</li>
+</ol>
+<p>Executor是跟SqlSession绑定在一起的，每一个SqlSession都拥有一个新的Executor对象，由Configuration创建。</p>
+<p>Executor接口的实现类有==BaseExecutor和CachingExecutor==，而BaseExecutor的子类又有SimpleExecutor、ReuseExecutor和BatchExecutor，但==BaseExecutor是一个抽象类==，其只实现了一些公共的封装，而把真正的核心实现都==通过方法抽象出来给子类实现==，如doUpdate()、doQuery()；CachingExecutor只是在Executor的基础上加入了缓存的功能，底层还是通过Executor调用的，所以真正有作用的Executor只有SimpleExecutor、ReuseExecutor和BatchExecutor。它们都是自己实现的Executor核心功能，没有借助任何其它的Executor实现，它们是实现不同也就注定了它们的功能也是不一样的。</p>
+<p><img src="/p/mybatis/images/image-20240301175035782.png"
+	width="1006"
+	height="354"
+	
+	loading="lazy"
+	
+		alt="image-20240301175035782"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="284"
+		data-flex-basis="682px"
+	
+></p>
+<h2 id="statementhandler">StatementHandler
+</h2><p>封装了JDBC Statement操作，负责对JDBC statement的操作，如设置参数等</p>
+<pre><code>1. 对于JDBC的preparedStatement类型的对象，创建过程中，sql语句字符串会包含若干个？占位符，然后再赋值。
+2. StatementHandler通过parameterize（statement）方法对statement进行设值
+ StatementHandler通过List query(Statement statement,ResultHandler resultHandler)方法来完成执行Statement，和将Statement对象返回的resultSet封装成List
+</code></pre>
+<p><img src="/p/mybatis/images/image-20240304100611518.png"
+	width="992"
+	height="515"
+	
+	loading="lazy"
+	
+		alt="image-20240304100611518"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="192"
+		data-flex-basis="462px"
+	
+></p>
+<p>statementHandler接口的实现大致有四个，其中三个实现类都是和JDBC中的Statement响对应的：</p>
+<ol>
+<li>SimpleStatementHandler，这个很简单了，就是对应我们JDBC中常用的Statement接口，用于简单SQL的处理；</li>
+<li>PreparedStatementHandler，这个对应JDBC中的PreparedStatement，预编译SQL的接口；</li>
+<li>CallableStatementHandler，这个对应JDBC中CallableStatement，用于执行存储过程相关的接口；</li>
+<li>RoutingStatementHandler，这个接口是以上三个接口的路由，没有实际操作，只是负责上面三个StatementHandler的创建及调用。</li>
+</ol>
+<h2 id="parameterhandler">ParameterHandler
+</h2><p>负责对用户传递的参数转换成JDBC Statement所对应的数据类型，对statement对象的？占位符进行赋值</p>
+<h2 id="resultsethandler">ResultSetHandler
+</h2><p>负责将JDBC返回的ResultSet结果集对象转换成List类型的集合</p>
+<h2 id="typehandler">TypeHandler
+</h2><p>负责java数据类型和jdbc数据类型（也可以说是数据表列类型）之间的映射和转换</p>
+<h2 id="mappedstatement">MappedStatement
+</h2><p>MappedStatement维护一条==&lt;select|update|delete|insert&gt;节点的封装==</p>
+<p><code>MappedStatement</code> 中包含了一条SQL语句操作所需要的全部信息，如下：</p>
+<ol>
+<li><code>id</code> ：对应的SQL语句ID。</li>
+<li><code>sqlSource</code> ：SQL语句的封装。</li>
+<li><code>commandType</code>：Sql命令类型，取值INSERT, UPDATE, DELETE, SELECT, FLUSH。</li>
+<li><code>resource</code>：对应的Mapper.xml的路径。</li>
+<li><code>parameterMap</code>：参数映射。</li>
+<li><code>resultMaps</code>：结果映射。</li>
+<li><code>timeout</code>：超时时间。</li>
+<li><code>statementType</code>：语句类型，取值STATEMENT, PREPARED, CALLABLE。表示对应的jdbc statement类型。</li>
+<li><code>fetchSize</code>：FetchSize大小。</li>
+<li><code>resultSetType</code>：结果集类型，取值FORWARD_ONLY,SCROLL_SENSITIVE, SCROLL_INSENSITIVE 或者null。</li>
+</ol>
+<p>有了<code>MappedStatement</code>，当执行一个SQL语句时，Mybatis就能知道应该如何去操作数据库，这些SQL语句被封装成<code>MappedStatement</code>后，存放在Configuration对象的mappedStatements属性中，供MyBatis在进行数据库操作时使用。</p>
+<p><code>getBoundSql()</code>方法是<code>MappedStatement</code>类的一个方法，它用来获取<code>BoundSql</code>对象。</p>
+<p><code>BoundSql</code>是MyBatis的核心处理单元之一，你可以理解为它代表了一段已准备好待执行的SQL语句。主要包含以下信息：</p>
+<ul>
+<li><code>sql</code>: 实际的SQL语句，所有的参数都已经被替换成？问号作为占位符。</li>
+<li><code>parameterObject</code>: 参数对象，用来替换SQL中的问号。可以是一个简单类型如String、Integer或者是一个POJO类或者Map等复合类型。</li>
+<li><code>parameterMappings</code>: 一个ParameterMapping对象的列表，每个ParameterMapping对象代表一个?占位符及其映射。</li>
+<li><code>additionalParameters</code>: 额外的参数，通常我们不需要关心。</li>
+</ul>
+<p><code>getBoundSql()</code>方法接收一个参数对象，该参数对象通过<code>sqlSource.getBoundSql(parameterObject)</code>获取<code>BoundSql</code>对象。</p>
+<p>为了以后可能需要重用SQL，这部分信息被封装到<code>BoundSql</code>类中，并在<code>StatementHandler</code>下一步需要准备（Prepare）Statement时被使用。</p>
+<h2 id="sqlsource">SqlSource
+</h2><p>负责根据用户传递的parameterObject，动态的生成SQL语句，将信息封装到BoundSql对象中并返回</p>
+<h2 id="boundsql">BoundSql
+</h2><p>表示动态生成的SQL语句以及相应的参数信息</p>
+<p>代表了一段已准备好待执行的SQL语句。主要包含以下信息：</p>
+<ul>
+<li><code>sql</code>: 实际的SQL语句，所有的参数都已经被替换成？问号作为占位符。</li>
+<li><code>parameterObject</code>: 参数对象，用来替换SQL中的问号。可以是一个简单类型如String、Integer或者是一个POJO类或者Map等复合类型。</li>
+<li><code>parameterMappings</code>: 一个ParameterMapping对象的列表，每个ParameterMapping对象代表一个?占位符及其映射。</li>
+<li><code>additionalParameters</code>: 额外的参数，通常我们不需要关心。</li>
+</ul>
+<p><code>getBoundSql()</code>方法接收一个参数对象，该参数对象通过<code>sqlSource.getBoundSql(parameterObject)</code>获取<code>BoundSql</code>对象。</p>
+<p>为了以后可能需要重用SQL，这部分信息被封装到<code>BoundSql</code>类中，并在<code>StatementHandler</code>下一步需要准备（Prepare）Statement时被使用。</p>
+<h1 id="3-常用-sql">3. 常用 sql
+</h1><pre><code class="language-xml">&lt;!--热门套餐，查询前5条--&gt;
+    &lt;select id=&quot;findHotSetmeal&quot; resultType=&quot;map&quot;&gt;
+        select s.name, count(o.id) setmeal_count ,count(o.id)/t.total proportion,s.remark
+        from t_order o, t_setmeal s,(select count(id) total from t_order) t
+        where s.id = o.setmeal_id
+        group by o.setmeal_id
+        order by setmeal_count desc limit 0,4
+    &lt;/select&gt;
+</code></pre>
+<pre><code class="language-xml">    &lt;!--新增--&gt;
+    &lt;insert id=&quot;add&quot; parameterType=&quot;Order&quot;&gt;
+        &lt;selectKey resultType=&quot;java.lang.Integer&quot; order=&quot;AFTER&quot; keyProperty=&quot;id&quot;&gt;
+            SELECT LAST_INSERT_ID()
+        &lt;/selectKey&gt;
+        insert into t_order(member_id,orderDate,orderType,orderStatus,setmeal_id)
+        values (#{memberId},#{orderDate},#{orderType},#{orderStatus},#{setmealId})
+    &lt;/insert&gt;
+</code></pre>
+<p>条件 choose, otherwise</p>
+<pre><code class="language-xml">&lt;select id=&quot;listEnforceAction&quot; parameterType=&quot;map&quot; resultType=&quot;map&quot;&gt;
+    SELECT ea.*,b.name,b.id_code
+    FROM enforce_action ea
+    LEFT JOIN account b on ea.account_id = b.id
+    WHERE ea.status !=0
+
+    &lt;if test=&quot;params.accountId != null&quot;&gt;
+      &lt;choose&gt;
+        &lt;when test=&quot;params.cid == null and  params.did == null&quot;&gt;
+          AND ea.id IN (
+          SELECT p.action_id
+          FROM enforce_participate p
+          LEFT JOIN enforce_action a
+          ON p.action_id = a.id
+          WHERE p.account_id = #{params.accountId}
+          AND p.status != 0
+          ORDER BY a.start_time DESC
+          )
+        &lt;/when&gt;
+        &lt;otherwise&gt;
+          &lt;if test=&quot;params.actionIds != null and params.actionIds.size&gt;0&quot;&gt;
+            AND ea.id IN (
+            &lt;foreach collection=&quot;params.actionIds&quot; item=&quot;item&quot; separator=&quot;,&quot; &gt;
+              #{item}
+            &lt;/foreach&gt;
+            )
+          &lt;/if&gt;
+        &lt;/otherwise&gt;
+      &lt;/choose&gt;
+    &lt;/if&gt;
+</code></pre>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/mybatis/">Mybatis</a>
+        
+            <a href="/tags/orm/">ORM</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

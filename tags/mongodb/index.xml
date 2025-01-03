@@ -1,0 +1,2337 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>MongoDb on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/tags/mongodb/</link>
+        <description>Recent content in MongoDb on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Fri, 03 Jan 2025 14:32:15 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/tags/mongodb/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>MongoDb</title>
+        <link>https://mikeLing-qx.github.io/p/mongodb/</link>
+        <pubDate>Fri, 03 Jan 2025 14:32:15 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/mongodb/</guid>
+        <description>&lt;h1 id=&#34;mongodb&#34;&gt;MongoDB
+&lt;/h1&gt;&lt;h1 id=&#34;目标&#34;&gt;目标
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 了解什么是MongoDB&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 掌握MongoDB的安装&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 掌握MongoDB的常用命令&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 掌握mongo的索引&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 了解mongo集群原理，能够搭建集群&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 掌握mongodb-driver的基本使用&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 掌握SpringDataMongoDB的使用&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 了解如何在原有的spring-data框架中封装新的功能&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;第一章-mongodb&#34;&gt;第一章-MongoDB
+&lt;/h1&gt;&lt;h2 id=&#34;知识点-mongodb简介&#34;&gt;知识点-MongoDB简介
+&lt;/h2&gt;&lt;h3 id=&#34;1目标&#34;&gt;1.目标
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 了解什么是MongoDB&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2路径&#34;&gt;2.路径
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;为什么要使用MongoDB&lt;/li&gt;
+&lt;li&gt;什么是MongoDB&lt;/li&gt;
+&lt;li&gt;MongoDB特点&lt;/li&gt;
+&lt;li&gt;MongoDB体系结构&lt;/li&gt;
+&lt;li&gt;MongoDB数据类型&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;3讲解&#34;&gt;3.讲解
+&lt;/h3&gt;&lt;h4 id=&#34;31-为什么要使用mongodb&#34;&gt;3.1 为什么要使用MongoDB
+&lt;/h4&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/1564300991182-1592442209458.png&#34;
+	width=&#34;713&#34;
+	height=&#34;430&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564300991182&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;165&#34;
+		data-flex-basis=&#34;397px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;文章评论功能存在以下特点：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;数据量大&lt;/li&gt;
+&lt;li&gt;写入操作频繁&lt;/li&gt;
+&lt;li&gt;价值较低&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;对于这样的数据，我们更适合使用MongoDB来实现数据的存储&lt;/p&gt;
+&lt;h4 id=&#34;32-什么是mongodb&#34;&gt;3.2 什么是MongoDB
+&lt;/h4&gt;&lt;p&gt;​	MongoDB是一个基于分布式文件存储的数据库。由C++语言编写。旨在为WEB应用提供==可扩展的高性能数据存储解决方案==。
+​	MongoDB是一个介于关系数据库和非关系数据库之间的产品，是&lt;strong&gt;非关系数据库&lt;/strong&gt;当中功能最丰富，最像关系数据库的。它支持的数据结构非常松散，是类似json的bson(数据类型)格式，因此可以存储比较复杂的数据类型。&lt;/p&gt;
+&lt;h4 id=&#34;33-mongodb特点&#34;&gt;3.3 MongoDB特点
+&lt;/h4&gt;&lt;p&gt;​	Mongo最大的特点是它支持的&lt;strong&gt;查询语言非常强大&lt;/strong&gt;，其语法有点类似于&lt;strong&gt;面向对象的查询语言&lt;/strong&gt;，几乎可以实现类似关系数据库单表查询的绝大部分功能，而且还支持对数据建立&lt;strong&gt;索引&lt;/strong&gt;。(正则表达式支持索引)&lt;/p&gt;
+&lt;p&gt;它的特点是高性能、易部署、易使用，存储数据非常方便。主要功能特性有：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;面向集合存储，易存储对象类型的数据。(集合相当于表)&lt;/li&gt;
+&lt;li&gt;模式自由。&lt;/li&gt;
+&lt;li&gt;支持动态查询。&lt;/li&gt;
+&lt;li&gt;支持完全索引，包含内部对象。&lt;/li&gt;
+&lt;li&gt;支持查询。&lt;/li&gt;
+&lt;li&gt;支持复制和故障恢复。(高可用)&lt;/li&gt;
+&lt;li&gt;使用高效的二进制数据存储，包括大型对象（如视频等）。&lt;/li&gt;
+&lt;li&gt;自动处理碎片，以支持云计算层次的扩展性。（mapreduce）&lt;/li&gt;
+&lt;li&gt;支持RUBY，PYTHON，JAVA，C++，PHP，C#等多种语言。&lt;/li&gt;
+&lt;li&gt;文件存储格式为BSON（一种JSON的扩展）。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;支持将mongodb bson文件转换成json 文件&lt;/p&gt;
+&lt;p&gt;命令&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;bsondump collection.bson &amp;gt; collection.json
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;34-mongodb体系结构&#34;&gt;3.4 MongoDB体系结构
+&lt;/h4&gt;&lt;p&gt;​	MongoDB 的逻辑结构是一种层次结构。主要由：文档(document)、集合(collection)、数据库(database)这三部分组成的。逻辑结构是面向用户的，用户使用 MongoDB 开发应用程序使用的就是逻辑结构。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;MongoDB 的文档（document），相当于关系数据库中的一行记录。&lt;/li&gt;
+&lt;li&gt;多个文档组成一个集合（collection），相当于关系数据库的表。&lt;/li&gt;
+&lt;li&gt;多个集合（collection），逻辑上组织在一起，就是数据库（database）。&lt;/li&gt;
+&lt;li&gt;一个 MongoDB 实例支持多个数据库（database）。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;文档(document)、集合(collection)、数据库(database)的层次结构如下图:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/1559303526465.png&#34;
+	width=&#34;332&#34;
+	height=&#34;340&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1559303526465&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;97&#34;
+		data-flex-basis=&#34;234px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;MongoDb&lt;/th&gt;
+          &lt;th&gt;关系型数据库Mysql&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;数据库(databases)&lt;/td&gt;
+          &lt;td&gt;数据库(databases)&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;集合(collections)&lt;/td&gt;
+          &lt;td&gt;表(table)&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;文档(document)&lt;/td&gt;
+          &lt;td&gt;行(row)&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h4 id=&#34;35-mongodb数据类型&#34;&gt;3.5 MongoDB数据类型
+&lt;/h4&gt;&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;数据类型&lt;/th&gt;
+          &lt;th&gt;描述&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;String&lt;/td&gt;
+          &lt;td&gt;字符串。存储数据常用的数据类型。在  MongoDB 中，UTF-8 编码的字符串才是合法的。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Integer&lt;/td&gt;
+          &lt;td&gt;整型数值。用于存储数值。根据你所采用的服务器，可分为  32 位或 64 位。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Boolean&lt;/td&gt;
+          &lt;td&gt;布尔值。用于存储布尔值（真/假）。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Double&lt;/td&gt;
+          &lt;td&gt;双精度浮点值。用于存储浮点值。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Array&lt;/td&gt;
+          &lt;td&gt;用于将数组或列表或多个值存储为一个键。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Timestamp&lt;/td&gt;
+          &lt;td&gt;时间戳。记录文档修改或添加的具体时间。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Object&lt;/td&gt;
+          &lt;td&gt;用于内嵌文档。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Null&lt;/td&gt;
+          &lt;td&gt;用于创建空值。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Date&lt;/td&gt;
+          &lt;td&gt;日期时间。用  UNIX 时间格式来存储当前日期或时间。你可以指定自己的日期时间：创建 Date 对象，传入年月日信息。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Object  ID&lt;/td&gt;
+          &lt;td&gt;对象  ID。用于创建文档的 ID。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Binary  Data&lt;/td&gt;
+          &lt;td&gt;二进制数据。用于存储二进制数据。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Code&lt;/td&gt;
+          &lt;td&gt;代码类型。用于在文档中存储  JavaScript 代码。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Regular  expression&lt;/td&gt;
+          &lt;td&gt;正则表达式类型。用于存储正则表达式。&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;特殊说明：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;ObjectId&lt;/p&gt;
+&lt;p&gt;ObjectId 类似唯一主键，可以很快的去生成和排序，包含 12 bytes，含义是：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;前 4 个字节表示创建 unix 时间戳，格林尼治时间 UTC 时间，比北京时间晚了 8 个小时&lt;/li&gt;
+&lt;li&gt;接下来的 3 个字节是机器标识码&lt;/li&gt;
+&lt;li&gt;紧接的两个字节由进程 id 组成 PID&lt;/li&gt;
+&lt;li&gt;最后三个字节是随机数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/1559617643826.png&#34;
+	width=&#34;581&#34;
+	height=&#34;78&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1559617643826&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;744&#34;
+		data-flex-basis=&#34;1787px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;MongoDB 中存储的文档必须有一个 _id 键。这个键的值可以是任何类型的，默认是个 ObjectId 对象&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;时间戳&lt;/p&gt;
+&lt;p&gt;BSON 有一个特殊的时间戳类型，与普通的日期类型不相关。时间戳值是一个 64 位的值。其中：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;前32位是一个 time_t 值【与Unix新纪元（1970年1月1日）相差的秒数】&lt;/li&gt;
+&lt;li&gt;后32位是在某秒中操作的一个递增的序数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在单个 mongod 实例中，时间戳值通常是唯一的。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;日期&lt;/p&gt;
+&lt;p&gt;表示当前距离 Unix新纪元（1970年1月1日）的毫秒数。日期类型是有符号的, 负数表示 1970 年之前的日期。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;36-mongodb和redis比较面试&#34;&gt;3.6 MongoDB和Redis比较【面试】
+&lt;/h4&gt;&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;比较指标&lt;/th&gt;
+          &lt;th&gt;MongoDB(海量数据)&lt;/th&gt;
+          &lt;th&gt;Redis（热点数据）&lt;/th&gt;
+          &lt;th&gt;比较说明&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;实现语言&lt;/td&gt;
+          &lt;td&gt;c++&lt;/td&gt;
+          &lt;td&gt;c/c++&lt;/td&gt;
+          &lt;td&gt;-&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;协议&lt;/td&gt;
+          &lt;td&gt;==BSON,自定义二进制==&lt;/td&gt;
+          &lt;td&gt;==类telnet(TCP/IP)==&lt;/td&gt;
+          &lt;td&gt;-&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;性能&lt;/td&gt;
+          &lt;td&gt;==依赖内存 (内存映射文件技术)==&lt;/td&gt;
+          &lt;td&gt;==依赖内存==（纯内存）&lt;/td&gt;
+          &lt;td&gt;Redis优于MongoDB&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;可操作性&lt;/td&gt;
+          &lt;td&gt;丰富的数据表达,索引;最类似于关系型数据库,支持丰富的查询语句&lt;/td&gt;
+          &lt;td&gt;数据类型丰富,较少的IO&lt;/td&gt;
+          &lt;td&gt;-&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;内存及存储&lt;/td&gt;
+          &lt;td&gt;适合大数据量存储,依赖系统虚拟内存,采用镜像文件存储;内存占用率比较高,官方建议独立部署在64位系统&lt;/td&gt;
+          &lt;td&gt;Redis2.0后支持虚拟内存特性(VM) 突破物理内存限制;数据可以设置时效性,类似于memcache&lt;/td&gt;
+          &lt;td&gt;不同的应用场景,各有千秋&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;可用性&lt;/td&gt;
+          &lt;td&gt;支持master-slave,replicatset(内部采用paxos选举算法,自动故障恢复),auto sharding机制,对客户端屏蔽了故障转移和切片机制&lt;/td&gt;
+          &lt;td&gt;依赖客户端来实现分布式读写;主从复制时,每次从节点重新连接主节点都要依赖整个快照,无增量复制;不支持auto sharding,需要依赖程序设定一致性hash机制&lt;/td&gt;
+          &lt;td&gt;MongoDB优于Redis；单点问题上,MongoDB应用简单,相对用户透明,Redis比较复杂,需要客户端主动解决.(MongoDB一般使用replicasets和sharding相结合,replicasets侧重高可用性以及高可靠,sharding侧重性能,水平扩展)&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;可靠性&lt;/td&gt;
+          &lt;td&gt;从1.8版本后,采用binlog方式(类似Mysql) 支持持久化&lt;/td&gt;
+          &lt;td&gt;依赖快照进行持久化;AOF增强可靠性;增强性的同时,影响访问性能&lt;/td&gt;
+          &lt;td&gt;mongodb在启动时，专门初始化一个线程不断循环（除非应用crash掉），用于在一定时间周期内来从defer队列中获取要持久化的数据并写入到磁盘的journal(日志)和mongofile(数据)处，当然它不是在用户添加记录时就写到磁盘上&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;一致性&lt;/td&gt;
+          &lt;td&gt;==以前都版本不支持事务,靠客户端保证==  ==最新4.x的支持事务==&lt;/td&gt;
+          &lt;td&gt;==支持事务,比较脆,仅能保证事务中的操作按顺序执行==&lt;/td&gt;
+          &lt;td&gt;-&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;数据分析&lt;/td&gt;
+          &lt;td&gt;内置数据分析功能(mapreduce)&lt;/td&gt;
+          &lt;td&gt;不支持&lt;/td&gt;
+          &lt;td&gt;MongoDB优于Redis&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;应用场景&lt;/td&gt;
+          &lt;td&gt;==海量数据存储和访问效率提升==&lt;/td&gt;
+          &lt;td&gt;==热点数据的存储==&lt;/td&gt;
+          &lt;td&gt;-&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;知识点-mongodb安装&#34;&gt;知识点-MongoDB安装
+&lt;/h2&gt;&lt;h3 id=&#34;1目标-1&#34;&gt;1.目标
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 掌握MongoDB的安装&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2路径-1&#34;&gt;2.路径
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;Docker 环境下MongoDB安装&lt;/li&gt;
+&lt;li&gt;客户端的安装使用&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;3讲解-1&#34;&gt;3.讲解
+&lt;/h3&gt;&lt;h4 id=&#34;31-docker-环境下mongodb安装&#34;&gt;3.1 Docker 环境下MongoDB安装
+&lt;/h4&gt;&lt;p&gt;在Linux虚拟机中创建mongo容器，命令如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;docker run -di --name=tensquare_mongo -p 27017:27017 mongo
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;在Window命令行窗口出入登录命令：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;mongo 192.168.200.128
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;32客户端的安装和使用&#34;&gt;3.2客户端的安装和使用
+&lt;/h4&gt;&lt;p&gt;Mongodb有很多可视化工具，这里我们使用robomongo，可以访问官网：&lt;a class=&#34;link&#34; href=&#34;https://robomongo.org/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://robomongo.org/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/1559634897474.png&#34;
+	width=&#34;1322&#34;
+	height=&#34;549&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1559634897474&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;240&#34;
+		data-flex-basis=&#34;577px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;我们可以看到有两个版本Studio 3T和Robo 3T&lt;/p&gt;
+&lt;p&gt;Studio 3T是一个功能很强大的收费版。。。&lt;/p&gt;
+&lt;p&gt;Robo 3T前身就是Robomongo，是一个免费的可视化工具，我们使用他可以很轻松的进行Mongodb的管理。&lt;/p&gt;
+&lt;p&gt;在资料中找到robo3t-1.3.1-windows-x86_64-7419c406.exe并双击安装。打开后看到以下界面：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/1559635108010.png&#34;
+	width=&#34;677&#34;
+	height=&#34;411&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1559635108010&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;164&#34;
+		data-flex-basis=&#34;395px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;点击&lt;code&gt;Create&lt;/code&gt;创建连接，进行如下配置即可：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/1559635267915.png&#34;
+	width=&#34;480&#34;
+	height=&#34;340&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1559635267915&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;141&#34;
+		data-flex-basis=&#34;338px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;4小结&#34;&gt;4.小结
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;docker环境
+&lt;ul&gt;
+&lt;li&gt;下载镜像(已经下载了)&lt;/li&gt;
+&lt;li&gt;启动容器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;客户端&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;默认端口: 27017&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;知识点-常用命令&#34;&gt;知识点-常用命令
+&lt;/h2&gt;&lt;h3 id=&#34;1目标-2&#34;&gt;1.目标
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 掌握MongoDB的常用命令&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2路径-2&#34;&gt;2.路径
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;数据库&lt;/li&gt;
+&lt;li&gt;集合&lt;/li&gt;
+&lt;li&gt;文档&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;3讲解-2&#34;&gt;3.讲解
+&lt;/h3&gt;&lt;h4 id=&#34;31-选择和创建数据库&#34;&gt;3.1 选择和创建数据库
+&lt;/h4&gt;&lt;p&gt;选择和创建数据库的语法格式：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;use 数据库名称
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;如果数据库存在则选择该数据库，如果数据库不存在则自动创建。以下语句创建commentdb数据库：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;use commentdb
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;查看数据库：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;show dbs
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;查看集合,需要先选择数据库之后，才能查看该数据库的集合：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;show collections
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;32-插入与查询文档&#34;&gt;3.2 插入与查询文档
+&lt;/h4&gt;&lt;p&gt;选择数据库后，使用集合来对文档进行操作，插入文档语法格式：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.集合名称.insert(数据);
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;插入以下测试数据：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.comment.insert({content:&amp;quot;十次方课程&amp;quot;,userid:&amp;quot;1011&amp;quot;})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;查询集合的语法格式：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.集合名称.find()
+
+db.collection.find(query, projection);
+
+projection 也为可选项，表示使用投影操作符指定返回的字段，如果忽略此选项则返回所有字段。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;查询spit集合的所有文档，输入以下命令：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.comment.find()
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​	发现文档会有一个叫_id的字段，==这个相当于我们原来关系数据库中表的主键，当你在插入文档记录时没有指定该字段，MongoDB会自动创建，其类型是ObjectID类型==。如果我们在插入文档记录时指定该字段也可以，其类型可以是ObjectID类型，也可以是MongoDB支持的任意类型。&lt;/p&gt;
+&lt;p&gt;输入以下测试语句:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;db.comment.insert({_id:&amp;quot;1&amp;quot;,content:&amp;quot;到底为啥 出错&amp;quot;,username:&amp;quot;张三&amp;quot;,userid:&amp;quot;1012&amp;quot;,thumbup:2020,tags:[&amp;quot;很好&amp;quot;,&amp;quot;十分认同&amp;quot;],tupuser:[{name:&amp;quot;李大&amp;quot;,sex:&amp;quot;女&amp;quot;,age:10},{name:&amp;quot;李二&amp;quot;,sex:&amp;quot;男&amp;quot;,age:42}],lastModifiedDate:new Date()});
+
+db.comment.insert({_id:&amp;quot;2&amp;quot;,content:&amp;quot;加班到半夜&amp;quot;,username:&amp;quot;李  四&amp;quot;,userid:&amp;quot;1013&amp;quot;,thumbup:1023,tags:[&amp;quot;一般&amp;quot;,&amp;quot;不给力&amp;quot;],tupuser:[{name:&amp;quot;李二&amp;quot;,sex:&amp;quot;男&amp;quot;,age:42},{name:&amp;quot;李三&amp;quot;,sex:&amp;quot;女&amp;quot;,age:12}],lastModifiedDate:new Date()});
+
+db.comment.insert({_id:&amp;quot;3&amp;quot;,content:&amp;quot;手机流量超了咋办&amp;quot;,username:&amp;quot;王五&amp;quot;,userid:&amp;quot;1013&amp;quot;,thumbup:111,tags:[&amp;quot;很好&amp;quot;,&amp;quot;给力&amp;quot;],tupuser:[{name:&amp;quot;李三&amp;quot;,sex:&amp;quot;女&amp;quot;,age:12},{name:&amp;quot;李四&amp;quot;,sex:&amp;quot;男&amp;quot;,age:17}],lastModifiedDate:new Date()});
+
+db.comment.insert({_id:&amp;quot;4&amp;quot;,content:&amp;quot;坚持就是胜利&amp;quot;,username:&amp;quot;赵六&amp;quot;,userid:&amp;quot;1014&amp;quot;,thumbup:1223,tags:[&amp;quot;不好&amp;quot;,&amp;quot;说的不对&amp;quot;],tupuser:[{name:&amp;quot;李四&amp;quot;,sex:&amp;quot;男&amp;quot;,age:17},{name:&amp;quot;李五&amp;quot;,sex:&amp;quot;女&amp;quot;,age:26}],lastModifiedDate:new Date()});
+
+db.comment.insert({_id:&amp;quot;5&amp;quot;,content:&amp;quot;手机没电了啊&amp;quot;,username:&amp;quot;李云龙&amp;quot;,userid:&amp;quot;1014&amp;quot;,thumbup:923,tags:[&amp;quot;很好&amp;quot;,&amp;quot;十分认同&amp;quot;],tupuser:[{name:&amp;quot;李五&amp;quot;,sex:&amp;quot;女&amp;quot;,age:26},{name:&amp;quot;李六&amp;quot;,sex:&amp;quot;男&amp;quot;,age:39}],lastModifiedDate:new Date()});
+
+db.comment.insert({_id:&amp;quot;6&amp;quot;,content:&amp;quot;这个手机好&amp;quot;,username:&amp;quot;风清扬&amp;quot;,userid:&amp;quot;1014&amp;quot;,thumbup:123,tags:[&amp;quot;很好&amp;quot;,&amp;quot;十分认同&amp;quot;],tupuser:[{name:&amp;quot;李六&amp;quot;,sex:&amp;quot;男&amp;quot;,age:39},{name:&amp;quot;李七&amp;quot;,sex:&amp;quot;男&amp;quot;,age:62}],lastModifiedDate:new Date()});
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;按一定条件来查询，比如查询userid为1013的记录，只要在find()中添加参数即可，参数也是json格式，如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.comment.find({userid:&#39;1013&#39;})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;只需要返回符合条件的第一条数据，我们可以使用findOne命令来实现：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.comment.findOne({userid:&#39;1013&#39;})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;返回指定条数的记录，可以在find方法后调用limit来返回结果，例如：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.comment.find().limit(2)
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;33-修改与删除文档&#34;&gt;3.3 修改与删除文档
+&lt;/h4&gt;&lt;p&gt;修改文档的语法结构：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;db.集合名称.update(条件,修改后的数据)
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;修改_id为1的记录，点赞数为1000，输入以下语句：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.comment.update({_id:&amp;quot;1&amp;quot;},{thumbup:1000})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;执行后发现，这条文档除了thumbup字段其它字段都不见了。&lt;/p&gt;
+&lt;p&gt;为了解决这个问题，我们需要使用修改器$set来实现，命令如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;db.comment.update({_id:&amp;quot;2&amp;quot;},{$set:{thumbup:2000}})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;删除文档的语法结构：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.集合名称.remove(条件)
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;以下语句可以将数据全部删除，慎用~&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.comment.remove({})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;删除条件可以放到大括号中，例如删除thumbup为1000的数据，输入以下语句：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.comment.remove({thumbup:1000})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;update 更新函数&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;$push : 增加一个对象到数组底部&lt;/li&gt;
+&lt;li&gt;$pushAll: 增加多个对象到数组底部&lt;/li&gt;
+&lt;li&gt;$pop: 从数组底部删除一个对象&lt;/li&gt;
+&lt;li&gt;$pull: 如果匹配指定的值, 从数组中删除对应的对象&lt;/li&gt;
+&lt;li&gt;$pullAll: 如果匹配任意的值, 从数据中删除相应的对象&lt;/li&gt;
+&lt;li&gt;$addToSet: 如果不存在则增加一个值到数组&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;34-统计条数&#34;&gt;3.4 统计条数
+&lt;/h4&gt;&lt;p&gt;统计记录条件使用count()方法。以下语句统计spit集合的记录数：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.comment.count()
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;按条件统计 ，例如统计userid为1013的记录条数：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.comment.count({userid:&amp;quot;1013&amp;quot;})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;35-模糊查询&#34;&gt;3.5 模糊查询
+&lt;/h4&gt;&lt;p&gt;MongoDB的模糊查询是通过正则表达式的方式实现的。格式为：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;/模糊查询字符串/
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;查询评论内容包含“流量”的所有文档，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.comment.find({content:/流量/})
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;查询评论内容中以“加班”开头的，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-BASH&#34;&gt;db.comment.find({content:/^加班/})
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;36-大于-小于-不等于&#34;&gt;3.6 大于 小于 不等于
+&lt;/h4&gt;&lt;p&gt;&amp;lt;, &amp;lt;=, &amp;gt;, &amp;gt;= 这个操作符也是很常用的，格式如下:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.集合名称.find({ &amp;quot;field&amp;quot; : { $gt: value }}) // 大于: field &amp;gt; value
+db.集合名称.find({ &amp;quot;field&amp;quot; : { $lt: value }}) // 小于: field &amp;lt; value
+db.集合名称.find({ &amp;quot;field&amp;quot; : { $gte: value }}) // 大于等于: field &amp;gt;= value
+db.集合名称.find({ &amp;quot;field&amp;quot; : { $lte: value }}) // 小于等于: field &amp;lt;= value
+db.集合名称.find({ &amp;quot;field&amp;quot; : { $ne: value }}) // 不等于: field != value
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;查询评论点赞数大于1000的记录：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.comment.find({thumbup:{$gt:1000}})
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;37-包含与不包含&#34;&gt;3.7 包含与不包含
+&lt;/h4&gt;&lt;p&gt;包含使用$in操作符&lt;/p&gt;
+&lt;p&gt;查询评论集合中userid字段包含1013和1014的文档：(select * from comment where userid in(1013,1014))&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.comment.find({userid:{$in:[&amp;quot;1013&amp;quot;,&amp;quot;1014&amp;quot;]}})
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;不包含使用$nin操作符&lt;/p&gt;
+&lt;p&gt;查询评论集合中userid字段不包含1013和1014的文档：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.comment.find({userid:{$nin:[&amp;quot;1013&amp;quot;,&amp;quot;1014&amp;quot;]}})
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;38-条件连接&#34;&gt;3.8 条件连接
+&lt;/h4&gt;&lt;p&gt;我们如果需要查询同时满足两个以上条件，需要使用$and操作符将条件进行关联（相当于SQL的and）。格式为：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$and:[ {条件},{条件},{条件} ]
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;查询评论集合中thumbup大于等于1000 并且小于2000的文档：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.comment.find({$and:[ {thumbup:{$gte:1000}} ,{thumbup:{$lt:2000} }]})
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;如果两个以上条件之间是或者的关系，我们使用操作符进行关联，与前面and的使用方式相同，格式为：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;$or:[ {条件},{条件},{条件} ]
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;查询评论集合中userid为1013，或者点赞数小于2000的文档记录：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.comment.find({$or:[ {userid:&amp;quot;1013&amp;quot;} ,{thumbup:{$lt:2000} }]})
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;39-列值增长&#34;&gt;3.9 列值增长
+&lt;/h4&gt;&lt;p&gt;对某列值在原有值的基础上进行增加或减少，可以使用$inc运算符：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;db.comment.update({_id:&amp;quot;2&amp;quot;},{$inc:{thumbup:1}})
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;4小结-1&#34;&gt;4.小结
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;语法下去过一遍就行&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;知识点-索引的使用&#34;&gt;知识点-索引的使用
+&lt;/h2&gt;&lt;h3 id=&#34;1目标-3&#34;&gt;1.目标
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;掌握索引的使用&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2路径-3&#34;&gt;2.路径
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;索引简介&lt;/li&gt;
+&lt;li&gt;索引基本操作&lt;/li&gt;
+&lt;li&gt;索引类型&lt;/li&gt;
+&lt;li&gt;索引属性&lt;/li&gt;
+&lt;li&gt;索引分析&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;3讲解-3&#34;&gt;3.讲解
+&lt;/h3&gt;&lt;h4 id=&#34;31-索引简介&#34;&gt;3.1 索引简介
+&lt;/h4&gt;&lt;p&gt;​	   索引支持在MongoDB中高效执行查询。没有索引，MongoDB必须执行集合扫描，即扫描集合中的每个文档，以选择与查询语句匹配的那些文档。如果查询存在适当的索引，则MongoDB可以使用该索引来限制它必须检查的文档数。索引是特殊的&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/indexes/#b-tree&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;数据结构&lt;/a&gt;，它以易于遍历的形式存储集合数据集的一小部分。索引存储一个特定字段或一组字段的值，按该字段的值排序。索引条目的排序支持有效的相等匹配和基于范围的查询操作。另外，MongoDB可以使用索引中的顺序返回排序的结果。&lt;/p&gt;
+&lt;p&gt;下图说明了使用==索引选择和排序匹配文档的查询==：&lt;/p&gt;
+&lt;p&gt;​	&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/index-for-sort.bakedsvg.svg&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;从根本上讲，MongoDB中的索引类似于其他数据库系统中的索引。MongoDB在&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/glossary/#term-collection&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;集合&lt;/a&gt; 级别定义索引，并支持MongoDB集合中文档的任何字段或子字段的索引。&lt;/p&gt;
+&lt;h4 id=&#34;32-索引基本操作&#34;&gt;3.2 索引基本操作
+&lt;/h4&gt;&lt;h5 id=&#34;321-创建索引&#34;&gt;3.2.1 创建索引
+&lt;/h5&gt;&lt;p&gt;&lt;strong&gt;基本语法&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;db.collection.createIndex(keys, options)
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​	&lt;strong&gt;keys&lt;/strong&gt;可写为要配置索引的字段如{&amp;ldquo;articleid&amp;rdquo;:1},其中，1 为指定按升序创建索引，如果你想按降序来创建索引指定为 -1 即可。但是字段不能指定为_id，因为该字段默认会创建索引。&lt;/p&gt;
+&lt;p&gt;​	&lt;strong&gt;注意:&lt;/strong&gt; &lt;em&gt;注意在 3.0.0 版本前创建索引方法为 db.collection.ensureIndex()，之后的版本使用了 db.collection.createIndex() 方法，ensureIndex() 还能用，但只是 createIndex() 的别名。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;​	&lt;strong&gt;options&lt;/strong&gt;表示创建索引时的设置，这个在索引属性中单独说明：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ex:&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;//为articleid字段创建升序索引
+db.comment.createIndex({&amp;quot;articleid&amp;quot;:1})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;也可以创建多个字段的联合索引，比如：&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;//创建article升序字段和userid降序字段的联合索引
+db.comment.createIndex({&amp;quot;articleid&amp;quot;:1,&amp;quot;userid&amp;quot;:-1})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;这种索引只支持：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;​	db.comment.find().sort({&amp;ldquo;articleid&amp;rdquo;:1,&amp;ldquo;userid&amp;rdquo;:-1})或者b.comment.find().sort({&amp;ldquo;articleid&amp;rdquo;:-1,&amp;ldquo;userid&amp;rdquo;:1})的查询使用该索引，其他情况如db.comment.find().sort({&amp;ldquo;articleid&amp;rdquo;:1,&amp;ldquo;userid&amp;rdquo;:1})则不能使用，这种情景和关系型数据库中的联合索引表现是一致的。 有关排序顺序和复合索引的更多信息，请参见 &lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/tutorial/sort-results-with-indexes/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;使用索引对查询结果进行排序&lt;/a&gt;。&lt;/p&gt;
+&lt;h5 id=&#34;322-查看索引&#34;&gt;3.2.2 查看索引
+&lt;/h5&gt;&lt;p&gt;查看当前数据库中该集合的所有索引&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;db.comment.getIndexes()
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;或者&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;db.comment.aggregate( [ { $indexStats: { } } ] )
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h5 id=&#34;323-删除索引&#34;&gt;3.2.3 删除索引
+&lt;/h5&gt;&lt;p&gt;删除所有索引&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;db.comment.dropIndexes() 
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;删除指定索引&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;db.comment.dropIndex(索引名称)
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h5 id=&#34;324-修改索引&#34;&gt;3.2.4 修改索引
+&lt;/h5&gt;&lt;p&gt;要修改现有索引，您需要删除并重新创建索引。&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/index-ttl/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;TTL索引&lt;/a&gt;是此规则的例外 ，可以通过&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/command/collMod/#dbcmd.collMod&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;code&gt;collMod&lt;/code&gt;&lt;/a&gt;命令与&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/command/collMod/#index&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;code&gt;index&lt;/code&gt;&lt;/a&gt;收集标志一起 修改&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/index-ttl/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;TTL索引&lt;/a&gt;。&lt;/p&gt;
+&lt;h4 id=&#34;33-索引类型&#34;&gt;3.3 索引类型
+&lt;/h4&gt;&lt;h5 id=&#34;普通索引-联合索引&#34;&gt;普通索引, 联合索引
+&lt;/h5&gt;&lt;p&gt;除了上面讲到的&lt;strong&gt;普通索引&lt;/strong&gt;以及&lt;strong&gt;联合索引&lt;/strong&gt;外还有以下类型：&lt;/p&gt;
+&lt;h5 id=&#34;多键索引数组索引&#34;&gt;多键索引（数组索引）
+&lt;/h5&gt;&lt;p&gt;​	 MongoDB使用&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/index-multikey/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;多键索引&lt;/a&gt;来索引存储在数组中的内容。如果您对保存数组值的字段建立索引，则MongoDB将为数组的&lt;em&gt;每个&lt;/em&gt;元素创建单独的索引key键。这些&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/index-multikey/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;多键索引&lt;/a&gt;允许查询通过匹配数组的一个或多个元素来选择包含数组的文档。如果索引字段包含数组值，MongoDB会自动确定是否创建多键索引。您无需显式指定多键类型。&lt;/p&gt;
+&lt;p&gt;ex：可以看到tags字段是一个数组，可以建立数组索引&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;//所有文档中的所有元素字段都作为该索引的key
+db.comment.createIndex({&amp;quot;tags&amp;quot;:1})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​	如果该字段是一个对象数组，可以建立&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;//对文档中的tupuser字段的age属性建立索引
+db.comment.createIndex({&amp;quot;tupuser.age&amp;quot;:1})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​	查询点赞用户年龄超过30岁的评论&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;db.comment.find({&amp;quot;tupuser.age&amp;quot;:{$gt:30}}).explain()
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​	发现该索引已经生效了&lt;/p&gt;
+&lt;h5 id=&#34;文本索引&#34;&gt;文本索引
+&lt;/h5&gt;&lt;p&gt;​	MongoDB提供了一种&lt;code&gt;text&lt;/code&gt;索引类型，该类型支持在集合中搜索字符串内容。这些文本索引不存储特定于语言的&lt;em&gt;停用&lt;/em&gt;词（例如“ the”，“ a”，“ or”），并且在集合中&lt;em&gt;词干&lt;/em&gt;仅存储根词。有关&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/index-text/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;文本&lt;/a&gt;索引和搜索的更多信息，请参见&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/index-text/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;文本索引&lt;/a&gt;。 &lt;strong&gt;一个集合最多可以有一个文本索引&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;//为username和content字段创建文本索引
+db.comment.createIndex(
+   {
+     username: &amp;quot;text&amp;quot;,
+     content: &amp;quot;text&amp;quot;
+   }
+ )
+//文本查询单个词条
+db.comment.find({$text:{$search:&amp;quot;出错&amp;quot;}})
+//文本查询多个词条
+db.comment.find({$text:{$search:&amp;quot;出错 李&amp;quot;}})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​	可以看到mongo的全文索引建立方式与英文的方式基本一样，是根据词（英文单词）的方式建立的， 如果一个文本里面有多个词条， 则需要按空格方式隔开，所以索引效率比较低，想要实现中文模糊搜素，可以用elasticsearch或者Sphinx，或者lucene 。&lt;/p&gt;
+&lt;h5 id=&#34;哈希索引&#34;&gt;哈希索引
+&lt;/h5&gt;&lt;p&gt;为了支持&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/hashed-sharding/#sharding-hashed-sharding&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;基于散列的分片&lt;/a&gt;，MongoDB提供了一种&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/index-hashed/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;散列索引&lt;/a&gt;类型，该索引类型对字段值的散列进行索引。这些索引在其范围内具有更随机的值分布，但&lt;em&gt;仅&lt;/em&gt; 支持相等匹配，而不能支持基于范围的查询。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;//为articleid字段创建hash索引
+db.comment.createIndex({&amp;quot;userid&amp;quot;:&amp;quot;hashed&amp;quot;})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;34-索引属性&#34;&gt;3.4 索引属性
+&lt;/h4&gt;&lt;p&gt;​	 索引属性参数列表：&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;Parameter&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;Type&lt;/th&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;Description&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;background&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Boolean&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;建索引过程会阻塞其它数据库操作，background可指定以后台方式创建索引，即增加 &amp;ldquo;background&amp;rdquo; 可选参数。 &amp;ldquo;background&amp;rdquo; 默认值为&lt;strong&gt;false&lt;/strong&gt;。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;unique&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Boolean&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;建立的索引是否唯一。指定为true创建唯一索引。默认值为&lt;strong&gt;false&lt;/strong&gt;.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;name&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;string&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;索引的名称。如果未指定，MongoDB的通过连接索引的字段名和排序顺序生成一个索引名称。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;dropDups&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Boolean&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;**3.0+版本已废弃。**在建立唯一索引时是否删除重复记录,指定 true 创建唯一索引。默认值为 &lt;strong&gt;false&lt;/strong&gt;.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;sparse&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Boolean&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;对文档中不存在的字段数据不启用索引；这个参数需要特别注意，如果设置为true的话，在索引字段中不会查询出不包含对应字段的文档.。默认值为 &lt;strong&gt;false&lt;/strong&gt;.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;expireAfterSeconds&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;integer&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;指定一个以秒为单位的数值，完成 TTL设定，设定集合的生存时间。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;v&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;index version&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;索引的版本号。默认的索引版本取决于mongod创建索引时运行的版本。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;weights&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;document&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;索引权重值，数值在 1 到 99,999 之间，表示该索引相对于其他索引字段的得分权重。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;default_language&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;string&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;对于文本索引，该参数决定了停用词及词干和词器的规则的列表。 默认为英语&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;language_override&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;string&lt;/td&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;对于文本索引，该参数指定了包含在文档中的字段名，语言覆盖默认的language，默认值为 language.&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h5 id=&#34;唯一索引&#34;&gt;唯一索引
+&lt;/h5&gt;&lt;p&gt;唯一索引可确保索引字段不会存储重复值；即对索引字段实施唯一性。默认情况下， 在创建集合期间，MongoDB在&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/document/#document-id-field&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;_id&lt;/a&gt;字段上创建唯一索引。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;//创建articleid字段的唯一索引
+db.comment.createIndex({&amp;quot;articleid&amp;quot;:1},{ unique: true })
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;和mysql一样，复合索引也可创建为唯一索引&lt;/p&gt;
+&lt;h5 id=&#34;部分索引&#34;&gt;部分索引
+&lt;/h5&gt;&lt;p&gt;&lt;em&gt;3.2版中的新功能。&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/index-partial/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;部分索引&lt;/a&gt;仅索引集合中符合指定过滤器表达式的文档。通过索引集合中文档的子集，部分索引具有较低的存储需求，并降低了索引创建和维护的性能成本。&lt;/p&gt;
+&lt;p&gt;要创建部分索引，请将该 &lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;code&gt;db.collection.createIndex()&lt;/code&gt;&lt;/a&gt;方法与 &lt;code&gt;partialFilterExpression&lt;/code&gt;选项一起使用。该&lt;code&gt;partialFilterExpression&lt;/code&gt; 选项接受使用以下命令指定过滤条件的文档&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;等式表达式（即或使用 运算符），&lt;code&gt;field: value&lt;/code&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/operator/query/eq/#op._S_eq&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;code&gt;$eq&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/operator/query/exists/#op._S_exists&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;code&gt;$exists: true&lt;/code&gt;&lt;/a&gt; 表达，&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/operator/query/gt/#op._S_gt&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;code&gt;$gt&lt;/code&gt;&lt;/a&gt;，&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/operator/query/gte/#op._S_gte&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;code&gt;$gte&lt;/code&gt;&lt;/a&gt;，&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/operator/query/lt/#op._S_lt&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;code&gt;$lt&lt;/code&gt;&lt;/a&gt;，&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/operator/query/lte/#op._S_lte&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;code&gt;$lte&lt;/code&gt;&lt;/a&gt;表情，&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/operator/query/type/#op._S_type&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;code&gt;$type&lt;/code&gt;&lt;/a&gt; 表达式，&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/operator/query/and/#op._S_and&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;code&gt;$and&lt;/code&gt;&lt;/a&gt; 仅限顶级运营商&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;ex:只给该集合点赞数大于900的评论的thumbup字段创建索引&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;db.comment.createIndex(
+   { thumbup: 1},
+   { partialFilterExpression: { thumbup: { $gt: 900 } } }
+) 
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;部分索引提供了稀疏索引功能的超集，应优先于稀疏索引。&lt;/p&gt;
+&lt;h5 id=&#34;稀疏索引&#34;&gt;稀疏索引
+&lt;/h5&gt;&lt;p&gt;稀疏索引仅包含具有索引字段的文档条目，即使索引字段包含空值也是如此。索引会跳过缺少索引字段的所有文档。索引是“稀疏的”，因为它不包括集合的所有文档。相比之下，非稀疏索引包含集合中的所有文档，为那些不包含索引字段的文档存储空值。 将sparse属性设置为true即为稀疏索引&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;//插入一条没有tags字段的索引
+db.comment.insert({_id:&amp;quot;6&amp;quot;,content:&amp;quot;这个手机好&amp;quot;,username:&amp;quot;风清扬&amp;quot;,userid:&amp;quot;1014&amp;quot;,thumbup:123,tupuser:[{name:&amp;quot;李六&amp;quot;,sex:&amp;quot;男&amp;quot;,age:39},{name:&amp;quot;李七&amp;quot;,sex:&amp;quot;男&amp;quot;,age:62}],lastModifiedDate:new Date()});
+//删除原tags索引
+db.comment.dropIndex(&amp;quot;tags_1&amp;quot;)
+//创建tags字段的稀疏索引
+db.comment.createIndex({tags: 1},{ sparse: true })
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h5 id=&#34;ttl指数&#34;&gt;TTL指数
+&lt;/h5&gt;&lt;p&gt;TTL索引是特殊的单字段索引，MongoDB可以使用它们在一定时间后或在特定时钟时间自动从集合中删除文档。数据到期对于某些类型的信息很有用，例如机器生成的事件数据，日志和会话信息，它们仅需要在数据库中保留有限的时间。&lt;/p&gt;
+&lt;p&gt;要创建TTL索引，请将该&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;code&gt;db.collection.createIndex()&lt;/code&gt;&lt;/a&gt; 方法与&lt;code&gt;expireAfterSeconds&lt;/code&gt;选项结合使用，该方法的值（索引字段类型）是&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/bson-types/#document-bson-type-date&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;日期&lt;/a&gt;或包含&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/bson-types/#document-bson-type-date&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;日期值&lt;/a&gt;的数组。ex:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;//当前时间如果在lastModifiedDate的10s之后，则标记该文档过期
+db.comment.createIndex({&amp;quot;lastModifiedDate&amp;quot;:1},{expireAfterSeconds:10})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;mongo后台的TTL线程会每隔60s删除一次被ttl索引标记为过期的文档&lt;/p&gt;
+&lt;h4 id=&#34;35-索引分析&#34;&gt;3.5 索引分析
+&lt;/h4&gt;&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;//对查询进行分析
+db.comment.find().explain()
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;作用和mysql的explain关键字一样都是用来分析执行计划的&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;queryPlanner：执行计划&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;winningPlan：竞争成功的计划
+&lt;ul&gt;
+&lt;li&gt;如果该计划使用了索引，会有以下参数
+&lt;ul&gt;
+&lt;li&gt;indexName：索引名称&lt;/li&gt;
+&lt;li&gt;isMultiKey：是否为多键索引&lt;/li&gt;
+&lt;li&gt;isUnique：是否唯一索引&lt;/li&gt;
+&lt;li&gt;isSparse：是否是稀疏索引&lt;/li&gt;
+&lt;li&gt;isPartial：是否是部分索引&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;如果没有以上参数，表示没有使用索引&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;rejectedPlans：竞争失败的计划&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;4总结&#34;&gt;4.总结
+&lt;/h3&gt;&lt;h2 id=&#34;知识点-mongo集群搭建&#34;&gt;知识点-mongo集群搭建	
+&lt;/h2&gt;&lt;h3 id=&#34;1目标-4&#34;&gt;1.目标
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;了解集群原理，能够搭建出分片集群&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;查看集群状态&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;db.stats()
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;2路径-4&#34;&gt;2.路径
+&lt;/h3&gt;&lt;h3 id=&#34;3讲解-4&#34;&gt;3.讲解
+&lt;/h3&gt;&lt;h4 id=&#34;31-集群简介&#34;&gt;3.1 集群简介
+&lt;/h4&gt;&lt;p&gt;​		mongodb集群搭建方式有三种，1、主从(官方已经不推荐)，2、副本集，3、分片。这里介绍如何通过分片sharding方式搭建mongodb集群。sharding集群方式也基于副本集，在搭建过程中，需要对分片和配置节点做副本集。最后将做好的副本集的分片加入到路由节点，构成集群。&lt;/p&gt;
+&lt;h4 id=&#34;32-副本集&#34;&gt;3.2 副本集
+&lt;/h4&gt;&lt;h5 id=&#34;321副本集角色&#34;&gt;3.2.1副本集角色
+&lt;/h5&gt;&lt;ol&gt;
+&lt;li&gt;主节点（Primary）
+接收所有的写请求，然后把修改同步到所有Secondary。一个Replica Set只能有一个Primary节点，当Primary挂掉后，其他Secondary或者Arbiter节点会重新选举出来一个主节点。
+默认读请求也是发到Primary节点处理的，可以通过修改客户端连接配置以支持读取Secondary节点。&lt;/li&gt;
+&lt;li&gt;副本节点（Secondary）
+与主节点保持同样的数据集。当主节点挂掉的时候，参与选主。&lt;/li&gt;
+&lt;li&gt;仲裁者（Arbiter）
+不保有数据，不参与选主，只进行选主投票。使用Arbiter可以减轻数据存储的硬件需求，Arbiter几乎没什么大的硬件资源需求，但重要的一点是，在生产环境下它和其他数据节点不要部署在同一台机器上。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h5 id=&#34;322-两种架构模式&#34;&gt;3.2.2 两种架构模式
+&lt;/h5&gt;&lt;ol&gt;
+&lt;li&gt;PSS
+Primary + Secondary + Secondary模式，通过Primary和Secondary搭建的Replica Set
+Diagram of a 3 member replica set that consists of a primary and two secondaries.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/242916-20180313214807697-1361550290.png&#34;
+	width=&#34;740&#34;
+	height=&#34;280&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;img&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;264&#34;
+		data-flex-basis=&#34;634px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;该模式下 Replica Set节点数必须为奇数，目的是选主投票的时候要出现&lt;strong&gt;大多数&lt;/strong&gt;才能进行选主决策。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;PSA
+Primary + Secondary + Arbiter模式，使用Arbiter搭建Replica Set&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/242916-20180313214821963-1134366100.png&#34;
+	width=&#34;700&#34;
+	height=&#34;265&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;img&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;264&#34;
+		data-flex-basis=&#34;633px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;偶数个数据节点，加一个Arbiter构成的Replica Set&lt;/p&gt;
+&lt;h4 id=&#34;33-分片&#34;&gt;3.3 分片
+&lt;/h4&gt;&lt;p&gt;sharding方式的集群中，有三类角色，分别是shard， config servers，router（mongos）。如下图所示。&lt;/p&gt;
+&lt;p&gt;​	&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/sharded-cluster-production-architecture.bakedsvg.svg&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/sharded-cluster-shards/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;shard&lt;/a&gt;： 分片节点，存储数据。每个分片都可以部署为&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/glossary/#term-replica-set&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;副本集&lt;/a&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/sharded-cluster-query-router/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;router&lt;/a&gt;： 路由节点，是mongo集群与外部客户端连接的入口，他提供mongos客户端，对客户端透明，让客户端感觉使用单节点数据库。&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/sharded-cluster-config-servers/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;config servers&lt;/a&gt; ： 配置节点，不会存储数据，会存储元数据信息，比如片键的范围。 从MongoDB 3.4开始，必须将配置服务器部署为&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/glossary/#term-replica-set&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;副本集&lt;/a&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;32-搭建集群&#34;&gt;3.2 搭建集群
+&lt;/h4&gt;&lt;h5 id=&#34;321-创建配置服务复本集&#34;&gt;3.2.1 创建配置服务复本集
+&lt;/h5&gt;&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;docker run --name configsvr0 -d mongo --configsvr --replSet &amp;quot;rs_configsvr&amp;quot;  --bind_ip_all
+docker run --name configsvr1 -d mongo --configsvr --replSet &amp;quot;rs_configsvr&amp;quot;  --bind_ip_all
+docker run --name configsvr2 -d mongo --configsvr --replSet &amp;quot;rs_configsvr&amp;quot;  --bind_ip_all
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h5 id=&#34;322-创建分片复本集&#34;&gt;3.2.2 创建分片复本集
+&lt;/h5&gt;&lt;p&gt;&lt;strong&gt;创建分片0复制集&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;docker run --name shardsvr00 -d mongo --shardsvr --replSet &amp;quot;rs_shardsvr0&amp;quot;  --bind_ip_all
+docker run --name shardsvr01 -d mongo --shardsvr --replSet &amp;quot;rs_shardsvr0&amp;quot;  --bind_ip_all
+docker run --name shardsvr02 -d mongo --shardsvr --replSet &amp;quot;rs_shardsvr0&amp;quot;  --bind_ip_all
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;创建分片1复制集&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;docker run --name shardsvr10 -d mongo --shardsvr --replSet &amp;quot;rs_shardsvr1&amp;quot;  --bind_ip_all
+docker run --name shardsvr11 -d mongo --shardsvr --replSet &amp;quot;rs_shardsvr1&amp;quot;  --bind_ip_all
+docker run --name shardsvr12 -d mongo --shardsvr --replSet &amp;quot;rs_shardsvr1&amp;quot;  --bind_ip_all
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;执行 docker inspect -f &amp;lsquo;{{.Name}} - {{.NetworkSettings.IPAddress }}&amp;rsquo; $(docker ps -aq) 得到我们刚刚启动的容器的名称和ip列表&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;/shardsvr12 - 172.17.0.11
+/shardsvr11 - 172.17.0.10
+/shardsvr10 - 172.17.0.9
+
+/shardsvr02 - 172.17.0.8
+/shardsvr01 - 172.17.0.7
+/shardsvr00 - 172.17.0.6
+
+/configsvr2 - 172.17.0.5
+/configsvr1 - 172.17.0.4
+/configsvr0 - 172.17.0.3
+/tensquare_mongo - 172.17.0.2
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h5 id=&#34;323-初始化配置副本集和分片副本集&#34;&gt;&lt;strong&gt;3.2.3 初始化配置副本集&lt;/strong&gt;和分片副本集
+&lt;/h5&gt;&lt;p&gt;ps:使用&lt;code&gt;--configsvr&lt;/code&gt;构建的配置容器默认的端口是&lt;strong&gt;27019&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;#进入容器
+docker exec -it configsvr0 bash
+#连接configsvr0
+mongo --host 172.17.0.3 --port 27019
+#启动配置副本集
+rs.initiate(
+  {
+    _id: &amp;quot;rs_configsvr&amp;quot;,
+    configsvr: true,
+    members: [
+      { _id : 0, host : &amp;quot;172.17.0.3:27019&amp;quot; },
+      { _id : 1, host : &amp;quot;172.17.0.4:27019&amp;quot; },
+      { _id : 2, host : &amp;quot;172.17.0.5:27019&amp;quot; }
+    ]
+  }
+)
+#exit退出
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;同理，以相同的方式初始化分片副本集&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;ps:使用&lt;code&gt;--shardsvr&lt;/code&gt;构建的分片容器默认的端口是&lt;strong&gt;27018&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;初始化分片副本集0：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;#连接shardsvr00
+mongo --host 172.17.0.6 --port 27018
+#初始化分片副本集0
+rs.initiate(
+  {
+    _id : &amp;quot;rs_shardsvr0&amp;quot;,
+    members: [
+      { _id : 0, host : &amp;quot;172.17.0.6:27018&amp;quot; },
+      { _id : 1, host : &amp;quot;172.17.0.7:27018&amp;quot; },
+      { _id : 2, host : &amp;quot;172.17.0.8:27018&amp;quot; }
+    ]
+  }
+)
+#exit退出
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;初始化分片副本集1:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;#连接shardsvr10
+mongo --host 172.17.0.9 --port 27018
+#初始化分片副本集1
+rs.initiate(
+  {
+    _id : &amp;quot;rs_shardsvr1&amp;quot;,
+    members: [
+      { _id : 0, host : &amp;quot;172.17.0.9:27018&amp;quot; },
+      { _id : 1, host : &amp;quot;172.17.0.10:27018&amp;quot; },
+      { _id : 2, host : &amp;quot;172.17.0.11:27018&amp;quot; }
+    ]
+  }
+)
+#exit退出
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h5 id=&#34;324-创建集群入口并关联配置集&#34;&gt;3.2.4 创建集群入口并关联配置集
+&lt;/h5&gt;&lt;p&gt;ps:默认是mongod(分片处理模式),我们需要将起修改为mongos(路由模式),负责路由和协调操作，使得集群像一个整体的系统&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;#exit退出到root目录
+#创建路由实例
+docker run --name mongos0 -p 27027:27017 -d --entrypoint &amp;quot;mongos&amp;quot; mongo --configdb rs_configsvr/172.17.0.3:27019,172.17.0.4:27019,172.17.0.5:27019 --bind_ip_all
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;同样执行 docker inspect -f &amp;lsquo;{{.Name}} - {{.NetworkSettings.IPAddress }}&amp;rsquo; $(docker ps -aq) 得到容器的名称和ip的对应列表，并获得mongo0容器的ip为&lt;code&gt;172.17.0.12&lt;/code&gt;&lt;/p&gt;
+&lt;h5 id=&#34;325-在集群入口路由上挂载分片集&#34;&gt;3.2.5 在集群入口(路由)上挂载分片集
+&lt;/h5&gt;&lt;p&gt;ps:容器默认的端口是27017&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;#进入容器
+docker exec -it mongos0 bash
+#连接mongos0
+mongo --host 172.17.0.12 --port 27017
+sh.addShard(&amp;quot;rs_shardsvr0/172.17.0.6:27018,172.17.0.7:27018,172.17.0.8:27018&amp;quot;)
+sh.addShard(&amp;quot;rs_shardsvr1/172.17.0.9:27018,172.17.0.10:27018,172.17.0.11:27018&amp;quot;)
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h5 id=&#34;326-测试集群&#34;&gt;3.2.6 测试集群
+&lt;/h5&gt;&lt;p&gt;进入路由容器创建commentdb数据库并启用分片&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;sh.enableSharding(&amp;quot;commentdb&amp;quot;)
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;分片方式有两种远程分片和hash分片，我们采用hash分片&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;#对 commentdb.comment 的 _id 字段进行哈希分片
+sh.shardCollection(&amp;quot;commentdb.comment&amp;quot;, {&amp;quot;_id&amp;quot;: &amp;quot;hashed&amp;quot; })
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;插入数据测试下&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;#使用数据库
+use commentdb
+#插入数据
+db.comment.insert({_id:&amp;quot;1&amp;quot;,content:&amp;quot;到底为啥 出错&amp;quot;,username:&amp;quot;张三&amp;quot;,userid:&amp;quot;1012&amp;quot;,thumbup:2020,tags:[&amp;quot;很好&amp;quot;,&amp;quot;十分认同&amp;quot;],tupuser:[{name:&amp;quot;李大&amp;quot;,sex:&amp;quot;女&amp;quot;,age:10},{name:&amp;quot;李二&amp;quot;,sex:&amp;quot;男&amp;quot;,age:42}],lastModifiedDate:new Date()});
+db.comment.insert({_id:&amp;quot;2&amp;quot;,content:&amp;quot;加班到半夜&amp;quot;,username:&amp;quot;李  四&amp;quot;,userid:&amp;quot;1013&amp;quot;,thumbup:1023,tags:[&amp;quot;一般&amp;quot;,&amp;quot;不给力&amp;quot;],tupuser:[{name:&amp;quot;李二&amp;quot;,sex:&amp;quot;男&amp;quot;,age:42},{name:&amp;quot;李三&amp;quot;,sex:&amp;quot;女&amp;quot;,age:12}],lastModifiedDate:new Date()});
+db.comment.insert({_id:&amp;quot;3&amp;quot;,content:&amp;quot;手机流量超了咋办&amp;quot;,username:&amp;quot;王五&amp;quot;,userid:&amp;quot;1013&amp;quot;,thumbup:111,tags:[&amp;quot;很好&amp;quot;,&amp;quot;给力&amp;quot;],tupuser:[{name:&amp;quot;李三&amp;quot;,sex:&amp;quot;女&amp;quot;,age:12},{name:&amp;quot;李四&amp;quot;,sex:&amp;quot;男&amp;quot;,age:17}],lastModifiedDate:new Date()});
+db.comment.insert({_id:&amp;quot;4&amp;quot;,content:&amp;quot;坚持就是胜利&amp;quot;,username:&amp;quot;赵六&amp;quot;,userid:&amp;quot;1014&amp;quot;,thumbup:1223,tags:[&amp;quot;不好&amp;quot;,&amp;quot;说的不对&amp;quot;],tupuser:[{name:&amp;quot;李四&amp;quot;,sex:&amp;quot;男&amp;quot;,age:17},{name:&amp;quot;李五&amp;quot;,sex:&amp;quot;女&amp;quot;,age:26}],lastModifiedDate:new Date()});
+db.comment.insert({_id:&amp;quot;5&amp;quot;,content:&amp;quot;手机没电了啊&amp;quot;,username:&amp;quot;李云龙&amp;quot;,userid:&amp;quot;1014&amp;quot;,thumbup:923,tags:[&amp;quot;很好&amp;quot;,&amp;quot;十分认同&amp;quot;],tupuser:[{name:&amp;quot;李五&amp;quot;,sex:&amp;quot;女&amp;quot;,age:26},{name:&amp;quot;李六&amp;quot;,sex:&amp;quot;男&amp;quot;,age:39}],lastModifiedDate:new Date()});
+db.comment.insert({_id:&amp;quot;6&amp;quot;,content:&amp;quot;这个手机好&amp;quot;,username:&amp;quot;风清扬&amp;quot;,userid:&amp;quot;1014&amp;quot;,thumbup:123,tags:[&amp;quot;很好&amp;quot;,&amp;quot;十分认同&amp;quot;],tupuser:[{name:&amp;quot;李六&amp;quot;,sex:&amp;quot;男&amp;quot;,age:39},{name:&amp;quot;李七&amp;quot;,sex:&amp;quot;男&amp;quot;,age:62}],lastModifiedDate:new Date()});
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;到分片数据库看下数据情况&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;#连接mongo
+mongo --host 172.17.0.9 --port 27018
+#选择数据库
+use commentdb
+#查看数量
+db.comment.count()
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;可以看到已经得到预期效果
+那么备份呢?(备份默认情况下不允许读取,需要执行&lt;code&gt;db.getMongo().setSlaveOk()&lt;/code&gt;来允许读取)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;mongo --host 172.17.0.7 --port 27018
+db.getMongo().setSlaveOk()
+db.comment.count()
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;4总结-1&#34;&gt;4.总结
+&lt;/h3&gt;&lt;h2 id=&#34;知识点-mongo聚合查询&#34;&gt;知识点-mongo聚合查询
+&lt;/h2&gt;&lt;h3 id=&#34;1目标-5&#34;&gt;1.目标
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;管道查询&lt;/li&gt;
+&lt;li&gt;map-reduce&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2路径-5&#34;&gt;2.路径
+&lt;/h3&gt;&lt;h3 id=&#34;3讲解-5&#34;&gt;3.讲解
+&lt;/h3&gt;&lt;h4 id=&#34;31-管道查询&#34;&gt;3.1 管道查询
+&lt;/h4&gt;&lt;p&gt;MongoDB的&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/aggregation-pipeline/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;聚合框架&lt;/a&gt;以数据处理管道的概念为模型。文档进入多阶段流水线，该流水线将文档转换成汇总结果。例如：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/r1043-v93gf.gif&#34;
+	width=&#34;1920&#34;
+	height=&#34;1080&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;177&#34;
+		data-flex-basis=&#34;426px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;在这个例子中&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;db.orders.aggregate([
+   { $match: { status: &amp;quot;A&amp;quot; } },
+   { $group: { _id: &amp;quot;$cust_id&amp;quot;, total: { $sum: &amp;quot;$amount&amp;quot; } } }
+])
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;第一阶段&lt;/strong&gt;：&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/operator/aggregation/match/#pipe._S_match&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;code&gt;$match&lt;/code&gt;&lt;/a&gt;阶段按&lt;code&gt;status&lt;/code&gt;字段过滤文档，并将&lt;code&gt;status&lt;/code&gt;等于的文档传递到下一阶段&lt;code&gt;&amp;quot;A&amp;quot;&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;第二阶段&lt;/strong&gt;：该&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/operator/aggregation/group/#pipe._S_group&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;code&gt;$group&lt;/code&gt;&lt;/a&gt;阶段按&lt;code&gt;cust_id&lt;/code&gt;字段将文档分组，以计算每个唯一值的总和&lt;code&gt;cust_id&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;最基本的管道阶段提供&lt;em&gt;过滤器&lt;/em&gt;，其操作类似于查询和修改输出文档形式的&lt;em&gt;文档转换&lt;/em&gt;。&lt;/p&gt;
+&lt;p&gt;其他管道操作提供了用于按特定字段对文档进行分组和排序的工具，以及用于聚合包括文档数组在内的数组内容的工具。另外，管道阶段可以将&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/reference/operator/aggregation/#aggregation-expression-operators&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;运算符&lt;/a&gt;用于诸如计算平均值或连接字符串之类的任务。&lt;/p&gt;
+&lt;p&gt;管道使用MongoDB中的本机操作提供有效的数据聚合，并且是MongoDB中数据聚合的首选方法。&lt;/p&gt;
+&lt;p&gt;聚合管道可以操作 &lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/sharding/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;分片集合&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;聚合管道可以在某些阶段使用索引来提高其性能。另外，聚合管道具有内部优化阶段。有关详细信息，请参见&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/aggregation-pipeline/#aggregation-pipeline-operators-and-performance&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;管道运算符和索引&lt;/a&gt;以及 &lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/aggregation-pipeline-optimization/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;聚合管道优化&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;ex:获取当前点赞数大于200并统计用户的总点赞数&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;db.comment.aggregate([
+   { $match: { thumbup: {$gt:200} } },
+   { $group: { _id: &amp;quot;$userid&amp;quot;, total: { $sum: &amp;quot;$thumbup&amp;quot; } } }
+])
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;32-map-reduce&#34;&gt;3.2 map-reduce
+&lt;/h4&gt;&lt;p&gt;MongoDB还提供了&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/map-reduce/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;map-reduce&lt;/a&gt;操作来执行聚合。通常，map-reduce操作有两个阶段：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;em&gt;map&lt;/em&gt;阶段: 处理每个文档并为每个输入文档&lt;em&gt;发出&lt;/em&gt;一个或多个对象的，&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;reduce&lt;/em&gt;阶段: 以及将map操作的输出组合在一起的。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;可选地，map-reduce可以具有一个 &lt;em&gt;finalize&lt;/em&gt;阶段来对结果进行最终修改。与其他聚合操作一样，map-reduce可以指定查询条件以选择输入文档以及对结果进行排序和限制。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Map-reduce使用自定义JavaScript函数来执行映射和归约操作以及可选的&lt;em&gt;finalize&lt;/em&gt;操作。尽管自定义JavaScript与聚合管道相比提供了极大的灵活性，但总的来说，map-reduce比聚合管道效率低下，并且复杂性更高。&lt;/p&gt;
+&lt;p&gt;Map-reduce可以对分片 &lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/sharding/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;集合进行操作&lt;/a&gt;。映射减少操作也可以输出到分片集合。有关详细信息，请参见 &lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/core/map-reduce-sharded-collections/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Map-Reduce和分片集合&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/map-reduce.bakedsvg.svg&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;ex:获取当前点赞数大于200并统计用户的总点赞数&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/image-20200618070608408.png&#34;
+	width=&#34;1081&#34;
+	height=&#34;399&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20200618070608408&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;270&#34;
+		data-flex-basis=&#34;650px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;var mapFunction1 = function() {
+  emit(this.userid, this.thumbup);
+};
+var reduceFunction1 = function(keyUid, thumbupArr) {
+ return Array.sum(thumbupArr);
+};
+db.comment.mapReduce(
+  mapFunction1,
+  reduceFunction1,
+  { 
+    query: {thumbup:{$gt:200}},
+    out: &amp;quot;thumbup_sum&amp;quot; 
+    	}
+)
+db.thumbup_sum.find().sort({value:-1});
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;修改成我们想要的样子&lt;/p&gt;
+&lt;h3 id=&#34;4总结-2&#34;&gt;4.总结
+&lt;/h3&gt;&lt;h2 id=&#34;知识点-mongodb-driver使用&#34;&gt;知识点-mongodb-driver使用
+&lt;/h2&gt;&lt;h3 id=&#34;mongodb-driver&#34;&gt;mongodb-driver
+&lt;/h3&gt;&lt;p&gt;​	mongodb-driver是mongo官方推出的java连接mongoDB的驱动包，相当于JDBC驱动。我们现在来使用mongodb-driver完成对Mongodb的操作。&lt;/p&gt;
+&lt;p&gt;添加以下依赖：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt; &amp;lt;dependencies&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.mongodb&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;mongodb-driver&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;3.10.1&amp;lt;/version&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;junit&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;junit&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;4.12&amp;lt;/version&amp;gt;
+            &amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+    &amp;lt;/dependencies&amp;gt;
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;使用步骤:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;创建客户端连接 mongoclient&lt;/li&gt;
+&lt;li&gt;获取数据库&lt;/li&gt;
+&lt;li&gt;获取集合&lt;/li&gt;
+&lt;li&gt;操作集合&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;32-查询所有&#34;&gt;3.2 查询所有
+&lt;/h4&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt; @Test
+    public void test1() {
+        //创建连接
+        MongoClient client = new MongoClient(&amp;quot;192.168.184.136&amp;quot;,27027);
+        //打开数据库
+        MongoDatabase commentdb = client.getDatabase(&amp;quot;commentdb&amp;quot;);
+        //获取集合
+        MongoCollection&amp;lt;Document&amp;gt; comment = commentdb.getCollection(&amp;quot;comment&amp;quot;);
+
+        //查询
+        FindIterable&amp;lt;Document&amp;gt; documents = comment.find();
+
+        //查询记录获取文档集合
+        for (Document document : documents) {
+            System.out.println(&amp;quot;_id：&amp;quot; + document.get(&amp;quot;_id&amp;quot;));
+            System.out.println(&amp;quot;内容：&amp;quot; + document.get(&amp;quot;content&amp;quot;));
+            System.out.println(&amp;quot;用户ID:&amp;quot; + document.get(&amp;quot;userid&amp;quot;));
+            System.out.println(&amp;quot;点赞数：&amp;quot; + document.get(&amp;quot;thumbup&amp;quot;));
+        }
+        //关闭连接
+        client.close();
+    }
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;33根据_id查询&#34;&gt;3.3根据_id查询
+&lt;/h4&gt;&lt;p&gt;每次使用都要用到MongoCollection，进行抽取：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;private MongoClient client;
+private MongoCollection&amp;lt;Document&amp;gt; comment;
+
+@Before
+public void init() {
+    //创建连接
+    client =new MongoClient(&amp;quot;192.168.184.136&amp;quot;,27027);
+    //打开数据库
+    MongoDatabase commentdb = client.getDatabase(&amp;quot;commentdb&amp;quot;);
+    //获取集合
+    comment = commentdb.getCollection(&amp;quot;comment&amp;quot;);
+}
+
+@After
+public void after() {
+    client.close();
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;测试根据_id查询：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test
+public void test2() {
+    //查询
+    FindIterable&amp;lt;Document&amp;gt; documents = comment.find(new BasicDBObject(&amp;quot;_id&amp;quot;, &amp;quot;1&amp;quot;));
+
+    //查询记录获取文档集合
+    for (Document document : documents) {
+        System.out.println(&amp;quot;_id：&amp;quot; + document.get(&amp;quot;_id&amp;quot;));
+        System.out.println(&amp;quot;内容：&amp;quot; + document.get(&amp;quot;content&amp;quot;));
+        System.out.println(&amp;quot;用户ID:&amp;quot; + document.get(&amp;quot;userid&amp;quot;));
+        System.out.println(&amp;quot;点赞数：&amp;quot; + document.get(&amp;quot;thumbup&amp;quot;));
+    }
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;34新增&#34;&gt;3.4新增
+&lt;/h4&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test
+public void test3() {
+    Map&amp;lt;String, Object&amp;gt; map = new HashMap();
+    map.put(&amp;quot;_id&amp;quot;, &amp;quot;6&amp;quot;);
+    map.put(&amp;quot;content&amp;quot;, &amp;quot;很棒！&amp;quot;);
+    map.put(&amp;quot;userid&amp;quot;, &amp;quot;9999&amp;quot;);
+    map.put(&amp;quot;thumbup&amp;quot;, 123);
+
+    Document document = new Document(map);
+
+    comment.insertOne(document);
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;35修改&#34;&gt;3.5修改
+&lt;/h4&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test
+public void test4() {
+    //修改的条件
+    Bson filter = new BasicDBObject(&amp;quot;_id&amp;quot;, &amp;quot;6&amp;quot;);
+    //修改的数据
+    Bson update = new BasicDBObject(&amp;quot;$set&amp;quot;, new Document(&amp;quot;userid&amp;quot;, &amp;quot;8888&amp;quot;));
+
+    comment.updateOne(filter, update);
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;36-删除&#34;&gt;3.6 删除
+&lt;/h4&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test
+public void test5() {
+    //删除的条件
+    Bson filter = new BasicDBObject(&amp;quot;_id&amp;quot;, &amp;quot;6&amp;quot;);
+
+    comment.deleteOne(filter);
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;4小结-2&#34;&gt;4.小结
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;mongodb-driver: mongo官方提供的一个Java操作Mongo客户端 类似jdbc驱动&lt;/li&gt;
+&lt;li&gt;如果有条件, 我们使用 new BasicDbObject()
+&lt;ul&gt;
+&lt;li&gt;一个BasicDbObject就相当于语法里面的一组{}&lt;/li&gt;
+&lt;li&gt;操作过程
+&lt;ul&gt;
+&lt;li&gt;创建连接&lt;/li&gt;
+&lt;li&gt;获取数据库对象&lt;/li&gt;
+&lt;li&gt;获取集合对象&lt;/li&gt;
+&lt;li&gt;操作集合&lt;/li&gt;
+&lt;li&gt;关闭连接&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;我们使用mongodb-driver有些繁琐, 项目里面使用Spring-Data-mongo, 内部就是封装了mongodb-driver&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;第二章-springdatamongodb&#34;&gt;第二章-SpringDataMongoDB
+&lt;/h1&gt;&lt;h2 id=&#34;知识点-基本crud实现&#34;&gt;知识点-基本crud实现
+&lt;/h2&gt;&lt;h3 id=&#34;1目标-6&#34;&gt;1.目标
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 掌握文章评论环境准备&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2路径-6&#34;&gt;2.路径
+&lt;/h3&gt;&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;开发准备环境准备&lt;/li&gt;
+&lt;li&gt;基本CRUD&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;3讲解-6&#34;&gt;3.讲解
+&lt;/h3&gt;&lt;h4 id=&#34;31-开发准备&#34;&gt;3.1 开发准备
+&lt;/h4&gt;&lt;p&gt;​	SpringDataMongoDB是SpringData家族成员之一，用于操作MongoDb的持久层框架，封装了底层的==mongodb-driver==。本功能使用SpringDataMongoDB进行开发&lt;/p&gt;
+&lt;p&gt;步骤:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;创建maven项目&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;添加SpringDataMongoDB起步依赖&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在application.yml里面配置MongoDB&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;创建pojo(和集合对应)&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;@Document(collection=&amp;ldquo;集合名称&amp;rdquo;)&lt;/li&gt;
+&lt;li&gt;@Id标记主键&lt;/li&gt;
+&lt;li&gt;@CompoundIndexes({@CompoundIndex(),@CompoundIndex()})添加索引&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;创建一个Dao接口继承MongoRepository&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;添加依赖：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt; &amp;lt;parent&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-parent&amp;lt;/artifactId&amp;gt;
+        &amp;lt;version&amp;gt;2.1.4.RELEASE&amp;lt;/version&amp;gt;
+        &amp;lt;relativePath/&amp;gt;
+    &amp;lt;/parent&amp;gt;
+
+    &amp;lt;dependencies&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-web&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt;
+            &amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-data-mongodb&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.projectlombok&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;lombok&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+    &amp;lt;/dependencies&amp;gt;
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;添加配置文件：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;spring:
+  data:
+    mongodb:
+      host: 192.168.184.136
+      port: 27027
+      database: commentdb
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;创建实体类&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Document(collection = &amp;quot;comment&amp;quot;)
+@CompoundIndexes({
+        @CompoundIndex(name = &amp;quot;idx_userid&amp;quot;, def = &amp;quot;{&#39;userid&#39;: &#39;hashed&#39;}&amp;quot;, background = true)
+})
+public class Comment implements Serializable {
+    @Id
+    private String _id;
+    private String articleid;
+    private String content;
+    private String userid;
+    private String parentid;
+    private Date publishdate;
+    private Integer thumbup;
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;32基本crud&#34;&gt;3.2基本CRUD
+&lt;/h4&gt;&lt;h5 id=&#34;321新增&#34;&gt;3.2.1新增
+&lt;/h5&gt;&lt;ul&gt;
+&lt;li&gt;CommentService&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Service
+public class CommentService {
+    @Autowired
+    private IdWorker idWorker;
+    @Autowired
+    private CommentRepository commentRepository;
+
+    public void add(Comment comment) {
+        String id = idWorker.nextId() + &amp;quot;&amp;quot;;
+        comment.set_id(id);
+        //初始化数据
+        comment.setPublishdate(new Date());
+        comment.setThumbup(0);
+        commentRepository.save(comment);
+    }
+}    
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;CommentRepository&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public interface CommentRepository extends MongoRepository&amp;lt;Comment,String&amp;gt;{
+
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;在com.tensquare.article.repository包下创建&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h5 id=&#34;322删除&#34;&gt;3.2.2删除
+&lt;/h5&gt;&lt;p&gt;业务:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;把所有的子评论也删除&lt;/li&gt;
+&lt;li&gt;不删子评论, 只删自己&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;CommentService&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public void deleteById(String id) {
+    commentRepository.deleteById(id);
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;递归删除&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;//1.查询出父id为commentid的数据做为集合A
+List&amp;lt;Comment&amp;gt; childList = commentDao.findByParentid(commentid);
+//2.删除id为commentid的数据
+commentDao.deleteById(commentid);
+//3.遍历集合A，递归调用deleteById(A[i]._id)
+for (Comment comment : childList) {
+    deleteById(comment.get_id());
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h5 id=&#34;323修改&#34;&gt;3.2.3修改
+&lt;/h5&gt;&lt;ul&gt;
+&lt;li&gt;CommentService&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public void update(Comment comment) {
+    commentRepository.save(comment);
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;这种方式的缺陷就是会覆盖原本的数据，应该只修改要修改的数据&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;//1.查询条件
+Query query = new Query();
+query.addCriteria(new Criteria(&amp;quot;_id&amp;quot;).is(comment.get_id()));
+//2.修改内容
+/*Update update = new Update();
+update.inc(&amp;quot;thumbup&amp;quot;,1).set(&amp;quot;content&amp;quot;,&amp;quot;aaaaaa&amp;quot;);*/
+Update update = MongoUpdateUtils.attrUpdateByBean(comment);
+//3.集合名称
+mongoTemplate.updateFirst(query,update,&amp;quot;comment&amp;quot;);
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;创建一个工具类通过反射封装Update&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class MongoUpdateUtils {
+    public static Update attrUpdateByBean(Object object) {
+        Update update = new Update();
+        //1.通过反射拿到属性
+        Field[] declaredFields = object.getClass().getDeclaredFields();
+        for (Field declaredField : declaredFields) {
+            try {
+                declaredField.setAccessible(true);//允许不通过get方法直接获取私有属性值
+                Object value = declaredField.get(object);
+                //2.通过get获取值如果不为空的话作为Update要修改属性
+                if(value!=null){
+                    update = update.set(declaredField.getName(),value);
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+        return update;
+    }
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h5 id=&#34;324查询所有&#34;&gt;3.2.4查询所有
+&lt;/h5&gt;&lt;ul&gt;
+&lt;li&gt;CommentService&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public List&amp;lt;Comment&amp;gt; findAll() {
+    return commentRepository.findAll();
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h5 id=&#34;325根据id查询&#34;&gt;3.2.5根据id查询
+&lt;/h5&gt;&lt;ul&gt;
+&lt;li&gt;CommentService&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;    public Comment findById(String id) {
+        return commentRepository.findById(id).get();
+    }
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h5 id=&#34;326-获取当前点赞数大于200并统计用户的总点赞数&#34;&gt;3.2.6 获取当前点赞数大于200并统计用户的总点赞数
+&lt;/h5&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt; public List&amp;lt;Map&amp;gt; findTotalThumbupByUserId(){
+        TypedAggregation&amp;lt;Comment&amp;gt; commentTypedAggregation = Aggregation.newAggregation(Comment.class,
+                Aggregation.match(Criteria.where(&amp;quot;thumbup&amp;quot;).gt(1000)),
+                Aggregation.group(&amp;quot;userid&amp;quot;).sum(&amp;quot;thumbup&amp;quot;).as(&amp;quot;sum&amp;quot;)
+        );
+        AggregationResults&amp;lt;Map&amp;gt; aggregate = mongoTemplate.aggregate(commentTypedAggregation, mongoTemplate.getCollectionName(Comment.class), Map.class);
+        return aggregate.getMappedResults();
+    }
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h5 id=&#34;327-按照点赞数排序查询前3条评论&#34;&gt;3.2.7 按照点赞数排序，查询前3条评论
+&lt;/h5&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public PageResult&amp;lt;Comment&amp;gt; findByPage(int current, int size){
+        Sort sort = Sort.by(Sort.Direction.DESC,&amp;quot;thumbup&amp;quot;);
+        Query query = new Query();
+        long total = mongoTemplate.count(query, Comment.class);
+        int offset = (current- 1)*size;
+        List&amp;lt;Comment&amp;gt; list = mongoTemplate.find(query.with(sort).limit(size).skip(offset), Comment.class, mongoTemplate.getCollectionName(Comment.class));
+        PageResult&amp;lt;Comment&amp;gt; pageResult = new PageResult();
+        pageResult.setCurrent(current);
+        pageResult.setData(list);
+        pageResult.setPages((int) ((total/size)+1));
+        return pageResult;
+    }
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;4小结-3&#34;&gt;4.小结
+&lt;/h3&gt;&lt;h2 id=&#34;知识点-框架封装&#34;&gt;知识点-框架封装
+&lt;/h2&gt;&lt;h3 id=&#34;1目标-7&#34;&gt;1.目标
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 了解如何在原有的springdata框架上封装自己的功能&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 将我们自己实现的修改功能封装进框架&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 封装分页查询功能&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 封装聚合查询功能&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2路径-7&#34;&gt;2.路径
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 讲解如何在原有的springdata框架上封装自己的功能&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 讲解如何将我们自己实现的修改功能封装进框架&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 讲解如何封装分页查询功能&lt;/li&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 讲解如何封装聚合查询功能&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;3讲解-7&#34;&gt;3.讲解
+&lt;/h3&gt;&lt;h4 id=&#34;31-在原有的springdata框架上封装自己的功能&#34;&gt;3.1 在原有的springdata框架上封装自己的功能
+&lt;/h4&gt;&lt;p&gt;​	MongoRepository虽然已经封装了一些基本功能，但是在我们日常开发的过程中会发现仍然不够用，比如分页，聚合查询都需要使用mongoTepmlate，如果你是架构师，为了保证开发人员在开发过程中能够更加规范的使用框架，我们需要对框架进一步进行封装，所以我们需要对SpringDataMongoDB框架进行研究，了解MongoRepository是如何实现接口的功能，我们又该如何合理的封装一些新的功能进来。&lt;strong&gt;这个过程和其他的springdata框架都是类似的&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;​	首先找到这个类&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/image-20200602051144739.png&#34;
+	width=&#34;1522&#34;
+	height=&#34;691&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20200602051144739&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;220&#34;
+		data-flex-basis=&#34;528px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;​	随便找个方法，找到实现类&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/image-20200602051235179.png&#34;
+	width=&#34;1260&#34;
+	height=&#34;540&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20200602051235179&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;233&#34;
+		data-flex-basis=&#34;560px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;​		正是这个SimpleMongoRepository&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/image-20200602051323421.png&#34;
+	width=&#34;1276&#34;
+	height=&#34;684&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20200602051323421&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;447px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;​		那么这个实现类又是如何注册到ioc容器的呢&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/image-20200602051424984.png&#34;
+	width=&#34;1900&#34;
+	height=&#34;753&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20200602051424984&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;252&#34;
+		data-flex-basis=&#34;605px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;​			选择第一个，是个工厂类&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/image-20200602053416216.png&#34;
+	width=&#34;1314&#34;
+	height=&#34;686&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20200602053416216&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;191&#34;
+		data-flex-basis=&#34;459px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;​			那么这个工厂类又是如何工作的呢，我们ctrl+左键点击类查看&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/image-20200602053520826.png&#34;
+	width=&#34;1886&#34;
+	height=&#34;212&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20200602053520826&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;889&#34;
+		data-flex-basis=&#34;2135px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/image-20200602053548030.png&#34;
+	width=&#34;1677&#34;
+	height=&#34;86&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20200602053548030&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;1950&#34;
+		data-flex-basis=&#34;4680px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;​			发现配置到了配置文件中，我们当然可以仿照它的方式也创建一个配置文件，保存自定义的工厂类，或者使用@EnableMongoRepositories注解更加方便一些，经过我们的查看，接下来要做的事很清楚了：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;创建接口封装自定义的方法，最好将接口分开，比如分页的单独放一个接口，聚合查询单独放一个接口，基本的增删改也单独放一个接口&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;创建一个接口继承所有创建的接口包括MongoRepository&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;创建该接口的实现类&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在启动类上添加@EnableMongoRepositories注解，并将我们的实现类配置进来&lt;/p&gt;
+&lt;p&gt;​		开始动手吧：&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;1.创建HMMongoRepository,以后这个接口就是我们要实现的接口&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public interface HMMongoRepository&amp;lt;T, ID extends Serializable&amp;gt;{
+
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;2.创建该接口的实现类&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class HMMongoRespositoryImpl&amp;lt;T, ID extends Serializable&amp;gt; extends SimpleMongoRepository&amp;lt;T, ID&amp;gt; implements HMMongoRepository&amp;lt;T,ID&amp;gt; {
+
+    private final MongoOperations mongoOperations;
+    private final MongoEntityInformation&amp;lt;T, ID&amp;gt; entityInformation;
+    /**
+     * Creates a new {@link SimpleMongoRepository} for the given {@link MongoEntityInformation} and {@link MongoTemplate}.
+     *
+     * @param metadata        must not be {@literal null}.
+     * @param mongoOperations must not be {@literal null}.
+     */
+    public HMMongoRespositoryImpl(MongoEntityInformation&amp;lt;T, ID&amp;gt; metadata, MongoOperations mongoOperations) {
+        super(metadata, mongoOperations);
+        this.entityInformation = metadata;
+        this.mongoOperations = mongoOperations;
+    }
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;32-将我们自己实现的修改功能封装进框架&#34;&gt;3.2 将我们自己实现的修改功能封装进框架
+&lt;/h4&gt;&lt;p&gt;创建接口&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public interface BaseMongoRepository&amp;lt;T,TD&amp;gt;  extends MongoRepository&amp;lt;T,TD&amp;gt; {
+    public int upsert(Query query, Update update);
+    public int update(T t);
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;将接口添加到HMMongoRepository继承列表中&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public interface HMMongoRepository&amp;lt;T, ID extends Serializable&amp;gt; extends MongoRepository&amp;lt;T, ID&amp;gt;,BaseMongoRepository&amp;lt;T,ID&amp;gt; {
+
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;添加实现&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt; @Override
+    public int upsert(Query query, Update update) {
+        return (int) mongoTemplate.upsert(query, update, entityClass).getModifiedCount();
+    }
+
+    @Override
+    public int update(T t) {
+        Query query = new Query();
+        query.addCriteria(new Criteria(&amp;quot;_id&amp;quot;).is(entityInformation.getId(t)));
+        Update update = MongoUpdateUtils.attrUpdateByBean(t);
+        return (int)mongoOperations.updateFirst(query,update,entityInformation.getCollectionName()).getModifiedCount();
+    }
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;33-封装分页查询功能&#34;&gt;3.3 封装分页查询功能
+&lt;/h4&gt;&lt;p&gt;封装一个Page接口&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public interface Page&amp;lt;T&amp;gt; {
+    
+    Page getInstance(int total, int current, int size, List&amp;lt;T&amp;gt; list);
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;封装一个分页接口&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public interface PageMongoRespository&amp;lt;T,TD&amp;gt; {
+
+    public long count(@Nullable Query query);
+
+    public Page&amp;lt;T&amp;gt; findPage(Query query, int current, int size, @Nullable Sort sort, Page&amp;lt;T&amp;gt; page);
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;添加到HMMongoRepository继承列表中,实现该方法&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt; @Override
+    public long count(@Nullable Query query) {
+        if (query == null) query = new Query();
+        return mongoOperations.count(query, entityInformation.getJavaType());
+    }
+
+    @Override
+    public Page&amp;lt;T&amp;gt; findPage(Query query, int current, int size, @Nullable Sort sort, Page&amp;lt;T&amp;gt; page) {
+        long total = count(query);
+        int offset = (current- 1)*size;
+        List&amp;lt;T&amp;gt; list = mongoOperations.find(query.with(sort).limit(size).skip(offset), entityInformation.getJavaType(), entityInformation.getCollectionName());
+        return page.getInstance((int) total, current, size, list);
+    }
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;34-封装聚合查询功能&#34;&gt;3.4 封装聚合查询功能
+&lt;/h4&gt;&lt;h5 id=&#34;341-管道查询&#34;&gt;3.4.1 管道查询
+&lt;/h5&gt;&lt;p&gt;接口&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public interface AggregationOperationMongoDao&amp;lt;T,TD&amp;gt; {
+
+    public List&amp;lt;T&amp;gt; findAggregationOperation(List&amp;lt;AggregationOperation&amp;gt; aggregationOperationList);
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;实现&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Override
+    public List&amp;lt;T&amp;gt; findAggregationOperation(List&amp;lt;AggregationOperation&amp;gt; aggregationOperationList) {
+        Aggregation aggregation = Aggregation.newAggregation(aggregationOperationList);
+        AggregationResults&amp;lt;T&amp;gt; outputType = mongoOperations.aggregate(aggregation,entityInformation.getCollectionName(), entityInformation.getJavaType());
+        List&amp;lt;T&amp;gt; resultList = new ArrayList&amp;lt;&amp;gt;();
+        Iterator&amp;lt;T&amp;gt; iterator = outputType.iterator();
+        while (iterator.hasNext()) {
+            resultList.add(iterator.next());
+        }
+        return resultList;
+    }
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;4小结-4&#34;&gt;4.小结
+&lt;/h3&gt;&lt;h1 id=&#34;第三章-聚合查询&#34;&gt;第三章 聚合查询
+&lt;/h1&gt;&lt;h2 id=&#34;0-mysql类比&#34;&gt;0. mysql类比
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/image-20211127171238134.png&#34;
+	width=&#34;484&#34;
+	height=&#34;633&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20211127171238134&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;76&#34;
+		data-flex-basis=&#34;183px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;1-聚合管道操作符&#34;&gt;1. 聚合管道操作符
+&lt;/h2&gt;&lt;p&gt;pipeline &amp;ndash; stage种类&lt;/p&gt;
+&lt;p&gt;$count , $group,  $match, $project, $unwind, $limit, $skip, $sort, $sortByCount, $lookup, $out, $addFields&lt;/p&gt;
+&lt;h3 id=&#34;11-count&#34;&gt;1.1 $count
+&lt;/h3&gt;&lt;p&gt;语法&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{ $count: &amp;lt;string&amp;gt; }
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;示例&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;db.collection.aggregate( [
+   { $group: { _id: null, myCount: { $sum: 1 } } }, #这里myCount自定义，相当于mysql的select count(*) as myCount
+   { $project: { _id: 0 } }  # 返回不显示_id字段
+] )
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;12--group&#34;&gt;1.2  $group
+&lt;/h3&gt;&lt;p&gt;指定的表达式对文档进行分组，并将每个不同分组的文档输出到下一个阶段,$group不会输出具体的文档而只是统计信息。&lt;/p&gt;
+&lt;p&gt;accumulator操作符&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/image-20211129134924122.png&#34;
+	width=&#34;913&#34;
+	height=&#34;572&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20211129134924122&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;159&#34;
+		data-flex-basis=&#34;383px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;语法&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{ $group: { _id: &amp;lt;expression&amp;gt;, &amp;lt;field1&amp;gt;: { &amp;lt;accumulator1&amp;gt; : &amp;lt;expression1&amp;gt; }, ... } }
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;_id字段是必填的;但是，可以指定_id值为null来为整个输入文档计算累计值。&lt;/li&gt;
+&lt;li&gt;剩余的计算字段是可选的，并使用&lt;accumulator&gt;运算符进行计算。&lt;/li&gt;
+&lt;li&gt;_id和&lt;accumulator&gt;表达式可以接受任何有效的&lt;a class=&#34;link&#34; href=&#34;https://docs.mongodb.com/manual/meta/aggregation-quick-reference/#aggregation-expressions&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;表达式&lt;/a&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;查询distinct values&lt;/p&gt;
+&lt;h3 id=&#34;13-match&#34;&gt;1.3 $match
+&lt;/h3&gt;&lt;p&gt;语法&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{ $match: { &amp;lt;query&amp;gt; } }
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;在实际应用中尽可能将$match放在管道的前面位置&lt;/strong&gt;。这样有两个好处：&lt;/p&gt;
+&lt;p&gt;一是可以快速将不需要的文档过滤掉，以&lt;strong&gt;减少管道的工作量&lt;/strong&gt;；&lt;/p&gt;
+&lt;p&gt;二是如果再投射和分组之前执行$match，&lt;strong&gt;查询可以使用索引&lt;/strong&gt;。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;不能在$ match查询中使用$作为聚合管道的一部分。&lt;/li&gt;
+&lt;li&gt;要在$match阶段使用$text，$match阶段必须是管道的第一阶段。&lt;/li&gt;
+&lt;li&gt;视图不支持文本搜索。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;14-unwind&#34;&gt;1.4 $unwind
+&lt;/h3&gt;&lt;p&gt;简单说就是 可以将数组拆分为单独的文档。&lt;/p&gt;
+&lt;p&gt;使用语法&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{
+  $unwind:
+    {
+      path: &amp;lt;field path&amp;gt;,
+      includeArrayIndex: &amp;lt;string&amp;gt;,  #可选,一个新字段的名称用于存放元素的数组索引。该名称不能以$开头。
+      preserveNullAndEmptyArrays: &amp;lt;boolean&amp;gt; #可选，default :false，若为true,如果路径为空，缺少或为空数组，则$unwind输出文档
+  } 
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;15-project&#34;&gt;1.5 $project
+&lt;/h3&gt;&lt;p&gt;==可以利用，&lt;code&gt;$project&lt;/code&gt; 对输入文档进行再次投影==&lt;/p&gt;
+&lt;h4 id=&#34;1-语法&#34;&gt;1. 语法
+&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;{ $project: { &amp;lt;specification(s)&amp;gt; } }
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;specifications有以下形式：&lt;/p&gt;
+&lt;p&gt;&lt;field&gt;: &amp;lt;1 or true&amp;gt;  是否包含该字段，field:1/0，表示选择/不选择 field&lt;/p&gt;
+&lt;p&gt;_id: &amp;lt;0 or false&amp;gt;    是否指定_id字段&lt;/p&gt;
+&lt;p&gt;&lt;field&gt;: &lt;expression&gt; 添加新字段或重置现有字段的值。 在版本3.6中更改：MongoDB 3.6添加变量REMOVE。如果表达式的计算结果为$$REMOVE，则该字段将排除在输出中&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4 id=&#34;2-例子&#34;&gt;2. 例子
+&lt;/h4&gt;&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;db.person.insert([
+    {name:{firstName:&#39;Jonathan&#39;, lastName:&#39;Lee&#39;}, age:18, book:{name:&#39;玩转HTML&#39;, price: 88}},
+    {name:{firstName:&#39;Amelie&#39;, lastName:&#39;BNTang&#39;}, age:17, book:{name:&#39;玩转JavaScript&#39;, price: 99}}
+]);
+
+db.person.find();
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/image-20230113105322790.png&#34;
+	width=&#34;611&#34;
+	height=&#34;512&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230113105322790&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;119&#34;
+		data-flex-basis=&#34;286px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;db.person.aggregate([
+    {
+        $project:{
+            _id:0,
+            clientName: &#39;$name.firstName&#39;,
+            clientAge: &#39;$age&#39;
+        }
+    }
+]);
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mongodb/images/image-20230113105505191.png&#34;
+	width=&#34;446&#34;
+	height=&#34;323&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230113105505191&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;138&#34;
+		data-flex-basis=&#34;331px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;16-lookup&#34;&gt;1.6 $lookup
+&lt;/h3&gt;&lt;p&gt;相当于 sql 的 left outer join&lt;/p&gt;
+&lt;h2 id=&#34;2-find详解&#34;&gt;2. find详解
+&lt;/h2&gt;&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;操作符&lt;/th&gt;
+          &lt;th&gt;格式&lt;/th&gt;
+          &lt;th&gt;实例&lt;/th&gt;
+          &lt;th&gt;与 RDBMS where 语句比较&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;等于（=）&lt;/td&gt;
+          &lt;td&gt;{&lt;key&gt; : {&lt;value&gt;}}&lt;/td&gt;
+          &lt;td&gt;db.test.find( {price : 24} )&lt;/td&gt;
+          &lt;td&gt;where price = 24&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;大于（&amp;gt;）&lt;/td&gt;
+          &lt;td&gt;{&lt;key&gt; : {$gt : &lt;value&gt;}}&lt;/td&gt;
+          &lt;td&gt;db.test.find( {price : {$gt : 24}} )&lt;/td&gt;
+          &lt;td&gt;where price &amp;gt; 24&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;小于（&amp;lt;）&lt;/td&gt;
+          &lt;td&gt;{&lt;key&gt; : {$lt : &lt;value&gt;}}&lt;/td&gt;
+          &lt;td&gt;db.test.find( {price : {$lt : 24}} )&lt;/td&gt;
+          &lt;td&gt;where price &amp;lt; 24&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;大于等于（&amp;gt;=）&lt;/td&gt;
+          &lt;td&gt;{&lt;key&gt; : {$gte : &lt;value&gt;}}&lt;/td&gt;
+          &lt;td&gt;db.test.find( {price : {$gte : 24}} )&lt;/td&gt;
+          &lt;td&gt;where price &amp;gt;= 24&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;小于等于（&amp;lt;=）&lt;/td&gt;
+          &lt;td&gt;{&lt;key&gt; : {$lte : &lt;value&gt;}}&lt;/td&gt;
+          &lt;td&gt;db.test.find( {price : {$lte : 24}} )&lt;/td&gt;
+          &lt;td&gt;where price &amp;lt;= 24&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;不等于（!=）&lt;/td&gt;
+          &lt;td&gt;{&lt;key&gt; : {$ne : &lt;value&gt;}}&lt;/td&gt;
+          &lt;td&gt;db.test.find( {price : {$ne : 24}} )&lt;/td&gt;
+          &lt;td&gt;where price != 24&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;与（and）&lt;/td&gt;
+          &lt;td&gt;{key01 : value01, key02 : value02, &amp;hellip;}&lt;/td&gt;
+          &lt;td&gt;db.test.find( {name : &amp;ldquo;《MongoDB 入门教程》&amp;rdquo;, price : 24} )&lt;/td&gt;
+          &lt;td&gt;where name = &amp;ldquo;《MongoDB 入门教程》&amp;rdquo; and price = 24&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;或（or）&lt;/td&gt;
+          &lt;td&gt;{$or : [{key01 : value01}, {key02 : value02}, &amp;hellip;]}&lt;/td&gt;
+          &lt;td&gt;db.test.find( {$or:[{name : &amp;ldquo;《MongoDB 入门教程》&amp;rdquo;},{price : 24}]} )&lt;/td&gt;
+          &lt;td&gt;where name = &amp;ldquo;《MongoDB 入门教程》&amp;rdquo; or price = 24&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;查询逻辑对照表&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;sql&lt;/th&gt;
+          &lt;th&gt;mql&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;a = 1 AND b = 1&lt;/td&gt;
+          &lt;td&gt;{a: 1, b: 1} 或 {$and : [{a:1},{b:1}]}&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;a = 1OR b = 1&lt;/td&gt;
+          &lt;td&gt;{$or: [{a: 1},{b: 1}]}&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;a is NULL&lt;/td&gt;
+          &lt;td&gt;{a: {$exists: false}}&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;a IN (1, 2, 3)&lt;/td&gt;
+          &lt;td&gt;{a: {$in: [1, 2, 3] }}&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;pre&gt;&lt;code&gt; db.test.find({age:null})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;此语句不仅匹配出 age 为 null 的文档，其他不同类型的文档也会被查出。这是因为 null 不仅会匹配某个键值为 null 的文档，而且还会匹配不包含这个键的文档&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;查询有三个元素的数组&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt; db.test.find(
+{
+    tags:{$size:3}
+}
+)
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;limiit()函数与SQL中的作用相同, 用于限制查询结果的个数&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;db.test.find().limit(3)
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Skip() 函数用于略过指定个数的文档，如下语句略过第一个文档，返回后两个：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt; db.test.find(
+{
+    tags:{$size:3}
+}
+)
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;sort() 函数用于对查询结果进行排序，1 是升序，-1 是降序，如下语句可将查询结果升序显示&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;db.test.find().sort({&amp;quot;price&amp;quot; : 1})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;3-游标&#34;&gt;3. 游标
+&lt;/h2&gt;&lt;h2 id=&#34;4-数组操作&#34;&gt;4. 数组操作
+&lt;/h2&gt;&lt;p&gt;$all, $size, $slice, $elemMatch&lt;/p&gt;
+&lt;h3 id=&#34;41-all&#34;&gt;4.1 $all
+&lt;/h3&gt;&lt;p&gt;查找数组中包含指定值的文档&lt;/p&gt;
+&lt;p&gt;语法&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{filed: {
+	$all: [
+		&amp;lt;value1&amp;gt;,
+		&amp;lt;value2&amp;gt;
+	]
+}}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;db.orders.find(
+{
+	&amp;quot;books&amp;quot;:{$all:[&amp;quot;java&amp;quot;, &amp;quot;mongodb&amp;quot;]}
+}
+)
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;42-size&#34;&gt;4.2 $size
+&lt;/h3&gt;&lt;p&gt;查找数组代销等于指定值的文档&lt;/p&gt;
+&lt;p&gt;语法&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{filed: {
+	$size: number
+}}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;43-slice&#34;&gt;4.3 $slice
+&lt;/h3&gt;&lt;p&gt;查询数组中指定返回元素的个数&lt;/p&gt;
+&lt;p&gt;语法&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;db.collect.find(
+{},filed:{$slice:number}
+)
+
+db.collect.find(
+{},
+{field:{
+	$slice:[
+		number1,
+		number2
+	]
+}})
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;number说明&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;为正数表示返回前面指定的值的个数, 例如为1, 返回数组第一个&lt;/p&gt;
+&lt;p&gt;为负数, 例如为-1, 返回数组倒数第一个&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;44-elemmatch&#34;&gt;4.4 $elemMatch
+&lt;/h3&gt;&lt;p&gt;数组元素操作符&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;作用：数组值中至少一个元素满足所有指定的匹配条件
+		语法：  { &amp;lt;field&amp;gt;: { $elemMatch: { &amp;lt;query1&amp;gt;, &amp;lt;query2&amp;gt;, ... } } }
+		说明：  如果查询为单值查询条件，即只有&amp;lt;query1&amp;gt;，则无需指定$elemMatch
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;搜索子对象的多个字段时, 如果使用$elemMatch, 它表示必须是同一个子对象满足多个条件&lt;/p&gt;
+&lt;h2 id=&#34;50-mongodb-compass&#34;&gt;5.0 mongodb compass
+&lt;/h2&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/jamin_liu_90/article/details/88017013&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://blog.csdn.net/jamin_liu_90/article/details/88017013&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;60-聚合性能分析&#34;&gt;6.0 聚合性能分析
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;db.report.explain().aggregate()
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;/* 1 */
+{
+    &amp;quot;stages&amp;quot; : [ 
+        {
+            &amp;quot;$cursor&amp;quot; : {
+                &amp;quot;query&amp;quot; : {
+                    &amp;quot;formId&amp;quot; : 5.0,
+                    &amp;quot;userId&amp;quot; : 1.0
+                },
+                &amp;quot;fields&amp;quot; : {
+                    &amp;quot;answers&amp;quot; : 1,
+                    &amp;quot;formId&amp;quot; : 1,
+                    &amp;quot;userId&amp;quot; : 1,
+                    &amp;quot;_id&amp;quot; : 1
+                },
+                &amp;quot;queryPlanner&amp;quot; : {
+                    &amp;quot;plannerVersion&amp;quot; : 1,
+                    &amp;quot;namespace&amp;quot; : &amp;quot;form.report&amp;quot;,
+                    &amp;quot;indexFilterSet&amp;quot; : false,
+                    &amp;quot;parsedQuery&amp;quot; : {
+                        &amp;quot;$and&amp;quot; : [ 
+                            {
+                                &amp;quot;formId&amp;quot; : {
+                                    &amp;quot;$eq&amp;quot; : 5.0
+                                }
+                            }, 
+                            {
+                                &amp;quot;userId&amp;quot; : {
+                                    &amp;quot;$eq&amp;quot; : 1.0
+                                }
+                            }
+                        ]
+                    },
+                    &amp;quot;queryHash&amp;quot; : &amp;quot;8046B318&amp;quot;,
+                    &amp;quot;planCacheKey&amp;quot; : &amp;quot;8046B318&amp;quot;,
+                    &amp;quot;winningPlan&amp;quot; : {
+                        &amp;quot;stage&amp;quot; : &amp;quot;COLLSCAN&amp;quot;,
+                        // 查询方式，常见的有COLLSCAN/全表扫描、IXSCAN/索引扫描、 FETCH/根据索引去检索文档、SHARD_MERGE/合并分片结果、IDHACK/针对_id进行查询
+                        &amp;quot;filter&amp;quot; : {
+                            &amp;quot;$and&amp;quot; : [ 
+                                {
+                                    &amp;quot;formId&amp;quot; : {
+                                        &amp;quot;$eq&amp;quot; : 5.0
+                                    }
+                                }, 
+                                {
+                                    &amp;quot;userId&amp;quot; : {
+                                        &amp;quot;$eq&amp;quot; : 1.0
+                                    }
+                                }
+                            ]
+                        },
+                        &amp;quot;direction&amp;quot; : &amp;quot;forward&amp;quot;
+                    },
+                    &amp;quot;rejectedPlans&amp;quot; : []
+                }
+            }
+        }, 
+        {
+            &amp;quot;$unwind&amp;quot; : {
+                &amp;quot;path&amp;quot; : &amp;quot;$answers&amp;quot;
+            }
+        }, 
+        {
+            &amp;quot;$match&amp;quot; : {
+                &amp;quot;answers.id&amp;quot; : {
+                    &amp;quot;$eq&amp;quot; : 64.0
+                }
+            }
+        }, 
+        {
+            &amp;quot;$unwind&amp;quot; : {
+                &amp;quot;path&amp;quot; : &amp;quot;$answers.contents&amp;quot;
+            }
+        }, 
+        {
+            &amp;quot;$sort&amp;quot; : {
+                &amp;quot;sortKey&amp;quot; : {
+                    &amp;quot;answers.contents.reportTime&amp;quot; : -1
+                },
+                &amp;quot;limit&amp;quot; : NumberLong(1)
+            }
+        }, 
+        {
+            &amp;quot;$project&amp;quot; : {
+                &amp;quot;_id&amp;quot; : true,
+                &amp;quot;formId&amp;quot; : true,
+                &amp;quot;userId&amp;quot; : true,
+                &amp;quot;answers&amp;quot; : {
+                    &amp;quot;id&amp;quot; : true,
+                    &amp;quot;contents&amp;quot; : {
+                        &amp;quot;reportTime&amp;quot; : true
+                    }
+                }
+            }
+        }
+    ],
+    &amp;quot;ok&amp;quot; : 1.0
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;参数解释&lt;/p&gt;
+&lt;h2 id=&#34;实践&#34;&gt;实践
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;db.report.aggregate([
+{
+    $match:{
+        formId:5,
+        userId:1
+    }
+},
+{
+    $unwind:{
+        path:&amp;quot;$answers&amp;quot;
+    }   
+}, 
+{
+    $match: {
+        &amp;quot;answers.id&amp;quot;: 1
+    }
+},
+{
+    $project: {
+        answers: 1
+    }
+},
+{
+    $unwind: {
+        path: &amp;quot;$answers.contents&amp;quot;
+    }
+}
+])
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;第四章-文档设计&#34;&gt;第四章 文档设计
+&lt;/h1&gt;&lt;p&gt;注意: mongodb 聚合管道中的数据不能超过 16mb&lt;/p&gt;
+&lt;h1 id=&#34;深拷贝&#34;&gt;深拷贝
+&lt;/h1&gt;&lt;pre&gt;&lt;code&gt;public Object deepClone() throws Exception {
+    Object cloneObj = null;
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    ObjectOutputStream obs = new ObjectOutputStream(out);
+    obs.writeObject(this);
+    obs.close();
+
+    ByteArrayInputStream ios = new ByteArrayInputStream(out.toByteArray());
+    ObjectInputStream ois = new ObjectInputStream(ios);
+    cloneObj = ois.readObject();
+    return cloneObj;
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

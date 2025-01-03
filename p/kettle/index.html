@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="1. 介绍 ETL是数据抽取（Extract）、转换（Transform）、装载（Load）的过程。 Kettle是一款国外开源的ETL工具，有两种脚本文件transformation和job，transformation完成针对数据的基础转换，job则完成整个工作流的控制。 Job：一个作业，由不同逻辑功能的entry组件构成，数据从一个entry组件传递到另一个entry组件，并在entry组件中进行相应的处理。 Transformation：完成针对数据的基础转换，即一个数据转换过程。 Entry:实体，即job型组件。用来完成特定功能应用，是job的组成单元、执行单元。 Step:步骤，是Transformation的功能单元，用来完成整个转换过程的一个特定步骤。 Hop:工作流或转换过程的流向指示，从一个组件指向另一个组件，在kettle源工程中有三种hop，无条件流向、判断为真时流向、判断为假时流向。 ==其他ETL工具: Sqoop, DataX, Kettle, Talend 等==\n">
+<title>Kettle</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/kettle/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Kettle">
+<meta property='og:description' content="1. 介绍 ETL是数据抽取（Extract）、转换（Transform）、装载（Load）的过程。 Kettle是一款国外开源的ETL工具，有两种脚本文件transformation和job，transformation完成针对数据的基础转换，job则完成整个工作流的控制。 Job：一个作业，由不同逻辑功能的entry组件构成，数据从一个entry组件传递到另一个entry组件，并在entry组件中进行相应的处理。 Transformation：完成针对数据的基础转换，即一个数据转换过程。 Entry:实体，即job型组件。用来完成特定功能应用，是job的组成单元、执行单元。 Step:步骤，是Transformation的功能单元，用来完成整个转换过程的一个特定步骤。 Hop:工作流或转换过程的流向指示，从一个组件指向另一个组件，在kettle源工程中有三种hop，无条件流向、判断为真时流向、判断为假时流向。 ==其他ETL工具: Sqoop, DataX, Kettle, Talend 等==\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/kettle/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='ETL' /><meta property='article:tag' content='kettle' /><meta property='article:published_time' content='2024-10-03T18:14:03&#43;08:00'/><meta property='article:modified_time' content='2024-10-03T18:14:03&#43;08:00'/>
+<meta name="twitter:title" content="Kettle">
+<meta name="twitter:description" content="1. 介绍 ETL是数据抽取（Extract）、转换（Transform）、装载（Load）的过程。 Kettle是一款国外开源的ETL工具，有两种脚本文件transformation和job，transformation完成针对数据的基础转换，job则完成整个工作流的控制。 Job：一个作业，由不同逻辑功能的entry组件构成，数据从一个entry组件传递到另一个entry组件，并在entry组件中进行相应的处理。 Transformation：完成针对数据的基础转换，即一个数据转换过程。 Entry:实体，即job型组件。用来完成特定功能应用，是job的组成单元、执行单元。 Step:步骤，是Transformation的功能单元，用来完成整个转换过程的一个特定步骤。 Hop:工作流或转换过程的流向指示，从一个组件指向另一个组件，在kettle源工程中有三种hop，无条件流向、判断为真时流向、判断为假时流向。 ==其他ETL工具: Sqoop, DataX, Kettle, Talend 等==\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-介绍">1. 介绍</a></li>
+    <li><a href="#2-体系结构">2. 体系结构</a>
+      <ul>
+        <li><a href="#1-元数据管理引擎">1. 元数据管理引擎</a></li>
+        <li><a href="#2-数据集成引擎">2. 数据集成引擎</a></li>
+        <li><a href="#3-功能模块">3. 功能模块</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-transformation">3. transformation</a>
+      <ul>
+        <li><a href="#1-步骤的特性">1. 步骤的特性</a></li>
+        <li><a href="#2-转换控件">2. 转换控件</a>
+          <ul>
+            <li><a href="#1-列转行">1. ==列转行==</a></li>
+            <li><a href="#2-行转列">2. 行转列</a></li>
+          </ul>
+        </li>
+        <li><a href="#3-流程控件">3. 流程控件</a></li>
+        <li><a href="#4-查询控件">4. 查询控件</a>
+          <ul>
+            <li><a href="#1-数据库查询">1. 数据库查询</a></li>
+            <li><a href="#2-流查询控件">2. 流查询控件</a></li>
+          </ul>
+        </li>
+        <li><a href="#5-连接控件">5. 连接控件</a>
+          <ul>
+            <li><a href="#1-合并记录">1. 合并记录</a></li>
+            <li><a href="#2-记录集连接">2. 记录集连接</a></li>
+          </ul>
+        </li>
+        <li><a href="#6-统计控件">6. 统计控件</a>
+          <ul>
+            <li><a href="#1-分组">1. 分组</a></li>
+          </ul>
+        </li>
+        <li><a href="#7-映射控件">7. 映射控件</a></li>
+        <li><a href="#8-从结果获取记录">8. 从结果获取记录</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-job">4. job</a></li>
+    <li><a href="#5-kettle传递参数">5. kettle传递参数</a>
+      <ul>
+        <li><a href="#1-全局变量">1. 全局变量</a></li>
+        <li><a href="#2-局部变量">2. 局部变量</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-疑问">6. 疑问</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/kettle/" >
+                Kettle
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/kettle/">Kettle</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Oct 03, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 5 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="1-介绍">1. 介绍
+</h1><ul>
+<li>ETL是数据抽取（Extract）、转换（Transform）、装载（Load）的过程。</li>
+<li>Kettle是一款国外开源的ETL工具，有两种脚本文件transformation和job，transformation完成针对数据的基础转换，job则完成整个工作流的控制。</li>
+<li>Job：一个作业，由不同逻辑功能的entry组件构成，数据从一个entry组件传递到另一个entry组件，并在entry组件中进行相应的处理。</li>
+<li>Transformation：完成针对数据的基础转换，即一个数据转换过程。</li>
+<li>Entry:实体，即job型组件。用来完成特定功能应用，是job的组成单元、执行单元。</li>
+<li>Step:步骤，是Transformation的功能单元，用来完成整个转换过程的一个特定步骤。</li>
+<li>Hop:工作流或转换过程的流向指示，从一个组件指向另一个组件，在kettle源工程中有三种hop，无条件流向、判断为真时流向、判断为假时流向。</li>
+</ul>
+<p>==其他ETL工具: Sqoop, DataX, Kettle, Talend 等==</p>
+<h1 id="2-体系结构">2. 体系结构
+</h1><p><img src="/p/kettle/images/image-20240418154411061.png"
+	width="1537"
+	height="786"
+	
+	loading="lazy"
+	
+		alt="image-20240418154411061"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="195"
+		data-flex-basis="469px"
+	
+></p>
+<p>两种工作单元文件</p>
+<ol>
+<li>ktr 文件, kettle transformation: 此文件定义一个转换任务, 包含多个步骤, 这些步骤可以并行或者按顺序执行, 转换的目的是从一个或者多个数据源读取数据, 然后进行一些处理 (比如 清洗, 验证, 转换, 合并), 并将这些数据输出到一个或者多个目标, 是xml 格式</li>
+<li>kjb 文件 （Kettle Job）: 此文件表示一个作业，作业是一种更高级别的工作流控制，可以包含多个转换（ktr）、作业（kjb）、脚本、邮件发送或其他任务等。这些任务按照某种特定的顺序（可以是并行、串行执行，也可以依赖于任务之间的成功与否）进行执行</li>
+</ol>
+<h2 id="1-元数据管理引擎">1. 元数据管理引擎
+</h2><p>元数据管理引擎管理ktr、kjb或者元数据库，插件通过该引擎获取基本信息，主要包括TransMeta、JobMeta和StepMeta三个类。</p>
+<ol>
+<li>TransMeta类，定义了一个转换（对应一个.ktr文件），提供了保存和加载该文件的方法；</li>
+<li>JobMeta类，同样对应于一个工作(对应一个.kjb文件)，提供保存和加载方法；</li>
+<li>StepMeta类，保存的是Step的一些公共信息的类，每个类的具体的元数据将保存在显示了StepMetaInterface的类里面。</li>
+</ol>
+<h2 id="2-数据集成引擎">2. 数据集成引擎
+</h2><p>数据集成引擎包括Step引擎、Job引擎和数据库访问引擎三大部分，主要负责调用插件，并返回相应信息。</p>
+<h2 id="3-功能模块">3. 功能模块
+</h2><p>Kettle的主要包括四大功能模块：</p>
+<ul>
+<li>Chef——工作(job)设计工具 (GUI方式)；</li>
+<li>Kitchen——工作(job)执行器(命令行方式)；</li>
+<li>Spoon——转换(transform)设计工具 (GUI方式)；</li>
+<li>Span——转换(trasform)执行器(命令行方式)。</li>
+</ul>
+<h1 id="3-transformation">3. transformation
+</h1><h2 id="1-步骤的特性">1. 步骤的特性
+</h2><ol>
+<li>步骤需要有名字, 同一个转换范围内唯一</li>
+<li>每个步骤都会读, 写数据行 , 唯一的例外是 &lsquo;生成记录&rsquo; 步骤, 该步骤只写数据</li>
+<li>步骤将数据==写到与之相连的一个或者多个输出跳 hop==,  再传送到 hop另一端的步骤</li>
+<li>大多数的步骤 都可以有多个输出 hop, 一个步骤的数据发送可以被设置==为分发 和 复制==, 分发是轮流接受, 复制是发送到所有的目标步骤</li>
+</ol>
+<p>跳实际上是两个步骤之间的 ==被称为行集的 数据行缓存,== ==行集的大小可以在转换的设置里定义==, 当行集满了, 向</p>
+<p>所有步骤都是并行执行的</p>
+<p>输出: 字段拆分之后, 原字段不会存在数据流里面</p>
+<p>行扁平化: 需要规整的数据, 需要先进行排</p>
+<h2 id="2-转换控件">2. 转换控件
+</h2><h3 id="1-列转行">1. ==列转行==
+</h3><p><img src="/p/kettle/images/image-20240423165918942.png"
+	width="993"
+	height="358"
+	
+	loading="lazy"
+	
+		alt="image-20240423165918942"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="277"
+		data-flex-basis="665px"
+	
+></p>
+<p>需要注意的是: 列转行之前, 数据流必须按照==分组字段==进行排序, 否则数据会错乱</p>
+<p><img src="/p/kettle/images/image-20240423170513520.png"
+	width="750"
+	height="285"
+	
+	loading="lazy"
+	
+		alt="image-20240423170513520"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="263"
+		data-flex-basis="631px"
+	
+></p>
+<h3 id="2-行转列">2. 行转列
+</h3><p><img src="/p/kettle/images/image-20240423173209885.png"
+	width="1052"
+	height="366"
+	
+	loading="lazy"
+	
+		alt="image-20240423173209885"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="287"
+		data-flex-basis="689px"
+	
+></p>
+<h2 id="3-流程控件">3. 流程控件
+</h2><ol>
+<li>switch</li>
+<li>过滤控件</li>
+<li>空操作&ndash;一般作为数据流的终点</li>
+<li>中止操作</li>
+</ol>
+<h2 id="4-查询控件">4. 查询控件
+</h2><h3 id="1-数据库查询">1. 数据库查询
+</h3><p><img src="/p/kettle/images/image-20240424093725426.png"
+	width="1116"
+	height="198"
+	
+	loading="lazy"
+	
+		alt="image-20240424093725426"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="563"
+		data-flex-basis="1352px"
+	
+></p>
+<p><img src="/p/kettle/images/image-20240424094518704.png"
+	width="941"
+	height="848"
+	
+	loading="lazy"
+	
+		alt="image-20240424094518704"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="110"
+		data-flex-basis="266px"
+	
+></p>
+<h3 id="2-流查询控件">2. 流查询控件
+</h3><p>可以把两个表输入, 根据指定条件进行连接</p>
+<p>==lookup step &ndash; 被连接的表 (次表)==</p>
+<p><img src="/p/kettle/images/image-20240424094945360.png"
+	width="1240"
+	height="693"
+	
+	loading="lazy"
+	
+		alt="image-20240424094945360"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="178"
+		data-flex-basis="429px"
+	
+></p>
+<h2 id="5-连接控件">5. 连接控件
+</h2><h3 id="1-合并记录">1. 合并记录
+</h3><p>==用于 新 旧数据的比较==, 必须要相同的结构, 而且需要对数据先进行排序</p>
+<p><img src="/p/kettle/images/image-20240424095305909.png"
+	width="1118"
+	height="571"
+	
+	loading="lazy"
+	
+		alt="image-20240424095305909"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="195"
+		data-flex-basis="469px"
+	
+></p>
+<p><img src="/p/kettle/images/image-20240424095545080.png"
+	width="1177"
+	height="650"
+	
+	loading="lazy"
+	
+		alt="image-20240424095545080"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="181"
+		data-flex-basis="434px"
+	
+></p>
+<h3 id="2-记录集连接">2. 记录集连接
+</h3><p><img src="/p/kettle/images/image-20240424100803698.png"
+	width="1116"
+	height="300"
+	
+	loading="lazy"
+	
+		alt="image-20240424100803698"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="372"
+		data-flex-basis="892px"
+	
+></p>
+<h2 id="6-统计控件">6. 统计控件
+</h2><h3 id="1-分组">1. 分组
+</h3><p>就类似与group by, 但是在分组之前, 最好先进行排序</p>
+<h2 id="7-映射控件">7. 映射控件
+</h2><p>类似于一个方法</p>
+<p><img src="/p/kettle/images/image-20240424104218527.png"
+	width="700"
+	height="259"
+	
+	loading="lazy"
+	
+		alt="image-20240424104218527"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="270"
+		data-flex-basis="648px"
+	
+></p>
+<h2 id="8-从结果获取记录">8. 从结果获取记录
+</h2><p>这个步骤通常与「Execute SQL script」步骤配合使用，==用于执行 SQL 查询并从查询结果中获取记录==。</p>
+<h1 id="4-job">4. job
+</h1><p><img src="/p/kettle/images/image-20240424111001729.png"
+	width="1133"
+	height="576"
+	
+	loading="lazy"
+	
+		alt="image-20240424111001729"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="196"
+		data-flex-basis="472px"
+	
+></p>
+<h1 id="5-kettle传递参数">5. kettle传递参数
+</h1><p>可分为全局参数和局部参数</p>
+<p>一般全局参数只在临时调试中使用, 存储在 kettle.properties 文件中</p>
+<h2 id="1-全局变量">1. 全局变量
+</h2><ol>
+<li>
+<p>全局参数定义是通过当前用户下.kettle文件夹中的kettle.properties文件来定义。</p>
+</li>
+<li>
+<p>定义方式是采用键=值对方式来定，如：start_date=20130101</p>
+</li>
+</ol>
+<p>注：在配置全局变量时需要重启Kettle才会生效。</p>
+<h2 id="2-局部变量">2. 局部变量
+</h2><p>局部参数 在kettle 流程的开发中使用较多, 主要的传递方式 为 ==“设置变量/获取变量”，“转换命名参数”，“常量引用”三种==,  <strong>参数（变量）在transformation 之间传递，参数（变量）传递时，每次只能传递一个变量。</strong></p>
+<ol>
+<li>在ktr转换中设置变量</li>
+</ol>
+<p>在转换中通过设置变量组件实现变量的设置，变量在当前转换中设置，不能在当前转换中使用，必须在下一转换中使用，在下一转换中通过获取变量组件实现上一转换中变量的获取使用。</p>
+<p>使用方式：使用获取变量组件获取后直接使用</p>
+<ol start="2">
+<li>在job作业中设置变量</li>
+</ol>
+<p>在job作业中也可以设置变量，在作业中通过==设置变量设置完成后，在下一转换中可以使用获取变量组件获取或直接在使用时通过${变量名}使用==（不需要使用获取变量组件）。</p>
+<p>使用方式：使用获取==变量组件获取后直接使用 或者直接在需要使用时使用${变量名}==</p>
+<ol start="3">
+<li>常量传递</li>
+</ol>
+<p>在任意组件都可以定义，定义后使用？获取使用。</p>
+<p>常量定义的顺序即？对应的顺序</p>
+<h1 id="6-疑问">6. 疑问
+</h1><ul>
+<li>kettle 中的日志打印, 在使用 代码调用的时候可以单独进行配置吗?
+<ul>
+<li>不需要, 有日志组件可以使用</li>
+</ul>
+</li>
+<li>如何配置本地kettle 模板, 并使用etl工程完成数据装载?</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/etl/">ETL</a>
+        
+            <a href="/tags/kettle/">Kettle</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

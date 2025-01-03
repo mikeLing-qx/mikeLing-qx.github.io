@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="1. 核心组件 1. Bean 组件 Spring的org.springframework.beans 包下的所有类主要解决了三件事：\nBean的定义 ==BeanDefinition==\nBean的创建 ==反射创建bean对象 . user{id=&quot;&quot;, name=&quot;&quot;, 还未赋值}==\n">
+<title>Spring源码</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/spring%E6%BA%90%E7%A0%81/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Spring源码">
+<meta property='og:description' content="1. 核心组件 1. Bean 组件 Spring的org.springframework.beans 包下的所有类主要解决了三件事：\nBean的定义 ==BeanDefinition==\nBean的创建 ==反射创建bean对象 . user{id=&quot;&quot;, name=&quot;&quot;, 还未赋值}==\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/spring%E6%BA%90%E7%A0%81/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Spring' /><meta property='article:published_time' content='2023-11-03T11:21:43&#43;08:00'/><meta property='article:modified_time' content='2023-11-03T11:21:43&#43;08:00'/>
+<meta name="twitter:title" content="Spring源码">
+<meta name="twitter:description" content="1. 核心组件 1. Bean 组件 Spring的org.springframework.beans 包下的所有类主要解决了三件事：\nBean的定义 ==BeanDefinition==\nBean的创建 ==反射创建bean对象 . user{id=&quot;&quot;, name=&quot;&quot;, 还未赋值}==\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-核心组件">1. 核心组件</a>
+      <ul>
+        <li><a href="#1-bean-组件">1. Bean 组件</a>
+          <ul>
+            <li><a href="#11-beandefinition">1.1 BeanDefinition</a></li>
+          </ul>
+        </li>
+        <li><a href="#2-context-组件">2. Context 组件</a>
+          <ul>
+            <li><a href="#21-后置处理器">2.1 后置处理器</a>
+              <ul>
+                <li><a href="#1-beanfactory-后置处理器-beanfactorypostprocessor">1. BeanFactory 后置处理器: BeanFactoryPostProcessor</a></li>
+                <li><a href="#2-bean-后置处理器-beanpostprocessor">2. Bean 后置处理器: BeanPostProcessor</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#2-ioc-流程">2. IOC 流程</a></li>
+    <li><a href="#3-bean的生命周期">3. Bean的生命周期</a></li>
+    <li><a href="#4-源码">4. 源码</a>
+      <ul>
+        <li><a href="#1-如何创建的beanfactory-真实类型">1. 如何创建的BeanFactory? (真实类型)</a></li>
+        <li><a href="#2-如何解析的配置文件-封装beandefinition">2. 如何解析的配置文件, 封装BeanDefinition</a></li>
+        <li><a href="#3-实例化过程">3. 实例化过程</a></li>
+        <li><a href="#4-factorybean">4. Factorybean</a>
+          <ul>
+            <li><a href="#1-用法">1. 用法</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#5-spring事件驱动">5. Spring事件驱动</a></li>
+    <li><a href="#6-spring-循环依赖">6. Spring 循环依赖</a>
+      <ul>
+        <li><a href="#1-三级缓存">1. 三级缓存</a></li>
+        <li><a href="#2-解决循环依赖的流程图">2. 解决循环依赖的流程图</a></li>
+        <li><a href="#3-源码">3. 源码</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-spring-aop">7. Spring Aop</a>
+      <ul>
+        <li><a href="#1-jdk-代理和-cglib-代理">1. Jdk 代理和 Cglib 代理</a></li>
+        <li><a href="#2-aop">2. Aop</a></li>
+        <li><a href="#3-责任链模式----aop中的体现">3. 责任链模式 &ndash; AOP中的体现</a></li>
+        <li><a href="#4-流程总结">4. 流程总结</a></li>
+      </ul>
+    </li>
+    <li><a href="#8-spring-mvc-流程">8. Spring mvc 流程</a>
+      <ul>
+        <li><a href="#1-servlet">1. Servlet</a></li>
+        <li><a href="#2-父子容器">2. 父子容器</a></li>
+      </ul>
+    </li>
+    <li><a href="#问题">问题</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/spring/" >
+                Spring
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/spring%E6%BA%90%E7%A0%81/">Spring源码</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Nov 03, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 14 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="1-核心组件">1. 核心组件
+</h1><h2 id="1-bean-组件">1. Bean 组件
+</h2><p>Spring的<strong>org.springframework.beans</strong> 包下的所有类主要解决了三件事：</p>
+<ol>
+<li>
+<p>Bean的定义 ==BeanDefinition==</p>
+</li>
+<li>
+<p>Bean的创建  ==反射创建bean对象 . user{id=&quot;&quot;, name=&quot;&quot;, 还未赋值}==</p>
+</li>
+<li>
+<p>Bean的解析  赋值和初始化</p>
+</li>
+</ol>
+<h3 id="11-beandefinition">1.1 BeanDefinition
+</h3><pre><code class="language-java">public class DefaultListableBeanFactory {
+
+    // 我们的bean 信息, 就被封装成了beanDefinition, 保存到这个map 中
+	private final Map&lt;String, BeanDefinition&gt; beanDefinitionMap;
+
+}
+</code></pre>
+<h2 id="2-context-组件">2. Context 组件
+</h2><p>Context在Spring的org.springframework.context包下</p>
+<p>Context模块构建于Core和Beans模块基础之上</p>
+<p>ApplicationContext是Context的顶级父类</p>
+<p><img src="/p/spring%E6%BA%90%E7%A0%81/images/image-20220301145305876.png"
+	width="229"
+	height="35"
+	
+	loading="lazy"
+	
+		alt="image-20220301145305876"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="654"
+		data-flex-basis="1570px"
+	
+></p>
+<p>上面的是懒加载的, 不会创建bean</p>
+<p>下面的 会创建所有非懒加载的bean</p>
+<ol>
+<li>BeanFactory 和 ApplicationContext 的区别</li>
+</ol>
+<blockquote>
+<p>ApplicationContext 继承自 BeanFactory</p>
+<p>==Beanfactory:==  ==容器对象==, 提供了对bean的==基本操作==, 读和写, 创建==管理bean的生命周期==, 工厂模式
+==ApplicationContext:==  ==具备BeanFactory 的功能, 还有一些拓展==; 国际化操作, 后置处理器的创建</p>
+</blockquote>
+<h3 id="21-后置处理器">2.1 后置处理器
+</h3><p>后置处理器是一种拓展机制, 贯穿Spring bean的生命周期</p>
+<p>分为两种</p>
+<h4 id="1-beanfactory-后置处理器-beanfactorypostprocessor">1. BeanFactory 后置处理器: BeanFactoryPostProcessor
+</h4><p>实现改接口, 可以再spring 的==bean 创建之前==, ==修改bean的定义属性, 修改BeanDefinition==</p>
+<p><img src="/p/spring%E6%BA%90%E7%A0%81/images/image-20220301145838529.png"
+	width="1126"
+	height="412"
+	
+	loading="lazy"
+	
+		alt="image-20220301145838529"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="273"
+		data-flex-basis="655px"
+	
+></p>
+<pre><code class="language-java">public interface BeanFactoryPostProcessor { 
+/** 该接口只有一个方法postProcessBeanFactory，
+	方法参数是 ConfigurableListableBeanFactory，
+	通过该 参数，可以获取BeanDefinition 
+*/
+	void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException; 
+}
+</code></pre>
+<p>场景</p>
+<p>spring 配置文件</p>
+<p>driverClassName = &ldquo;${jdbc.Driver}&rdquo;  在 BeanDefinition 中 是原样读到的数据, 需要 把 它改成配置文件中的数据, 就可以通过 后置处理器,  BeanPostProcessor 去完成</p>
+<h4 id="2-bean-后置处理器-beanpostprocessor">2. Bean 后置处理器: BeanPostProcessor
+</h4><p>BeanPostProcessor是Spring IOC容器给我们提供的一个扩展接口</p>
+<p>实现该接口，可以在spring容器==实例化bean之后== (此时是没有设置值的, 或者是默认值)，在执行==bean的初始化方法前后，添加一些处理逻辑==</p>
+<p><img src="/p/spring%E6%BA%90%E7%A0%81/images/image-20220301151115416.png"
+	width="1158"
+	height="401"
+	
+	loading="lazy"
+	
+		alt="image-20220301151115416"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="288"
+		data-flex-basis="693px"
+	
+></p>
+<pre><code class="language-java">public interface BeanPostProcessor { 
+	//bean初始化方法调用前被调用 
+	Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException; 
+	//bean初始化方法调用后被调用 
+	Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException; 
+}
+</code></pre>
+<p>==spring aop 代理对象就是 在after 方法进行修改==</p>
+<p>可以实现Ordered, PriorityOrdered 接口进行执行排序</p>
+<p>如果没有实现会按照在 xml 整配置的顺序执行</p>
+<h1 id="2-ioc-流程">2. IOC 流程
+</h1><p>IOC容器&ndash;&gt; DefaultListableBeanFactory  map集合(单例池)</p>
+<p>FactoryBean 创建复杂的bean对象的时候使用, getObejct 方法</p>
+<p><img src="/p/spring%E6%BA%90%E7%A0%81/images/image-20220301164925221.png"
+	width="1147"
+	height="547"
+	
+	loading="lazy"
+	
+		alt="image-20220301164925221"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="209"
+		data-flex-basis="503px"
+	
+></p>
+<pre><code class="language-xml">循环依赖
+&lt;bean id=&quot;a&quot; class=&quot;a&quot;&gt; 
+    init-method = &quot;init&quot; 初始化方法
+	&lt;property name = &quot;b&quot; ref=&quot;b&quot;&gt;
+     
+&lt;/bean&gt;
+
+&lt;bean id=&quot;b&quot; class=&quot;b&quot;&gt;
+	&lt;property name = &quot;a&quot; ref =&quot;a&quot;&gt;
+&lt;/bean&gt;
+</code></pre>
+<p>==流程总结==</p>
+<ol>
+<li>
+<p>创建BeanFactory ==容器对象== IOC容器</p>
+</li>
+<li>
+<p>创建BeanDefinitionReader, 加载解析Bean定义信息, 封装BeanDefinition</p>
+</li>
+<li>
+<p>执行BeanfactoryPostProcessor</p>
+</li>
+<li>
+<p>通过反射实例化对象</p>
+<p>==spring事件驱动准备工作==: 创建 BeanPostProcessor, 创建多播器, 监听器</p>
+</li>
+<li>
+<p>初始化操作</p>
+</li>
+<li>
+<p>完整对象, 添加到容器中</p>
+</li>
+</ol>
+<h1 id="3-bean的生命周期">3. Bean的生命周期
+</h1><p>Bean 生命周期的整个执行过程描述如下。
+1）根据配置情况调用 Bean 构造方法或工厂方法实例化 Bean。</p>
+<p>2）利用依赖注入完成 Bean 中所有属性值的配置注入。</p>
+<p>3）如果 Bean 实现了 BeanNameAware 接口，则 Spring 调用 Bean 的 setBeanName() 方法传入当前Bean 的 id 值。</p>
+<p>4）如果 Bean 实现了 BeanFactoryAware 接口，则 Spring 调用 setBeanFactory() 方法传入当前工厂实例的引用。</p>
+<p>5）如果 Bean 实现了 ApplicationContextAware 接口，则 Spring 调用setApplicationContext() 方法传入当前 ApplicationContext 实例的引用。</p>
+<p>6）如果 BeanPostProcessor 和 Bean 关联，则 Spring 将调用该接口的预初始化方法
+postProcessBeforeInitialzation() 对 Bean 进行加工操作</p>
+<p>7）如果 Bean 实现了 InitializingBean 接口，则 Spring 将调用 afterPropertiesSet() 方法。</p>
+<p>8）如果在配置文件中通过 init-method 属性==指定了初始化方法，则调用该初始化方法==。</p>
+<p>9）如果 BeanPostProcessor 和 Bean 关联，则 Spring 将调用该接口的初始化方法
+postProcessAfterInitialization()。此时，Bean 已经可以被应用系统使用了。</p>
+<p>10）如果在 中指定了该 Bean 的作用范围为 scope=&ldquo;singleton&rdquo;，则将该 Bean 放入 Spring IoC 的缓存池中，将触发 Spring 对该 Bean 的生命周期管理；如果在 中指定了该 Bean 的作用范围为scope=&ldquo;prototype&rdquo;，则将该 Bean 交给调用者，调用者管理该 Bean 的生命周期，Spring 不再管理该Bean。</p>
+<p>11）如果 Bean 实现了 DisposableBean 接口，则 Spring 会调用 destory() 方法将 Spring 中的 Bean 销毁；如果在配置文件中通过 destory-method 属性指定了 Bean 的销毁方法，则 Spring 将调用该方法。</p>
+<h1 id="4-源码">4. 源码
+</h1><h2 id="1-如何创建的beanfactory-真实类型">1. 如何创建的BeanFactory? (真实类型)
+</h2><p>obtainFreshBeanFactory</p>
+<blockquote>
+<ol>
+<li>如果存在旧的BeanFactory 就销毁</li>
+<li>创建新的BeanFactory (DefauListableBeanFactory)</li>
+<li>解析xml/ 加载Bean定义, 注册Bean定义到beanFactory (不初始化)</li>
+<li>返回新的Beanfactory</li>
+</ol>
+</blockquote>
+<h2 id="2-如何解析的配置文件-封装beandefinition">2. 如何解析的配置文件, 封装BeanDefinition
+</h2><ol>
+<li>解析bean 标签
+<ul>
+<li>再解析子标签</li>
+</ul>
+</li>
+<li>最后会注册到 BeanFactory 的 BeanDefinitionMap 中</li>
+</ol>
+<h2 id="3-实例化过程">3. 实例化过程
+</h2><p>DefaultListableBeanFactory 中的</p>
+<p>getBean方法 &mdash; doGetBean(从缓存中拿)&ndash;createBean &mdash; doCreateBean(会执行一系列的流程 BeanPostProcesser)</p>
+<h2 id="4-factorybean">4. Factorybean
+</h2><p>参考资料: <a class="link" href="https://juejin.cn/post/6844903954615107597"  target="_blank" rel="noopener"
+    >https://juejin.cn/post/6844903954615107597</a></p>
+<p>FactoryBean和BeanFactory虽然名字很像，但是这两者是完全不同的两个概念</p>
+<blockquote>
+<p>beanFactory &mdash; spring IOC 容器</p>
+<p>Factorybean 是一个特殊的bean</p>
+</blockquote>
+<h3 id="1-用法">1. 用法
+</h3><p>FactoryBean的特殊之处在于它可以==向容器中注册两个Bean==，一个是==它本身==，一个是==FactoryBean.getObject()方法返回值所代表的Bean==。</p>
+<p>代码示例</p>
+<pre><code>public void preInstantiateSingletons() throws BeansException {
+	// 从容器中获取到所有的beanName
+	List&lt;String&gt; beanNames = new ArrayList&lt;&gt;(this.beanDefinitionNames);
+	for (String beanName : beanNames) {
+		RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
+		if (!bd.isAbstract() &amp;&amp; bd.isSingleton() &amp;&amp; !bd.isLazyInit()) {
+			// 在此处会根据beanName判断bean是不是一个FactoryBean，实现了FactoryBean接口的bean，会返回true
+			// 此时当beanName为customerFactoryBean时，会返回true，会进入到if语句中
+			if (isFactoryBean(beanName)) {
+				// 然后通过getBean()方法去获取或者创建单例对象
+				// 注意：在此处为beanName拼接了一个前缀：FACTORY_BEAN_PREFIX
+				// FACTORY_BEAN_PREFIX是一个常量字符串，即：&amp;
+				// 所以在此时容器启动阶段，对于customerFactoryBean，应该是：getBean(&quot;&amp;customerFactoryBean&quot;)
+				Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
+				// 下面这一段逻辑，是判断是否需要在容器启动阶段，就去实例化getObject()返回的对象，即是否调用FactoryBean的getObject()方法
+				if (bean instanceof FactoryBean) {
+					final FactoryBean&lt;?&gt; factory = (FactoryBean&lt;?&gt;) bean;
+					boolean isEagerInit;
+					if (System.getSecurityManager() != null &amp;&amp; factory instanceof SmartFactoryBean) {
+						isEagerInit = AccessController.doPrivileged((PrivilegedAction&lt;Boolean&gt;)
+										((SmartFactoryBean&lt;?&gt;) factory)::isEagerInit,
+								getAccessControlContext());
+					}
+					else {
+						isEagerInit = (factory instanceof SmartFactoryBean &amp;&amp;
+								((SmartFactoryBean&lt;?&gt;) factory).isEagerInit());
+					}
+					if (isEagerInit) {
+						getBean(beanName);
+					}
+				}
+			}
+		}
+	}
+}
+
+</code></pre>
+<p>在容器启动阶段，会先通过==getBean()方法来创建CustomerFactoryBean的实例对象==。如果实现了==SmartFactoryBean接口，且isEagerInit()方法返回的是true==，那么在容器==启动阶段==，就会调用getObject()方法，向容器中注册getObject()方法返回值的对象。==否则，只有当第一次获取getObject()返回值的对象时，才会去回调getObject()方法==。</p>
+<p>在==getBean()==中会调用到==doGetBean()==方法，下面为doGetBean()精简后的源码。从源码中我们发现，最终都会调用==getObjectForBeanInstance()==方法</p>
+<pre><code>protected Object getObjectForBeanInstance(
+		Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
+
+	if (BeanFactoryUtils.isFactoryDereference(name)) {
+		if (beanInstance instanceof NullBean) {
+			return beanInstance;
+		}
+		if (!(beanInstance instanceof FactoryBean)) {
+			throw new BeanIsNotAFactoryException(beanName, beanInstance.getClass());
+		}
+	}
+	// 如果bean不是factoryBean，那么会直接返回Bean
+	// 或者bean是factoryBean但name是以&amp;特殊符号开头的,此时表示要获取FactoryBean的原生对象。
+	// 例如：如果name = &amp;customerFactoryBean，那么此时会返回CustomerFactoryBean类型的bean
+	if (!(beanInstance instanceof FactoryBean) || BeanFactoryUtils.isFactoryDereference(name)) {
+		return beanInstance;
+	}
+	// 如果是FactoryBean，那么先从cache中获取，如果缓存不存在，则会去调用FactoryBean的getObject()方法。
+	Object object = null;
+	if (mbd == null) {
+		// 从缓存中获取。什么时候放入缓存的呢？在第一次调用getObject()方法时，会将返回值放入到缓存。
+		object = getCachedObjectForFactoryBean(beanName);
+	}
+	if (object == null) {
+		FactoryBean&lt;?&gt; factory = (FactoryBean&lt;?&gt;) beanInstance;
+		if (mbd == null &amp;&amp; containsBeanDefinition(beanName)) {
+			mbd = getMergedLocalBeanDefinition(beanName);
+		}
+		boolean synthetic = (mbd != null &amp;&amp; mbd.isSynthetic());
+		// 在getObjectFromFactoryBean()方法中最终会调用到getObject()方法
+		object = getObjectFromFactoryBean(factory, beanName, !synthetic);
+	}
+	return object;
+}
+
+</code></pre>
+<p>==FactoryBean的创建流程==</p>
+<img src="https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/9/27/16d72cab4c659a1b~tplv-t2oaga2asx-zoom-in-crop-mark:1304:0:0:0.awebp" alt="FactoryBean的创建流程" style="zoom:50%;" />
+<h1 id="5-spring事件驱动">5. Spring事件驱动
+</h1><p>基于观察者模式基础上改良</p>
+<p>ApplicationEventPublisher</p>
+<h1 id="6-spring-循环依赖">6. Spring 循环依赖
+</h1><p>循环依赖：一个或多个对象实例之间存在直接或间接的依赖关系，这种依赖关系构成了构成一个环形调用(闭环)</p>
+<p>Spring 循环依赖场景</p>
+<ul>
+<li>构造器的循环依赖</li>
+<li>field 属性的循环依赖</li>
+</ul>
+<p>==构造器引起的循环依赖 不能解决==</p>
+<p>单例bean的 Setter 注入产生的循环依赖 &ndash;可以解决</p>
+<p>==<strong>Spring怎么解决循环依赖</strong>==</p>
+<p>Spring的循环依赖的理论依据其实是基于==Java的引用传递==，当我们==获取到对象的引用时，对象的field或者属性是可以延后设置==的(但是构造器必须是在获取引用之前)。</p>
+<h2 id="1-三级缓存">1. 三级缓存
+</h2><pre><code class="language-java">/** Cache of singleton objects: bean name --&gt; bean instance */ 
+
+	private final Map&lt;String, Object&gt; singletonObjects = new ConcurrentHashMap&lt;String, Object&gt;(256); 
+
+/** Cache of early singleton objects: bean name --&gt; bean instance */ 
+	private final Map&lt;String, Object&gt; earlySingletonObjects = new HashMap&lt;String, Object&gt;(16); 
+
+/** Cache of singleton factories: bean name --&gt; ObjectFactory */
+	private final Map&lt;String, ObjectFactory&lt;?&gt;&gt; singletonFactories = new HashMap&lt;String, ObjectFactory&lt;?&gt;&gt;(16);
+</code></pre>
+<p><img src="/p/spring%E6%BA%90%E7%A0%81/images/image-20220302174426919.png"
+	width="1146"
+	height="413"
+	
+	loading="lazy"
+	
+		alt="image-20220302174426919"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="277"
+		data-flex-basis="665px"
+	
+></p>
+<ul>
+<li>
+<p>一级缓存: spring的容器, 也就是存放完整的bean实例, 已经实例化和初始化好的实例</p>
+</li>
+<li>
+<p>二级缓存: bean是否被AOP 切面代理</p>
+<ul>
+<li>否: 保存半成品的bean 实例, 属性未填充</li>
+<li>是: 保存的是代理的bean 实例beanProxy, 目标bean 还是半成品的</li>
+</ul>
+</li>
+<li>
+<p>三件缓存: 存放的是 ObjectFactory, 传入的是一个匿名内部类, <code>objectFactory.getObject</code> 最终调用的是==getEarlyBeanReference方法==</p>
+<ul>
+<li>如果bean 被代理,  getEarlyBeanReference则返回bean的代理对象, 如果bean未被代理, 则返回原bean 实例</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-解决循环依赖的流程图">2. 解决循环依赖的流程图
+</h2><p><img src="/p/spring%E6%BA%90%E7%A0%81/images/image-20220302180152075.png"
+	width="486"
+	height="228"
+	
+	loading="lazy"
+	
+		alt="image-20220302180152075"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="213"
+		data-flex-basis="511px"
+	
+></p>
+<p><img src="/p/spring%E6%BA%90%E7%A0%81/images/%E5%BE%AA%E7%8E%AF%E4%BE%9D%E8%B5%96%E8%A7%A3%E5%86%B3.png"
+	width="2747"
+	height="1185"
+	
+	loading="lazy"
+	
+		alt="循环依赖解决"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="231"
+		data-flex-basis="556px"
+	
+></p>
+<ol>
+<li>只使用一级缓存能不能解决循环依赖?</li>
+</ol>
+<p>半成品, 属性注入未完成</p>
+<ol start="2">
+<li>不使用二级缓存能否解决循环依赖?</li>
+</ol>
+<blockquote>
+<p>可以,但是在没有AOP的情况下, 可以直接使用 一级缓存和三级缓存解决循环依赖, 但是有AOP的话则需要二级缓存来保证, 获取到的代理对象是同一个</p>
+</blockquote>
+<ol start="3">
+<li>构造注入为什么不能解决循环依赖?</li>
+</ol>
+<p>解决循环依赖的本质: 将实例化对象和 初始化对象是 分割来的, 实例化不了</p>
+<p>==<strong>我们先用构造函数创建一个不完整 的 bean</strong>== 实例，从这句话</p>
+<p>可以看出，构造器循环依赖是无法解决的，因为当构造器出现循环依赖，我们连 “不完整” 的 bean 实例</p>
+<p>都构建不出来。</p>
+<h2 id="3-源码">3. 源码
+</h2><p>第一步: getBean</p>
+<p>使用getBean(java.lang.Class)从IOC中获取bean信息，实际上在IOC容器通过扫描包或加载XML后也会循环调用getBean(&hellip;)进行Bean的首轮实例化。</p>
+<p>第二步: ==doGetBean大致步骤==：</p>
+<p>1.尝试根据beanName从缓存中获取获取bean对象</p>
+<p>2.若获取到缓存对象则执行getObjectForBeanInstance(&hellip;)后返回bean信息</p>
+<p>3.若没有获取到缓存对象(首次创建)，则根据bean的作用域类型来采取不同方式创建bean(这里默认为单例模式)，然后再执行getObjectForBeanInstance(&hellip;)后返回bean信息</p>
+<h1 id="7-spring-aop">7. Spring Aop
+</h1><p>概述</p>
+<ol>
+<li>
+<p>AOP: 面向切面编程</p>
+</li>
+<li>
+<p>用途: 日志管理, 事务管理</p>
+</li>
+<li>
+<p>实现: 利用==代理模式==, 通过代理对象对被代理的对象增加功能</p>
+<p>所以, 关键在于AOP 框架自动创建AOP代理对象, 代理模式分为静态代理和动态代理</p>
+</li>
+<li>
+<p>框架</p>
+<ul>
+<li>==AspectJ 使用静态代理==, 编译时增强, 在编译器生成代理对象</li>
+<li>==SpringAop 使用动态代理==, 运行时增强, 在运行时, 动态生成代理对象</li>
+</ul>
+</li>
+</ol>
+<p>实现机制:</p>
+<p>​		Spring AOP 底层实现机制目前有两种：JDK 动态代理、CGLIB 动态字节码生成。在阅读源码前对这两种机制的使用有个认识，有利于更好的理解源码。</p>
+<h2 id="1-jdk-代理和-cglib-代理">1. Jdk 代理和 Cglib 代理
+</h2><h2 id="2-aop">2. Aop
+</h2><blockquote>
+<ol>
+<li>哪个后置处理器 AnnotationAeareAspectAutoProxyCreator</li>
+<li>代理对象创建的细节 BeanpostProcess的after方法中</li>
+<li>AOP 中责任链</li>
+</ol>
+</blockquote>
+<p>&lt;aop: aspecj-autoproxy  proxy-target-class = true/&gt;  配置了AOP才生效;</p>
+<p><strong>会往容器中加一个BeanPostProcessor</strong> ==proxy-target-class = true== 则 spring生成代理对象将强制使用cgli;  false 就是接口使用jdk, 普通类使用cglib</p>
+<h2 id="3-责任链模式----aop中的体现">3. 责任链模式 &ndash; AOP中的体现
+</h2><p>==一个对象被多个拦截器拦截处理时, 这样干的设计模式就是为责任链模式==</p>
+<h2 id="4-流程总结">4. 流程总结
+</h2><p><strong>源码剖析创建</strong> AOP <strong>代理</strong></p>
+<p><strong>AnnotationAwareAspectJAutoProxyCreator****类图</strong></p>
+<p>AnnotationAwareAspectJAutoProxyCreator 实现了几个重要的扩展接口（可能是在父类中实现）：</p>
+<p>1）实现了 BeanPostProcessor 接口：实现了 postProcessAfterInitialization 方法。</p>
+<p>2）实现了 InstantiationAwareBeanPostProcessor 接口：实现了postProcessBeforeInstantiation 方法。</p>
+<p>3）实现了 SmartInstantiationAwareBeanPostProcessor 接口：实现了 predictBeanType 方法、getEarlyBeanReference 方法。</p>
+<p>4）实现了 BeanFactoryAware 接口，实现了 setBeanFactory 方法。对于 AOP 来说，postProcessAfterInitialization 是我们重点分析的内容，因为在该方法中，会对 bean</p>
+<p>进行代理，该方法由父类 AbstractAutoProxyCreator 实现。</p>
+<h1 id="8-spring-mvc-流程">8. Spring mvc 流程
+</h1><p>问题1: Springmvc 和 Spring混合使用的时候, 会创建几个容器 (父子容器)</p>
+<p>问题2: DispatcherServlet 初始化过程中做了什么?</p>
+<blockquote>
+<p>init() &ndash;&gt; 创建子容器, setParent (根容器), 解析springmvc.xml, 生成了一些bean 对象: 保存地址和handlerMethod 的映射关系 mappingLookUp (mapping, handleMethod) ; urlLookUp</p>
+<p>例子:  (&quot;[GET /test/user]&quot; ,  getUser)</p>
+<p>初始化9大组件 (进行一些赋值操作)</p>
+</blockquote>
+<p><img src="/p/spring%E6%BA%90%E7%A0%81/images/image-20220307171431574.png"
+	width="1011"
+	height="296"
+	
+	loading="lazy"
+	
+		alt="image-20220307171431574"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="341"
+		data-flex-basis="819px"
+	
+></p>
+<p>问题3: 请求的执行流程是怎样的</p>
+<ul>
+<li>怎么根据请求url 找到controller 里面的方法
+<ul>
+<li>获取请求地址的uri, 根据uri 获取初始化过程中保存的映射关系(RequestMapiingInfo),  根据RequestMappingInfo 获取handleMethod</li>
+</ul>
+</li>
+<li>怎么设置的参数
+<ul>
+<li>根据method 里面的参数名称, 通过reuest获取到参数值Object[], 反射调用目标方法handler, invoke(bean, args[]);</li>
+</ul>
+</li>
+<li>怎么向model 设置值
+<ul>
+<li>底层就是像Request域中设置的值, request.setAttribute()</li>
+</ul>
+</li>
+<li>怎么完成视图渲染和跳转
+<ul>
+<li>通过视图解析器 解析逻辑视图 (拼接前缀后缀), 进行请求转发</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>程序的入口:</p>
+<p>FrameworkServlet#service 方法</p>
+<p>doService 关键方法</p>
+</blockquote>
+<p><img src="/p/spring%E6%BA%90%E7%A0%81/images/image-20220307180852593.png"
+	width="868"
+	height="370"
+	
+	loading="lazy"
+	
+		alt="image-20220307180852593"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="234"
+		data-flex-basis="563px"
+	
+></p>
+<h2 id="1-servlet">1. Servlet
+</h2><ol>
+<li>生命周期: 默认情况下: 单实例 多线程的, 客户端发送一个请求到达客户端的时候才会进行创建</li>
+</ol>
+<pre><code>&lt;load-on-startup&gt;4&lt;/&gt; 配置了该标签的servlet 将在服务器启动时完成实例化及初始化操作
+</code></pre>
+<pre><code class="language-java">public interface Servlet { 
+	
+    // 只会执行一次
+    public void init(ServletConfig config) throws ServletException; 
+		
+    public ServletConfig getServletConfig(); // init-param --&gt; 指定springmvc.xml 配置文件
+		
+    // 处理业务逻辑
+    public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException; 
+		
+    public String getServletInfo(); 
+    
+    public void destroy();  // 销毁
+
+}
+</code></pre>
+<p>invocableMethod</p>
+<blockquote>
+<p>returnValueHandlers 返回值处理器</p>
+<p>resolvers</p>
+<ul>
+<li>​	argumentResolvers  参数处理器</li>
+</ul>
+</blockquote>
+<h2 id="2-父子容器">2. 父子容器
+</h2><h1 id="问题">问题
+</h1><ol>
+<li>BeanFactory 和 ApplicationContext 的区别</li>
+</ol>
+<pre><code>ApplicationContext 继承自 BeanFactory
+
+Beanfactory: 提供了对bean的基本操作, 读和写
+ApplicationContext:  具备BeanFactory 的功能, 还有一些拓展; 国际化操作, 后置处理器的创建
+</code></pre>
+<ol start="2">
+<li>BeanFactory 后置处理器: BeanFactoryPostProcessor</li>
+</ol>
+<p>实现改接口, 可以再spring 的 bean 创建之前, 修改bean的定义属性</p>
+<ol start="3">
+<li>
+<p>bean的生命周期</p>
+</li>
+<li>
+<p>循环依赖怎么解决</p>
+</li>
+<li>
+<p>代理对象 Bean 的后置处理器</p>
+</li>
+<li>
+<p>allowBeanDefinitionOverriding = true 是否允许bean覆盖</p>
+<ul>
+<li>同一个配置文件会报错</li>
+<li>不同配置文件, 后加载的bean会把前面加载的bean给覆盖</li>
+</ul>
+</li>
+<li>
+<p>AllowCircleRefer 是否允许循环引用</p>
+</li>
+<li>
+<p>ApplicationContextAwareProcessor 在papareBeanfactory 的时候会进行设置</p>
+</li>
+<li>
+<p>什么是Aspectj ?</p>
+</li>
+<li>
+<p>构建bean有哪些方法</p>
+<ul>
+<li>xml 配置</li>
+<li>注解</li>
+<li>实现BeanDefinitionRegistryPostProcess 接口, 实现方法, 构建beanDefinition 添加到BeanFactory 中</li>
+</ul>
+</li>
+<li>
+<p>Beanfactory 后置处理器  可以通过 beanFactoryPostProcessor 和 BeanDefinitionRegistryPostProcess  接口</p>
+</li>
+<li>
+<p>初始化事件广播器 initApplicationEnentMulticaster(); spring的事件驱动, 用到了观察者模式</p>
+</li>
+<li>
+<p>getBean 方法 获取FactoryBean 需要在 BeanName 前面加上&quot;&amp;&quot;</p>
+</li>
+</ol>
+<pre><code>Error:Kotlin: [Internal Error] java.lang.LinkageError: loader constraint violation: loader (instance of org/jetbrains/kotlin/cli/jvm/plugins/PluginURLClassLoader$SelfThenParentURLClassLoader) previously initiated loading for a different type with name &quot;kotlin/sequences/Sequence&quot;
+	at java.lang.ClassLoader.defineClass1(Native Method)
+	at
+</code></pre>
+<p>lamda 表达式</p>
+<blockquote>
+<p>匿名内部类是局部内部类的更深入一步。
+假如只创建某类的一个对象时，就不必将该类进行命名。
+匿名内部类的前提是存在一个类或者接口，且匿名内部类是写在方法中的。
+只针对重写一个方法时使用，需要重写多个方法时不建议使用</p>
+</blockquote>
+<pre><code>new 类名或接口名(){
+    重写方法;
+}；     //注意分号
+//以上就是内部类的格式，其实这整体就相当于是new出来的一个对象
+</code></pre>
+<p>多线程</p>
+<pre><code>new Thread(){
+             public void run(){
+                 System.out.println(getName());
+             }
+         }.start();
+上面例子，如果去除.start()就是一个线程的匿名内部类【创建匿名内部类的同时，也会创建一个
+对象】所以上文中的.start（）就相当于调用了Thread的start方法
+</code></pre>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/spring/">Spring</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/spring%E4%BA%8B%E5%8A%A1/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Spring事务</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

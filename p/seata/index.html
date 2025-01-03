@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="官方文档: https://seata.io/zh-cn/docs/overview/what-is-seata.html\n1. AT 模式 1. AT 一阶段提交 第一阶段包括提交业务数据和回滚日志（undoLog）\n==全局事务的状态和操作决策的关键仍在 TC 中==\n">
+<title>Seata</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/seata/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Seata">
+<meta property='og:description' content="官方文档: https://seata.io/zh-cn/docs/overview/what-is-seata.html\n1. AT 模式 1. AT 一阶段提交 第一阶段包括提交业务数据和回滚日志（undoLog）\n==全局事务的状态和操作决策的关键仍在 TC 中==\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/seata/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='分布式' /><meta property='article:tag' content='seata' /><meta property='article:published_time' content='2023-05-14T15:03:55&#43;08:00'/><meta property='article:modified_time' content='2023-05-14T15:03:55&#43;08:00'/>
+<meta name="twitter:title" content="Seata">
+<meta name="twitter:description" content="官方文档: https://seata.io/zh-cn/docs/overview/what-is-seata.html\n1. AT 模式 1. AT 一阶段提交 第一阶段包括提交业务数据和回滚日志（undoLog）\n==全局事务的状态和操作决策的关键仍在 TC 中==\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-at-模式">1. AT 模式</a>
+      <ul>
+        <li><a href="#1-at-一阶段提交">1. AT 一阶段提交</a>
+          <ul>
+            <li><a href="#undo-log-结构">undo log 结构</a></li>
+          </ul>
+        </li>
+        <li><a href="#2-at-二阶段">2. AT 二阶段</a></li>
+        <li><a href="#3-流程思考">3. 流程思考</a></li>
+        <li><a href="#4-注意事项">4. 注意事项</a>
+          <ul>
+            <li><a href="#1-at-模式注意事项">1. AT 模式注意事项</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#2-事务上下文">2. 事务上下文</a>
+      <ul>
+        <li><a href="#1-事务传播">1. 事务传播</a>
+          <ul>
+            <li><a href="#1-服务内部的事务传播">1. 服务内部的事务传播</a></li>
+            <li><a href="#2-跨服务调用的事务传播">2. 跨服务调用的事务传播</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#3-tcc-模式">3. TCC 模式</a></li>
+    <li><a href="#4-saga--长事务模式">4. SAGA  长事务模式</a></li>
+    <li><a href="#5-xa">5. XA</a></li>
+    <li><a href="#6-二阶段提交和三阶段提交">6. 二阶段提交和三阶段提交</a></li>
+    <li><a href="#seata">Seata</a>
+      <ul>
+        <li>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#262-seata支持的模式">2.6.2 Seata支持的模式</a></li>
+                <li><a href="#263-seata的优点">2.6.3 Seata的优点</a></li>
+                <li><a href="#264-at模式">2.6.4 AT模式</a></li>
+                <li><a href="#265-tcc模式">2.6.5 TCC模式</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#27-跨mysql-ip测试">2.7 跨mysql ip测试</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E4%BA%8B%E5%8A%A1/" >
+                事务
+            </a>
+        
+            <a href="/categories/seata/" >
+                Seata
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/seata/">Seata</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">May 14, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 13 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>官方文档: <a class="link" href="https://seata.io/zh-cn/docs/overview/what-is-seata.html"  target="_blank" rel="noopener"
+    >https://seata.io/zh-cn/docs/overview/what-is-seata.html</a></p>
+<h1 id="1-at-模式">1. AT 模式
+</h1><h2 id="1-at-一阶段提交">1. AT 一阶段提交
+</h2><p>第一阶段包括提交业务数据和回滚日志（undoLog）</p>
+<p><img src="/p/seata/images/image-20211227143300338.png"
+	width="667"
+	height="583"
+	
+	loading="lazy"
+	
+		alt="image-20211227143300338"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="114"
+		data-flex-basis="274px"
+	
+></p>
+<p><img src="/p/seata/images/image-20241208170920817.png"
+	width="2226"
+	height="1439"
+	
+	loading="lazy"
+	
+		alt="image-20241208170920817"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="154"
+		data-flex-basis="371px"
+	
+></p>
+<p>==全局事务的状态和操作决策的关键仍在 <strong>TC</strong> 中==</p>
+<p><code>@GlobalTransactional</code>的方法<strong>通过AOP实现了，开启全局事务和提交全局事务两个操作</strong>，与Spring 事务机制类似，当 GlobalTransactionalInterceptor 在事务执行过程中捕获到Throwable时，会发起全局事务回滚</p>
+<p>0.1 步骤中会生成一个<strong>全局事务ID</strong></p>
+<p>0.2 所有事务参与者执行结束后，一阶段事务提交</p>
+<h3 id="undo-log-结构">undo log 结构
+</h3><pre><code class="language-text">// 省略了相关方法
+public class SQLUndoLog {
+ // insert, update ...
+    private SQLType sqlType;
+
+    private String tableName;
+
+	// 执行前
+    private TableRecords beforeImage;
+
+	// 执行后
+    private TableRecords afterImage;
+}
+</code></pre>
+<h2 id="2-at-二阶段">2. AT 二阶段
+</h2><p>二阶段是<strong>完全异步化的并且完全由Seata控制</strong>，Seata根据所有事务<strong>参与者的提交情况决定二阶段如何处理</strong></p>
+<ul>
+<li>如果所有事务提交成功，则二阶段的任务就是删除一阶段生成 的undoLog，修改分支事务的状态, 并释放<strong>全局锁</strong></li>
+<li>如果部分事务参与者提交失败，则需要根据undoLog对已经注册的事务分支进行回滚，并释放<strong>全局锁</strong></li>
+</ul>
+<h2 id="3-流程思考">3. 流程思考
+</h2><p><strong>问题1. Seata如何做到==无侵入的分析业务SQL生成undoLog==，注册事务分支等操作？</strong></p>
+<p>==Seata 代理了DataSource==，我们可以通过在代码注入一个DataSource来验证我的说法，目前的DataSource 是 <code>io.seata.rm.datasource.DataSourceProxy</code></p>
+<p><strong>问题2. ConnectionProxy 如何判断当前事务是全局事务，还是本地事务？</strong></p>
+<p>==前线程是否绑定了全局事务id==，在进行全局事务之前，需要调用<code>RootContext.bind(xid);</code></p>
+<p><strong>问题3. 全局事务并发更新</strong></p>
+<p>订单扣减库存的场景为例，如果TX1和TX2同时扣减product_id为1的库存，这时Seata会不会生成相同的beforeImage？</p>
+<p>举个例子，TX1读库存为100，TX1扣减库存1，此时BeforeImage为100 紧接着 如果TX2读库存也为100，那么就有问题了，不管TX2扣减多少库存，如果TX1回滚那么相当于覆盖了TX2扣减的库存，出现了脏写</p>
+<p><code>io.seata.rm.datasource.exec.AbstractDMLBaseExecutor::executeAutoCommitFalse</code></p>
+<p><code>beforeImage()</code>，这是一个抽象方法，看一下他的子类<code>UpdateExecutor</code>是如何实现的</p>
+<p>直接通过 select for update</p>
+<p><strong>问题4. 全局事务外的更新</strong></p>
+<p>我们现在可以确认在Seata的保证下，全局事务，不会造成数据的脏写，但是全局事务外会！</p>
+<p>什么意思呢？</p>
+<p>还以库存为例</p>
+<ul>
+<li>用户正在抢购，用户A完成了1阶段的库存扣减，这个时候库存为99。</li>
+<li>此时库存管理员上线了，他查了一下库存为99。嗯&hellip;太少了，我加100个，库存管理员把库存更新为200。</li>
+<li>而此时seata给用户A生成beforeImage为100，如果此时用户A的全局事务失败了，发生了回滚，再次将库存更新为100&hellip; 再次出现脏写</li>
+</ul>
+<p>Seata 针对这个问题，提供了<code>@GlobalLock</code>注解，标记该注解时，会像全局事务一样进行SQL分析，竞争全局锁，就不会出现上述问题了</p>
+<p><strong>问题5. @GlobalTransactional 和 @Transactional 同时使用会怎么样</strong></p>
+<p>我们上文中已经说过了 @GlobalTransactional 的作用了，他是负责开启全局事务/提交事务1阶段，说白了@GlobalTransactional 只和Seata-server 交互，而 @Transactional 管理的是本地数据库的事务，所以二者不发生冲突。</p>
+<blockquote>
+<p>但是需要注意 @GlobalTransactional AOP 覆盖范围一定要大于 @Transactional</p>
+</blockquote>
+<pre><code>事务分组说明。
+1.事务分组是什么？
+事务分组是seata的资源逻辑，类似于服务实例。在file.conf中的my_test_tx_group就是一个事务分组。
+
+2.通过事务分组如何找到后端集群？
+首先程序中配置了事务分组（GlobalTransactionScanner 构造方法的txServiceGroup参数），程序会通过用户配置的配置中心去寻找service.vgroup_mapping.事务分组配置项，取得配置项的值就是TC集群的名称。拿到集群名称程序通过一定的前后缀+集群名称去构造服务名，各配置中心的服务名实现不同。拿到服务名去相应的注册中心去拉取相应服务名的服务列表，获得后端真实的TC服务列表。
+
+3.为什么这么设计，不直接取服务名？
+这里多了一层获取事务分组到映射集群的配置。这样设计后，事务分组可以作为资源的逻辑隔离单位，当发生故障时可以快速failover。
+</code></pre>
+<h2 id="4-注意事项">4. 注意事项
+</h2><h3 id="1-at-模式注意事项">1. AT 模式注意事项
+</h3><ol>
+<li>必须使用代理数据源，有 3 种形式可以代理数据源：</li>
+</ol>
+<ul>
+<li>依赖 seata-spring-boot-starter 时，自动代理数据源，无需额外处理。</li>
+<li>依赖 seata-all 时，使用 @EnableAutoDataSourceProxy (since 1.1.0) 注解，注解参数可选择 jdk 代理或者 cglib 代理。</li>
+<li>依赖 seata-all 时，也可以手动使用 DatasourceProxy 来包装 DataSource。</li>
+</ul>
+<ol>
+<li>配置 GlobalTransactionScanner，使用 seata-all 时需要手动配置，使用 seata-spring-boot-starter 时无需额外处理。</li>
+<li>业务表中必须包含单列主键，若存在复合主键，请参考问题 13 。</li>
+<li>每个业务库中必须包含 undo_log 表，若与分库分表组件联用，分库不分表。</li>
+<li>跨微服务链路的事务需要对相应 RPC 框架支持，目前 seata-all 中已经支持：Apache Dubbo、Alibaba Dubbo、sofa-RPC、Motan、gRpc、httpClient，对于 Spring Cloud 的支持，请大家引用 spring-cloud-alibaba-seata。其他自研框架、异步模型、消息消费事务模型请结合 API 自行支持。</li>
+<li>目前AT模式支持的数据库有：MySQL、Oracle、PostgreSQL和 TiDB。</li>
+<li>使用注解开启分布式事务时，若默认服务 provider 端加入 consumer 端的事务，provider 可不标注注解。但是，provider 同样需要相应的依赖和配置，仅可省略注解。</li>
+<li>使用注解开启分布式事务时，若要求事务回滚，必须将异常抛出到事务的发起方，被事务发起方的 @GlobalTransactional 注解感知到。provide 直接抛出异常 或 定义错误码由 consumer 判断再抛出异常。</li>
+</ol>
+<h1 id="2-事务上下文">2. 事务上下文
+</h1><p>​	Seata 的事务上下文由 RootContetxt 来管理</p>
+<p>​	1. 应用开启一个全局事务后，RootContext 会自动绑定该事务的 XID，事务结束（提交或回滚完成），RootContext 会自动解绑 XID。</p>
+<pre><code class="language-java">// 绑定 XID
+RootContext.bind(xid);
+
+// 解绑 XID
+String xid = RootContext.unbind();
+</code></pre>
+<ol start="2">
+<li>应用可以通过 RootContext 的 API 接口来获取当前运行时的全局事务 XID</li>
+</ol>
+<pre><code>// 获取 XID
+String xid = RootContext.getXID();
+</code></pre>
+<ol start="3">
+<li>应用是否运行在一个全局事务的上下文中，就是通过 RootContext 是否绑定 XID 来判定的</li>
+</ol>
+<pre><code>public static boolean inGlobalTransaction() {
+        return CONTEXT_HOLDER.get(KEY_XID) != null;
+    }
+</code></pre>
+<h2 id="1-事务传播">1. 事务传播
+</h2><p>​	Seata 全局事务的传播机制就是指==事务上下文的传播，根本上，就是 XID 的应用运行时的传播方式==。</p>
+<h3 id="1-服务内部的事务传播">1. 服务内部的事务传播
+</h3><p>默认的，RootContext 的实现是基于 ==<em>ThreadLocal</em> 的，即 XID 绑定在当前线程上下文中==。</p>
+<pre><code class="language-java">public class ThreadLocalContextCore implements ContextCore {
+
+    private ThreadLocal&lt;Map&lt;String, String&gt;&gt; threadLocal = new ThreadLocal&lt;Map&lt;String, String&gt;&gt;() {
+        @Override
+        protected Map&lt;String, String&gt; initialValue() {
+            return new HashMap&lt;String, String&gt;();
+        }
+
+    };
+
+    @Override
+    public String put(String key, String value) {
+        return threadLocal.get().put(key, value);
+    }
+
+    @Override
+    public String get(String key) {
+        return threadLocal.get().get(key);
+    }
+
+    @Override
+    public String remove(String key) {
+        return threadLocal.get().remove(key);
+    }
+}
+</code></pre>
+<p>所以服务内部的 XID 传播通常是天然的通过同一个线程的调用链路串连起来的。默认不做任何处理，事务的上下文就是传播下去的。</p>
+<p>如果希望挂起事务上下文，则需要通过 RootContext 提供的 API 来实现：</p>
+<pre><code>// 挂起（暂停）
+String xid = RootContext.unbind();
+
+// TODO: 运行在全局事务外的业务逻辑
+
+// 恢复全局事务上下文
+RootContext.bind(xid);
+</code></pre>
+<h3 id="2-跨服务调用的事务传播">2. 跨服务调用的事务传播
+</h3><blockquote>
+<p>跨服务调用场景下的事务传播，本质上就是要把 XID 通过==服务调用传递到服务提供方==，并绑定到 RootContext 中去</p>
+</blockquote>
+<p><img src="/p/seata/images/image-20220428151130759.png"
+	width="389"
+	height="280"
+	
+	loading="lazy"
+	
+		alt="image-20220428151130759"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="138"
+		data-flex-basis="333px"
+	
+></p>
+<p>对Dubbo 的支持的机制的解读</p>
+<pre><code class="language-java">/**
+ * The type Transaction propagation filter.
+ */
+@Activate(group = { Constants.PROVIDER, Constants.CONSUMER }, order = 100)
+public class TransactionPropagationFilter implements Filter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionPropagationFilter.class);
+
+    @Override
+    public Result invoke(Invoker&lt;?&gt; invoker, Invocation invocation) throws RpcException {
+        String xid = RootContext.getXID(); // 获取当前事务 XID
+        String rpcXid = RpcContext.getContext().getAttachment(RootContext.KEY_XID); // 获取 RPC 调用传递过来的 XID
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(&quot;xid in RootContext[&quot; + xid + &quot;] xid in RpcContext[&quot; + rpcXid + &quot;]&quot;);
+        }
+        boolean bind = false;
+        if (xid != null) { // Consumer：把 XID 置入 RPC 的 attachment 中
+            RpcContext.getContext().setAttachment(RootContext.KEY_XID, xid);
+        } else {
+            if (rpcXid != null) { // Provider：把 RPC 调用传递来的 XID 绑定到当前运行时
+                RootContext.bind(rpcXid);
+                bind = true;
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(&quot;bind[&quot; + rpcXid + &quot;] to RootContext&quot;);
+                }
+            }
+        }
+        try {
+            return invoker.invoke(invocation); // 业务方法的调用
+
+        } finally {
+            if (bind) { // Provider：调用完成后，对 XID 的清理
+                String unbindXid = RootContext.unbind();
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(&quot;unbind[&quot; + unbindXid + &quot;] from RootContext&quot;);
+                }
+                if (!rpcXid.equalsIgnoreCase(unbindXid)) {
+                    LOGGER.warn(&quot;xid in change during RPC from &quot; + rpcXid + &quot; to &quot; + unbindXid);
+                    if (unbindXid != null) { // 调用过程有新的事务上下文开启，则不能清除
+                        RootContext.bind(unbindXid);
+                        LOGGER.warn(&quot;bind [&quot; + unbindXid + &quot;] back to RootContext&quot;);
+                    }
+                }
+            }
+        }
+    }
+}
+</code></pre>
+<h1 id="3-tcc-模式">3. TCC 模式
+</h1><p><strong>Try</strong>（尝试执行）、<strong>Confirm</strong>（确认执行）、<strong>Cancel</strong>（取消执行）。它要求业务服务提供者定义这些阶段的具体实现。</p>
+<p><strong>Try</strong> 阶段：进行业务操作的预留资源操作。例如，扣款、锁库存等操作。</p>
+<p><strong>Confirm</strong> 阶段：在所有服务都成功执行 <strong>Try</strong> 后，正式执行操作（如，扣款成功并提交）。</p>
+<p><strong>Cancel</strong> 阶段：如果任何服务失败，回滚所有已做的操作（如，取消扣款、释放库存等）。</p>
+<h1 id="4-saga--长事务模式">4. SAGA  长事务模式
+</h1><pre><code>SAGA 模式是一种**基于补偿机制**的分布式事务模型，通过将**长事务分解为多个子事务（也叫局部事务）**，每个局部事务都可以独立提交。每当一个子事务失败时，SAGA 会触发补偿事务，回滚之前的事务，从而实现最终一致性。 
+</code></pre>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>事务模式</th>
+          <th>适用场景</th>
+          <th>优缺点</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>AT 模式</td>
+          <td></td>
+          <td>简单、易用，适合无需精细控制的场景，但不适合多数据库</td>
+      </tr>
+      <tr>
+          <td>TCC 模式</td>
+          <td>适用于需要精确控制的复杂业务流程</td>
+          <td>高度灵活，但需要开发者实现 Try、Confirm、Cancel  方法</td>
+      </tr>
+      <tr>
+          <td>SAGA 模式</td>
+          <td>长时间的业务流程、需要逐步执行的事务</td>
+          <td>适合长事务，支持补偿，但实现复杂，性能相对较低</td>
+      </tr>
+      <tr>
+          <td>XA 模式</td>
+          <td>跨数据库、分布式消息队列等全局事务场景</td>
+          <td>保证全局一致性，但实现复杂、性能较低</td>
+      </tr>
+  </tbody>
+</table></div>
+<h1 id="5-xa">5. XA
+</h1><p>XA模式使用两阶段提交来保证所有资源同时提交或回滚任何特定的事务。第一阶段，事务协调者通知每个事务参与者执行本地事务，本地事务执行完成后报告事务执行状态给事务协调者，此时事务不提交，继续持有数据库锁。第二阶段，根据第一阶段的执行结果而决定，==如果一阶段都成功，则通知所有事务参与者提交事务；如果一阶段任意一个参与者失败，则通知所有事务参与者回滚事务==</p>
+<p>TM: 事务管理器</p>
+<p>RM: 资源管理器</p>
+<h1 id="6-二阶段提交和三阶段提交">6. 二阶段提交和三阶段提交
+</h1><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th>两阶段提交（2PC）</th>
+          <th>三阶段提交（3PC）</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>事务一致性</td>
+          <td>提供强一致性</td>
+          <td>提供强一致性</td>
+      </tr>
+      <tr>
+          <td>容错性</td>
+          <td>如果协调器宕机或网络分区，可能造成死锁</td>
+          <td>增加超时回滚机制，降低死锁风险</td>
+      </tr>
+      <tr>
+          <td>性能开销</td>
+          <td>较低（两轮通信）</td>
+          <td>较高（三轮通信）</td>
+      </tr>
+      <tr>
+          <td>资源锁定</td>
+          <td>一阶段锁定资源直到二阶段完成</td>
+          <td>仅在预提交阶段锁定资源</td>
+      </tr>
+  </tbody>
+</table></div>
+<p>==二阶段提交流程==</p>
+<p><strong>第一阶段（Prepare 阶段）</strong>：</p>
+<ul>
+<li>事务管理器（TM）向所有参与的资源管理器（RM）发送 <code>Prepare</code> 请求，询问它们是否可以提交事务。</li>
+<li>参与者（RM）会执行事务操作但不提交，并将操作的锁定资源、事务状态等持久化。</li>
+<li>如果所有参与者都返回成功，第一阶段完成。</li>
+</ul>
+<p><strong>第二阶段（Commit 或 Rollback 阶段）</strong>：</p>
+<ul>
+<li>如果第一阶段所有参与者都成功，TM 向所有 RM 发送 <code>Commit</code> 请求，要求它们正式提交事务。</li>
+<li>如果任何参与者在第一阶段失败，TM 会发送 <code>Rollback</code> 请求，要求所有参与者回滚已执行的事务操作。</li>
+</ul>
+<p>==三阶段提交流程==</p>
+<p><strong>CanCommit（询问阶段）</strong>：</p>
+<ul>
+<li>协调者询问所有参与者<strong>是否可以提交事务</strong>，参与者仅反馈“是”或“否”，并不锁定资源。</li>
+</ul>
+<p><strong>PreCommit（预提交阶段）</strong>：</p>
+<ul>
+<li>如果所有参与者答复“是”，协调者发送“预提交”请求，==参与者锁定资源并将事务状态设置为“准备提交”==，但尚未正式提交。</li>
+<li>如果任何参与者答复“否”，协调者发送“回滚”指令，所有参与者释放资源。</li>
+</ul>
+<p><strong>DoCommit（正式提交阶段）</strong>：</p>
+<ul>
+<li>协调者在预提交阶段成功后，发送“提交”指令，所有参与者正式完成事务。</li>
+<li>如果协调者未能发送指令，参与者会超时自动回滚（进一步提高容错能力）。</li>
+</ul>
+<h1 id="seata">Seata
+</h1><p>简介</p>
+<p>2019 年 1 月，阿里巴巴中间件团队发起了开源项目 <a class="link" href="https://www.oschina.net/p/fescar"  target="_blank" rel="noopener"
+    ><em>Fescar</em></a><em>（Fast &amp; Easy Commit And Rollback）</em>，和社区一起共建开源分布式事务解决方案。Fescar 的愿景是让分布式事务的使用像本地事务的使用一样，简单和高效，并逐步解决开发者们遇到的分布式事务方面的所有难题。</p>
+<p><strong>Fescar 开源后，蚂蚁金服加入 Fescar 社区参与共建，并在 Fescar 0.4.0 版本中贡献了 TCC 模式。</strong></p>
+<p>为了打造更中立、更开放、生态更加丰富的分布式事务开源社区，经过社区核心成员的投票，大家决定对 Fescar 进行品牌升级，并更名为 <strong>Seata</strong>，意为：<strong>Simple Extensible Autonomous Transaction Architecture</strong>，是一套一站式分布式事务解决方案。</p>
+<p>Seata 融合了阿里巴巴和蚂蚁金服在分布式事务技术上的积累，并沉淀了新零售、云计算和新金融等场景下丰富的实践经验。</p>
+<p><strong>核心组件：</strong></p>
+<ul>
+<li>Transaction Coordinator (TC)： 事务协调器，维护全局事务的运行状态，负责协调并驱动全局事务的提交或回滚。</li>
+<li>Transaction Manager (TM)： 控制全局事务的边界，负责开启一个全局事务，并最终发起全局提交或全局回滚的决议。</li>
+<li>Resource Manager (RM)： 控制分支事务，负责分支注册、状态汇报，并接收事务协调器的指令，驱动分支（本地）事务的提交和回滚。</li>
+</ul>
+<p><strong>工作流程：</strong></p>
+<ol>
+<li>TM 向 TC 申请开启一个全局事务，全局事务创建成功并生成一个全局唯一的事务ID（XID），XID 在微服务调用链路的上下文中传播。</li>
+<li>RM 向 TC 注册分支事务，接着执行这个分支事务并提交事务（==重点：RM在此阶段就已经执行了本地事务的提交/回滚==），最后将执行结果汇报给TC。</li>
+<li>TM 根据 TC 中所有的分支事务的执行情况，发起全局提交或回滚决议。</li>
+<li>TC 调度 XID 下管辖的全部分支事务完成提交或回滚请求。</li>
+</ol>
+<p><img src="/p/seata/images/333.png"
+	width="960"
+	height="551"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="174"
+		data-flex-basis="418px"
+	
+></p>
+<h4 id="262-seata支持的模式">2.6.2 Seata支持的模式
+</h4><p>seata中有两种常见分布式事务实现方案，AT及TCC</p>
+<ul>
+<li>
+<p>AT模式：赖于RM拥有本地数据库事务的能力，对于客户业务无侵入性</p>
+<p><img src="/p/seata/images/222.png"
+	width="721"
+	height="260"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="277"
+		data-flex-basis="665px"
+	
+></p>
+</li>
+<li>
+<p>TCC 模式</p>
+</li>
+</ul>
+<h4 id="263-seata的优点">2.6.3 Seata的优点
+</h4><p><strong>对业务无侵入</strong>：即减少技术架构上的微服务化所带来的分布式事务问题对业务的侵入
+<strong>高性能</strong>：减少分布式事务解决方案所带来的性能消耗(2PC)</p>
+<h4 id="264-at模式">2.6.4 AT模式
+</h4><p>Seata AT模式是基于XA事务演进而来的一个分布式事务中间件，XA是一个基于数据库实现的分布式事务协议，本质上和两阶段提交一样，需要数据库支持，Mysql5.6以上版本支持XA协议，其他数据库如Oracle，DB2也实现了XA接口。</p>
+<p>AT模式分为两个阶段，如下：</p>
+<ul>
+<li><strong>第一阶段：本地数据备份阶段</strong></li>
+</ul>
+<ol>
+<li>Seata 的 JDBC 数据源代理通过对业务 SQL 的解析，把==业务数据在变化前后的数据镜像组织成回滚日志==（XID/分支事务ID（Branch ID/变化前的数据/变化后的数据）。</li>
+<li>将回滚日志存入一张日志表UNDO_LOG（==需要手动创建==）,并对UNDO_LOG表中的这条数据形成行锁（for update）。</li>
+<li>若锁定失败，说明有其他事务在操作这条数据，它会在一段时间内重试，重试失败则回滚本地事务，并向TC汇报本地事务执行失败。</li>
+</ol>
+<p>这样，可以保证：<strong>任何提交的业务数据的更新一定有相应的回滚日志存在</strong></p>
+<p><img src="/p/seata/images/1565820909345.png"
+	width="1132"
+	height="378"
+	
+	loading="lazy"
+	
+		alt="1565820909345"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="299"
+		data-flex-basis="718px"
+	
+></p>
+<p><strong>目的：</strong></p>
+<ol>
+<li>基于这样的机制，分支的本地事务便可以在全局事务的第一阶段提交，并马上释放本地事务锁定的资源。</li>
+<li>有了回滚日志之后，可以在第一阶段释放对资源的锁定，降低了锁范围，提高效率，即使第二阶段发生异常需要回滚，只需找对undolog中对应数据并反解析成sql来达到回滚目的。</li>
+<li>Seata通过代理数据源（DataSource-&gt;DataSourceProxy）将业务sql的执行解析成undolog来与业务数据的更新同时入库，达到了对业务无侵入的效果</li>
+</ol>
+<p><strong>第二阶段：全局事务提交/回滚</strong></p>
+<ul>
+<li><strong>全局提交</strong>：
+<ol>
+<li>所有分支事务此时已经完成提交，所有分支事务提交都正常。</li>
+<li>==TM从TC获知后会决议执行====全局提交====，TC异步通知所有的RM释放UNDO_LOG表中的行锁==，同时清理掉UNDO_LOG表中刚才释放锁的那条数据。</li>
+</ol>
+</li>
+</ul>
+<p><img src="/p/seata/images/1565821037492.png"
+	width="1218"
+	height="525"
+	
+	loading="lazy"
+	
+		alt="1565821037492"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="232"
+		data-flex-basis="556px"
+	
+></p>
+<ul>
+<li><strong>全局回滚</strong>：
+<ol>
+<li>若任何一个RM一阶段事务提交失败，通知TC提交失败。</li>
+<li>==TM从TC获知后会决议执行全局回滚====，====TC向所有的RM发送回滚请求==。</li>
+<li>RM通过XID和Branch ID找到相应的回滚日志记录，<strong>通过回滚记录生成反向的更新 SQL 并执行</strong>，以完成分支的回滚，同时释放锁，清除UNDO_LOG表中释放锁的那条数据。</li>
+</ol>
+</li>
+</ul>
+<p><img src="/p/seata/images/1565821069728.png"
+	width="1207"
+	height="564"
+	
+	loading="lazy"
+	
+		alt="1565821069728"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="214"
+		data-flex-basis="513px"
+	
+></p>
+<h4 id="265-tcc模式">2.6.5 TCC模式
+</h4><p>seata也针对TCC做了适配兼容，支持TCC事务方案，原理前面已经介绍过，基本思路就是使用侵入业务上的补偿及事务管理器的协调来达到全局事务的一起提交及回滚。</p>
+<p><img src="/p/seata/images/1565821173446.png"
+	width="1223"
+	height="615"
+	
+	loading="lazy"
+	
+		alt="1565821173446"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="198"
+		data-flex-basis="477px"
+	
+></p>
+<h2 id="27-跨mysql-ip测试">2.7 跨mysql ip测试
+</h2><p>插入数据库</p>
+<p><img src="/p/seata/images/seata-16312535244541.png"
+	width="1204"
+	height="610"
+	
+	loading="lazy"
+	
+		alt="seata"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="197"
+		data-flex-basis="473px"
+	
+></p>
+<p>undo_log 表</p>
+<p><img src="/p/seata/images/seata_undo_log.png"
+	width="1750"
+	height="438"
+	
+	loading="lazy"
+	
+		alt="seata_undo_log"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="399"
+		data-flex-basis="958px"
+	
+></p>
+<p>发生异常&ndash;回滚</p>
+<p><img src="/p/seata/images/seata%E5%9B%9E%E6%BB%9A.png"
+	width="1724"
+	height="747"
+	
+	loading="lazy"
+	
+		alt="seata回滚"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="230"
+		data-flex-basis="553px"
+	
+></p>
+<p>数据库可以看到之前被修改的数据被回滚了</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+        
+            <a href="/tags/seata/">Seata</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

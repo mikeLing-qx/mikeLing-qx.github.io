@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>事务 on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/tags/%E4%BA%8B%E5%8A%A1/</link>
+        <description>Recent content in 事务 on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Fri, 03 Jan 2025 19:21:43 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/tags/%E4%BA%8B%E5%8A%A1/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Spring事务</title>
+        <link>https://mikeLing-qx.github.io/p/spring%E4%BA%8B%E5%8A%A1/</link>
+        <pubDate>Fri, 03 Jan 2025 19:21:43 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/spring%E4%BA%8B%E5%8A%A1/</guid>
+        <description>&lt;h1 id=&#34;1-spring事务的7种传播行为&#34;&gt;1. Spring事务的7种传播行为
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_REQUIRED ，==默认==的spring事务传播级别，==如果上下文中已经存在事务，那么就加入到事务中执行，如果当前上下文中不存在事务，则新建事务执行==。所以这个级别通常能满足处理大多数的业务场景。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_SUPPORTS ，==如果上下文存在事务，则支持事务加入事务，如果没有事务，则使用非事务的方式执行==。所以说，并非所有的包在transactionTemplate.execute中的代码都会有事务支持。这个通常是用来处理那些并非原子性的非核心业务逻辑操作。应用场景较少。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_MANDATORY（强制） ， ==该级别的事务要求上下文中必须要存在事务，否则就会抛出异常！==配置该方式的传播级别是有效的控制上下文调用代码遗漏添加事务控制的保证手段。比如一段代码不能单独被调用执行，但是一旦被调用，就必须有事务包含的情况，就可以使用这个传播级别。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_REQUIRES_NEW ，==每次都会新建一个事务，并且同时将上下文中的事务挂起，执行当前新建事务完成以后，上下文事务恢复再执行==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;这是一个很有用的传播级别，举一个应用场景：现在有一个发送100个红包的操作，在发送之前，要做一些系统的初始化、验证、数据记录操作，然后发送100封红包，然后再记录发送日志，发送日志要求100%的准确，如果日志不准确，那么整个父事务逻辑需要回滚。
+怎么处理整个业务需求呢？就是通过这个PROPAGATION_REQUIRES_NEW 级别的事务传播控制就可以完成。发送红包的子事务不会直接影响到父事务的提交和回滚。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_NOT_SUPPORTED ，当前级别的特点就是&lt;strong&gt;上下文中存在事务&lt;/strong&gt;，==则挂起事务，执行当前逻辑，结束后恢复上下文的事务==。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_NEVER ，该事务更严格，就抛出runtime异常，强制停止执行！&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_NESTED ，字面也可知道，nested，嵌套级别事务。该传播级别特征是，如果上下文中存在事务，则==嵌套事务==执行，如果不存在事务，则新建事务。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;还是子事务先提交，父事务再提交, 子事务是父事务的一部分，由父事务统一提交。&lt;/li&gt;
+&lt;li&gt;回滚特性
+&lt;ul&gt;
+&lt;li&gt;主事务和嵌套事务属于同一个事务&lt;/li&gt;
+&lt;li&gt;嵌套事务出错回滚不会影响到主事务&lt;/li&gt;
+&lt;li&gt;主事务回滚会将嵌套事务一起回滚了&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;2-多线程事务--二阶段提交&#34;&gt;2. 多线程事务&amp;ndash;二阶段提交
+&lt;/h1&gt;&lt;p&gt;这两个方法的两种写法, 第一种是可以正常的进行事务的提交和回滚的, 第二种执行的时候线程会一直阻塞, 不会退出, 分析原因&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;原因分析过程:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;第一种方式 是根据线程池大小来划分任务, 第二种方式是根据数据列表来划分任务,  第二种方式会出现一个线程需要处理多个事务的情况, 然而在updateStudentsTransaction 方法里面 ==事务的隔离级别  PROPAGATION_REQUIRES_NEW  会导致 线程新开任务==, ==这会导致 主线程等待子线程全部完成后再进行事务的提交或回滚==,  需要修改为 ==PROPAGATION_REQUIRES==&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;第一种
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
+    public void updateStudentWithThreadsAndTrans() throws InterruptedException {
+
+        //查询总数据
+        List&amp;lt;UserDemo&amp;gt; allUser = userMapper.selectAll();
+
+        // 线程数量
+        final int threadCount = 2;
+
+        //每个线程处理的数据量
+        final int dataPartionLength = (allUser.size() + threadCount - 1) / threadCount;
+
+        // 创建多线程处理任务
+        ExecutorService studentThreadPool = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch threadLatchs = new CountDownLatch(threadCount);
+        AtomicBoolean isError = new AtomicBoolean(false);
+        try {
+            for (int i = 0; i &amp;lt; threadCount; i++) {
+                // 每个线程处理的数据
+                List&amp;lt;UserDemo&amp;gt; threadDatas = allUser.stream()
+                        .skip((long) i * dataPartionLength).limit(dataPartionLength).collect(Collectors.toList());
+                studentThreadPool.execute(() -&amp;gt; {
+                    try {
+                        try {
+                            userService.updateStudentsTransaction(transactionManager, transactionStatusList, threadDatas);
+                        } catch (Throwable e) {
+                            isError.set(true);
+                            throw e;
+                        }finally {
+                            threadLatchs.countDown();
+                        }
+                    } catch (Exception e) {
+                        isError.set(true);
+                        throw e;
+                    }
+                });
+            }
+
+            // 倒计时锁设置超时时间 30s
+            boolean await = threadLatchs.await(30, TimeUnit.SECONDS);
+            // 判断是否超时
+            if (!await) {
+                isError.set(true);
+            }
+        } catch (Throwable e) {
+            isError.set(true);
+            throw e;
+        }
+
+        if (!transactionStatuses.isEmpty()) {
+            if (isError.get()) {
+                transactionStatuses.forEach(transactionManager::rollback);
+            } else {
+                transactionStatuses.forEach(transactionManager::commit);
+            }
+        }
+
+        System.out.println(&amp;quot;主线程完成&amp;quot;);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;第二种
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
+    public void updateStudentWithThreadsAndTrans() throws InterruptedException {
+
+        //查询总数据
+        List&amp;lt;UserDemo&amp;gt; allUser = userMapper.selectAll();
+
+        // 线程数量
+        final int threadCount = 5;
+
+        //每个线程处理的数据量
+        final int dataPartionLength = (allUser.size() + threadCount - 1) / threadCount;
+
+        ExecutorService studentThreadPool = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch threadLatchs = new CountDownLatch(threadCount);
+        AtomicBoolean isError = new AtomicBoolean(false);
+
+        // 创建CompletableFuture列表
+        List&amp;lt;CompletableFuture&amp;lt;Void&amp;gt;&amp;gt; futures = new ArrayList&amp;lt;&amp;gt;();
+
+        int batchSize = 100;
+        int size = allUser.size();
+        int batchNum = size / batchSize;
+        if (size % batchSize != 0) {
+            batchNum++;
+        }
+
+        for (int i = 0; i &amp;lt; batchNum; i++) {
+            int start = i * batchSize;
+            int end = Math.min((i + 1) * batchSize, size);
+
+            // 使用CompletableFuture执行异步任务
+            CompletableFuture&amp;lt;Void&amp;gt; future = CompletableFuture.runAsync(() -&amp;gt; {
+                try {
+                    userService.updateStudentsTransaction(transactionManager, transactionStatusList, allUser.subList(start, end));
+                } catch (Throwable e) {
+                    throw new CompletionException(e);
+                } finally {
+                    threadLatchs.countDown();
+                }
+            }, studentThreadPool).exceptionally(e -&amp;gt; {
+                isError.set(true);
+                return null;
+            });
+
+            futures.add(future);
+        }
+
+        // 等待所有任务完成
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+        if (!transactionStatusList.isEmpty()) {
+            if (isError.get()) {
+                transactionStatusList.forEach(transactionManager::rollback);
+            } else {
+                transactionStatusList.forEach(transactionManager::commit);
+            }
+        }
+
+        System.out.println(&amp;quot;主线程完成&amp;quot;);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;对于updateStudentsTransaction的调用里面是一样的代码&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;@Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
+    public void updateStudentsTransaction(PlatformTransactionManager transactionManager, List&amp;lt;TransactionStatus&amp;gt; transactionStatuses, List&amp;lt;UserDemo&amp;gt; userList) {
+        // 使用这种方式将事务状态都放在同一个事务里面
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW); // 事物隔离级别，开启新事务，这样会比较安全些。
+        TransactionStatus status = transactionManager.getTransaction(def); // 获得事务状态
+        transactionStatuses.add(status);
+
+        userList.forEach(s -&amp;gt; {
+//            if (&amp;quot;mike&amp;quot;.equals(s.getUserName())) {
+//                throw new RuntimeException(&amp;quot;故意抛出异常&amp;quot;);
+//            }
+            // 更新教师信息
+            // String teacher = s.getTeacher();
+            String newTeacher = &amp;quot;TNO_&amp;quot; + new Random().nextInt(100);
+            s.setUserName(newTeacher);
+            userMapper.updateByPrimaryKey(s);
+        });
+        System.out.println(&amp;quot;子线程：&amp;quot; + Thread.currentThread().getName());
+    }
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

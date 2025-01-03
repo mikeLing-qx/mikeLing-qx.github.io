@@ -1,0 +1,626 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Nginx on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/categories/nginx/</link>
+        <description>Recent content in Nginx on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Sat, 27 Apr 2024 15:39:00 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/categories/nginx/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Nginx</title>
+        <link>https://mikeLing-qx.github.io/p/nginx/</link>
+        <pubDate>Sat, 27 Apr 2024 15:39:00 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/nginx/</guid>
+        <description>&lt;h1 id=&#34;0-nginx-配置&#34;&gt;0. nginx 配置
+&lt;/h1&gt;&lt;p&gt;nginx配置文件主要分成四个部分：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;main，全局设置，影响其它部分所有设置&lt;/li&gt;
+&lt;li&gt;server，主机服务相关设置，主要用于指定虚拟主机域名、IP和端口&lt;/li&gt;
+&lt;li&gt;location，URL匹配特定位置后的设置，反向代理、内容篡改相关设置&lt;/li&gt;
+&lt;li&gt;upstream，上游服务器设置，负载均衡相关配置&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;server继承main，location继承server；upstream既不会继承指令也不会被继承。&lt;/p&gt;
+&lt;p&gt;​	在这四个部分当中，每个部分都包含若干指令，这些指令主要包含Nginx的主模块指令、事件模块 指令、HTTP核心模块指令，同时每个部分还可以使用其他HTTP模块指令，例如Http SSL模块、 HttpGzip Static模块和Http Addition模块等。&lt;/p&gt;
+&lt;p&gt;nginx 在 linux 的安装位置 一般为 /etc/nginx&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240805162750043.png&#34;
+	width=&#34;1139&#34;
+	height=&#34;708&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240805162750043&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;160&#34;
+		data-flex-basis=&#34;386px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;示例配置&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# 全局块配置
+user administrator administrators; # 配置用户或者组，默认为nobody nobody。
+worker_processes 2; # 允许生成的进程数，默认为1
+pid /nginx/pid/nginx.pid; # 指定nginx进程运行文件存放地址
+
+events {
+    accept_mutex on; # 设置网路连接序列化，防止惊群现象发生，默认为on
+    multi_accept on; # 设置一个进程是否同时接受多个网络连接，默认为off
+    worker_connections 1024; # 最大连接数，默认为512
+    # use epoll; # 事件驱动模型，可选select|poll|kqueue|epoll等
+}
+
+http {
+    include mime.types; # 文件扩展名与文件类型映射表
+    default_type application/octet-stream; # 默认文件类型，默认为text/plain
+
+    # access_log off; # 取消服务日志
+    log_format myFormat &#39;$remote_addr–$remote_user [$time_local] $request &#39;
+                      &#39;$status $body_bytes_sent $http_referer $http_user_agent &#39;
+                      &#39;$http_x_forwarded_for&#39;;
+    # 自定义格式
+    access_log log/access.log myFormat; # combined为日志格式的默认值
+
+    sendfile on; # 允许sendfile方式传输文件，默认为off
+    sendfile_max_chunk 100k; # 每个进程每次调用传输数量不能大于设定的值，默认为0
+
+    keepalive_timeout 65; # 连接超时时间，默认为75s
+
+    upstream mysvr {
+        server 127.0.0.1:7878;
+        server 192.168.10.121:3333 backup; # 热备
+    }
+
+    error_page 404 https://www.baidu.com;  # 错误页重定向
+
+    server {
+        keepalive_requests 120; # 单连接请求上限次数
+        listen 4545; # 监听端口
+        server_name 127.0.0.1; # 监听地址
+
+        location ~*^.+$ { # 请求的url过滤，正则匹配
+            # root path; # 根目录
+            # index vv.txt; # 设置默认页
+            proxy_pass http://mysvr; # 请求转向mysvr 定义的服务器列表
+            deny 127.0.0.1; # 拒绝的ip
+            allow 172.18.5.54; # 允许的ip
+        }
+    }
+}
+
+error_log log/error.log debug; # 指定日志路径和级别
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;1-upstream-负载均衡策略&#34;&gt;1. upstream 负载均衡策略
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;#动态服务器组
+upstream dynamicserver {
+	server 192.168.64.1:9001; #tomcat 1
+	server 192.168.64.1:9002; #tomcat 2
+	server 192.168.64.1:9003; #tomcat 3
+	server 192.168.64.1:9004; #tomcat 4
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240805165324863.png&#34;
+	width=&#34;791&#34;
+	height=&#34;503&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240805165324863&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;157&#34;
+		data-flex-basis=&#34;377px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240805165337592.png&#34;
+	width=&#34;800&#34;
+	height=&#34;393&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240805165337592&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;203&#34;
+		data-flex-basis=&#34;488px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;在轮询中，==如果服务器down掉了，会自动剔除该服务器==。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;默认配置就是轮询策略。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;此策略适合服务器配置相当，无状态且短平快的服务使用&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;==weight权重方式==&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-conf&#34;&gt;#动态服务器组
+upstream dynamicserver {
+	server 192.168.64.1:9001 weight=2; #tomcat 1
+	server 192.168.64.1:9002; #tomcat 2
+	server 192.168.64.1:9003 backup; #tomcat 3
+	server 192.168.64.1:9004 max_fails=3 fail_timeout=20s; #tomcat 4
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;权重越高分配到需要处理的请求越多。&lt;/li&gt;
+&lt;li&gt;此策略可以与least_conn和ip_hash结合使用。&lt;/li&gt;
+&lt;li&gt;此策略比较适合服务器的硬件配置差别比较大的情况。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;==&lt;strong&gt;ip_hash&lt;/strong&gt;==&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;指定负载均衡器按照基于客户端IP的分配方式，这个方法确保了相同的客户端的请求一直发送到相&lt;/p&gt;
+&lt;p&gt;同的服务器，以保证session会话。这样每个访客都固定访问一个后端服务器，可以解决session不&lt;/p&gt;
+&lt;p&gt;能跨服务器的问题。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;upstream dynamicserver {
+	ip_hash; #保证每个访客固定访问一个后端服务器
+	server 192.168.64.1:9001 weight=2; #tomcat 1
+	server 192.168.64.1:9002; #tomcat 2
+	server 192.168.64.1:9003 backup; #tomcat 3
+	server 192.168.64.1:9004 max_fails=3 fail_timeout=20s; #tomcat 4
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;在nginx版本1.3.1之前，不能在ip_hash中使用权重（weight）。&lt;/li&gt;
+&lt;li&gt;ip_hash不能与backup同时使用。&lt;/li&gt;
+&lt;li&gt;此策略适合有状态服务，比如session。&lt;/li&gt;
+&lt;li&gt;当有服务器需要剔除，必须手动down掉。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;least_conn&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;把==请求转发给连接数较少的后端服务器==。轮询算法是把请求平均的转发给各个后端，使它们的负载&lt;/p&gt;
+&lt;p&gt;大致相同；但是，有些请求占用的时间很长，会导致其所在的后端负载较高。这种情况下， least_conn这种方式就可以达到更好的负载均衡效&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;upstream dynamicserver {
+	least_conn; #把请求转发给连接数较少的后端服务器
+	server 192.168.64.1:9001 weight=2; #tomcat 1
+	server 192.168.64.1:9002; #tomcat 2
+	server 192.168.64.1:9003 backup; #tomcat 3
+	server 192.168.64.1:9004 max_fails=3 fail_timeout=20s; #tomcat 4
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;==重试策略==&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;upstream dynamicserver {
+	server 192.168.64.1:9001 fail_timeout=60s max_fails=3; #Server A
+	server 192.168.64.1:9002 fail_timeout=60s max_fails=3; #Server B
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;可以配置nginx 能够到其它的服务器进行重试, 并且可以配置指定的错误码&lt;/p&gt;
+&lt;p&gt;官方说明&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Syntax: proxy_next_upstream error | timeout | invalid_header | http_500 | 
+
+http_502 | http_503 | http_504 | http_403 | http_404 | off ...; 
+
+Default: proxy_next_upstream error timeout; 
+
+Context: http, server, location
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;upstream dynamicserver {
+	server 192.168.64.1:9001 fail_timeout=60s max_fails=3; #tomcat 1
+	server 192.168.64.1:9002 fail_timeout=60s max_fails=3; #tomcat 2
+}
+server {
+	server_name www.itcast.com;
+	default_type text/html;
+	charset utf-8;
+	location ~ .*$ {
+	index index.jsp index.html;
+	proxy_pass http://dynamicserver;
+	#下一节点重试的错误状态
+	proxy_next_upstream error timeout http_500 http_502 http_503
+	http_504;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-跨域配置&#34;&gt;2. 跨域配置
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;server {
+    listen 80;
+    server_name test.cross.com;
+
+    if ($host ~ (.*).cross.com) {
+        set $domain $1; ##记录二级域名值
+    }
+
+    # 是否允许请求带有验证信息
+    add_header Access-Control-Allow-Credentials true;
+
+    # 允许跨域访问的域名,可以是一个域的列表，也可以是通配符*
+    add_header Access-Control-Allow-Origin http://static.enjoy.com;
+
+    # 允许脚本访问的返回头
+    add_header Access-Control-Allow-Headers &#39;x-requested-with,content-type,Cache-Control,Pragma,Date,x-timestamp&#39;;
+
+    # 允许使用的请求方法，以逗号隔开
+    add_header Access-Control-Allow-Methods &#39;POST,GET,OPTIONS,PUT,DELETE&#39;;
+
+    # 允许自定义的头部，以逗号隔开,大小写不敏感
+    add_header Access-Control-Expose-Headers &#39;WWW-Authenticate,Server-Authorization&#39;;
+
+    # P3P支持跨域cookie操作
+    add_header P3P &#39;policyref=&amp;quot;/w3c/p3p.xml&amp;quot;, CP=&amp;quot;NOI DSP PSAa OUR BUS IND ONL UNI COM NAV INT LOC&amp;quot;&#39;;
+
+    if ($request_method = &#39;OPTIONS&#39;) { ##OPTIONS类的请求，是跨域先验请求
+        return 204; ##204代表ok
+    }
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;1-nginx-安装&#34;&gt;1. nginx 安装
+&lt;/h1&gt;&lt;pre&gt;&lt;code&gt;# 下载nginx
+wget http://nginx.org/download/nginx-1.21.1.tar.gz
+# 解压nginx
+tar -zxvf
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;进入auto目录&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240805152526474.png&#34;
+	width=&#34;643&#34;
+	height=&#34;623&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240805152526474&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;103&#34;
+		data-flex-basis=&#34;247px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;​	cc是用于编译的，对所有的操作系统的判断在os里面，其他所有文件都是为了辅助configure文件在 执行的时候去判定支持哪些模块，当前的操作系统有哪些特性可以供nginx使用 然后我们在看图1中，conf是配置文件的示例文件，方便我们在安装完以后可以直接把conf里面的 配置文件复制到安装目录下面, CHANGES这个文件里面描述了nginx的哪些特性,CHANGES.ru是一个俄罗 斯版本的描述，因为nginx的作者是一个俄罗斯人，configure是一个用来生成中间文件进行编译前的一 个必备动作 接下来我们通过 ./configure &amp;ndash;help | more 命令来查看一下&lt;/p&gt;
+&lt;h1 id=&#34;2-nginx-常用命令&#34;&gt;2. nginx 常用命令
+&lt;/h1&gt;&lt;pre&gt;&lt;code&gt;nginx -s reload #重新加载配置文件
+nginx -t -c /路径/nginx.conf # 检查配置文件是否正确
+nginx -v
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;3-openresty&#34;&gt;3. openresty
+&lt;/h1&gt;&lt;h2 id=&#34;1-yum-安装&#34;&gt;1. yum 安装
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;sudo yum install yum-utils
+
+sudo yum-config-manager --add-repo https://openresty.org/package/centos/openresty.repo
+
+sudo yum install openresty
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;环境设置&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;vi /etc/profile ##加入path路径
+export PATH=$PATH:/usr/local/openresty/nginx/sbin
+source /etc/profile ##生效配置
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;查看&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;nginx -v
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-常用命令&#34;&gt;2. 常用命令
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240805192301330.png&#34;
+	width=&#34;722&#34;
+	height=&#34;617&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240805192301330&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;117&#34;
+		data-flex-basis=&#34;280px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;3-商品详情页--架构&#34;&gt;3. 商品详情页&amp;ndash;架构
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240805192555827.png&#34;
+	width=&#34;924&#34;
+	height=&#34;468&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240805192555827&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;197&#34;
+		data-flex-basis=&#34;473px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;把商品详情页直接做成一个静态页面，&lt;/li&gt;
+&lt;li&gt;然后这样子每次全量的更新，把数据全部静态放 到 redis 里面，&lt;/li&gt;
+&lt;li&gt;每次数据变化的时候，我们就通过一个Java服务去渲染这个数据&lt;/li&gt;
+&lt;li&gt;然后把这个静态页面 推送到到文件服务器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;缺点&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;这种方案的缺点，如果商品很多，那么渲染的时间会很长，达不到实时的效果&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;文件服务器性能高，tomcat性能差，压力都在Tomcat服务器了&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;只能处理一些静态的东西，如果动态数据很多，比如有库存的，你不可能说每次去渲染，然后推送&lt;/p&gt;
+&lt;p&gt;到文件服务器，那不是更加慢？&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;通过openresty 改造的&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240805192746412.png&#34;
+	width=&#34;962&#34;
+	height=&#34;555&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240805192746412&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;173&#34;
+		data-flex-basis=&#34;416px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;生成静态页&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;添加修改页面的时候生成静态页，这个地方生成的是一个通用的静态页，敏感数据比如 价格，商品&lt;/p&gt;
+&lt;p&gt;名称等，通过占位符来替换，然后将生成的静态页的链接，以及敏感数据同步到redis中，如果只修改价&lt;/p&gt;
+&lt;p&gt;格不需要重新生成静态页，只需要修改redis敏感数据即可。&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;&lt;strong&gt;推送到文件服务器&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这个的文件服务器泛指能够提供静态文件处理的文件服务器，nginx代理静态文件，tomcat，以及&lt;/p&gt;
+&lt;p&gt;OSS等都算静态文件服务器，生成完静态文件后将文件推送到文件服务器，==并将请求连接存放进redis中==&lt;/p&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;&lt;strong&gt;布隆过滤器过滤请求&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Redis和nginx的速度很快，但是如果有人恶意请求不存在的请求会造成redis很大的开销，那么可以&lt;/p&gt;
+&lt;p&gt;采用布隆过滤器将不存在的请求过滤出去。&lt;/p&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;&lt;strong&gt;lua直连Redis读取数据&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;因为java连接Reids进行操作并发性能很弱，相对于OpenResty来说性能差距很大，这里使用&lt;/p&gt;
+&lt;p&gt;OpenResty，读取Redis中存放的URL以及敏感数据。&lt;/p&gt;
+&lt;ol start=&#34;5&#34;&gt;
+&lt;li&gt;&lt;strong&gt;OpenResty渲染数据&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;从Redis获取到URL后lua脚本抓取模板页面内容，==然后通过redis里面的敏感数据进行渲染==然后返回&lt;/p&gt;
+&lt;p&gt;前端，因为都是lua脚本操作性能会很高&lt;/p&gt;
+&lt;h2 id=&#34;4-redis布隆过滤器&#34;&gt;4. redis布隆过滤器
+&lt;/h2&gt;&lt;p&gt;==它用于高效地判断一个元素是否在一个集合中，特别适用于需要快速判断大量数据的场景==&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240806093230755.png&#34;
+	width=&#34;966&#34;
+	height=&#34;529&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240806093230755&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;182&#34;
+		data-flex-basis=&#34;438px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;布隆过滤器的原理&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;布隆过滤器其==本质就是一个只包含0和1的数组==。具体操作当一个元素被加入到集合里面后，该元素&lt;/p&gt;
+&lt;p&gt;通过K个Hash函数运算得到K个hash后的值，然后将K个值映射到这个位数组对应的位置，把对应位置的&lt;/p&gt;
+&lt;p&gt;值设置为1。查询是否存在时，我们就看对应的映射点位置如果全是1，他就很可能存在（跟hash函数的&lt;/p&gt;
+&lt;p&gt;个数和hash函数的设计有关），如果有一个位置是0，那这个元素就一定不存在&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;1-包安装&#34;&gt;1. 包安装
+&lt;/h3&gt;&lt;p&gt;创建目录&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mkdir -p /tmp/etc/redis/
+mkdir -p /tmp/data/redis/node{1..6}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;redis 配置文件&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;cat &amp;gt; /tmp/etc/redis/redis.conf&amp;lt;&amp;lt; EOF
+protected-mode no
+port 6379
+tcp-backlog 511
+timeout 0
+tcp-keepalive 300
+daemonize no
+supervised no
+pidfile /var/run/redis_6379.pid
+loglevel notice
+logfile &amp;quot;&amp;quot;
+databases 1
+always-show-logo yes
+save 900 1
+save 300 10
+save 60 10000
+stop-writes-on-bgsave-error yes
+rdbcompression yes
+rdbchecksum yes
+dbfilename dump.rdb
+rdb-del-sync-files no
+dir ./
+replica-serve-stale-data yes
+replica-read-only yes
+repl-diskless-sync no
+repl-diskless-sync-delay 5
+repl-diskless-load disabled
+repl-disable-tcp-nodelay no
+replica-priority 100
+acllog-max-len 128
+lazyfree-lazy-eviction no
+lazyfree-lazy-expire no
+lazyfree-lazy-server-del no
+replica-lazy-flush no
+lazyfree-lazy-user-del no
+oom-score-adj no
+oom-score-adj-values 0 200 800
+appendonly yes
+appendfilename &amp;quot;appendonly.aof&amp;quot;
+appendfsync everysec
+no-appendfsync-on-rewrite no
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb
+aof-load-truncated yes
+aof-use-rdb-preamble yes
+lua-time-limit 5000
+cluster-enabled yes
+cluster-config-file nodes-6379.conf
+cluster-node-timeout 15000
+slowlog-log-slower-than 10000
+slowlog-max-len 128
+latency-monitor-threshold 0
+notify-keyspace-events &amp;quot;&amp;quot;
+hash-max-ziplist-entries 512
+hash-max-ziplist-value 64
+list-max-ziplist-size -2
+list-compress-depth 0
+set-max-intset-entries 512
+zset-max-ziplist-entries 128
+zset-max-ziplist-value 64
+hll-sparse-max-bytes 3000
+stream-node-max-bytes 4096
+stream-node-max-entries 100
+activerehashing yes
+client-output-buffer-limit normal 0 0 0
+client-output-buffer-limit replica 256mb 64mb 60
+client-output-buffer-limit pubsub 32mb 8mb 60
+hz 10
+dynamic-hz yes
+aof-rewrite-incremental-fsync yes
+rdb-save-incremental-fsync yes
+jemalloc-bg-thread yes
+loadmodule /etc/redis/redisbloom.so
+EOF
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;docker-compose.yml&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;version: &#39;2&#39;
+
+services:
+  redis01:
+    image: redis
+    hostname: redis01
+    container_name: redis01
+    networks:
+      docker-network:
+          ipv4_address: 172.31.0.2
+    ports:
+      - &amp;quot;7001:6379&amp;quot;
+    volumes:
+      - &amp;quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&amp;quot;
+      - &amp;quot;/tmp/data/redis/node1:/data&amp;quot;
+      - &amp;quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&amp;quot;
+    command: redis-server /etc/redis/redis.conf
+
+  redis02:
+    image: redis
+    hostname: redis02
+    container_name: redis02
+    networks:
+      docker-network:
+          ipv4_address: 172.31.0.3
+    ports:
+      - &amp;quot;7002:6379&amp;quot;
+    volumes:
+      - &amp;quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&amp;quot;
+      - &amp;quot;/tmp/data/redis/node2:/data&amp;quot;
+      - &amp;quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&amp;quot;
+    command: redis-server /etc/redis/redis.conf
+
+  redis03:
+    image: redis
+    hostname: redis03
+    container_name: redis03
+    networks:
+      docker-network:
+          ipv4_address: 172.31.0.4
+    ports:
+      - &amp;quot;7003:6379&amp;quot;
+    volumes:
+      - &amp;quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&amp;quot;
+      - &amp;quot;/tmp/data/redis/node3:/data&amp;quot;
+      - &amp;quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&amp;quot;
+    command: redis-server /etc/redis/redis.conf
+
+  redis04:
+    image: redis
+    hostname: redis04
+    container_name: redis04
+    networks:
+      docker-network:
+          ipv4_address: 172.31.0.5
+    ports:
+      - &amp;quot;7004:6379&amp;quot;
+    volumes:
+      - &amp;quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&amp;quot;
+      - &amp;quot;/tmp/data/redis/node4:/data&amp;quot;
+      - &amp;quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&amp;quot;
+    command: redis-server /etc/redis/redis.conf
+
+  redis05:
+    image: redis
+    hostname: redis05
+    container_name: redis05
+    networks:
+       docker-network:
+          ipv4_address: 172.31.0.6
+    ports:
+      - &amp;quot;7005:6379&amp;quot;
+    volumes:
+      - &amp;quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&amp;quot;
+      - &amp;quot;/tmp/data/redis/node5:/data&amp;quot;
+      - &amp;quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&amp;quot;
+    command: redis-server /etc/redis/redis.conf
+
+  redis06:
+    image: redis
+    hostname: redis06
+    container_name: redis06
+    networks:
+      docker-network:
+          ipv4_address: 172.31.0.7
+    ports:
+      - &amp;quot;7006:6379&amp;quot;
+    volumes:
+      - &amp;quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&amp;quot;
+      - &amp;quot;/tmp/data/redis/node6:/data&amp;quot;
+      - &amp;quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&amp;quot;
+    command: redis-server /etc/redis/redis.conf
+
+networks:
+  docker-network:
+    ipam:
+      config:
+        - subnet: 172.31.0.0/16
+          gateway: 172.31.0.1
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;2--docker-安装&#34;&gt;2.  docker 安装
+&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;docker run -d -p 6379:6379 --name redis-redisbloom redislabs/rebloom:latest
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;3-常用命令&#34;&gt;3. 常用命令
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240807190515768.png&#34;
+	width=&#34;739&#34;
+	height=&#34;730&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240807190515768&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;101&#34;
+		data-flex-basis=&#34;242px&#34;
+	
+&gt;&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

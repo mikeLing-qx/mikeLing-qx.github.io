@@ -1,0 +1,1992 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>分布式 on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/</link>
+        <description>Recent content in 分布式 on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Sun, 14 May 2023 15:03:55 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Seata</title>
+        <link>https://mikeLing-qx.github.io/p/seata/</link>
+        <pubDate>Sun, 14 May 2023 15:03:55 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/seata/</guid>
+        <description>&lt;p&gt;官方文档: &lt;a class=&#34;link&#34; href=&#34;https://seata.io/zh-cn/docs/overview/what-is-seata.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://seata.io/zh-cn/docs/overview/what-is-seata.html&lt;/a&gt;&lt;/p&gt;
+&lt;h1 id=&#34;1-at-模式&#34;&gt;1. AT 模式
+&lt;/h1&gt;&lt;h2 id=&#34;1-at-一阶段提交&#34;&gt;1. AT 一阶段提交
+&lt;/h2&gt;&lt;p&gt;第一阶段包括提交业务数据和回滚日志（undoLog）&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/image-20211227143300338.png&#34;
+	width=&#34;667&#34;
+	height=&#34;583&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20211227143300338&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;114&#34;
+		data-flex-basis=&#34;274px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/image-20241208170920817.png&#34;
+	width=&#34;2226&#34;
+	height=&#34;1439&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241208170920817&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;154&#34;
+		data-flex-basis=&#34;371px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;==全局事务的状态和操作决策的关键仍在 &lt;strong&gt;TC&lt;/strong&gt; 中==&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;@GlobalTransactional&lt;/code&gt;的方法&lt;strong&gt;通过AOP实现了，开启全局事务和提交全局事务两个操作&lt;/strong&gt;，与Spring 事务机制类似，当 GlobalTransactionalInterceptor 在事务执行过程中捕获到Throwable时，会发起全局事务回滚&lt;/p&gt;
+&lt;p&gt;0.1 步骤中会生成一个&lt;strong&gt;全局事务ID&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;0.2 所有事务参与者执行结束后，一阶段事务提交&lt;/p&gt;
+&lt;h3 id=&#34;undo-log-结构&#34;&gt;undo log 结构
+&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;language-text&#34;&gt;// 省略了相关方法
+public class SQLUndoLog {
+ // insert, update ...
+    private SQLType sqlType;
+
+    private String tableName;
+
+	// 执行前
+    private TableRecords beforeImage;
+
+	// 执行后
+    private TableRecords afterImage;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-at-二阶段&#34;&gt;2. AT 二阶段
+&lt;/h2&gt;&lt;p&gt;二阶段是&lt;strong&gt;完全异步化的并且完全由Seata控制&lt;/strong&gt;，Seata根据所有事务&lt;strong&gt;参与者的提交情况决定二阶段如何处理&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果所有事务提交成功，则二阶段的任务就是删除一阶段生成 的undoLog，修改分支事务的状态, 并释放&lt;strong&gt;全局锁&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;如果部分事务参与者提交失败，则需要根据undoLog对已经注册的事务分支进行回滚，并释放&lt;strong&gt;全局锁&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;3-流程思考&#34;&gt;3. 流程思考
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;问题1. Seata如何做到==无侵入的分析业务SQL生成undoLog==，注册事务分支等操作？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;==Seata 代理了DataSource==，我们可以通过在代码注入一个DataSource来验证我的说法，目前的DataSource 是 &lt;code&gt;io.seata.rm.datasource.DataSourceProxy&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;问题2. ConnectionProxy 如何判断当前事务是全局事务，还是本地事务？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;==前线程是否绑定了全局事务id==，在进行全局事务之前，需要调用&lt;code&gt;RootContext.bind(xid);&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;问题3. 全局事务并发更新&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;订单扣减库存的场景为例，如果TX1和TX2同时扣减product_id为1的库存，这时Seata会不会生成相同的beforeImage？&lt;/p&gt;
+&lt;p&gt;举个例子，TX1读库存为100，TX1扣减库存1，此时BeforeImage为100 紧接着 如果TX2读库存也为100，那么就有问题了，不管TX2扣减多少库存，如果TX1回滚那么相当于覆盖了TX2扣减的库存，出现了脏写&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;io.seata.rm.datasource.exec.AbstractDMLBaseExecutor::executeAutoCommitFalse&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;beforeImage()&lt;/code&gt;，这是一个抽象方法，看一下他的子类&lt;code&gt;UpdateExecutor&lt;/code&gt;是如何实现的&lt;/p&gt;
+&lt;p&gt;直接通过 select for update&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;问题4. 全局事务外的更新&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;我们现在可以确认在Seata的保证下，全局事务，不会造成数据的脏写，但是全局事务外会！&lt;/p&gt;
+&lt;p&gt;什么意思呢？&lt;/p&gt;
+&lt;p&gt;还以库存为例&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;用户正在抢购，用户A完成了1阶段的库存扣减，这个时候库存为99。&lt;/li&gt;
+&lt;li&gt;此时库存管理员上线了，他查了一下库存为99。嗯&amp;hellip;太少了，我加100个，库存管理员把库存更新为200。&lt;/li&gt;
+&lt;li&gt;而此时seata给用户A生成beforeImage为100，如果此时用户A的全局事务失败了，发生了回滚，再次将库存更新为100&amp;hellip; 再次出现脏写&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Seata 针对这个问题，提供了&lt;code&gt;@GlobalLock&lt;/code&gt;注解，标记该注解时，会像全局事务一样进行SQL分析，竞争全局锁，就不会出现上述问题了&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;问题5. @GlobalTransactional 和 @Transactional 同时使用会怎么样&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;我们上文中已经说过了 @GlobalTransactional 的作用了，他是负责开启全局事务/提交事务1阶段，说白了@GlobalTransactional 只和Seata-server 交互，而 @Transactional 管理的是本地数据库的事务，所以二者不发生冲突。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;但是需要注意 @GlobalTransactional AOP 覆盖范围一定要大于 @Transactional&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;事务分组说明。
+1.事务分组是什么？
+事务分组是seata的资源逻辑，类似于服务实例。在file.conf中的my_test_tx_group就是一个事务分组。
+
+2.通过事务分组如何找到后端集群？
+首先程序中配置了事务分组（GlobalTransactionScanner 构造方法的txServiceGroup参数），程序会通过用户配置的配置中心去寻找service.vgroup_mapping.事务分组配置项，取得配置项的值就是TC集群的名称。拿到集群名称程序通过一定的前后缀+集群名称去构造服务名，各配置中心的服务名实现不同。拿到服务名去相应的注册中心去拉取相应服务名的服务列表，获得后端真实的TC服务列表。
+
+3.为什么这么设计，不直接取服务名？
+这里多了一层获取事务分组到映射集群的配置。这样设计后，事务分组可以作为资源的逻辑隔离单位，当发生故障时可以快速failover。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;4-注意事项&#34;&gt;4. 注意事项
+&lt;/h2&gt;&lt;h3 id=&#34;1-at-模式注意事项&#34;&gt;1. AT 模式注意事项
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;必须使用代理数据源，有 3 种形式可以代理数据源：&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;依赖 seata-spring-boot-starter 时，自动代理数据源，无需额外处理。&lt;/li&gt;
+&lt;li&gt;依赖 seata-all 时，使用 @EnableAutoDataSourceProxy (since 1.1.0) 注解，注解参数可选择 jdk 代理或者 cglib 代理。&lt;/li&gt;
+&lt;li&gt;依赖 seata-all 时，也可以手动使用 DatasourceProxy 来包装 DataSource。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;配置 GlobalTransactionScanner，使用 seata-all 时需要手动配置，使用 seata-spring-boot-starter 时无需额外处理。&lt;/li&gt;
+&lt;li&gt;业务表中必须包含单列主键，若存在复合主键，请参考问题 13 。&lt;/li&gt;
+&lt;li&gt;每个业务库中必须包含 undo_log 表，若与分库分表组件联用，分库不分表。&lt;/li&gt;
+&lt;li&gt;跨微服务链路的事务需要对相应 RPC 框架支持，目前 seata-all 中已经支持：Apache Dubbo、Alibaba Dubbo、sofa-RPC、Motan、gRpc、httpClient，对于 Spring Cloud 的支持，请大家引用 spring-cloud-alibaba-seata。其他自研框架、异步模型、消息消费事务模型请结合 API 自行支持。&lt;/li&gt;
+&lt;li&gt;目前AT模式支持的数据库有：MySQL、Oracle、PostgreSQL和 TiDB。&lt;/li&gt;
+&lt;li&gt;使用注解开启分布式事务时，若默认服务 provider 端加入 consumer 端的事务，provider 可不标注注解。但是，provider 同样需要相应的依赖和配置，仅可省略注解。&lt;/li&gt;
+&lt;li&gt;使用注解开启分布式事务时，若要求事务回滚，必须将异常抛出到事务的发起方，被事务发起方的 @GlobalTransactional 注解感知到。provide 直接抛出异常 或 定义错误码由 consumer 判断再抛出异常。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;2-事务上下文&#34;&gt;2. 事务上下文
+&lt;/h1&gt;&lt;p&gt;​	Seata 的事务上下文由 RootContetxt 来管理&lt;/p&gt;
+&lt;p&gt;​	1. 应用开启一个全局事务后，RootContext 会自动绑定该事务的 XID，事务结束（提交或回滚完成），RootContext 会自动解绑 XID。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// 绑定 XID
+RootContext.bind(xid);
+
+// 解绑 XID
+String xid = RootContext.unbind();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;应用可以通过 RootContext 的 API 接口来获取当前运行时的全局事务 XID&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;// 获取 XID
+String xid = RootContext.getXID();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;应用是否运行在一个全局事务的上下文中，就是通过 RootContext 是否绑定 XID 来判定的&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;public static boolean inGlobalTransaction() {
+        return CONTEXT_HOLDER.get(KEY_XID) != null;
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;1-事务传播&#34;&gt;1. 事务传播
+&lt;/h2&gt;&lt;p&gt;​	Seata 全局事务的传播机制就是指==事务上下文的传播，根本上，就是 XID 的应用运行时的传播方式==。&lt;/p&gt;
+&lt;h3 id=&#34;1-服务内部的事务传播&#34;&gt;1. 服务内部的事务传播
+&lt;/h3&gt;&lt;p&gt;默认的，RootContext 的实现是基于 ==&lt;em&gt;ThreadLocal&lt;/em&gt; 的，即 XID 绑定在当前线程上下文中==。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class ThreadLocalContextCore implements ContextCore {
+
+    private ThreadLocal&amp;lt;Map&amp;lt;String, String&amp;gt;&amp;gt; threadLocal = new ThreadLocal&amp;lt;Map&amp;lt;String, String&amp;gt;&amp;gt;() {
+        @Override
+        protected Map&amp;lt;String, String&amp;gt; initialValue() {
+            return new HashMap&amp;lt;String, String&amp;gt;();
+        }
+
+    };
+
+    @Override
+    public String put(String key, String value) {
+        return threadLocal.get().put(key, value);
+    }
+
+    @Override
+    public String get(String key) {
+        return threadLocal.get().get(key);
+    }
+
+    @Override
+    public String remove(String key) {
+        return threadLocal.get().remove(key);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;所以服务内部的 XID 传播通常是天然的通过同一个线程的调用链路串连起来的。默认不做任何处理，事务的上下文就是传播下去的。&lt;/p&gt;
+&lt;p&gt;如果希望挂起事务上下文，则需要通过 RootContext 提供的 API 来实现：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;// 挂起（暂停）
+String xid = RootContext.unbind();
+
+// TODO: 运行在全局事务外的业务逻辑
+
+// 恢复全局事务上下文
+RootContext.bind(xid);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;2-跨服务调用的事务传播&#34;&gt;2. 跨服务调用的事务传播
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;跨服务调用场景下的事务传播，本质上就是要把 XID 通过==服务调用传递到服务提供方==，并绑定到 RootContext 中去&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/image-20220428151130759.png&#34;
+	width=&#34;389&#34;
+	height=&#34;280&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220428151130759&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;138&#34;
+		data-flex-basis=&#34;333px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;对Dubbo 的支持的机制的解读&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;/**
+ * The type Transaction propagation filter.
+ */
+@Activate(group = { Constants.PROVIDER, Constants.CONSUMER }, order = 100)
+public class TransactionPropagationFilter implements Filter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionPropagationFilter.class);
+
+    @Override
+    public Result invoke(Invoker&amp;lt;?&amp;gt; invoker, Invocation invocation) throws RpcException {
+        String xid = RootContext.getXID(); // 获取当前事务 XID
+        String rpcXid = RpcContext.getContext().getAttachment(RootContext.KEY_XID); // 获取 RPC 调用传递过来的 XID
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(&amp;quot;xid in RootContext[&amp;quot; + xid + &amp;quot;] xid in RpcContext[&amp;quot; + rpcXid + &amp;quot;]&amp;quot;);
+        }
+        boolean bind = false;
+        if (xid != null) { // Consumer：把 XID 置入 RPC 的 attachment 中
+            RpcContext.getContext().setAttachment(RootContext.KEY_XID, xid);
+        } else {
+            if (rpcXid != null) { // Provider：把 RPC 调用传递来的 XID 绑定到当前运行时
+                RootContext.bind(rpcXid);
+                bind = true;
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(&amp;quot;bind[&amp;quot; + rpcXid + &amp;quot;] to RootContext&amp;quot;);
+                }
+            }
+        }
+        try {
+            return invoker.invoke(invocation); // 业务方法的调用
+
+        } finally {
+            if (bind) { // Provider：调用完成后，对 XID 的清理
+                String unbindXid = RootContext.unbind();
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(&amp;quot;unbind[&amp;quot; + unbindXid + &amp;quot;] from RootContext&amp;quot;);
+                }
+                if (!rpcXid.equalsIgnoreCase(unbindXid)) {
+                    LOGGER.warn(&amp;quot;xid in change during RPC from &amp;quot; + rpcXid + &amp;quot; to &amp;quot; + unbindXid);
+                    if (unbindXid != null) { // 调用过程有新的事务上下文开启，则不能清除
+                        RootContext.bind(unbindXid);
+                        LOGGER.warn(&amp;quot;bind [&amp;quot; + unbindXid + &amp;quot;] back to RootContext&amp;quot;);
+                    }
+                }
+            }
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;3-tcc-模式&#34;&gt;3. TCC 模式
+&lt;/h1&gt;&lt;p&gt;&lt;strong&gt;Try&lt;/strong&gt;（尝试执行）、&lt;strong&gt;Confirm&lt;/strong&gt;（确认执行）、&lt;strong&gt;Cancel&lt;/strong&gt;（取消执行）。它要求业务服务提供者定义这些阶段的具体实现。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Try&lt;/strong&gt; 阶段：进行业务操作的预留资源操作。例如，扣款、锁库存等操作。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Confirm&lt;/strong&gt; 阶段：在所有服务都成功执行 &lt;strong&gt;Try&lt;/strong&gt; 后，正式执行操作（如，扣款成功并提交）。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Cancel&lt;/strong&gt; 阶段：如果任何服务失败，回滚所有已做的操作（如，取消扣款、释放库存等）。&lt;/p&gt;
+&lt;h1 id=&#34;4-saga--长事务模式&#34;&gt;4. SAGA  长事务模式
+&lt;/h1&gt;&lt;pre&gt;&lt;code&gt;SAGA 模式是一种**基于补偿机制**的分布式事务模型，通过将**长事务分解为多个子事务（也叫局部事务）**，每个局部事务都可以独立提交。每当一个子事务失败时，SAGA 会触发补偿事务，回滚之前的事务，从而实现最终一致性。 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;事务模式&lt;/th&gt;
+          &lt;th&gt;适用场景&lt;/th&gt;
+          &lt;th&gt;优缺点&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;AT 模式&lt;/td&gt;
+          &lt;td&gt;&lt;/td&gt;
+          &lt;td&gt;简单、易用，适合无需精细控制的场景，但不适合多数据库&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;TCC 模式&lt;/td&gt;
+          &lt;td&gt;适用于需要精确控制的复杂业务流程&lt;/td&gt;
+          &lt;td&gt;高度灵活，但需要开发者实现 Try、Confirm、Cancel  方法&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;SAGA 模式&lt;/td&gt;
+          &lt;td&gt;长时间的业务流程、需要逐步执行的事务&lt;/td&gt;
+          &lt;td&gt;适合长事务，支持补偿，但实现复杂，性能相对较低&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;XA 模式&lt;/td&gt;
+          &lt;td&gt;跨数据库、分布式消息队列等全局事务场景&lt;/td&gt;
+          &lt;td&gt;保证全局一致性，但实现复杂、性能较低&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h1 id=&#34;5-xa&#34;&gt;5. XA
+&lt;/h1&gt;&lt;p&gt;XA模式使用两阶段提交来保证所有资源同时提交或回滚任何特定的事务。第一阶段，事务协调者通知每个事务参与者执行本地事务，本地事务执行完成后报告事务执行状态给事务协调者，此时事务不提交，继续持有数据库锁。第二阶段，根据第一阶段的执行结果而决定，==如果一阶段都成功，则通知所有事务参与者提交事务；如果一阶段任意一个参与者失败，则通知所有事务参与者回滚事务==&lt;/p&gt;
+&lt;p&gt;TM: 事务管理器&lt;/p&gt;
+&lt;p&gt;RM: 资源管理器&lt;/p&gt;
+&lt;h1 id=&#34;6-二阶段提交和三阶段提交&#34;&gt;6. 二阶段提交和三阶段提交
+&lt;/h1&gt;&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;特性&lt;/th&gt;
+          &lt;th&gt;两阶段提交（2PC）&lt;/th&gt;
+          &lt;th&gt;三阶段提交（3PC）&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;事务一致性&lt;/td&gt;
+          &lt;td&gt;提供强一致性&lt;/td&gt;
+          &lt;td&gt;提供强一致性&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;容错性&lt;/td&gt;
+          &lt;td&gt;如果协调器宕机或网络分区，可能造成死锁&lt;/td&gt;
+          &lt;td&gt;增加超时回滚机制，降低死锁风险&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;性能开销&lt;/td&gt;
+          &lt;td&gt;较低（两轮通信）&lt;/td&gt;
+          &lt;td&gt;较高（三轮通信）&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;资源锁定&lt;/td&gt;
+          &lt;td&gt;一阶段锁定资源直到二阶段完成&lt;/td&gt;
+          &lt;td&gt;仅在预提交阶段锁定资源&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;==二阶段提交流程==&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;第一阶段（Prepare 阶段）&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;事务管理器（TM）向所有参与的资源管理器（RM）发送 &lt;code&gt;Prepare&lt;/code&gt; 请求，询问它们是否可以提交事务。&lt;/li&gt;
+&lt;li&gt;参与者（RM）会执行事务操作但不提交，并将操作的锁定资源、事务状态等持久化。&lt;/li&gt;
+&lt;li&gt;如果所有参与者都返回成功，第一阶段完成。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;第二阶段（Commit 或 Rollback 阶段）&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果第一阶段所有参与者都成功，TM 向所有 RM 发送 &lt;code&gt;Commit&lt;/code&gt; 请求，要求它们正式提交事务。&lt;/li&gt;
+&lt;li&gt;如果任何参与者在第一阶段失败，TM 会发送 &lt;code&gt;Rollback&lt;/code&gt; 请求，要求所有参与者回滚已执行的事务操作。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;==三阶段提交流程==&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;CanCommit（询问阶段）&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;协调者询问所有参与者&lt;strong&gt;是否可以提交事务&lt;/strong&gt;，参与者仅反馈“是”或“否”，并不锁定资源。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;PreCommit（预提交阶段）&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果所有参与者答复“是”，协调者发送“预提交”请求，==参与者锁定资源并将事务状态设置为“准备提交”==，但尚未正式提交。&lt;/li&gt;
+&lt;li&gt;如果任何参与者答复“否”，协调者发送“回滚”指令，所有参与者释放资源。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;DoCommit（正式提交阶段）&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;协调者在预提交阶段成功后，发送“提交”指令，所有参与者正式完成事务。&lt;/li&gt;
+&lt;li&gt;如果协调者未能发送指令，参与者会超时自动回滚（进一步提高容错能力）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;seata&#34;&gt;Seata
+&lt;/h1&gt;&lt;p&gt;简介&lt;/p&gt;
+&lt;p&gt;2019 年 1 月，阿里巴巴中间件团队发起了开源项目 &lt;a class=&#34;link&#34; href=&#34;https://www.oschina.net/p/fescar&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;em&gt;Fescar&lt;/em&gt;&lt;/a&gt;&lt;em&gt;（Fast &amp;amp; Easy Commit And Rollback）&lt;/em&gt;，和社区一起共建开源分布式事务解决方案。Fescar 的愿景是让分布式事务的使用像本地事务的使用一样，简单和高效，并逐步解决开发者们遇到的分布式事务方面的所有难题。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Fescar 开源后，蚂蚁金服加入 Fescar 社区参与共建，并在 Fescar 0.4.0 版本中贡献了 TCC 模式。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;为了打造更中立、更开放、生态更加丰富的分布式事务开源社区，经过社区核心成员的投票，大家决定对 Fescar 进行品牌升级，并更名为 &lt;strong&gt;Seata&lt;/strong&gt;，意为：&lt;strong&gt;Simple Extensible Autonomous Transaction Architecture&lt;/strong&gt;，是一套一站式分布式事务解决方案。&lt;/p&gt;
+&lt;p&gt;Seata 融合了阿里巴巴和蚂蚁金服在分布式事务技术上的积累，并沉淀了新零售、云计算和新金融等场景下丰富的实践经验。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;核心组件：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Transaction Coordinator (TC)： 事务协调器，维护全局事务的运行状态，负责协调并驱动全局事务的提交或回滚。&lt;/li&gt;
+&lt;li&gt;Transaction Manager (TM)： 控制全局事务的边界，负责开启一个全局事务，并最终发起全局提交或全局回滚的决议。&lt;/li&gt;
+&lt;li&gt;Resource Manager (RM)： 控制分支事务，负责分支注册、状态汇报，并接收事务协调器的指令，驱动分支（本地）事务的提交和回滚。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;工作流程：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;TM 向 TC 申请开启一个全局事务，全局事务创建成功并生成一个全局唯一的事务ID（XID），XID 在微服务调用链路的上下文中传播。&lt;/li&gt;
+&lt;li&gt;RM 向 TC 注册分支事务，接着执行这个分支事务并提交事务（==重点：RM在此阶段就已经执行了本地事务的提交/回滚==），最后将执行结果汇报给TC。&lt;/li&gt;
+&lt;li&gt;TM 根据 TC 中所有的分支事务的执行情况，发起全局提交或回滚决议。&lt;/li&gt;
+&lt;li&gt;TC 调度 XID 下管辖的全部分支事务完成提交或回滚请求。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/333.png&#34;
+	width=&#34;960&#34;
+	height=&#34;551&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;174&#34;
+		data-flex-basis=&#34;418px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;262-seata支持的模式&#34;&gt;2.6.2 Seata支持的模式
+&lt;/h4&gt;&lt;p&gt;seata中有两种常见分布式事务实现方案，AT及TCC&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;AT模式：赖于RM拥有本地数据库事务的能力，对于客户业务无侵入性&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/222.png&#34;
+	width=&#34;721&#34;
+	height=&#34;260&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;277&#34;
+		data-flex-basis=&#34;665px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;TCC 模式&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;263-seata的优点&#34;&gt;2.6.3 Seata的优点
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;对业务无侵入&lt;/strong&gt;：即减少技术架构上的微服务化所带来的分布式事务问题对业务的侵入
+&lt;strong&gt;高性能&lt;/strong&gt;：减少分布式事务解决方案所带来的性能消耗(2PC)&lt;/p&gt;
+&lt;h4 id=&#34;264-at模式&#34;&gt;2.6.4 AT模式
+&lt;/h4&gt;&lt;p&gt;Seata AT模式是基于XA事务演进而来的一个分布式事务中间件，XA是一个基于数据库实现的分布式事务协议，本质上和两阶段提交一样，需要数据库支持，Mysql5.6以上版本支持XA协议，其他数据库如Oracle，DB2也实现了XA接口。&lt;/p&gt;
+&lt;p&gt;AT模式分为两个阶段，如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;第一阶段：本地数据备份阶段&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;Seata 的 JDBC 数据源代理通过对业务 SQL 的解析，把==业务数据在变化前后的数据镜像组织成回滚日志==（XID/分支事务ID（Branch ID/变化前的数据/变化后的数据）。&lt;/li&gt;
+&lt;li&gt;将回滚日志存入一张日志表UNDO_LOG（==需要手动创建==）,并对UNDO_LOG表中的这条数据形成行锁（for update）。&lt;/li&gt;
+&lt;li&gt;若锁定失败，说明有其他事务在操作这条数据，它会在一段时间内重试，重试失败则回滚本地事务，并向TC汇报本地事务执行失败。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这样，可以保证：&lt;strong&gt;任何提交的业务数据的更新一定有相应的回滚日志存在&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/1565820909345.png&#34;
+	width=&#34;1132&#34;
+	height=&#34;378&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565820909345&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;299&#34;
+		data-flex-basis=&#34;718px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;目的：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;基于这样的机制，分支的本地事务便可以在全局事务的第一阶段提交，并马上释放本地事务锁定的资源。&lt;/li&gt;
+&lt;li&gt;有了回滚日志之后，可以在第一阶段释放对资源的锁定，降低了锁范围，提高效率，即使第二阶段发生异常需要回滚，只需找对undolog中对应数据并反解析成sql来达到回滚目的。&lt;/li&gt;
+&lt;li&gt;Seata通过代理数据源（DataSource-&amp;gt;DataSourceProxy）将业务sql的执行解析成undolog来与业务数据的更新同时入库，达到了对业务无侵入的效果&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;第二阶段：全局事务提交/回滚&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;全局提交&lt;/strong&gt;：
+&lt;ol&gt;
+&lt;li&gt;所有分支事务此时已经完成提交，所有分支事务提交都正常。&lt;/li&gt;
+&lt;li&gt;==TM从TC获知后会决议执行====全局提交====，TC异步通知所有的RM释放UNDO_LOG表中的行锁==，同时清理掉UNDO_LOG表中刚才释放锁的那条数据。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/1565821037492.png&#34;
+	width=&#34;1218&#34;
+	height=&#34;525&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565821037492&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;232&#34;
+		data-flex-basis=&#34;556px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;全局回滚&lt;/strong&gt;：
+&lt;ol&gt;
+&lt;li&gt;若任何一个RM一阶段事务提交失败，通知TC提交失败。&lt;/li&gt;
+&lt;li&gt;==TM从TC获知后会决议执行全局回滚====，====TC向所有的RM发送回滚请求==。&lt;/li&gt;
+&lt;li&gt;RM通过XID和Branch ID找到相应的回滚日志记录，&lt;strong&gt;通过回滚记录生成反向的更新 SQL 并执行&lt;/strong&gt;，以完成分支的回滚，同时释放锁，清除UNDO_LOG表中释放锁的那条数据。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/1565821069728.png&#34;
+	width=&#34;1207&#34;
+	height=&#34;564&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565821069728&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;214&#34;
+		data-flex-basis=&#34;513px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;265-tcc模式&#34;&gt;2.6.5 TCC模式
+&lt;/h4&gt;&lt;p&gt;seata也针对TCC做了适配兼容，支持TCC事务方案，原理前面已经介绍过，基本思路就是使用侵入业务上的补偿及事务管理器的协调来达到全局事务的一起提交及回滚。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/1565821173446.png&#34;
+	width=&#34;1223&#34;
+	height=&#34;615&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565821173446&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;198&#34;
+		data-flex-basis=&#34;477px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;27-跨mysql-ip测试&#34;&gt;2.7 跨mysql ip测试
+&lt;/h2&gt;&lt;p&gt;插入数据库&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/seata-16312535244541.png&#34;
+	width=&#34;1204&#34;
+	height=&#34;610&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;seata&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;197&#34;
+		data-flex-basis=&#34;473px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;undo_log 表&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/seata_undo_log.png&#34;
+	width=&#34;1750&#34;
+	height=&#34;438&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;seata_undo_log&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;399&#34;
+		data-flex-basis=&#34;958px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;发生异常&amp;ndash;回滚&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/seata%E5%9B%9E%E6%BB%9A.png&#34;
+	width=&#34;1724&#34;
+	height=&#34;747&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;seata回滚&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;230&#34;
+		data-flex-basis=&#34;553px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;数据库可以看到之前被修改的数据被回滚了&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>分布式锁</title>
+        <link>https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/</link>
+        <pubDate>Wed, 03 Aug 2022 19:53:40 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/</guid>
+        <description>&lt;h1 id=&#34;分布式锁&#34;&gt;分布式锁
+&lt;/h1&gt;&lt;h2 id=&#34;学习目标&#34;&gt;学习目标
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;什么是分布式&lt;/li&gt;
+&lt;li&gt;什么是锁&lt;/li&gt;
+&lt;li&gt;什么是分布式锁&lt;/li&gt;
+&lt;li&gt;分布式锁的使用场景-为什么要使用分布式锁&lt;/li&gt;
+&lt;li&gt;分布式锁需要具备哪些功能/条件&lt;/li&gt;
+&lt;li&gt;分布式锁的解决方案&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;1-分布式锁介绍&#34;&gt;1 分布式锁介绍
+&lt;/h2&gt;&lt;h3 id=&#34;11-什么是分布式&#34;&gt;1.1 什么是分布式
+&lt;/h3&gt;&lt;p&gt;一个大型的系统往往被分为几个子系统来做，一个子系统可以部署在一台机器的多个 JVM(java虚拟机) 上，也可以部署在多台机器上。但是每一个系统不是独立的，不是完全独立的。需要相互通信，共同实现业务功能。&lt;/p&gt;
+&lt;p&gt;一句话来说：分布式就是通过计算机网络将后端工作分布到多台主机上，多个主机一起协同完成工作。&lt;/p&gt;
+&lt;h3 id=&#34;12-什么是锁--作用安全&#34;&gt;1.2 什么是锁&amp;ndash;作用安全
+&lt;/h3&gt;&lt;p&gt;现实生活中，当我们需要保护一样东西的时候，就会使用锁。例如门锁，车锁等等。很多时候可能许多人会共用这些资源，就会有很多个钥匙。但是有些时候我们希望使用的时候是独自不受打扰的，那么就会在使用的时候从里面反锁，等使用完了再从里面解锁。这样其他人就可以继续使用了。&lt;/p&gt;
+&lt;p&gt;JAVA程序中，当存在多个线程可以同时改变某个变量（可变共享变量）时，就需要对变量或代码块做同步，使其在修改这种变量时能够线性执行消除并发修改变量，而同步的本质是通过锁来实现的。如 Java 中 synchronize 是在对象头设置标记，Lock 接口的实现类基本上都只是某一个 volitile 修饰的 int 型变量其保证每个线程都能拥有对该 int 的可见性和原子修改&lt;/p&gt;
+&lt;h3 id=&#34;14-什么是分布式锁&#34;&gt;1.4 什么是分布式锁
+&lt;/h3&gt;&lt;p&gt;任何一个分布式系统都无法同时满足一致性（Consistency）、可用性（Availability）和分区容错性（Partition tolerance），最多只能同时满足两项。CAP&lt;/p&gt;
+&lt;p&gt;当在分布式模型下，数据只有一份（或有限制），此时需要利用锁的技术控制某一时刻修改数据的进程数。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;分布式锁&lt;/strong&gt;: 在分布式环境下，多个程序/线程都需要对某一份(或有限制)的数据进行修改时，针对程序进行控制，保证同一时间节点下，只有一个程序/线程对数据进行操作的技术。&lt;/p&gt;
+&lt;h3 id=&#34;15-分布式锁的真实使用场景&#34;&gt;1.5 分布式锁的真实使用场景
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;场景一：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/1.png&#34;
+	width=&#34;1036&#34;
+	height=&#34;702&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;147&#34;
+		data-flex-basis=&#34;354px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;场景二：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/2.png&#34;
+	width=&#34;1221&#34;
+	height=&#34;619&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;197&#34;
+		data-flex-basis=&#34;473px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;15-分布式锁的执行流程&#34;&gt;1.5 分布式锁的执行流程
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/3.png&#34;
+	width=&#34;1182&#34;
+	height=&#34;624&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;3&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;189&#34;
+		data-flex-basis=&#34;454px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;16-分布式锁具备的条件&#34;&gt;1.6 分布式锁具备的条件
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;互斥性&lt;/strong&gt;：同一时刻只能有一个服务(或应用)访问资源，特殊情况下有读写锁&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;原子性&lt;/strong&gt;：一致性要求保证加锁和解锁的行为是原子性的&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;安全性&lt;/strong&gt;：锁只能被持有该锁的服务(或应用)释放&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;容错性&lt;/strong&gt;：在持有锁的服务崩溃时，锁仍能得到释放避免死锁&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;可重用性&lt;/strong&gt;：同一个客户端获得锁后可递归调用&amp;mdash;重入锁和不可重入锁&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;公平性&lt;/strong&gt;：看业务是否需要公平，避免饿死&amp;ndash;公平锁和非公平锁&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;支持阻塞和非阻塞&lt;/strong&gt;：和 ReentrantLock 一样支持 lock 和 trylock 以及 tryLock(long timeOut)&amp;mdash;阻塞锁和非阻塞锁==PS:::自选锁==&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;高可用&lt;/strong&gt;：获取锁和释放锁 要高可用&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;高性能&lt;/strong&gt;：获取锁和释放锁的性能要好&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;持久性&lt;/strong&gt;：锁按业务需要自动续约/自动延期&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;2分布式锁的解决方案&#34;&gt;2.分布式锁的解决方案
+&lt;/h2&gt;&lt;h3 id=&#34;21-数据库实现分布式锁&#34;&gt;2.1 数据库实现分布式锁
+&lt;/h3&gt;&lt;h4 id=&#34;211-基于数据库表实现&#34;&gt;2.1.1 基于数据库表实现
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;准备工作&lt;/strong&gt;：创建tb_program表，用于记录当前哪个程序正在使用数据&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;CREATE TABLE `tb_program` (
+  `program_no` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT &#39;程序的编号&#39;
+  PRIMARY KEY (`program_no`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;实现步骤：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;程序访问数据时，将程序的编号（insert）存入tb_program表；&lt;/li&gt;
+&lt;li&gt;当insert成功，代表该程序获得了锁，即可执行逻辑；&lt;/li&gt;
+&lt;li&gt;当program_no相同的其他程序进行insert是，由于主键冲突会导致insert失败，则代表获取锁失败；&lt;/li&gt;
+&lt;li&gt;获取锁成功的程序在逻辑执行完以后，删除该数据,代表释放锁。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;212-基于数据库的排他锁实现&#34;&gt;2.1.2 基于数据库的排他锁实现
+&lt;/h4&gt;&lt;p&gt;除了可以通过增删操作数据表中的记录以外，其实还可以借助数据中自带的锁来实现分布式的锁。我们还用刚刚创建的那张数据库表，基于MySql的InnoDB引擎(MYSQL的引擎种类)可以通过数据库的排他锁来实现分布式锁。&lt;/p&gt;
+&lt;p&gt;实现步骤：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;在查询语句后面增加&lt;code&gt;for update&lt;/code&gt;，数据库会在查询过程中给数据库表增加排他锁。当某条记录被加上排他锁之后，其他线程无法再在该行记录上增加排他锁&lt;/li&gt;
+&lt;li&gt;获得排它锁的线程即可获得分布式锁，执行方法的业务逻辑&lt;/li&gt;
+&lt;li&gt;执行完方法之后，再通过&lt;code&gt;connection.commit();&lt;/code&gt;操作来释放锁。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;实现代码&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;pom.xml&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;
+&amp;lt;project xmlns=&amp;quot;http://maven.apache.org/POM/4.0.0&amp;quot;
+         xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot;
+         xsi:schemaLocation=&amp;quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&amp;quot;&amp;gt;
+    &amp;lt;modelVersion&amp;gt;4.0.0&amp;lt;/modelVersion&amp;gt;
+
+    &amp;lt;groupId&amp;gt;com.itheima&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;mysql-demo&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;1.0-SNAPSHOT&amp;lt;/version&amp;gt;
+
+    &amp;lt;!--依赖包--&amp;gt;
+    &amp;lt;dependencies&amp;gt;
+      
+        &amp;lt;!-- MySql --&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;mysql&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;mysql-connector-java&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;5.1.32&amp;lt;/version&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+
+        &amp;lt;!-- Test dependencies --&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;junit&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;junit&amp;lt;/artifactId&amp;gt;
+            &amp;lt;version&amp;gt;4.12&amp;lt;/version&amp;gt;
+            &amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+    &amp;lt;/dependencies&amp;gt;
+&amp;lt;/project&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Book&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Book {
+
+    // 图书ID
+    private Integer id;
+    // 图书名称
+    private String name;
+    // 图书价格
+    private Float price;
+    // 图书图片
+    private String pic;
+    // 图书描述
+    private String desc;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;BookDao&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public interface BookDao {
+
+    /**
+     * 查询所有的book数据
+     * @return
+     */
+    List&amp;lt;Book&amp;gt; queryBookList(String name) throws Exception;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;BookDaoImpl实现类&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class BookDaoImpl implements BookDao {
+
+    /***
+     * 查询数据库数据
+     * @return
+     * @throws Exception
+     */
+    public List&amp;lt;Book&amp;gt; queryBookList(String name) throws Exception{
+
+        // 数据库链接
+        Connection connection = null;
+        // 预编译statement
+        PreparedStatement preparedStatement = null;
+        // 结果集
+        ResultSet resultSet = null;
+        // 图书列表
+        List&amp;lt;Book&amp;gt; list = new ArrayList&amp;lt;Book&amp;gt;();
+
+        try {
+            // 加载数据库驱动
+            Class.forName(&amp;quot;com.mysql.jdbc.Driver&amp;quot;);
+            // 连接数据库
+            connection = DriverManager.getConnection(&amp;quot;jdbc:mysql://39.108.189.37:3306/lucene&amp;quot;, &amp;quot;ybbmysql&amp;quot;, &amp;quot;ybbmysql&amp;quot;);
+            //关闭自动提交
+            connection.setAutoCommit(false);
+            // SQL语句
+            String sql = &amp;quot;SELECT * FROM book where id = 1 for update&amp;quot;;
+            // 创建preparedStatement
+            preparedStatement = connection.prepareStatement(sql);
+            // 获取结果集
+            resultSet = preparedStatement.executeQuery();
+            // 结果集解析
+            while (resultSet.next()) {
+                Book book = new Book();
+                book.setId(resultSet.getInt(&amp;quot;id&amp;quot;));
+                book.setName(resultSet.getString(&amp;quot;name&amp;quot;));
+                list.add(book);
+            }
+            System.out.println(name + &amp;quot;执行了for update&amp;quot;);
+            System.out.println(&amp;quot;结果为:&amp;quot; + list);
+            //锁行后休眠5秒
+            Thread.sleep(5000);
+
+            //休眠结束释放
+            connection.commit();
+            System.out.println(name + &amp;quot;结束&amp;quot;);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;测试类&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Test {
+
+    private BookDao bookDao = new BookDaoImpl();
+
+    @org.junit.Test
+    public void testLock() throws Exception  {
+        new Thread(new LockRunner(&amp;quot;线程1&amp;quot;)).start();
+        new Thread(new LockRunner(&amp;quot;线程2&amp;quot;)).start();
+        new Thread(new LockRunner(&amp;quot;线程3&amp;quot;)).start();
+        new Thread(new LockRunner(&amp;quot;线程4&amp;quot;)).start();
+        new Thread(new LockRunner(&amp;quot;线程5&amp;quot;)).start();
+        Thread.sleep(200000L);
+    }
+
+    class LockRunner implements Runnable {
+
+        private String name;
+
+        public LockRunner(String name) {
+            this.name = name;
+        }
+
+        public void run() {
+            try {
+                bookDao.queryBookList(name);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;执行结果&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/10.png&#34;
+	width=&#34;870&#34;
+	height=&#34;370&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;10&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;235&#34;
+		data-flex-basis=&#34;564px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;213-优点及缺点&#34;&gt;2.1.3 优点及缺点
+&lt;/h4&gt;&lt;p&gt;**优点：**简单，方便，快速实现&lt;/p&gt;
+&lt;p&gt;**缺点：**基于数据库，开销比较大，对数据库性能可能会存在影响，服务数量比较多的情况下，数据库也要做集群，使用数据库加锁，锁状态不能同步到其他机器上面，使用insert的方式有一个同步的过程，如果访问从机是可以加到锁的。&lt;/p&gt;
+&lt;h3 id=&#34;22-redis实现分布式锁&#34;&gt;2.2 Redis实现分布式锁
+&lt;/h3&gt;&lt;h4 id=&#34;221-基于-redis-的-setnxexpire-getset方法做分布式锁&#34;&gt;2.2.1 基于 REDIS 的 SETNX()、EXPIRE() 、GETSET()方法做分布式锁
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;实现原理&lt;/strong&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;setnx():setnx 的含义就是 SET if Not Exists，其主要有两个参数 setnx(key, value)。该方法是原子的，如果 key 不存在，则设置当前 key 成功，返回 1；如果当前 key 已经存在，则设置当前 key 失败，返回 0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;expire():expire 设置过期时间，要注意的是 setnx 命令不能设置 key 的超时时间，只能通过 expire() 来对 key 设置。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;getset():这个命令主要有两个参数 getset(key，newValue)。该方法是原子的，对 key 设置 newValue 这个值，并且返回 key 原来的旧值。假设 key 原来是不存在的，那么多次执行这个命令，会出现下边的效果：
+
+getset(key, “value1”) 返回 null 此时 key 的值会被设置为 value1
+getset(key, “value2”) 返回 value1 此时 key 的值会被设置为 value2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;实现流程&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/7.png&#34;
+	width=&#34;812&#34;
+	height=&#34;610&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;133&#34;
+		data-flex-basis=&#34;319px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;setnx(lockkey, 当前时间+过期超时时间)，如果返回 1，则获取锁成功；如果返回 0 则没有获取到锁。&lt;/li&gt;
+&lt;li&gt;get(lockkey) 获取值 oldExpireTime ，并将这个 value 值与当前的系统时间进行比较，如果小于当前系统时间，则认为这个锁已经超时，可以允许别的请求重新获取。&lt;/li&gt;
+&lt;li&gt;计算 newExpireTime = 当前时间+过期超时时间，然后 getset(lockkey, newExpireTime) 会返回当前 lockkey 的值currentExpireTime。判断 currentExpireTime 与 oldExpireTime 是否相等，如果相等，说明当前 getset 设置成功，获取到了锁。如果不相等，说明这个锁又被别的请求获取走了，那么当前请求可以直接返回失败，或者继续重试。&lt;/li&gt;
+&lt;li&gt;在获取到锁之后，当前线程可以开始自己的业务处理，当处理完毕后，比较自己的处理时间和对于锁设置的超时时间，如果小于锁设置的超时时间，则直接执行 delete 释放锁；如果大于锁设置的超时时间，则不需要再锁进行处理。
+&lt;ol&gt;
+&lt;li&gt;思路: 如果处理时间大于锁设置的超时时间, 需要先去拿到锁的预期的超时时间 和现在的锁的超时时间, 如果不一致, 说明业务处理超时的时候 锁被别的程序获取了, 所以这次的操作只能进行rollback&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;在Linux虚拟机中创建redis容器&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;docker run -di &amp;ndash;name=tensquare_redis -p 6379:6379 redis&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;代码实现&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;pom.xml文件&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;
+&amp;lt;project xmlns=&amp;quot;http://maven.apache.org/POM/4.0.0&amp;quot; xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot;
+         xsi:schemaLocation=&amp;quot;http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd&amp;quot;&amp;gt;
+    &amp;lt;modelVersion&amp;gt;4.0.0&amp;lt;/modelVersion&amp;gt;
+    
+     &amp;lt;groupId&amp;gt;com.itheima&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;redis&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;0.0.1-SNAPSHOT&amp;lt;/version&amp;gt;
+    &amp;lt;name&amp;gt;redis&amp;lt;/name&amp;gt;
+    &amp;lt;description&amp;gt;redis实现分布式锁测试&amp;lt;/description&amp;gt;
+    &amp;lt;parent&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-parent&amp;lt;/artifactId&amp;gt;
+        &amp;lt;version&amp;gt;2.1.4.RELEASE&amp;lt;/version&amp;gt;
+        &amp;lt;relativePath/&amp;gt; &amp;lt;!-- lookup parent from repository --&amp;gt;
+    &amp;lt;/parent&amp;gt;
+   
+
+    &amp;lt;properties&amp;gt;
+        &amp;lt;java.version&amp;gt;1.8&amp;lt;/java.version&amp;gt;
+    &amp;lt;/properties&amp;gt;
+
+    &amp;lt;dependencies&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-data-redis&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-web&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt;
+            &amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt;
+            &amp;lt;exclusions&amp;gt;
+                &amp;lt;exclusion&amp;gt;
+                    &amp;lt;groupId&amp;gt;org.junit.vintage&amp;lt;/groupId&amp;gt;
+                    &amp;lt;artifactId&amp;gt;junit-vintage-engine&amp;lt;/artifactId&amp;gt;
+                &amp;lt;/exclusion&amp;gt;
+            &amp;lt;/exclusions&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+    &amp;lt;/dependencies&amp;gt;
+
+    &amp;lt;build&amp;gt;
+        &amp;lt;plugins&amp;gt;
+            &amp;lt;plugin&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-boot-maven-plugin&amp;lt;/artifactId&amp;gt;
+            &amp;lt;/plugin&amp;gt;
+        &amp;lt;/plugins&amp;gt;
+    &amp;lt;/build&amp;gt;
+
+&amp;lt;/project&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;RedisUtil工具类&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Component
+public class RedisUtil {
+    //定义默认超时时间:单位毫秒
+    private static final Integer LOCK_TIME_OUT = 10000;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    /**
+     * 外部调用加锁方法
+     */
+    public Boolean tryLock(String key, Long timeout) throws Exception{
+
+        //获取当前系统时间设置为开始时间
+        Long startTime = System.currentTimeMillis();
+
+        //设置返回默认值-false:加锁失败
+        boolean flag = false;
+
+        //死循环获取锁:1.获取锁成功退出 2.获取锁超时退出
+        while(true){
+            //判断是否超时
+            if((System.currentTimeMillis() - startTime) &amp;gt;= timeout){
+                break;
+            }else{
+                //获取锁
+                flag = lock(key);
+                //判断是否获取成功
+                if(flag){
+                    break;
+                }else{
+                    //休息0.1秒重试,降低服务压力
+                    Thread.sleep(100);
+                }
+            }
+        }
+        return flag;
+    }
+
+    /**
+     * 加锁实现
+     * @param key
+     * @return
+     */
+    private Boolean lock(String key){
+        return (Boolean) stringRedisTemplate.execute((RedisCallback) redisConnection -&amp;gt; {
+            //获取当前系统时间
+            Long time = System.currentTimeMillis();
+
+            //设置锁超时时间
+            Long timeout = time + LOCK_TIME_OUT + 1;
+
+            //setnx加锁并获取解锁结果
+            Boolean result = redisConnection.setNX(key.getBytes(), String.valueOf(timeout).getBytes());
+
+            //加锁成功返回true
+            if(result){
+                return true;
+            }
+
+            //加锁失败判断锁是否超时
+            if(checkLock(key, timeout)){
+                //getset设置值成功后,会返回旧的锁有效时间
+                byte[] newtime = redisConnection.getSet(key.getBytes(), String.valueOf(timeout).getBytes());
+                if(time &amp;gt; Long.valueOf(new String(newtime))){
+                    return true;
+                }
+            }
+            //默认加锁失败
+            return false;
+        });
+
+    }
+
+    /**
+     * 释放锁
+     */
+    public Boolean release(String key){
+        return (Boolean) stringRedisTemplate.execute((RedisCallback) redisConnection -&amp;gt; {
+            Long del = redisConnection.del(key.getBytes());
+            if (del &amp;gt; 0){
+                return true;
+            }
+            return false;
+        });
+    }
+
+    /**
+     * 判断锁是否超时
+     */
+    private Boolean checkLock(String key, Long timeout){
+
+        return (Boolean) stringRedisTemplate.execute((RedisCallback) redisConnection -&amp;gt; {
+            //获取锁的超时时间
+            byte[] bytes = redisConnection.get(key.getBytes());
+
+            try {
+                //判断锁的有效时间是否大与当前时间
+                if(timeout &amp;gt; Long.valueOf(new String(bytes))){
+                    return true;
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                return false;
+            }
+            return false;
+        });
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;RedisController测试类&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@RestController
+@RequestMapping(value = &amp;quot;/redis&amp;quot;)
+public class RedisController {
+
+    @Autowired
+    private RedisUtil redisUtil;
+
+    /**
+     * 获取锁
+     * @return
+     */
+    @GetMapping(value = &amp;quot;/lock/{name}&amp;quot;)
+    public String lock(@PathVariable(value = &amp;quot;name&amp;quot;)String name) throws Exception{
+        Boolean result = redisUtil.tryLock(name, 3000L);
+        if(result){
+            return &amp;quot;获取锁成功&amp;quot;;
+        }
+        return &amp;quot;获取锁失败&amp;quot;;
+    }
+
+    /**
+     * 释放锁
+     * @param name
+     */
+    @GetMapping(value = &amp;quot;/unlock/{name}&amp;quot;)
+    public String unlock(@PathVariable(value = &amp;quot;name&amp;quot;)String name){
+        Boolean result = redisUtil.release(name);
+        if(result){
+            return &amp;quot;释放锁成功&amp;quot;;
+        }
+        return &amp;quot;释放锁失败&amp;quot;;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;222-redis锁的key键如何选择&#34;&gt;2.2.2 redis锁的key键如何选择
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;如果锁的key是一个定值，意味着所有加锁的线程访问同一把锁，效率非常低下&lt;/li&gt;
+&lt;li&gt;所以锁的key最好不要是定值而是和业务相关的
+&lt;ul&gt;
+&lt;li&gt;ex：
+&lt;ul&gt;
+&lt;li&gt;业务逻辑是和商品相关的，加锁的目的是为了保证商品数据修改的原子性&lt;/li&gt;
+&lt;li&gt;锁的key应该是和商品id相关联&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;锁得名称应该如何设计
+&lt;ul&gt;
+&lt;li&gt;应该是和当前的服务还有业务逻辑相关联的
+&lt;ul&gt;
+&lt;li&gt;ex：
+&lt;ul&gt;
+&lt;li&gt;商品服务下的商品加锁：锁的key可以设计为=&amp;gt;shop:mer:ID:1&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;223-优点及缺点&#34;&gt;2.2.3 优点及缺点
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;优点&lt;/strong&gt;：性能极高&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;缺点&lt;/strong&gt;：失效时间设置没有定值。设置的失效时间太短，方法没等执行完锁就自动释放了，那么就会产生并发问题。如果设置的时间太长，如果加锁的服务奔溃了，其他获取锁的线程就可能要平白的多等一段时间，用户体验会降低。&lt;/p&gt;
+&lt;h3 id=&#34;23-zookeeper实现分布式锁&#34;&gt;2.3 zookeeper实现分布式锁
+&lt;/h3&gt;&lt;h4 id=&#34;231-zookeeper-锁相关基础知识&#34;&gt;2.3.1 zookeeper 锁相关基础知识
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;zookeeper 一般由多个节点构成（单数），采用 zab 一致性协议。因此可以将 zk 看成一个单点结构，对其修改数据其内部自动将所有节点数据进行修改而后才提供查询服务。&lt;/li&gt;
+&lt;li&gt;zookeeper  的数据以目录树的形式，每个目录称为 znode， znode 中可存储数据（一般不超过 1M），还可以在其中增加子节点。&lt;/li&gt;
+&lt;li&gt;子节点有三种类型。序列化节点，每在该节点下增加一个节点自动给该节点的名称上自增。临时节点，一旦创建这个 znode 的客户端与服务器失去联系，这个 znode 也将自动删除。最后就是普通节点。&lt;/li&gt;
+&lt;li&gt;Watch 机制，client 可以监控每个节点的变化，当产生变化会给 client 产生一个事件。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;232-zookeeper-分布式锁的原理&#34;&gt;2.3.2 zookeeper 分布式锁的原理
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;获取和释放锁原理&lt;/strong&gt;：利用临时节点与 watch 机制。每个锁占用一个普通节点 /lock，当需要获取锁时在 /lock 目录下创建一个临时节点，创建成功则表示获取锁成功，失败则 watch/lock 节点，有删除操作后再去争锁。临时节点好处在于当进程挂掉后能自动上锁的节点自动删除即取消锁。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;获取锁的顺序原理&lt;/strong&gt;：上锁为创建临时有序节点，每个上锁的节点均能创建节点成功，只是其序号不同。只有序号最小的可以拥有锁，如果这个节点序号不是最小的则 watch 序号比本身小的前一个节点 (公平锁)。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;232-zookeeper实现分布式锁流程&#34;&gt;2.3.2 zookeeper实现分布式锁流程
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;简易流程&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/5.jpg&#34;
+	width=&#34;600&#34;
+	height=&#34;245&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;5&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;244&#34;
+		data-flex-basis=&#34;587px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;获取锁流程：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;先有一个锁根节点，lockRootNode，这可以是一个永久的节点&lt;/li&gt;
+&lt;li&gt;客户端获取锁，先在 lockRootNode 下创建一个顺序的临时节点，保证客户端断开连接，节点也自动删除&lt;/li&gt;
+&lt;li&gt;调用 lockRootNode 父节点的 getChildren() 方法，获取所有的节点，并从小到大排序，如果创建的最小的节点是当前节点，则返回 true,获取锁成功，否则，关注比自己序号小的节点的释放动作(exist watch)，这样可以保证每一个客户端只需要关注一个节点，不需要关注所有的节点，避免羊群效应。&lt;/li&gt;
+&lt;li&gt;如果有节点释放操作，重复步骤 3&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;释放锁流程：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;只需要删除步骤 2 中创建的节点即可&lt;/p&gt;
+&lt;h4 id=&#34;232-优点及缺点&#34;&gt;2.3.2 优点及缺点
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;优点：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;客户端如果出现宕机故障的话，锁可以马上释放&lt;/li&gt;
+&lt;li&gt;可以实现阻塞式锁，通过 watcher 监听，实现起来也比较简单&lt;/li&gt;
+&lt;li&gt;集群模式，稳定性比较高&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;缺点：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;一旦网络有任何的抖动，Zookeeper 就会认为客户端已经宕机，就会断掉连接，其他客户端就可以获取到锁。&lt;/li&gt;
+&lt;li&gt;性能不高，因为每次在创建锁和释放锁的过程中，都要动态创建、销毁临时节点来实现锁功能。ZK 中创建和删除节点只能通过 Leader 服务器来执行，然后将数据同步到所有的 Follower 机器上。(zookeeper对外提供服务的只有leader)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;24-consul实现分布式锁eurekaregister保存服务的ip-端口-服务列表&#34;&gt;2.4 consul实现分布式锁(eureka/Register:保存服务的IP 端口 服务列表)
+&lt;/h3&gt;&lt;h4 id=&#34;241-实现原理及流程&#34;&gt;2.4.1 实现原理及流程
+&lt;/h4&gt;&lt;p&gt;基于Consul注册中心的Key/Value存储来实现分布式锁以及信号量的方法主要利用Key/Value存储API中的acquire和release操作来实现。acquire和release操作是类似Check-And-Set的操作：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;acquire操作只有当锁不存在持有者时才会返回true，并且set设置的Value值，同时执行操作的session会持有对该Key的锁，否则就返回false
+
+release操作则是使用指定的session来释放某个Key的锁，如果指定的session无效，那么会返回false，否则就会set设置Value值，并返回true
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;实现流程&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/6.png&#34;
+	width=&#34;1402&#34;
+	height=&#34;1374&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;6&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;102&#34;
+		data-flex-basis=&#34;244px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;实现步骤：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;客户端创建会话session，得到sessionId；&lt;/li&gt;
+&lt;li&gt;使用acquire设置value的值，若acquire结果为false，代表获取锁失败；&lt;/li&gt;
+&lt;li&gt;acquire结果为true，代表获取锁成功，客户端执行业务逻辑；&lt;/li&gt;
+&lt;li&gt;客户端业务逻辑执行完成后，执行release操作释放锁；&lt;/li&gt;
+&lt;li&gt;销毁当前session，客户端连接断开。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;代码&lt;/strong&gt;:&lt;/p&gt;
+&lt;p&gt;docker安装consul&lt;/p&gt;
+&lt;p&gt;下载镜像&lt;/p&gt;
+&lt;p&gt;docker pull consul&lt;/p&gt;
+&lt;p&gt;开启容器&lt;/p&gt;
+&lt;p&gt;docker run -p 8500:8500/tcp consul agent -server -ui -bootstrap-expect=1 -client=0.0.0.0&lt;/p&gt;
+&lt;p&gt;启动consul命令: consul agent -dev&lt;/p&gt;
+&lt;p&gt;pom.xml文件&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;
+&amp;lt;project xmlns=&amp;quot;http://maven.apache.org/POM/4.0.0&amp;quot; xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot;
+         xsi:schemaLocation=&amp;quot;http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd&amp;quot;&amp;gt;
+    &amp;lt;modelVersion&amp;gt;4.0.0&amp;lt;/modelVersion&amp;gt;
+    &amp;lt;parent&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-parent&amp;lt;/artifactId&amp;gt;
+        &amp;lt;version&amp;gt;2.2.5.RELEASE&amp;lt;/version&amp;gt;
+        &amp;lt;relativePath/&amp;gt; &amp;lt;!-- lookup parent from repository --&amp;gt;
+    &amp;lt;/parent&amp;gt;
+    &amp;lt;groupId&amp;gt;com.example&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;demo-consul&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;0.0.1-SNAPSHOT&amp;lt;/version&amp;gt;
+    &amp;lt;name&amp;gt;demo-consul&amp;lt;/name&amp;gt;
+    &amp;lt;description&amp;gt;Demo project for Spring Boot&amp;lt;/description&amp;gt;
+
+    &amp;lt;properties&amp;gt;
+        &amp;lt;java.version&amp;gt;1.8&amp;lt;/java.version&amp;gt;
+        &amp;lt;spring-cloud.version&amp;gt;Hoxton.SR3&amp;lt;/spring-cloud.version&amp;gt;
+    &amp;lt;/properties&amp;gt;
+
+    &amp;lt;dependencies&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-web&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.cloud&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-cloud-starter-consul-discovery&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt;
+            &amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt;
+            &amp;lt;exclusions&amp;gt;
+                &amp;lt;exclusion&amp;gt;
+                    &amp;lt;groupId&amp;gt;org.junit.vintage&amp;lt;/groupId&amp;gt;
+                    &amp;lt;artifactId&amp;gt;junit-vintage-engine&amp;lt;/artifactId&amp;gt;
+                &amp;lt;/exclusion&amp;gt;
+            &amp;lt;/exclusions&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+    &amp;lt;/dependencies&amp;gt;
+
+    &amp;lt;dependencyManagement&amp;gt;
+        &amp;lt;dependencies&amp;gt;
+            &amp;lt;dependency&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework.cloud&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-cloud-dependencies&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;${spring-cloud.version}&amp;lt;/version&amp;gt;
+                &amp;lt;type&amp;gt;pom&amp;lt;/type&amp;gt;
+                &amp;lt;scope&amp;gt;import&amp;lt;/scope&amp;gt;
+            &amp;lt;/dependency&amp;gt;
+        &amp;lt;/dependencies&amp;gt;
+    &amp;lt;/dependencyManagement&amp;gt;
+
+    &amp;lt;build&amp;gt;
+        &amp;lt;plugins&amp;gt;
+            &amp;lt;plugin&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-boot-maven-plugin&amp;lt;/artifactId&amp;gt;
+            &amp;lt;/plugin&amp;gt;
+        &amp;lt;/plugins&amp;gt;
+    &amp;lt;/build&amp;gt;
+
+&amp;lt;/project&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class ConsulUtil {
+
+    private ConsulClient consulClient;
+
+    private String sessionId = null;
+
+    /**
+     * 构造函数
+     */
+    public ConsulUtil(ConsulClient consulClient) {
+        this.consulClient = consulClient;
+    }
+
+    /**
+     * 创建session
+     */
+    private String createSession(String name, Integer ttl){
+        NewSession newSession = new NewSession();
+        //设置锁有效时长
+        newSession.setTtl(ttl + &amp;quot;s&amp;quot;);
+        //设置锁名字
+        newSession.setName(name);
+        String value = consulClient.sessionCreate(newSession, null).getValue();
+        return value;
+    }
+
+    /**
+     * 获取锁
+     */
+    public Boolean lock(String name, Integer ttl){
+        //定义获取标识
+        Boolean flag = false;
+        //创建session
+        sessionId = createSession(name, ttl);
+        //死循环获取锁
+        while (true){
+            //执行acquire操作
+            PutParams putParams = new PutParams();
+            putParams.setAcquireSession(sessionId);
+            flag = consulClient.setKVValue(name, &amp;quot;local&amp;quot; + System.currentTimeMillis(), putParams).getValue();
+            if(flag){
+                break;
+            }
+        }
+        return flag;
+    }
+
+    /**
+     * 释放锁
+     */
+    public Boolean release(String name){
+        //执行acquire操作
+        PutParams putParams = new PutParams();
+        putParams.setReleaseSession(sessionId);
+        Boolean value = consulClient.setKVValue(name, &amp;quot;local&amp;quot; + System.currentTimeMillis(), putParams).getValue();
+        return value;
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;测试代码:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@SpringBootTest
+class DemoApplicationTests {
+
+    @Test
+    public void testLock() throws Exception  {
+         LoggerContext loggerContext= (LoggerContext) LoggerFactory.getILoggerFactory();
+        //设置全局日志级别
+        ch.qos.logback.classic.Logger logger=loggerContext.getLogger(&amp;quot;root&amp;quot;);
+        logger.setLevel(Level.toLevel(&amp;quot;info&amp;quot;));
+        new Thread(new LockRunner(&amp;quot;线程1&amp;quot;)).start();
+        new Thread(new LockRunner(&amp;quot;线程2&amp;quot;)).start();
+        new Thread(new LockRunner(&amp;quot;线程3&amp;quot;)).start();
+        new Thread(new LockRunner(&amp;quot;线程4&amp;quot;)).start();
+        new Thread(new LockRunner(&amp;quot;线程5&amp;quot;)).start();
+        Thread.sleep(200000L);
+    }
+
+    class LockRunner implements Runnable {
+
+        private String name;
+
+        public LockRunner(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public void run() {
+            ConsulUtil lock = new ConsulUtil(new ConsulClient());
+            try {
+                if (lock.lock(&amp;quot;test&amp;quot;, 10)) {
+
+                    System.out.println(name + &amp;quot;获取到了锁&amp;quot;);
+                    //持有锁5秒
+                    Thread.sleep(5000);
+                    //释放锁
+                    lock.release(&amp;quot;test&amp;quot;);
+                    System.out.println(name + &amp;quot;释放了锁&amp;quot;);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;结果&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/8.png&#34;
+	width=&#34;1812&#34;
+	height=&#34;523&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;8&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;346&#34;
+		data-flex-basis=&#34;831px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/images/9.png&#34;
+	width=&#34;1920&#34;
+	height=&#34;979&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;9&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;196&#34;
+		data-flex-basis=&#34;470px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;242-优点及缺点&#34;&gt;2.4.2 优点及缺点
+&lt;/h4&gt;&lt;p&gt;**优点：**基于consul注册中心即可实现分布式锁，实现简单、方便、快捷&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;缺点：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;lock delay&lt;/strong&gt;：consul实现分布式锁存在延迟，一个节点释放锁了，另一个节点不能立马拿到锁。需要等待lock delay时间后才可以拿到锁。&lt;/li&gt;
+&lt;li&gt;高负载的场景下，不能及时的续约，导致session timeout, 其他节点拿到锁。&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
+        <title>分布式事务</title>
+        <link>https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/</link>
+        <pubDate>Wed, 13 Jul 2022 19:53:40 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/</guid>
+        <description>&lt;h1 id=&#34;分布式事务&#34;&gt;分布式事务
+&lt;/h1&gt;&lt;h2 id=&#34;学习目标&#34;&gt;学习目标
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;什么是事务&lt;/li&gt;
+&lt;li&gt;什么是分布式事务&lt;/li&gt;
+&lt;li&gt;分布式事务的产生过程&lt;/li&gt;
+&lt;li&gt;==什么是CAP定理（面试）==&lt;/li&gt;
+&lt;li&gt;==分布式事务解决方案（面试）==&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;1-分布式事务介绍&#34;&gt;1 分布式事务介绍
+&lt;/h2&gt;&lt;h3 id=&#34;11-什么是事务&#34;&gt;1.1 什么是事务
+&lt;/h3&gt;&lt;p&gt;数据库事务(简称：事务，Transaction)是指数据库执行过程中的一个逻辑单位，由一个有限的数据库操作序列构成[由当前业务逻辑多个不同操作构成]。&lt;/p&gt;
+&lt;p&gt;事务拥有以下四个特性，习惯上被称为ACID特性：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;原子性(Atomicity)&lt;/strong&gt;：事务作为一个整体被执行，包含在其中的对数据库的操作要么全部被执行，要么都不执行。==记录之前的版本，允许回滚。==&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;一致性(Consistency)&lt;/strong&gt;：一致性是指事务使得系统从一个一致的状态转换到另一个一致状态。事务的一致性决定了一个系统设计和实现的复杂度，也导致了事务的不同隔离级别。==事务开始和结束之间的中间状态不会被其他事务看到。==&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;隔离性(Isolation)&lt;/strong&gt;：多个事务并发执行时，并发事务之间互相影响的程度，比如一个事务会不会读取到另一个未提交的事务修改的数据。==适当的破坏一致性来提升性能与并行度==&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;持久性(Durability)&lt;/strong&gt;：已被提交的事务对数据库的修改应该永久保存在数据库中。==每一次的事务提交后就会保证不会丢失。==&lt;/p&gt;
+&lt;p&gt;延申拓展：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;事务隔离性(面试)：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;脏读&lt;/strong&gt;：事务A修改了一个数据，但未提交，事务B读到了事务A未提交的更新结果，如果事务A提交失败，事务B读到的就是脏数据。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;幻读&lt;/strong&gt;：在同一个事务中，同一个查询多次返回的结果不一致。事务A新增了一条记录，事务B在事务A==新增==提交前后各执行了一次查询操作，发现后一次比前一次多了一条记录。幻读是由于并发事务增加记录导致的，这个不能像不可重复读通过记录加锁解决，因为对于新增的记录根本无法加锁。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;不可重复读&lt;/strong&gt;：在同一个事务中，对于同一份数据读取到的结果不一致。比如，事务B在事务A==更新或删除==提交前读到的结果，和提交后读到的结果可能不同。不可重复读出现的原因就是事务并发修改记录，要避免这种情况，最简单的方法就是对要修改的记录加锁，这会导致锁竞争加剧，影响性能。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;事务的隔离级别(面试)：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Read Uncommitted&lt;/strong&gt;(读未提交)：最低的隔离级别，什么都不需要做，一个事务可以读到另一个事务未提交的结果。所有的并发事务问题都会发生。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Read Committed&lt;/strong&gt;(读已提交)：只有在事务提交后，其更新结果才会被其他事务看见。可以解决脏读问题。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Repeated Read&lt;/strong&gt;(可重复读)：在一个事务中，对于同一份数据的读取结果总是相同的，无论是否有其他事务对这份数据进行操作，以及这个事务是否提交。可以解决脏读、不可重复读。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Serialization&lt;/strong&gt;：事务串行化执行，隔离级别最高，牺牲了系统的并发性。可以解决并发事务的所有问题。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;自行复习/了解：spring事务的传播机制(spring事务面试必问)&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;12-什么是分布式事务&#34;&gt;1.2 什么是分布式事务
+&lt;/h3&gt;&lt;p&gt;分布式事务指事务的参与者、支持事务的服务器、资源服务器以及事务管理器分别位于不同的分布式系统的不同节点之上，且属于不同的应用，分布式事务需要保证这些操作要么全部成功，要么全部失败。本质上来说，分布式事务就是为了保证不同数据库的数据一致性。&lt;/p&gt;
+&lt;h3 id=&#34;13-事务的演变&#34;&gt;1.3 事务的演变
+&lt;/h3&gt;&lt;h4 id=&#34;131-单服务单数据库的本地事务&#34;&gt;1.3.1 单服务单数据库的本地事务
+&lt;/h4&gt;&lt;p&gt;事务仅限于对单一数据库资源的访问控制,架构服务化以后，事务的概念延伸到了服务中。倘若将一个单一的服务操作作为一个事务，那么整个服务操作只能涉及一个单一的数据库资源,这类基于单个服务单一数据库资源访问的事务，被称为本地事务(Local Transaction)。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1553290426650.png&#34;
+	width=&#34;1164&#34;
+	height=&#34;279&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1553290426650&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;417&#34;
+		data-flex-basis=&#34;1001px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;132-单一服务多数据库的分布式事务&#34;&gt;1.3.2 单一服务多数据库的分布式事务
+&lt;/h4&gt;&lt;p&gt;最早的分布式事务应用架构很简单，不涉及服务间的访问调用，仅仅是服务内操作涉及到对多个数据库资源的访问。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1553290753247.png&#34;
+	width=&#34;1149&#34;
+	height=&#34;432&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1553290753247&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;265&#34;
+		data-flex-basis=&#34;638px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;133-多服务多数据库的分布式事务&#34;&gt;1.3.3 多服务多数据库的分布式事务
+&lt;/h4&gt;&lt;p&gt;当一个服务操作访问不同的数据库资源，又希望对它们的访问具有事务特性时，就需要采用分布式事务来协调所有的事务参与者。在这种情况下，起始于某个服务的事务在调用另外一个服务的时候，需要以某种机制流转到另外一个服务，从而使被调用的服务访问的资源也自动加入到该事务当中来。下图反映了这样一个跨越多个服务的分布式事务：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1553291001209.png&#34;
+	width=&#34;1267&#34;
+	height=&#34;412&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1553291001209&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;307&#34;
+		data-flex-basis=&#34;738px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;134-多服务多数据源的分布式事务&#34;&gt;1.3.4 多服务多数据源的分布式事务
+&lt;/h4&gt;&lt;p&gt;如果将上面这两种场景(一个服务可以调用多个数据库资源，也可以调用其他服务)结合在一起，对此进行延伸，整个分布式事务的参与者将会组成如下图所示的树形拓扑结构。在一个跨服务的分布式事务中，事务的发起者和提交均系同一个，它可以是整个调用的客户端，也可以是客户端最先调用的那个服务。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1553291217001.png&#34;
+	width=&#34;1261&#34;
+	height=&#34;589&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1553291217001&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;214&#34;
+		data-flex-basis=&#34;513px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;较之基于单一数据库资源访问的本地事务，分布式事务的应用架构更为复杂。在不同的分布式应用架构下，实现一个分布式事务要考虑的问题并不完全一样，比如对多资源的协调、事务的跨服务传播等，实现机制也是复杂多变。&lt;/p&gt;
+&lt;p&gt;事务的作用：==保证每个事务的数据一致性。==&lt;/p&gt;
+&lt;h3 id=&#34;14-cap定理面试&#34;&gt;1.4 CAP定理（面试）
+&lt;/h3&gt;&lt;p&gt;CAP 定理，又被叫作布鲁尔定理。对于设计分布式系统(不仅仅是分布式事务)的架构师来说，CAP 就是你的入门理论。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/cap.png&#34;
+	width=&#34;559&#34;
+	height=&#34;537&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;104&#34;
+		data-flex-basis=&#34;249px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;**C (一致性)：**对某个指定的客户端来说，读操作能返回最新的写操作。&lt;/p&gt;
+&lt;p&gt;对于数据分布在不同节点上的数据来说，如果在某个节点更新了数据，那么在其他节点如果都能读取到这个最新的数据，那么就称为强一致，如果有某个节点没有读取到，那就是分布式不一致。&lt;/p&gt;
+&lt;p&gt;**A (可用性)：**非故障的节点在合理的时间内返回合理的响应(不是错误和超时的响应)。可用性的两个关键一个是合理的时间，一个是合理的响应。&lt;/p&gt;
+&lt;p&gt;合理的时间指的是请求不能无限被阻塞，应该在合理的时间给出返回。合理的响应指的是系统应该明确返回结果并且结果是正确的，这里的正确指的是比如应该返回 50，而不是返回 40。&lt;/p&gt;
+&lt;p&gt;**P (网络分区容错性)：**当出现网络分区后，系统能够继续工作。打个比方，这里集群有多台机器，有台机器网络出现了问题，但是这个集群仍然可以正常工作。&lt;/p&gt;
+&lt;p&gt;CAP定理中: 所有架构只能够满足C A P 三个中间的两个!&lt;/p&gt;
+&lt;h2 id=&#34;2-分布式事务解决方案面试&#34;&gt;2 分布式事务解决方案（面试）
+&lt;/h2&gt;&lt;p&gt;1.XA两段提交(强一致)&lt;/p&gt;
+&lt;p&gt;2.TCC三段提交(强一致)&lt;/p&gt;
+&lt;p&gt;3.本地消息表(MQ+Table)(最终一致)&lt;/p&gt;
+&lt;p&gt;4.事务消息(RocketMQ[alibaba])(最终一致)&lt;/p&gt;
+&lt;p&gt;==5.Seata(alibaba)==&lt;/p&gt;
+&lt;p&gt;6.RabbitMQ的ACK机制实现分布式事务(拓展)&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;一致性拓展：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;强一致性&lt;/strong&gt;：只要系统提供服务，那么数据一定一致的。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;弱一致性&lt;/strong&gt;：系统提供服务的时候，数据有可能不是一致的，而是要等待一段时间才能一致。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;最终一致性&lt;/strong&gt;：是弱一致性的特例，数据最终总会一致的，但是需要一定时间。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;21--基于xa协议的两阶段提交2pc&#34;&gt;2.1  基于XA协议的两阶段提交(2PC)
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;X/Open 组织（即现在的 Open Group ）定义了分布式事务处理模型&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;XA协议&lt;/strong&gt;：XA 是 X/Open 定义的交易中间件与数据库之间的接口规范（即接口函数），交易中间件用它来通知数据库事务的开始、结束以及提交、回滚等， XA 接口函数由数据库厂商提供。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;两阶段提交协议(Two Phase Commitment Protocol)中，涉及到两种角色&lt;/p&gt;
+&lt;p&gt;一个事务协调者（coordinator）：负责协调多个参与者进行事务投票及提交(回滚)
+多个事务参与者（participants）：即本地事务执行者&lt;/p&gt;
+&lt;p&gt;总共处理步骤有两个
+（1）投票阶段（voting phase）：协调者将通知事务参与者准备提交或取消事务，然后进入表决过程。参与者将告知协调者自己的决策：同意（事务参与者本地事务执行成功，但未提交）或取消（本地事务执行故障）；
+（2）提交阶段（commit phase）：收到参与者的通知后，协调者再向参与者发出通知，根据反馈情况决定各参与者是否要提交还是回滚；&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565819561657.png&#34;
+	width=&#34;1128&#34;
+	height=&#34;474&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565819561657&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;237&#34;
+		data-flex-basis=&#34;571px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565819640025.png&#34;
+	width=&#34;1187&#34;
+	height=&#34;461&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565819640025&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;257&#34;
+		data-flex-basis=&#34;617px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;如果任一资源管理器在第一阶段返回准备失败，那么事务管理器会要求所有资源管理器在第二阶段执行回滚操作。通过事务管理器的两阶段协调，最终所有资源管理器要么全部提交，要么全部回滚，最终状态都是一致的&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;优点：&lt;/strong&gt; 尽量保证了数据的强一致（无法完全保证），适合对数据强一致要求很高的关键领域。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;缺点：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;**同步阻塞问题：**执行过程中，所有参与节点都是事务阻塞型的。当参与者占有公共资源时，其他第三方节点访问公共资源不得不处于阻塞状态。&lt;/li&gt;
+&lt;li&gt;**单点故障：**由于协调者的重要性，一旦协调者发生故障。参与者会一直阻塞下去。尤其在第二阶段，协调者发生故障，那么所有的参与者还都处于锁定事务资源的状态中，而无法继续完成事务操作。（如果是协调者挂掉，可以重新选举一个协调者，但是无法解决因为协调者宕机导致的参与者处于阻塞状态的问题）&lt;/li&gt;
+&lt;li&gt;**数据不一致：**在二阶段提交的阶段二中，当协调者向参与者发送commit请求之后，发生了局部网络异常或者在发送commit请求过程中协调者发生了故障，这回导致只有一部分参与者接受到了commit请求。而在这部分参与者接到commit请求之后就会执行commit操作。但是其他部分未接到commit请求的机器则无法执行事务提交。于是整个分布式系统便出现了数据不一致性的现象。&lt;/li&gt;
+&lt;li&gt;**==二阶段无法解决的问题：==**协调者再发出commit消息之后宕机，而唯一接收到这条消息的参与者同时也宕机了。那么即使协调者通过选举协议产生了新的协调者，这条事务的状态也是不确定的，没人知道事务是否被已经提交&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;22-三段提交3pc&#34;&gt;2.2 三段提交（3PC）
+&lt;/h3&gt;&lt;p&gt;三段提交是两段提交的升级版&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;CanCommit阶段：询问阶段&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/555.png&#34;
+	width=&#34;876&#34;
+	height=&#34;262&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;334&#34;
+		data-flex-basis=&#34;802px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;类似2PC的准备阶段，协调者向参与者发送CanCommit请求，询问是否可以执行事务提交操作，然后开始等待参与者的响应。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;PreCommit阶段：事务执行但不提交阶段&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/666.png&#34;
+	width=&#34;996&#34;
+	height=&#34;281&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;354&#34;
+		data-flex-basis=&#34;850px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;协调者根据参与者的反应情况来决定是否可以进行事务的PreCommit操作：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;协调者从所有的参与者获得的反馈都是Yes响应
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;发送预提交请求协调者向参与者发送PreCommit请求；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;参与者接收到PreCommit请求后，执行事务操作，并将undo（执行前数据）和redo（执行后数据）信息记录到事务日志中；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;参与者成功的执行了事务操作，则返回ACK（确认机制：已确认执行）响应，同时开始等待最终指令。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;有任何一个参与者向协调者发送了No响应，或者等待超时
+&lt;ol&gt;
+&lt;li&gt;协调者向所有参与者发送中断请求请求。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;参与者收到来自协调者的中断请求之后（或超时之后，仍未收到协调者的请求），执行事务的中断。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;doCommit阶段：事务提交阶段&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/444.png&#34;
+	width=&#34;996&#34;
+	height=&#34;297&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;335&#34;
+		data-flex-basis=&#34;804px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;执行提交&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;协调接收到所有参与者返回的ACK响应后，协调者向所有参与者发送doCommit请求。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;参与者接收到doCommit请求之后，执行最终事务提交，事务提交完之后，向协调者发送Ack响应并释放所有事务资源。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;协调者接收到所有参与者的ACK响应之后，完成事务。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;中断事务&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;协调者没有接收到参与者发送的ACK响应（可能是接受者发送的不是ACK响应，也可能响应超时），协调者向所有参与者发送中断请求；&lt;/li&gt;
+&lt;li&gt;参与者接收到中断请求之后，利用其在阶段二记录的undo信息来执行事务的回滚操作，并在完成回滚之后，向协调者发送ACK消息，释放所有的事务资源。&lt;/li&gt;
+&lt;li&gt;协调者接收到参与者反馈的ACK消息之后，执行事务的中断。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;**优点：**相对于2PC，3PC主要解决的单点故障问题，并减少阻塞，因为一旦参与者无法及时收到来自协调者的信息之后，他会默认执行commit。而不会一直持有事务资源并处于阻塞状态。&lt;/p&gt;
+&lt;p&gt;**缺点：**会导致数据一致性问题。由于网络原因，协调者发送的中断响应没有及时被参与者接收到，那么参与者在等待超时之后执行了commit操作。这样就和其他接到中断命令并执行回滚的参与者之间存在数据不一致的情况。&lt;/p&gt;
+&lt;h3 id=&#34;23-tcc补偿机制&#34;&gt;2.3 TCC补偿机制
+&lt;/h3&gt;&lt;p&gt;TCC 其实就是采用的补偿机制，其核心思想是：==针对每个操作，都要注册一个与其对应的确认和补偿（撤销）操作==。三个阶段如下：&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;操作方法&lt;/th&gt;
+          &lt;th&gt;含义&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Try&lt;/td&gt;
+          &lt;td&gt;预留业务资源/数据效验-尝试检查当前操作是否可执行&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Confirm&lt;/td&gt;
+          &lt;td&gt;确认执行业务操作，实际提交数据，不做任何业务检查。try成功，confirm必定成功&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Cancel&lt;/td&gt;
+          &lt;td&gt;执行业务出错时，需要回滚数据的状态下执行的业务逻辑&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;其核心在于将业务分为两个操作步骤完成。==不依赖事务协调器对分布式事务的支持，而是通过对业务逻辑的分解来实现分布式事务==。&lt;/p&gt;
+&lt;img src=&#34;images\1565819838546.png&#34; alt=&#34;1565819838546&#34; style=&#34;zoom:200%;&#34; /&gt;
+&lt;p&gt;例如： 小红要向小白转账100元，执行流程：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;首先在 Try 阶段，要先调用远程接口检查小红的账户余额是否大于等于100元，若足够则对余额进行冻结，检查小白的账户状态是否正常。&lt;/li&gt;
+&lt;li&gt;在 Confirm 阶段，执行远程调用的转账的操作，扣除小红账户100元，小白账户加100元。&lt;/li&gt;
+&lt;li&gt;如果第2步执行成功，那么转账成功，小红账户解冻，流程结束。&lt;/li&gt;
+&lt;li&gt;如果第二步执行失败，则调用服务A的Cancel方法，账户余额回滚100元及解冻小红账户，同时调用服务B的Cancel方法，账户扣除100元。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;优点：&lt;/strong&gt; 跟2PC比起来，实现以及流程相对简单了一些。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;缺点：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;在2 3 4步中都有可能失败，从而导致数据不一致。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;TCC属于应用层的一种补偿方式，需要程序员在实现的时候多写很多补偿的代码，复杂业务场景下代码逻辑非常复杂。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;幂等性无法确保。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;24-本地消息表异步确保&#34;&gt;2.4 本地消息表（异步确保）
+&lt;/h3&gt;&lt;p&gt;本地消息表这种实现方式应该是业界使用最多的，其核心思想是将==分布式事务拆分成本地事务进行处理==，这种思路是来源于ebay。我们可以从下面的流程图中看出其中的一些细节：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1553321000110.png&#34;
+	width=&#34;801&#34;
+	height=&#34;367&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1553321000110&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;218&#34;
+		data-flex-basis=&#34;523px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;工作流程：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;==消息生产方，需要额外建一个消息表==，并记录消息发送状态。消息表和业务数据要在一个事务里提交，也就是说他们要在一个数据库里面。然后消息会经过MQ发送到消息的消费方。如果消息发送失败，会进行重试发送。&lt;/li&gt;
+&lt;li&gt;==消息消费方，需要处理这个消息==，并完成自己的业务逻辑。此时如果本地事务处理成功，表明已经处理成功了，如果处理失败， 果是业务上面的失败，可以给生产方发送一个业务补偿消息，通知生产方进行回滚等操作。&lt;/li&gt;
+&lt;li&gt;生产方和消费方定时扫描本地消息表，把还没处理完成的消息或者失败的消息再发送一遍。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;优点：&lt;/strong&gt; 一种非常经典的实现，避免了分布式事务，实现了最终一致性。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;缺点：&lt;/strong&gt; 消息表会耦合到业务系统中，如果没有封装好的解决方案，会有很多杂活需要处理。&lt;/p&gt;
+&lt;h3 id=&#34;25-mq-事务消息&#34;&gt;2.5 MQ 事务消息
+&lt;/h3&gt;&lt;p&gt;有一些第三方的MQ是支持事务消息的，比如RocketMQ，他们支持事务消息的方式也是类似于采用的二阶段提交，但是市面上一些主流的MQ都是不支持事务消息的，比如 RabbitMQ 和 Kafka 都不支持（RabbitMQ、Kafka基于ACK机制）。&lt;/p&gt;
+&lt;p&gt;以阿里的 RocketMQ 中间件为例，流程为：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;发送一个事务消息，这个时候，RocketMQ将消息状态标记为Prepared，注意此时这条消息消费者是无法消费到的。&lt;/li&gt;
+&lt;li&gt;执行业务代码逻辑。&lt;/li&gt;
+&lt;li&gt;确认发送消息，RocketMQ将消息状态标记为可消费，这个时候消费者才能真正消费到这条消息。&lt;/li&gt;
+&lt;li&gt;如果步骤3确认消息发送失败，RocketMQ会定期扫描消息集群中的事务消息，如果发现了Prepared消息，它会向消息发送端(生产者)确认。RocketMQ会根据发送端设置的策略来决定是回滚还是继续发送确认消息。这样就保证了消息发送与本地事务同时成功或同时失败。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;正常流程图：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/111.png&#34;
+	width=&#34;800&#34;
+	height=&#34;363&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;220&#34;
+		data-flex-basis=&#34;528px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;完整流程图：&lt;/strong&gt;&lt;/p&gt;
+&lt;img src=&#34;images\1.jpg&#34; style=&#34;zoom:200%;&#34; /&gt;
+&lt;p&gt;&lt;strong&gt;优点：&lt;/strong&gt; 实现了最终一致性，不需要依赖本地数据库事务。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;缺点：&lt;/strong&gt; 目前主流MQ中只有RocketMQ支持事务消息。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;延申拓展：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;u&gt;MQ非事务消息实现：&lt;/u&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;u&gt;方案一：创建独立消息服务&lt;/u&gt;&lt;/li&gt;
+&lt;li&gt;&lt;u&gt;方案二：使用非事务MQ（RabbitMQ/Kafka）的ACK机制&lt;/u&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;26-seata&#34;&gt;2.6 Seata
+&lt;/h3&gt;&lt;h4 id=&#34;261-seata简介&#34;&gt;2.6.1 Seata简介
+&lt;/h4&gt;&lt;p&gt;2019 年 1 月，阿里巴巴中间件团队发起了开源项目 &lt;a class=&#34;link&#34; href=&#34;https://www.oschina.net/p/fescar&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;em&gt;Fescar&lt;/em&gt;&lt;/a&gt;&lt;em&gt;（Fast &amp;amp; Easy Commit And Rollback）&lt;/em&gt;，和社区一起共建开源分布式事务解决方案。Fescar 的愿景是让分布式事务的使用像本地事务的使用一样，简单和高效，并逐步解决开发者们遇到的分布式事务方面的所有难题。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Fescar 开源后，蚂蚁金服加入 Fescar 社区参与共建，并在 Fescar 0.4.0 版本中贡献了 TCC 模式。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;为了打造更中立、更开放、生态更加丰富的分布式事务开源社区，经过社区核心成员的投票，大家决定对 Fescar 进行品牌升级，并更名为 &lt;strong&gt;Seata&lt;/strong&gt;，意为：&lt;strong&gt;Simple Extensible Autonomous Transaction Architecture&lt;/strong&gt;，是一套一站式分布式事务解决方案。&lt;/p&gt;
+&lt;p&gt;Seata 融合了阿里巴巴和蚂蚁金服在分布式事务技术上的积累，并沉淀了新零售、云计算和新金融等场景下丰富的实践经验。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;核心组件：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Transaction Coordinator (TC)： 事务协调器，维护全局事务的运行状态，负责协调并驱动全局事务的提交或回滚。&lt;/li&gt;
+&lt;li&gt;Transaction Manager (TM)： 控制全局事务的边界，负责开启一个全局事务，并最终发起全局提交或全局回滚的决议。&lt;/li&gt;
+&lt;li&gt;Resource Manager (RM)： 控制分支事务，负责分支注册、状态汇报，并接收事务协调器的指令，驱动分支（本地）事务的提交和回滚。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;工作流程：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;TM 向 TC 申请开启一个全局事务，全局事务创建成功并生成一个全局唯一的事务ID（XID），XID 在微服务调用链路的上下文中传播。&lt;/li&gt;
+&lt;li&gt;RM 向 TC 注册分支事务，接着执行这个分支事务并提交事务（==重点：RM在此阶段就已经执行了本地事务的提交/回滚==），最后将执行结果汇报给TC。&lt;/li&gt;
+&lt;li&gt;TM 根据 TC 中所有的分支事务的执行情况，发起全局提交或回滚决议。&lt;/li&gt;
+&lt;li&gt;TC 调度 XID 下管辖的全部分支事务完成提交或回滚请求。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/333.png&#34;
+	width=&#34;960&#34;
+	height=&#34;551&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;174&#34;
+		data-flex-basis=&#34;418px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;262-seata支持的模式&#34;&gt;2.6.2 Seata支持的模式
+&lt;/h4&gt;&lt;p&gt;seata中有两种常见分布式事务实现方案，AT及TCC&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;AT模式：赖于RM拥有本地数据库事务的能力，对于客户业务无侵入性&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/222.png&#34;
+	width=&#34;721&#34;
+	height=&#34;260&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;277&#34;
+		data-flex-basis=&#34;665px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;TCC 模式&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;263-seata的优点&#34;&gt;2.6.3 Seata的优点
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;对业务无侵入&lt;/strong&gt;：即减少技术架构上的微服务化所带来的分布式事务问题对业务的侵入
+&lt;strong&gt;高性能&lt;/strong&gt;：减少分布式事务解决方案所带来的性能消耗(2PC)&lt;/p&gt;
+&lt;h4 id=&#34;264-at模式&#34;&gt;2.6.4 AT模式
+&lt;/h4&gt;&lt;p&gt;Seata AT模式是基于XA事务演进而来的一个分布式事务中间件，XA是一个基于数据库实现的分布式事务协议，本质上和两阶段提交一样，需要数据库支持，Mysql5.6以上版本支持XA协议，其他数据库如Oracle，DB2也实现了XA接口。&lt;/p&gt;
+&lt;p&gt;AT模式分为两个阶段，如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;第一阶段：本地数据备份阶段&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;Seata 的 JDBC 数据源代理通过对业务 SQL 的解析，把==业务数据在变化前后的数据镜像组织成回滚日志==（XID/分支事务ID（Branch ID/变化前的数据/变化后的数据）。&lt;/li&gt;
+&lt;li&gt;将回滚日志存入一张日志表UNDO_LOG（==需要手动创建==）,并对UNDO_LOG表中的这条数据形成行锁（for update）。&lt;/li&gt;
+&lt;li&gt;若锁定失败，说明有其他事务在操作这条数据，它会在一段时间内重试，重试失败则回滚本地事务，并向TC汇报本地事务执行失败。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这样，可以保证：&lt;strong&gt;任何提交的业务数据的更新一定有相应的回滚日志存在&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565820909345.png&#34;
+	width=&#34;1132&#34;
+	height=&#34;378&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565820909345&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;299&#34;
+		data-flex-basis=&#34;718px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;目的：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;基于这样的机制，分支的本地事务便可以在全局事务的第一阶段提交，并马上释放本地事务锁定的资源。&lt;/li&gt;
+&lt;li&gt;有了回滚日志之后，可以在第一阶段释放对资源的锁定，降低了锁范围，提高效率，即使第二阶段发生异常需要回滚，只需找对undolog中对应数据并反解析成sql来达到回滚目的。&lt;/li&gt;
+&lt;li&gt;Seata通过代理数据源（DataSource-&amp;gt;DataSourceProxy）将业务sql的执行解析成undolog来与业务数据的更新同时入库，达到了对业务无侵入的效果&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;第二阶段：全局事务提交/回滚&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;全局提交&lt;/strong&gt;：
+&lt;ol&gt;
+&lt;li&gt;所有分支事务此时已经完成提交，所有分支事务提交都正常。&lt;/li&gt;
+&lt;li&gt;==TM从TC获知后会决议执行====全局提交====，TC异步通知所有的RM释放UNDO_LOG表中的行锁==，同时清理掉UNDO_LOG表中刚才释放锁的那条数据。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565821037492.png&#34;
+	width=&#34;1218&#34;
+	height=&#34;525&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565821037492&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;232&#34;
+		data-flex-basis=&#34;556px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;全局回滚&lt;/strong&gt;：
+&lt;ol&gt;
+&lt;li&gt;若任何一个RM一阶段事务提交失败，通知TC提交失败。&lt;/li&gt;
+&lt;li&gt;==TM从TC获知后会决议执行全局回滚====，====TC向所有的RM发送回滚请求==。&lt;/li&gt;
+&lt;li&gt;RM通过XID和Branch ID找到相应的回滚日志记录，&lt;strong&gt;通过回滚记录生成反向的更新 SQL 并执行&lt;/strong&gt;，以完成分支的回滚，同时释放锁，清除UNDO_LOG表中释放锁的那条数据。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565821069728.png&#34;
+	width=&#34;1207&#34;
+	height=&#34;564&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565821069728&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;214&#34;
+		data-flex-basis=&#34;513px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;265-tcc模式&#34;&gt;2.6.5 TCC模式
+&lt;/h4&gt;&lt;p&gt;seata也针对TCC做了适配兼容，支持TCC事务方案，原理前面已经介绍过，基本思路就是使用侵入业务上的补偿及事务管理器的协调来达到全局事务的一起提交及回滚。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565821173446.png&#34;
+	width=&#34;1223&#34;
+	height=&#34;615&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565821173446&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;198&#34;
+		data-flex-basis=&#34;477px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;27-跨mysql-ip测试&#34;&gt;2.7 跨mysql ip测试
+&lt;/h2&gt;&lt;p&gt;插入数据库&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/seata-16312535244541.png&#34;
+	width=&#34;1204&#34;
+	height=&#34;610&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;seata&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;197&#34;
+		data-flex-basis=&#34;473px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;undo_log 表&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/seata_undo_log.png&#34;
+	width=&#34;1750&#34;
+	height=&#34;438&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;seata_undo_log&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;399&#34;
+		data-flex-basis=&#34;958px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;发生异常&amp;ndash;回滚&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/seata%E5%9B%9E%E6%BB%9A.png&#34;
+	width=&#34;1724&#34;
+	height=&#34;747&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;seata回滚&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;230&#34;
+		data-flex-basis=&#34;553px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;数据库可以看到之前被修改的数据被回滚了&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

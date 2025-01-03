@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="0. nginx 配置 nginx配置文件主要分成四个部分：\nmain，全局设置，影响其它部分所有设置 server，主机服务相关设置，主要用于指定虚拟主机域名、IP和端口 location，URL匹配特定位置后的设置，反向代理、内容篡改相关设置 upstream，上游服务器设置，负载均衡相关配置 server继承main，location继承server；upstream既不会继承指令也不会被继承。\n">
+<title>Nginx</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/nginx/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Nginx">
+<meta property='og:description' content="0. nginx 配置 nginx配置文件主要分成四个部分：\nmain，全局设置，影响其它部分所有设置 server，主机服务相关设置，主要用于指定虚拟主机域名、IP和端口 location，URL匹配特定位置后的设置，反向代理、内容篡改相关设置 upstream，上游服务器设置，负载均衡相关配置 server继承main，location继承server；upstream既不会继承指令也不会被继承。\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/nginx/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='运维' /><meta property='article:tag' content='Nginx' /><meta property='article:published_time' content='2024-04-27T15:39:00&#43;08:00'/><meta property='article:modified_time' content='2024-04-27T15:39:00&#43;08:00'/>
+<meta name="twitter:title" content="Nginx">
+<meta name="twitter:description" content="0. nginx 配置 nginx配置文件主要分成四个部分：\nmain，全局设置，影响其它部分所有设置 server，主机服务相关设置，主要用于指定虚拟主机域名、IP和端口 location，URL匹配特定位置后的设置，反向代理、内容篡改相关设置 upstream，上游服务器设置，负载均衡相关配置 server继承main，location继承server；upstream既不会继承指令也不会被继承。\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#0-nginx-配置">0. nginx 配置</a>
+      <ul>
+        <li><a href="#1-upstream-负载均衡策略">1. upstream 负载均衡策略</a></li>
+        <li><a href="#2-跨域配置">2. 跨域配置</a></li>
+      </ul>
+    </li>
+    <li><a href="#1-nginx-安装">1. nginx 安装</a></li>
+    <li><a href="#2-nginx-常用命令">2. nginx 常用命令</a></li>
+    <li><a href="#3-openresty">3. openresty</a>
+      <ul>
+        <li><a href="#1-yum-安装">1. yum 安装</a></li>
+        <li><a href="#2-常用命令">2. 常用命令</a></li>
+        <li><a href="#3-商品详情页--架构">3. 商品详情页&ndash;架构</a></li>
+        <li><a href="#4-redis布隆过滤器">4. redis布隆过滤器</a>
+          <ul>
+            <li><a href="#1-包安装">1. 包安装</a></li>
+            <li><a href="#2--docker-安装">2.  docker 安装</a></li>
+            <li><a href="#3-常用命令">3. 常用命令</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/nginx/" >
+                Nginx
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/nginx/">Nginx</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Apr 27, 2024</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 8 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="0-nginx-配置">0. nginx 配置
+</h1><p>nginx配置文件主要分成四个部分：</p>
+<ul>
+<li>main，全局设置，影响其它部分所有设置</li>
+<li>server，主机服务相关设置，主要用于指定虚拟主机域名、IP和端口</li>
+<li>location，URL匹配特定位置后的设置，反向代理、内容篡改相关设置</li>
+<li>upstream，上游服务器设置，负载均衡相关配置</li>
+</ul>
+<p>server继承main，location继承server；upstream既不会继承指令也不会被继承。</p>
+<p>​	在这四个部分当中，每个部分都包含若干指令，这些指令主要包含Nginx的主模块指令、事件模块 指令、HTTP核心模块指令，同时每个部分还可以使用其他HTTP模块指令，例如Http SSL模块、 HttpGzip Static模块和Http Addition模块等。</p>
+<p>nginx 在 linux 的安装位置 一般为 /etc/nginx</p>
+<p><img src="/p/nginx/images/image-20240805162750043.png"
+	width="1139"
+	height="708"
+	
+	loading="lazy"
+	
+		alt="image-20240805162750043"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="160"
+		data-flex-basis="386px"
+	
+></p>
+<p>示例配置</p>
+<pre><code># 全局块配置
+user administrator administrators; # 配置用户或者组，默认为nobody nobody。
+worker_processes 2; # 允许生成的进程数，默认为1
+pid /nginx/pid/nginx.pid; # 指定nginx进程运行文件存放地址
+
+events {
+    accept_mutex on; # 设置网路连接序列化，防止惊群现象发生，默认为on
+    multi_accept on; # 设置一个进程是否同时接受多个网络连接，默认为off
+    worker_connections 1024; # 最大连接数，默认为512
+    # use epoll; # 事件驱动模型，可选select|poll|kqueue|epoll等
+}
+
+http {
+    include mime.types; # 文件扩展名与文件类型映射表
+    default_type application/octet-stream; # 默认文件类型，默认为text/plain
+
+    # access_log off; # 取消服务日志
+    log_format myFormat '$remote_addr–$remote_user [$time_local] $request '
+                      '$status $body_bytes_sent $http_referer $http_user_agent '
+                      '$http_x_forwarded_for';
+    # 自定义格式
+    access_log log/access.log myFormat; # combined为日志格式的默认值
+
+    sendfile on; # 允许sendfile方式传输文件，默认为off
+    sendfile_max_chunk 100k; # 每个进程每次调用传输数量不能大于设定的值，默认为0
+
+    keepalive_timeout 65; # 连接超时时间，默认为75s
+
+    upstream mysvr {
+        server 127.0.0.1:7878;
+        server 192.168.10.121:3333 backup; # 热备
+    }
+
+    error_page 404 https://www.baidu.com;  # 错误页重定向
+
+    server {
+        keepalive_requests 120; # 单连接请求上限次数
+        listen 4545; # 监听端口
+        server_name 127.0.0.1; # 监听地址
+
+        location ~*^.+$ { # 请求的url过滤，正则匹配
+            # root path; # 根目录
+            # index vv.txt; # 设置默认页
+            proxy_pass http://mysvr; # 请求转向mysvr 定义的服务器列表
+            deny 127.0.0.1; # 拒绝的ip
+            allow 172.18.5.54; # 允许的ip
+        }
+    }
+}
+
+error_log log/error.log debug; # 指定日志路径和级别
+</code></pre>
+<h2 id="1-upstream-负载均衡策略">1. upstream 负载均衡策略
+</h2><pre><code>#动态服务器组
+upstream dynamicserver {
+	server 192.168.64.1:9001; #tomcat 1
+	server 192.168.64.1:9002; #tomcat 2
+	server 192.168.64.1:9003; #tomcat 3
+	server 192.168.64.1:9004; #tomcat 4
+}
+</code></pre>
+<p><img src="/p/nginx/images/image-20240805165324863.png"
+	width="791"
+	height="503"
+	
+	loading="lazy"
+	
+		alt="image-20240805165324863"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="157"
+		data-flex-basis="377px"
+	
+></p>
+<p><img src="/p/nginx/images/image-20240805165337592.png"
+	width="800"
+	height="393"
+	
+	loading="lazy"
+	
+		alt="image-20240805165337592"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="203"
+		data-flex-basis="488px"
+	
+></p>
+<ul>
+<li>
+<p>在轮询中，==如果服务器down掉了，会自动剔除该服务器==。</p>
+</li>
+<li>
+<p>默认配置就是轮询策略。</p>
+</li>
+<li>
+<p>此策略适合服务器配置相当，无状态且短平快的服务使用</p>
+</li>
+</ul>
+<p>==weight权重方式==</p>
+<pre><code class="language-conf">#动态服务器组
+upstream dynamicserver {
+	server 192.168.64.1:9001 weight=2; #tomcat 1
+	server 192.168.64.1:9002; #tomcat 2
+	server 192.168.64.1:9003 backup; #tomcat 3
+	server 192.168.64.1:9004 max_fails=3 fail_timeout=20s; #tomcat 4
+}
+</code></pre>
+<ul>
+<li>权重越高分配到需要处理的请求越多。</li>
+<li>此策略可以与least_conn和ip_hash结合使用。</li>
+<li>此策略比较适合服务器的硬件配置差别比较大的情况。</li>
+</ul>
+<p>==<strong>ip_hash</strong>==</p>
+<blockquote>
+<p>指定负载均衡器按照基于客户端IP的分配方式，这个方法确保了相同的客户端的请求一直发送到相</p>
+<p>同的服务器，以保证session会话。这样每个访客都固定访问一个后端服务器，可以解决session不</p>
+<p>能跨服务器的问题。</p>
+</blockquote>
+<pre><code>upstream dynamicserver {
+	ip_hash; #保证每个访客固定访问一个后端服务器
+	server 192.168.64.1:9001 weight=2; #tomcat 1
+	server 192.168.64.1:9002; #tomcat 2
+	server 192.168.64.1:9003 backup; #tomcat 3
+	server 192.168.64.1:9004 max_fails=3 fail_timeout=20s; #tomcat 4
+}
+</code></pre>
+<ul>
+<li>在nginx版本1.3.1之前，不能在ip_hash中使用权重（weight）。</li>
+<li>ip_hash不能与backup同时使用。</li>
+<li>此策略适合有状态服务，比如session。</li>
+<li>当有服务器需要剔除，必须手动down掉。</li>
+</ul>
+<p><strong>least_conn</strong></p>
+<blockquote>
+<p>把==请求转发给连接数较少的后端服务器==。轮询算法是把请求平均的转发给各个后端，使它们的负载</p>
+<p>大致相同；但是，有些请求占用的时间很长，会导致其所在的后端负载较高。这种情况下， least_conn这种方式就可以达到更好的负载均衡效</p>
+</blockquote>
+<pre><code>upstream dynamicserver {
+	least_conn; #把请求转发给连接数较少的后端服务器
+	server 192.168.64.1:9001 weight=2; #tomcat 1
+	server 192.168.64.1:9002; #tomcat 2
+	server 192.168.64.1:9003 backup; #tomcat 3
+	server 192.168.64.1:9004 max_fails=3 fail_timeout=20s; #tomcat 4
+}
+</code></pre>
+<p>==重试策略==</p>
+<pre><code>upstream dynamicserver {
+	server 192.168.64.1:9001 fail_timeout=60s max_fails=3; #Server A
+	server 192.168.64.1:9002 fail_timeout=60s max_fails=3; #Server B
+}
+</code></pre>
+<p>可以配置nginx 能够到其它的服务器进行重试, 并且可以配置指定的错误码</p>
+<p>官方说明</p>
+<pre><code>Syntax: proxy_next_upstream error | timeout | invalid_header | http_500 | 
+
+http_502 | http_503 | http_504 | http_403 | http_404 | off ...; 
+
+Default: proxy_next_upstream error timeout; 
+
+Context: http, server, location
+</code></pre>
+<pre><code>upstream dynamicserver {
+	server 192.168.64.1:9001 fail_timeout=60s max_fails=3; #tomcat 1
+	server 192.168.64.1:9002 fail_timeout=60s max_fails=3; #tomcat 2
+}
+server {
+	server_name www.itcast.com;
+	default_type text/html;
+	charset utf-8;
+	location ~ .*$ {
+	index index.jsp index.html;
+	proxy_pass http://dynamicserver;
+	#下一节点重试的错误状态
+	proxy_next_upstream error timeout http_500 http_502 http_503
+	http_504;
+}
+</code></pre>
+<h2 id="2-跨域配置">2. 跨域配置
+</h2><pre><code>server {
+    listen 80;
+    server_name test.cross.com;
+
+    if ($host ~ (.*).cross.com) {
+        set $domain $1; ##记录二级域名值
+    }
+
+    # 是否允许请求带有验证信息
+    add_header Access-Control-Allow-Credentials true;
+
+    # 允许跨域访问的域名,可以是一个域的列表，也可以是通配符*
+    add_header Access-Control-Allow-Origin http://static.enjoy.com;
+
+    # 允许脚本访问的返回头
+    add_header Access-Control-Allow-Headers 'x-requested-with,content-type,Cache-Control,Pragma,Date,x-timestamp';
+
+    # 允许使用的请求方法，以逗号隔开
+    add_header Access-Control-Allow-Methods 'POST,GET,OPTIONS,PUT,DELETE';
+
+    # 允许自定义的头部，以逗号隔开,大小写不敏感
+    add_header Access-Control-Expose-Headers 'WWW-Authenticate,Server-Authorization';
+
+    # P3P支持跨域cookie操作
+    add_header P3P 'policyref=&quot;/w3c/p3p.xml&quot;, CP=&quot;NOI DSP PSAa OUR BUS IND ONL UNI COM NAV INT LOC&quot;';
+
+    if ($request_method = 'OPTIONS') { ##OPTIONS类的请求，是跨域先验请求
+        return 204; ##204代表ok
+    }
+}
+
+
+</code></pre>
+<h1 id="1-nginx-安装">1. nginx 安装
+</h1><pre><code># 下载nginx
+wget http://nginx.org/download/nginx-1.21.1.tar.gz
+# 解压nginx
+tar -zxvf
+
+
+</code></pre>
+<p>进入auto目录</p>
+<p><img src="/p/nginx/images/image-20240805152526474.png"
+	width="643"
+	height="623"
+	
+	loading="lazy"
+	
+		alt="image-20240805152526474"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="103"
+		data-flex-basis="247px"
+	
+></p>
+<p>​	cc是用于编译的，对所有的操作系统的判断在os里面，其他所有文件都是为了辅助configure文件在 执行的时候去判定支持哪些模块，当前的操作系统有哪些特性可以供nginx使用 然后我们在看图1中，conf是配置文件的示例文件，方便我们在安装完以后可以直接把conf里面的 配置文件复制到安装目录下面, CHANGES这个文件里面描述了nginx的哪些特性,CHANGES.ru是一个俄罗 斯版本的描述，因为nginx的作者是一个俄罗斯人，configure是一个用来生成中间文件进行编译前的一 个必备动作 接下来我们通过 ./configure &ndash;help | more 命令来查看一下</p>
+<h1 id="2-nginx-常用命令">2. nginx 常用命令
+</h1><pre><code>nginx -s reload #重新加载配置文件
+nginx -t -c /路径/nginx.conf # 检查配置文件是否正确
+nginx -v
+
+</code></pre>
+<h1 id="3-openresty">3. openresty
+</h1><h2 id="1-yum-安装">1. yum 安装
+</h2><pre><code>sudo yum install yum-utils
+
+sudo yum-config-manager --add-repo https://openresty.org/package/centos/openresty.repo
+
+sudo yum install openresty
+
+</code></pre>
+<p>环境设置</p>
+<pre><code>vi /etc/profile ##加入path路径
+export PATH=$PATH:/usr/local/openresty/nginx/sbin
+source /etc/profile ##生效配置
+
+</code></pre>
+<p>查看</p>
+<pre><code>nginx -v
+
+</code></pre>
+<h2 id="2-常用命令">2. 常用命令
+</h2><p><img src="/p/nginx/images/image-20240805192301330.png"
+	width="722"
+	height="617"
+	
+	loading="lazy"
+	
+		alt="image-20240805192301330"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="117"
+		data-flex-basis="280px"
+	
+></p>
+<h2 id="3-商品详情页--架构">3. 商品详情页&ndash;架构
+</h2><p><img src="/p/nginx/images/image-20240805192555827.png"
+	width="924"
+	height="468"
+	
+	loading="lazy"
+	
+		alt="image-20240805192555827"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="197"
+		data-flex-basis="473px"
+	
+></p>
+<ul>
+<li>把商品详情页直接做成一个静态页面，</li>
+<li>然后这样子每次全量的更新，把数据全部静态放 到 redis 里面，</li>
+<li>每次数据变化的时候，我们就通过一个Java服务去渲染这个数据</li>
+<li>然后把这个静态页面 推送到到文件服务器</li>
+</ul>
+<p>缺点</p>
+<ul>
+<li>
+<p>这种方案的缺点，如果商品很多，那么渲染的时间会很长，达不到实时的效果</p>
+</li>
+<li>
+<p>文件服务器性能高，tomcat性能差，压力都在Tomcat服务器了</p>
+</li>
+<li>
+<p>只能处理一些静态的东西，如果动态数据很多，比如有库存的，你不可能说每次去渲染，然后推送</p>
+<p>到文件服务器，那不是更加慢？</p>
+</li>
+</ul>
+<p>通过openresty 改造的</p>
+<p><img src="/p/nginx/images/image-20240805192746412.png"
+	width="962"
+	height="555"
+	
+	loading="lazy"
+	
+		alt="image-20240805192746412"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="173"
+		data-flex-basis="416px"
+	
+></p>
+<ol>
+<li><strong>生成静态页</strong></li>
+</ol>
+<p>添加修改页面的时候生成静态页，这个地方生成的是一个通用的静态页，敏感数据比如 价格，商品</p>
+<p>名称等，通过占位符来替换，然后将生成的静态页的链接，以及敏感数据同步到redis中，如果只修改价</p>
+<p>格不需要重新生成静态页，只需要修改redis敏感数据即可。</p>
+<ol start="2">
+<li><strong>推送到文件服务器</strong></li>
+</ol>
+<p>这个的文件服务器泛指能够提供静态文件处理的文件服务器，nginx代理静态文件，tomcat，以及</p>
+<p>OSS等都算静态文件服务器，生成完静态文件后将文件推送到文件服务器，==并将请求连接存放进redis中==</p>
+<ol start="3">
+<li><strong>布隆过滤器过滤请求</strong></li>
+</ol>
+<p>Redis和nginx的速度很快，但是如果有人恶意请求不存在的请求会造成redis很大的开销，那么可以</p>
+<p>采用布隆过滤器将不存在的请求过滤出去。</p>
+<ol start="4">
+<li><strong>lua直连Redis读取数据</strong></li>
+</ol>
+<p>因为java连接Reids进行操作并发性能很弱，相对于OpenResty来说性能差距很大，这里使用</p>
+<p>OpenResty，读取Redis中存放的URL以及敏感数据。</p>
+<ol start="5">
+<li><strong>OpenResty渲染数据</strong></li>
+</ol>
+<p>从Redis获取到URL后lua脚本抓取模板页面内容，==然后通过redis里面的敏感数据进行渲染==然后返回</p>
+<p>前端，因为都是lua脚本操作性能会很高</p>
+<h2 id="4-redis布隆过滤器">4. redis布隆过滤器
+</h2><p>==它用于高效地判断一个元素是否在一个集合中，特别适用于需要快速判断大量数据的场景==</p>
+<p><img src="/p/nginx/images/image-20240806093230755.png"
+	width="966"
+	height="529"
+	
+	loading="lazy"
+	
+		alt="image-20240806093230755"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="182"
+		data-flex-basis="438px"
+	
+></p>
+<blockquote>
+<p><strong>布隆过滤器的原理</strong></p>
+<p>布隆过滤器其==本质就是一个只包含0和1的数组==。具体操作当一个元素被加入到集合里面后，该元素</p>
+<p>通过K个Hash函数运算得到K个hash后的值，然后将K个值映射到这个位数组对应的位置，把对应位置的</p>
+<p>值设置为1。查询是否存在时，我们就看对应的映射点位置如果全是1，他就很可能存在（跟hash函数的</p>
+<p>个数和hash函数的设计有关），如果有一个位置是0，那这个元素就一定不存在</p>
+</blockquote>
+<h3 id="1-包安装">1. 包安装
+</h3><p>创建目录</p>
+<pre><code>mkdir -p /tmp/etc/redis/
+mkdir -p /tmp/data/redis/node{1..6}
+
+</code></pre>
+<p>redis 配置文件</p>
+<pre><code>cat &gt; /tmp/etc/redis/redis.conf&lt;&lt; EOF
+protected-mode no
+port 6379
+tcp-backlog 511
+timeout 0
+tcp-keepalive 300
+daemonize no
+supervised no
+pidfile /var/run/redis_6379.pid
+loglevel notice
+logfile &quot;&quot;
+databases 1
+always-show-logo yes
+save 900 1
+save 300 10
+save 60 10000
+stop-writes-on-bgsave-error yes
+rdbcompression yes
+rdbchecksum yes
+dbfilename dump.rdb
+rdb-del-sync-files no
+dir ./
+replica-serve-stale-data yes
+replica-read-only yes
+repl-diskless-sync no
+repl-diskless-sync-delay 5
+repl-diskless-load disabled
+repl-disable-tcp-nodelay no
+replica-priority 100
+acllog-max-len 128
+lazyfree-lazy-eviction no
+lazyfree-lazy-expire no
+lazyfree-lazy-server-del no
+replica-lazy-flush no
+lazyfree-lazy-user-del no
+oom-score-adj no
+oom-score-adj-values 0 200 800
+appendonly yes
+appendfilename &quot;appendonly.aof&quot;
+appendfsync everysec
+no-appendfsync-on-rewrite no
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb
+aof-load-truncated yes
+aof-use-rdb-preamble yes
+lua-time-limit 5000
+cluster-enabled yes
+cluster-config-file nodes-6379.conf
+cluster-node-timeout 15000
+slowlog-log-slower-than 10000
+slowlog-max-len 128
+latency-monitor-threshold 0
+notify-keyspace-events &quot;&quot;
+hash-max-ziplist-entries 512
+hash-max-ziplist-value 64
+list-max-ziplist-size -2
+list-compress-depth 0
+set-max-intset-entries 512
+zset-max-ziplist-entries 128
+zset-max-ziplist-value 64
+hll-sparse-max-bytes 3000
+stream-node-max-bytes 4096
+stream-node-max-entries 100
+activerehashing yes
+client-output-buffer-limit normal 0 0 0
+client-output-buffer-limit replica 256mb 64mb 60
+client-output-buffer-limit pubsub 32mb 8mb 60
+hz 10
+dynamic-hz yes
+aof-rewrite-incremental-fsync yes
+rdb-save-incremental-fsync yes
+jemalloc-bg-thread yes
+loadmodule /etc/redis/redisbloom.so
+EOF
+
+</code></pre>
+<p>docker-compose.yml</p>
+<pre><code>version: '2'
+
+services:
+  redis01:
+    image: redis
+    hostname: redis01
+    container_name: redis01
+    networks:
+      docker-network:
+          ipv4_address: 172.31.0.2
+    ports:
+      - &quot;7001:6379&quot;
+    volumes:
+      - &quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&quot;
+      - &quot;/tmp/data/redis/node1:/data&quot;
+      - &quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&quot;
+    command: redis-server /etc/redis/redis.conf
+
+  redis02:
+    image: redis
+    hostname: redis02
+    container_name: redis02
+    networks:
+      docker-network:
+          ipv4_address: 172.31.0.3
+    ports:
+      - &quot;7002:6379&quot;
+    volumes:
+      - &quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&quot;
+      - &quot;/tmp/data/redis/node2:/data&quot;
+      - &quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&quot;
+    command: redis-server /etc/redis/redis.conf
+
+  redis03:
+    image: redis
+    hostname: redis03
+    container_name: redis03
+    networks:
+      docker-network:
+          ipv4_address: 172.31.0.4
+    ports:
+      - &quot;7003:6379&quot;
+    volumes:
+      - &quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&quot;
+      - &quot;/tmp/data/redis/node3:/data&quot;
+      - &quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&quot;
+    command: redis-server /etc/redis/redis.conf
+
+  redis04:
+    image: redis
+    hostname: redis04
+    container_name: redis04
+    networks:
+      docker-network:
+          ipv4_address: 172.31.0.5
+    ports:
+      - &quot;7004:6379&quot;
+    volumes:
+      - &quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&quot;
+      - &quot;/tmp/data/redis/node4:/data&quot;
+      - &quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&quot;
+    command: redis-server /etc/redis/redis.conf
+
+  redis05:
+    image: redis
+    hostname: redis05
+    container_name: redis05
+    networks:
+       docker-network:
+          ipv4_address: 172.31.0.6
+    ports:
+      - &quot;7005:6379&quot;
+    volumes:
+      - &quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&quot;
+      - &quot;/tmp/data/redis/node5:/data&quot;
+      - &quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&quot;
+    command: redis-server /etc/redis/redis.conf
+
+  redis06:
+    image: redis
+    hostname: redis06
+    container_name: redis06
+    networks:
+      docker-network:
+          ipv4_address: 172.31.0.7
+    ports:
+      - &quot;7006:6379&quot;
+    volumes:
+      - &quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&quot;
+      - &quot;/tmp/data/redis/node6:/data&quot;
+      - &quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&quot;
+    command: redis-server /etc/redis/redis.conf
+
+networks:
+  docker-network:
+    ipam:
+      config:
+        - subnet: 172.31.0.0/16
+          gateway: 172.31.0.1
+
+
+</code></pre>
+<h3 id="2--docker-安装">2.  docker 安装
+</h3><pre><code>docker run -d -p 6379:6379 --name redis-redisbloom redislabs/rebloom:latest
+
+</code></pre>
+<h3 id="3-常用命令">3. 常用命令
+</h3><p><img src="/p/nginx/images/image-20240807190515768.png"
+	width="739"
+	height="730"
+	
+	loading="lazy"
+	
+		alt="image-20240807190515768"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="101"
+		data-flex-basis="242px"
+	
+></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E8%BF%90%E7%BB%B4/">运维</a>
+        
+            <a href="/tags/nginx/">Nginx</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

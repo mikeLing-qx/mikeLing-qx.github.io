@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Redis on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/tags/redis/</link>
+        <description>Recent content in Redis on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Wed, 09 Sep 2020 14:35:17 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/tags/redis/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Redis集群搭建</title>
+        <link>https://mikeLing-qx.github.io/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</link>
+        <pubDate>Wed, 09 Sep 2020 14:35:17 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</guid>
+        <description>&lt;h1 id=&#34;方式一-linux-搭建-redis集群&#34;&gt;方式一: linux 搭建 redis集群
+&lt;/h1&gt;&lt;p&gt;效果: 三个主节点;每个主节点有1个从节点&lt;/p&gt;
+&lt;p&gt;redis 和哨兵 集群的搭建  (用原生的cluster; ==实现数据的分片==)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;可选的三个插件: 官方的cluster 和 豌豆荚 ; trainProxy
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;一个redis ==gem 包== ; 一个redis==源码包== 上传到服务器; 版本号要匹配&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;然后服务器上需要准备好 c++  ; ruby; rubyBem 环境&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;安装好 redis 的 gem;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;进到redis 源码包里面 用make命令进行安装Redis&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;编辑配置文件 ; 开启集群 ; 配置端口; 允许后台启动&lt;/p&gt;
+&lt;ol start=&#34;5&#34;&gt;
+&lt;li&gt;
+&lt;p&gt;创建一个 redis- cluster 文件夹; 里面 存放6个文件夹 ; redis1 到 6&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在 安装好的单机用make install 指定要安装Redis在 1到6 的文件夹下面&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;拷贝redis.conf 配置文件到 各个文件夹下&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;再编辑每个配置文件的端口&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;启动所有的redis服务&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;在redis 源码包src目录下 用 redis.trip.rb 脚本 去 创建集群; 设置一个节主点有两个从节点&lt;/li&gt;
+&lt;li&gt;连接的 ./redis-cli -c -p 7002&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;sentinel 哨兵集群的搭建( 为每一个主节点配置一个哨兵)&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;sentinel .conf 包里面&lt;/p&gt;
+&lt;p&gt;设置其要监控的主节点的ip 地址 和端口号 ; 有多少个从节点&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;redis-集群搭建-详细步骤&#34;&gt;redis 集群搭建 详细步骤
+&lt;/h2&gt;&lt;p&gt;(1) 安装gcc&lt;/p&gt;
+&lt;p&gt;Redis 是 c 语言开发的。安装 redis 需要 c 语言的编译环境&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;yum install gcc-c++
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(2)  使用yum命令安装 ruby  （我们需要使用ruby脚本来实现集群搭建）&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;yum install ruby
+yum install rubygems
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/images/%E5%AE%89%E8%A3%85ruby%E8%AF%AD%E8%A8%80%E7%8E%AF%E5%A2%83-16342817194591.png&#34;
+	width=&#34;445&#34;
+	height=&#34;341&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;安装ruby语言环境&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;130&#34;
+		data-flex-basis=&#34;313px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;(3) 将redis 源码包上传到linux, 解压; 进入源码文件夹; 执行命令&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;// 解压
+tar  tar -xzvf redis.tar.gz
+make  安装
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(4)  创建目录/usr/local/redis-cluster目录，  安装6个redis实例 ; 用以下命令根据不同的文件夹 , 执行6 次, 注意&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;make install PREFIX=/usr/local/redis-cluster/redis-1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/images/%E5%AE%89%E8%A3%856%E4%B8%AAredis%E5%AE%9E%E4%BE%8B-16342817471132.png&#34;
+	width=&#34;581&#34;
+	height=&#34;364&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;安装6个redis实例&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;159&#34;
+		data-flex-basis=&#34;383px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/images/%E5%88%9B%E5%BB%BA6%E4%B8%AAredis%E5%AE%9E%E4%BE%8B-16342817649753.png&#34;
+	width=&#34;423&#34;
+	height=&#34;292&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;创建6个redis实例&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;144&#34;
+		data-flex-basis=&#34;347px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;(5 修改配置文件&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;daemonize yes # 后台启动
+cluster-enabled yes # 开启集群功能
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/images/%e4%bf%ae%e6%94%b9%e7%ab%af%e5%8f%a3-16342817841374.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;修改端口&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;(5) 复制配置文件到 各个实例中&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/images/%E5%A4%8D%E5%88%B6%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6-16342818068905.png&#34;
+	width=&#34;577&#34;
+	height=&#34;104&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;复制配置文件&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;554&#34;
+		data-flex-basis=&#34;1331px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;(6)  进入各个实例的配置文件中修改端口&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;port 7001 # 端口
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(7)  在redis-cluster 文件夹 创建脚本文件start-all.sh; 以便同时启动redis服务&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;cd redis-1/bin/
+./redis-server redis.conf
+cd ../..
+cd redis-2/bin/
+./redis-server redis.conf
+cd ../..
+cd redis-3/bin/
+./redis-server redis.conf
+cd ../..
+cd redis-4/bin/
+./redis-server redis.conf
+cd ../..
+cd redis-5/bin/
+./redis-server redis.conf
+cd ../..
+cd redis-6/bin/
+./redis-server redis.conf
+cd ../..
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(8) 执行脚本文件 ;  查看进程&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;ps -ef | grep redis
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/images/%E6%9F%A5%E7%9C%8Bredis%E8%BF%9B%E7%A8%8B-16342818250836.png&#34;
+	width=&#34;577&#34;
+	height=&#34;150&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;查看redis进程&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;384&#34;
+		data-flex-basis=&#34;923px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;(9) 加入集群环境; 复制redis源码包 下的src 目录下的ruby脚本 redis-trib.rb 到redis-cluster 包下&lt;/p&gt;
+&lt;p&gt;![复制ruby脚本到 redis-cluster文件夹下](images/复制ruby脚本到 redis-cluster文件夹下-16342818506617.png)&lt;/p&gt;
+&lt;p&gt;(10) 执行ruby 脚本 (ip 为服务器ip)&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;# 先赋权
+chomd u+x redis-trib.rb
+
+./redis-trib.rb create --replicas 1 192.168.182.129:7001 192.168.182.129:7002 192.168.182.129:7003 192.168.182.129:7004 192.168.182.129:7005 192.168.182.129:7006
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/images/%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA%E6%88%90%E5%8A%9F-16342818654228.png&#34;
+	width=&#34;504&#34;
+	height=&#34;654&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;集群搭建成功&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;77&#34;
+		data-flex-basis=&#34;184px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;==可以看到 7001, 7002, 7003 是主节点; 7004是 7001的从节点; 7005是 7002的从节点; 7006是 7003的从节点;==&lt;/p&gt;
+&lt;p&gt;(11) 测试redis 集群 (正常运行)&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;进入任意redis文件夹执行菜单
+./redis-cli -p ip地址 -p 端口 -c
+-c 代表连接的是集群
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/images/%E6%B5%8B%E8%AF%95redis%E9%9B%86%E7%BE%A4-16342818816289.png&#34;
+	width=&#34;473&#34;
+	height=&#34;295&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;测试redis集群&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;160&#34;
+		data-flex-basis=&#34;384px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;(12) springboot 配置redis集群&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt; redis:
+    cluster:
+      nodes:
+      - 192.168.182.129:7001
+      - 192.168.182.129:7002
+      - 192.168.182.129:7003
+      - 192.168.182.129:7004
+      - 192.168.182.129:7005
+      - 192.168.182.129:7006
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;2-方式二-docker-安装redis集群&#34;&gt;2. 方式二: docker 安装redis集群
+&lt;/h1&gt;&lt;h3 id=&#34;21-通过docker-compose搭建&#34;&gt;2.1 通过docker compose搭建
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;安装依赖项&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;yum install -y epel-release
+yum install -y python-pip python-devel gcc
+pip install --upgrade pip -vvv
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;安装 docker-compose&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;pin install docker-compose
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;查看docker 的 多个容器的ip&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;docker inspect containerName XXX XXX | grep IPA
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/images/%E6%9F%A5%E7%9C%8B%E5%A4%9A%E4%B8%AA%E5%AE%B9%E5%99%A8%E7%9A%84ip%E9%85%8D%E7%BD%AE-163428190766110.png&#34;
+	width=&#34;734&#34;
+	height=&#34;404&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;查看多个容器的ip配置&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;181&#34;
+		data-flex-basis=&#34;436px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;22-直接搭建&#34;&gt;2.2 直接搭建
+&lt;/h3&gt;&lt;h4 id=&#34;221--环境准备&#34;&gt;2.2.1  环境准备;
+&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;1. 安装docker：
+2. 下载reids镜像：docker pull redis
+3. 下载ruby镜像：docker pull ruby   
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;222-创建多个redis容器并启动&#34;&gt;2.2.2 创建多个redis容器并启动
+&lt;/h4&gt;&lt;ol&gt;
+&lt;li&gt;在/usr/local/src目录下创建redis-cluster文件夹，并创建配置文件redis-cluster.conf&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;cd /usr/local/src &amp;amp;&amp;amp; mkdir redis-cluster &amp;amp;&amp;amp; cd ./redis-cluster &amp;amp;&amp;amp; touch redis-cluster.conf
+redis-cluster.conf的内容如下：
+ 
+port ${PORT}
+cluster-enabled yes
+cluster-config-file nodes.conf
+cluster-node-timeout 5000
+#对外ip
+cluster-announce-ip 写你的ip (用ifconfig 查看宿主机ip)
+cluster-announce-port ${PORT}
+cluster-announce-bus-port 1${PORT}
+appendonly yes
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;使用脚本创建 集群 (==待优化完善==)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;192.168.182.129&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;redis-cli --cluster create 172.18.0.2:6000 172.18.0.3:6001 172.18.0.4:6002 172.18.0.5:6003 172.18.0.6:6004 172.18.0.7:6005  --cluster-replicas 1
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;redis-cli --cluster create 192.168.182.129:6000 192.168.182.129:6001 192.168.182.129:6002 192.168.182.129:6003 192.168.182.129:6004 192.168.182.129:6005  --cluster-replicas 1
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;redis-cli --cluster create ip:6000 ip:6001 ip:6002 ip:6003 ip:6004 ip:6005  --cluster-replicas 1
+
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        <item>
+        <title>Redis</title>
+        <link>https://mikeLing-qx.github.io/p/redis/</link>
+        <pubDate>Tue, 07 Jul 2020 19:21:43 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/redis/</guid>
+        <description>&lt;h1 id=&#34;1-概览&#34;&gt;1. 概览
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;1.什么是 redis？它能做什么？&lt;/li&gt;
+&lt;li&gt;2.redis 有哪八种数据类型？有哪些应用场景？&lt;/li&gt;
+&lt;li&gt;3.redis为什么这么快？&lt;/li&gt;
+&lt;li&gt;4.听说 redis 6.0之后又使用了多线程，不会有线程安全的问题吗？&lt;/li&gt;
+&lt;li&gt;5.redis 的持久化机制有哪些？优缺点说说&lt;/li&gt;
+&lt;li&gt;\6. Redis的过期键的删除策略有哪些？&lt;/li&gt;
+&lt;li&gt;\7. Redis的内存满了怎么办？&lt;/li&gt;
+&lt;li&gt;8.Redis 的热 key 问题怎么解决？&lt;/li&gt;
+&lt;li&gt;9.缓存击穿、缓存穿透、缓存雪崩是什么？怎么解决呢？&lt;/li&gt;
+&lt;li&gt;10.Redis 有哪些部署方式？&lt;/li&gt;
+&lt;li&gt;11.哨兵有哪些作用？&lt;/li&gt;
+&lt;li&gt;12.哨兵选举过程是怎么样的？&lt;/li&gt;
+&lt;li&gt;13.cluster集群模式是怎么存放数据的？&lt;/li&gt;
+&lt;li&gt;14.cluster的故障恢复是怎么做的？&lt;/li&gt;
+&lt;li&gt;15.主从同步原理是怎样的？&lt;/li&gt;
+&lt;li&gt;16.无硬盘复制是什么？&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;2-redis-的数据类型&#34;&gt;2. Redis 的数据类型
+&lt;/h1&gt;&lt;p&gt;基本&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;string:  存储计数器，粉丝数; ==分布式锁也会用到该类型==&lt;/p&gt;
+&lt;p&gt;hashmap:  key - value 形式的，value 是一个map&lt;/p&gt;
+&lt;p&gt;list:  基本的数据类型，列表。在 Redis 中可以把 list 用作栈、队列、阻塞队列&lt;/p&gt;
+&lt;p&gt;set: 集合，不能有重复元素，可以做点赞，收藏等&lt;/p&gt;
+&lt;p&gt;zsat: 有序集合，不能有重复元素，有序集合中的每个元 素都需要指定一个分数，根据分数对元素进行升序排序。可以做排行榜&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;特殊数据类型&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;1.geospatial&lt;/strong&gt;: Redis 在 3.2 推出 ==Geo 类型==，该功能==&lt;strong&gt;可以推算出地理位置信息，两地之间的距离&lt;/strong&gt;==。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;2.hyperloglog&lt;/strong&gt;: 基数：数学上集合的元素个数，是不能重复的。这个数据结构&lt;strong&gt;常用于统计网站的 UV&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;3.bitmap&lt;/strong&gt;: bitmap 就是通过最小的单位 bit 来进行0或者1的设置，表示某个元素对应的值或者状态。一个 bit 的值，或者是0，或者是1；也就是说一个 bit 能存储的最多信息是2。bitmap &lt;strong&gt;常用于统计用户信息比如活跃粉丝和不活跃粉丝、登录和未登录、是否打卡等&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;3-redis-为什么快&#34;&gt;3. redis 为什么快
+&lt;/h1&gt;&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;1. 完全基于内存操作
+2. 使用单线程模型来处理客户端的请求, 避免上下文切换
+3. IO 多路复用机制
+4. 自身使用C语言编写, 有很多优化机制
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;4-redis-60-后用多线程-会线程不安全吗&#34;&gt;4. redis 6.0 后用多线程, 会线程不安全吗?
+&lt;/h1&gt;&lt;p&gt;不会&lt;/p&gt;
+&lt;p&gt;其实 redis &lt;strong&gt;还是使用单线程模型来处理客户端的请求&lt;/strong&gt;，只是使用多线程来处理数据的读写和协议解析，执行命令还是使用单线程，所以是不会有线程安全的问题。&lt;/p&gt;
+&lt;p&gt;==就相当与还是只有一个医生就诊, 但是会有多个护士将病人带给医生==&lt;/p&gt;
+&lt;p&gt;之所以加入了多线程因为 redis 的性能瓶颈在于网络IO而非CPU，使用多线程能提升IO读写的效率，从而整体提高redis的性能。&lt;/p&gt;
+&lt;h1 id=&#34;5-redis-的持久化机制有哪些-优缺点&#34;&gt;5. redis 的持久化机制有哪些? 优缺点
+&lt;/h1&gt;&lt;h2 id=&#34;一-aof&#34;&gt;一. AOF
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;redis ==每次执行一个命令时==,都会把这个「命令原本的语句记录到一个.aod的文件当中,然后通过fsync策略,将命令执行后的数据==持久化到磁盘==中」(不包括读命令)，&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;优点&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;1.AOF可以「更好的保护数据不丢失」，==一般AOF会以每隔1秒==，通过后台的一个线程去执行一次fsync操作，如果redis进程挂掉，==&lt;strong&gt;最多丢失1秒的数据&lt;/strong&gt;==&lt;/li&gt;
+&lt;li&gt;2.AOF是将命令直接==追加在文件末尾==的,==&lt;strong&gt;「写入性能非常高」&lt;/strong&gt;==&lt;/li&gt;
+&lt;li&gt;3.AOF日志文件的命令通过非常==可读的方式==进行记录，这个非常「==&lt;strong&gt;适合做灾难性的误删除紧急恢复」&lt;/strong&gt;==，如果某人不小心用 flushall 命令清空了所有数据，只要这个时候还没有执行 rewrite，那么就可以将日志文件中的 flushall 删除，进行恢复&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;二-rdb-快照&#34;&gt;二. RDB (快照)
+&lt;/h2&gt;&lt;p&gt;==优点==&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;将某一时间点redis 内的所有数据保存, 大型数据的恢复, RDB 的恢复速度会很快&lt;/li&gt;
+&lt;li&gt;对读写影响较小&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;==缺点==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;ol&gt;
+&lt;li&gt;==「有可能会产生长时间的数据丢失」==&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;可能会有长时间停顿:我们前面讲了,fork 子进程这个过程是和 redis 的数据量有很大关系的,==&lt;strong&gt;如果「数据量很大,那么很有可能会使redis暂停几秒」&lt;/strong&gt;==&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;6-redis-的过期键的删除策略&#34;&gt;6. Redis 的过期键的删除策略
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;定时过期&lt;/strong&gt;：&lt;strong&gt;每个设置过期时间的key都需要创建一个定时器，到过期时间就会立即清除&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;惰性过期&lt;/strong&gt;：只有当&lt;strong&gt;访问一个key时，才会判断该key是否已过期&lt;/strong&gt;，过期则清除。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;定期过期&lt;/strong&gt;：&lt;strong&gt;每隔一定的时间，会扫描一定数量的数据库的expires字典中一定数量的key，并清除其中已过期的key&lt;/strong&gt;。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;8-热key问题&#34;&gt;8. 热key问题
+&lt;/h1&gt;&lt;p&gt;某一时刻, 有非常多的请求访问某个key, 流量过大, 导致该redis 服务器宕机&lt;/p&gt;
+&lt;p&gt;方案&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;可以将结果缓存到本地内存&lt;/li&gt;
+&lt;li&gt;将热key 分散到不同的服务器&lt;/li&gt;
+&lt;li&gt;设置永不过期&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;9-缓存击穿-缓存穿透-缓存雪崩&#34;&gt;9. 缓存击穿; 缓存穿透; 缓存雪崩
+&lt;/h1&gt;&lt;p&gt;缓存穿透: 没有的数据, 不存在的数据, 每次 都请求到达数据库&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;存一个空对象, 设置一个比较短的过期时间&lt;/li&gt;
+&lt;li&gt;布隆过滤器
+&lt;ul&gt;
+&lt;li&gt;访问缓存层和存储层之前，将存在的key用布隆过滤器提前保存起来&lt;/li&gt;
+&lt;li&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/redis/images/image-20220228175217072.png&#34;
+	width=&#34;504&#34;
+	height=&#34;458&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220228175217072&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;110&#34;
+		data-flex-basis=&#34;264px&#34;
+	
+&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;缓存击穿: 一个key 非常热门, 失效的瞬间, 持续的请求就到了数据库&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;永不过期&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;缓存雪崩: &lt;strong&gt;不同的数据大批量到过期时间&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;设置不同的过期时间&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;10-redis-部署方式&#34;&gt;10. Redis 部署方式
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;单机模式:&lt;/li&gt;
+&lt;li&gt;哨兵模式:&lt;/li&gt;
+&lt;li&gt;cluster集群模式: 3.0版本; 自动将数据进行分片, 每个master 放一部分数据&lt;/li&gt;
+&lt;li&gt;主从复制: 主数据库负责 ==读写操作==, 从数据库 负责==读操作==&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;13-cluster-集群存放数据方式&#34;&gt;13. Cluster 集群存放数据方式
+&lt;/h1&gt;&lt;p&gt;一个cluster集群中总共有16384个节点，集群会&lt;strong&gt;将这16384个节点平均分配给每个==主节点==&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/redis/images/image-20220228191503147.png&#34;
+	width=&#34;578&#34;
+	height=&#34;281&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220228191503147&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;205&#34;
+		data-flex-basis=&#34;493px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;14-cluster-的故障恢复过程&#34;&gt;14. cluster 的故障恢复过程
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;每个节点会向其他节点发送ping命令, 通过有没有收到回复来判断其他节点是否已经下线;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果长时间没有收到回复, &lt;strong&gt;那么发起ping命令的节点就会认为目标节点疑似下线&lt;/strong&gt;,&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;1.当A节点发现目标节点疑似下线，就会向==集群中的其他节点散播消息==，其他节点就会向目标节点发送命令，判断目标节点是否下线&lt;/li&gt;
+&lt;li&gt;2.如果集群中==半数以上的节点都认为目标节点下线==，就会对目标节点标记为下线，从而告诉其他节点，让目标节点在整个集群中都下线&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;15-主从同步原理是怎样的&#34;&gt;15. 主从同步原理是怎样的?
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;1.当一个从数据库启动时，它会向==&lt;strong&gt;主数据库发送一个SYNC命令&lt;/strong&gt;==，master收到后，在后台保存==快照==，也就是我们说的==RDB持久化==，当然保存快照是需要消耗时间的，并且redis是单线程的，在==保存快照期间redis受到的命令会缓存起来==&lt;/li&gt;
+&lt;li&gt;2.快照完成后会==&lt;strong&gt;将缓存的命令以及快照一起打包发给slave节点&lt;/strong&gt;==，从而保证主从数据库的一致性。&lt;/li&gt;
+&lt;li&gt;3.从数据库接受到快照以及缓存的命令后会将这部分数据==&lt;strong&gt;写入到硬盘上的临时文件当中&lt;/strong&gt;==，写入完成后会用这份文件去替换掉RDB快照文件，当然，这个操作是不会阻塞的，可以继续接收命令执行，具体原因其实就是fork了一个子进程，用子进程去完成了这些功能。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;16-无硬盘辅助&#34;&gt;16. 无硬盘辅助
+&lt;/h1&gt;&lt;p&gt;我们刚刚说了主从之间是通过RDB快照来交互的，虽然看来逻辑很简单，但是还是会存在一些问题，但是会存在着一些问题。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;1.master禁用了RDB快照时，发生了主从同步(复制初始化)操作，也会生成RDB快照，但是之后如果master发成了重启，就会用RDB快照去恢复数据，这份数据可能已经很久了，中间就会丢失数据&lt;/li&gt;
+&lt;li&gt;2.在这种一主多从的结构中，master每次和slave同步数据都要进行一次快照，从而在硬盘中生成RDB文件，会影响性能&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;为了解决这种问题，redis在后续的更新中也加入了无硬盘复制功能，也就是说&lt;strong&gt;直接通过网络发送给slave&lt;/strong&gt;，避免了和硬盘交互，但是也是有io消耗&lt;/p&gt;
+&lt;h1 id=&#34;17-redis-的槽&#34;&gt;17. Redis 的槽
+&lt;/h1&gt;&lt;h3 id=&#34;槽的分配与迁移&#34;&gt;&lt;strong&gt;槽的分配与迁移&lt;/strong&gt;
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;槽分配&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;Redis 集群启动时，所有的槽需要分配给集群中的节点。&lt;/li&gt;
+&lt;li&gt;例如：
+&lt;ul&gt;
+&lt;li&gt;节点 A 管理槽 &lt;code&gt;0-5460&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;节点 B 管理槽 &lt;code&gt;5461-10922&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;节点 C 管理槽 &lt;code&gt;10923-16383&lt;/code&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;槽的迁移&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;当集群中新增或移除节点时，Redis 会重新分配槽。&lt;/li&gt;
+&lt;li&gt;数据迁移仅发生在重新分配的槽对应的数据上，减少迁移量。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;槽是 Redis 集群用来分布和管理数据的==逻辑分区==，数量固定为 16384 个。&lt;/li&gt;
+&lt;li&gt;每个键通过哈希算法映射到一个槽上，但槽本身不是存储数据的实体，而是一个==分区标识==。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;每个槽可以存储任意数量的键值对&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;槽相当于一个“桶”，每个槽可以包含非常多的键。&lt;/li&gt;
+&lt;li&gt;数据的实际存储仍然由分配该槽的 Redis 节点负责。&lt;/li&gt;
+&lt;li&gt;例如：
+&lt;ul&gt;
+&lt;li&gt;槽 &lt;code&gt;0&lt;/code&gt; 可能存储 1 万个键；&lt;/li&gt;
+&lt;li&gt;槽 &lt;code&gt;1&lt;/code&gt; 可能存储 100 万个键。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;键到槽的映射&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Redis 使用哈希算法（&lt;code&gt;CRC16(key) % 16384&lt;/code&gt;）计算每个键对应的槽。&lt;/li&gt;
+&lt;li&gt;同一个槽中的键分配到相同的 Redis 节点管理。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;18-redission&#34;&gt;18. redission
+&lt;/h1&gt;&lt;p&gt;&lt;strong&gt;分布式数据结构&lt;/strong&gt;
+提供对 Redis 中数据结构的封装，如：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;基本类型（Map、Set、List、Queue、Deque 等）&lt;/li&gt;
+&lt;li&gt;高级数据结构（BloomFilter、Geo 等）&lt;/li&gt;
+&lt;li&gt;锁相关数据结构（BitSet、CountDownLatch 等）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;分布式锁和同步器&lt;/strong&gt;
+Redisson 提供强大的分布式锁功能，包括：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;公平锁&lt;/li&gt;
+&lt;li&gt;读写锁&lt;/li&gt;
+&lt;li&gt;可重入锁&lt;/li&gt;
+&lt;li&gt;联锁（MultiLock）&lt;/li&gt;
+&lt;li&gt;红锁（RedLock） &lt;strong&gt;在分布式环境中，确保在多个 Redis 实例上获取锁的一致性，防止单点故障和锁的竞争问题。&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;分布式服务&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;对象存储服务&lt;/strong&gt;：可以直接将对象映射到 Redis。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;远程服务调用（RRemoteService）&lt;/strong&gt;：通过 Redis 实现微服务间的远程调用。&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

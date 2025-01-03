@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>事务 on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/categories/%E4%BA%8B%E5%8A%A1/</link>
+        <description>Recent content in 事务 on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Sun, 14 May 2023 15:03:55 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/categories/%E4%BA%8B%E5%8A%A1/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Seata</title>
+        <link>https://mikeLing-qx.github.io/p/seata/</link>
+        <pubDate>Sun, 14 May 2023 15:03:55 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/seata/</guid>
+        <description>&lt;p&gt;官方文档: &lt;a class=&#34;link&#34; href=&#34;https://seata.io/zh-cn/docs/overview/what-is-seata.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://seata.io/zh-cn/docs/overview/what-is-seata.html&lt;/a&gt;&lt;/p&gt;
+&lt;h1 id=&#34;1-at-模式&#34;&gt;1. AT 模式
+&lt;/h1&gt;&lt;h2 id=&#34;1-at-一阶段提交&#34;&gt;1. AT 一阶段提交
+&lt;/h2&gt;&lt;p&gt;第一阶段包括提交业务数据和回滚日志（undoLog）&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/image-20211227143300338.png&#34;
+	width=&#34;667&#34;
+	height=&#34;583&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20211227143300338&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;114&#34;
+		data-flex-basis=&#34;274px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/image-20241208170920817.png&#34;
+	width=&#34;2226&#34;
+	height=&#34;1439&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20241208170920817&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;154&#34;
+		data-flex-basis=&#34;371px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;==全局事务的状态和操作决策的关键仍在 &lt;strong&gt;TC&lt;/strong&gt; 中==&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;@GlobalTransactional&lt;/code&gt;的方法&lt;strong&gt;通过AOP实现了，开启全局事务和提交全局事务两个操作&lt;/strong&gt;，与Spring 事务机制类似，当 GlobalTransactionalInterceptor 在事务执行过程中捕获到Throwable时，会发起全局事务回滚&lt;/p&gt;
+&lt;p&gt;0.1 步骤中会生成一个&lt;strong&gt;全局事务ID&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;0.2 所有事务参与者执行结束后，一阶段事务提交&lt;/p&gt;
+&lt;h3 id=&#34;undo-log-结构&#34;&gt;undo log 结构
+&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;language-text&#34;&gt;// 省略了相关方法
+public class SQLUndoLog {
+ // insert, update ...
+    private SQLType sqlType;
+
+    private String tableName;
+
+	// 执行前
+    private TableRecords beforeImage;
+
+	// 执行后
+    private TableRecords afterImage;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-at-二阶段&#34;&gt;2. AT 二阶段
+&lt;/h2&gt;&lt;p&gt;二阶段是&lt;strong&gt;完全异步化的并且完全由Seata控制&lt;/strong&gt;，Seata根据所有事务&lt;strong&gt;参与者的提交情况决定二阶段如何处理&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果所有事务提交成功，则二阶段的任务就是删除一阶段生成 的undoLog，修改分支事务的状态, 并释放&lt;strong&gt;全局锁&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;如果部分事务参与者提交失败，则需要根据undoLog对已经注册的事务分支进行回滚，并释放&lt;strong&gt;全局锁&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;3-流程思考&#34;&gt;3. 流程思考
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;问题1. Seata如何做到==无侵入的分析业务SQL生成undoLog==，注册事务分支等操作？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;==Seata 代理了DataSource==，我们可以通过在代码注入一个DataSource来验证我的说法，目前的DataSource 是 &lt;code&gt;io.seata.rm.datasource.DataSourceProxy&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;问题2. ConnectionProxy 如何判断当前事务是全局事务，还是本地事务？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;==前线程是否绑定了全局事务id==，在进行全局事务之前，需要调用&lt;code&gt;RootContext.bind(xid);&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;问题3. 全局事务并发更新&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;订单扣减库存的场景为例，如果TX1和TX2同时扣减product_id为1的库存，这时Seata会不会生成相同的beforeImage？&lt;/p&gt;
+&lt;p&gt;举个例子，TX1读库存为100，TX1扣减库存1，此时BeforeImage为100 紧接着 如果TX2读库存也为100，那么就有问题了，不管TX2扣减多少库存，如果TX1回滚那么相当于覆盖了TX2扣减的库存，出现了脏写&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;io.seata.rm.datasource.exec.AbstractDMLBaseExecutor::executeAutoCommitFalse&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;beforeImage()&lt;/code&gt;，这是一个抽象方法，看一下他的子类&lt;code&gt;UpdateExecutor&lt;/code&gt;是如何实现的&lt;/p&gt;
+&lt;p&gt;直接通过 select for update&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;问题4. 全局事务外的更新&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;我们现在可以确认在Seata的保证下，全局事务，不会造成数据的脏写，但是全局事务外会！&lt;/p&gt;
+&lt;p&gt;什么意思呢？&lt;/p&gt;
+&lt;p&gt;还以库存为例&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;用户正在抢购，用户A完成了1阶段的库存扣减，这个时候库存为99。&lt;/li&gt;
+&lt;li&gt;此时库存管理员上线了，他查了一下库存为99。嗯&amp;hellip;太少了，我加100个，库存管理员把库存更新为200。&lt;/li&gt;
+&lt;li&gt;而此时seata给用户A生成beforeImage为100，如果此时用户A的全局事务失败了，发生了回滚，再次将库存更新为100&amp;hellip; 再次出现脏写&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Seata 针对这个问题，提供了&lt;code&gt;@GlobalLock&lt;/code&gt;注解，标记该注解时，会像全局事务一样进行SQL分析，竞争全局锁，就不会出现上述问题了&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;问题5. @GlobalTransactional 和 @Transactional 同时使用会怎么样&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;我们上文中已经说过了 @GlobalTransactional 的作用了，他是负责开启全局事务/提交事务1阶段，说白了@GlobalTransactional 只和Seata-server 交互，而 @Transactional 管理的是本地数据库的事务，所以二者不发生冲突。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;但是需要注意 @GlobalTransactional AOP 覆盖范围一定要大于 @Transactional&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;事务分组说明。
+1.事务分组是什么？
+事务分组是seata的资源逻辑，类似于服务实例。在file.conf中的my_test_tx_group就是一个事务分组。
+
+2.通过事务分组如何找到后端集群？
+首先程序中配置了事务分组（GlobalTransactionScanner 构造方法的txServiceGroup参数），程序会通过用户配置的配置中心去寻找service.vgroup_mapping.事务分组配置项，取得配置项的值就是TC集群的名称。拿到集群名称程序通过一定的前后缀+集群名称去构造服务名，各配置中心的服务名实现不同。拿到服务名去相应的注册中心去拉取相应服务名的服务列表，获得后端真实的TC服务列表。
+
+3.为什么这么设计，不直接取服务名？
+这里多了一层获取事务分组到映射集群的配置。这样设计后，事务分组可以作为资源的逻辑隔离单位，当发生故障时可以快速failover。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;4-注意事项&#34;&gt;4. 注意事项
+&lt;/h2&gt;&lt;h3 id=&#34;1-at-模式注意事项&#34;&gt;1. AT 模式注意事项
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;必须使用代理数据源，有 3 种形式可以代理数据源：&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;依赖 seata-spring-boot-starter 时，自动代理数据源，无需额外处理。&lt;/li&gt;
+&lt;li&gt;依赖 seata-all 时，使用 @EnableAutoDataSourceProxy (since 1.1.0) 注解，注解参数可选择 jdk 代理或者 cglib 代理。&lt;/li&gt;
+&lt;li&gt;依赖 seata-all 时，也可以手动使用 DatasourceProxy 来包装 DataSource。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;配置 GlobalTransactionScanner，使用 seata-all 时需要手动配置，使用 seata-spring-boot-starter 时无需额外处理。&lt;/li&gt;
+&lt;li&gt;业务表中必须包含单列主键，若存在复合主键，请参考问题 13 。&lt;/li&gt;
+&lt;li&gt;每个业务库中必须包含 undo_log 表，若与分库分表组件联用，分库不分表。&lt;/li&gt;
+&lt;li&gt;跨微服务链路的事务需要对相应 RPC 框架支持，目前 seata-all 中已经支持：Apache Dubbo、Alibaba Dubbo、sofa-RPC、Motan、gRpc、httpClient，对于 Spring Cloud 的支持，请大家引用 spring-cloud-alibaba-seata。其他自研框架、异步模型、消息消费事务模型请结合 API 自行支持。&lt;/li&gt;
+&lt;li&gt;目前AT模式支持的数据库有：MySQL、Oracle、PostgreSQL和 TiDB。&lt;/li&gt;
+&lt;li&gt;使用注解开启分布式事务时，若默认服务 provider 端加入 consumer 端的事务，provider 可不标注注解。但是，provider 同样需要相应的依赖和配置，仅可省略注解。&lt;/li&gt;
+&lt;li&gt;使用注解开启分布式事务时，若要求事务回滚，必须将异常抛出到事务的发起方，被事务发起方的 @GlobalTransactional 注解感知到。provide 直接抛出异常 或 定义错误码由 consumer 判断再抛出异常。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;2-事务上下文&#34;&gt;2. 事务上下文
+&lt;/h1&gt;&lt;p&gt;​	Seata 的事务上下文由 RootContetxt 来管理&lt;/p&gt;
+&lt;p&gt;​	1. 应用开启一个全局事务后，RootContext 会自动绑定该事务的 XID，事务结束（提交或回滚完成），RootContext 会自动解绑 XID。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// 绑定 XID
+RootContext.bind(xid);
+
+// 解绑 XID
+String xid = RootContext.unbind();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;应用可以通过 RootContext 的 API 接口来获取当前运行时的全局事务 XID&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;// 获取 XID
+String xid = RootContext.getXID();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;应用是否运行在一个全局事务的上下文中，就是通过 RootContext 是否绑定 XID 来判定的&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;public static boolean inGlobalTransaction() {
+        return CONTEXT_HOLDER.get(KEY_XID) != null;
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;1-事务传播&#34;&gt;1. 事务传播
+&lt;/h2&gt;&lt;p&gt;​	Seata 全局事务的传播机制就是指==事务上下文的传播，根本上，就是 XID 的应用运行时的传播方式==。&lt;/p&gt;
+&lt;h3 id=&#34;1-服务内部的事务传播&#34;&gt;1. 服务内部的事务传播
+&lt;/h3&gt;&lt;p&gt;默认的，RootContext 的实现是基于 ==&lt;em&gt;ThreadLocal&lt;/em&gt; 的，即 XID 绑定在当前线程上下文中==。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class ThreadLocalContextCore implements ContextCore {
+
+    private ThreadLocal&amp;lt;Map&amp;lt;String, String&amp;gt;&amp;gt; threadLocal = new ThreadLocal&amp;lt;Map&amp;lt;String, String&amp;gt;&amp;gt;() {
+        @Override
+        protected Map&amp;lt;String, String&amp;gt; initialValue() {
+            return new HashMap&amp;lt;String, String&amp;gt;();
+        }
+
+    };
+
+    @Override
+    public String put(String key, String value) {
+        return threadLocal.get().put(key, value);
+    }
+
+    @Override
+    public String get(String key) {
+        return threadLocal.get().get(key);
+    }
+
+    @Override
+    public String remove(String key) {
+        return threadLocal.get().remove(key);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;所以服务内部的 XID 传播通常是天然的通过同一个线程的调用链路串连起来的。默认不做任何处理，事务的上下文就是传播下去的。&lt;/p&gt;
+&lt;p&gt;如果希望挂起事务上下文，则需要通过 RootContext 提供的 API 来实现：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;// 挂起（暂停）
+String xid = RootContext.unbind();
+
+// TODO: 运行在全局事务外的业务逻辑
+
+// 恢复全局事务上下文
+RootContext.bind(xid);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;2-跨服务调用的事务传播&#34;&gt;2. 跨服务调用的事务传播
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;跨服务调用场景下的事务传播，本质上就是要把 XID 通过==服务调用传递到服务提供方==，并绑定到 RootContext 中去&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/image-20220428151130759.png&#34;
+	width=&#34;389&#34;
+	height=&#34;280&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220428151130759&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;138&#34;
+		data-flex-basis=&#34;333px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;对Dubbo 的支持的机制的解读&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;/**
+ * The type Transaction propagation filter.
+ */
+@Activate(group = { Constants.PROVIDER, Constants.CONSUMER }, order = 100)
+public class TransactionPropagationFilter implements Filter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionPropagationFilter.class);
+
+    @Override
+    public Result invoke(Invoker&amp;lt;?&amp;gt; invoker, Invocation invocation) throws RpcException {
+        String xid = RootContext.getXID(); // 获取当前事务 XID
+        String rpcXid = RpcContext.getContext().getAttachment(RootContext.KEY_XID); // 获取 RPC 调用传递过来的 XID
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(&amp;quot;xid in RootContext[&amp;quot; + xid + &amp;quot;] xid in RpcContext[&amp;quot; + rpcXid + &amp;quot;]&amp;quot;);
+        }
+        boolean bind = false;
+        if (xid != null) { // Consumer：把 XID 置入 RPC 的 attachment 中
+            RpcContext.getContext().setAttachment(RootContext.KEY_XID, xid);
+        } else {
+            if (rpcXid != null) { // Provider：把 RPC 调用传递来的 XID 绑定到当前运行时
+                RootContext.bind(rpcXid);
+                bind = true;
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(&amp;quot;bind[&amp;quot; + rpcXid + &amp;quot;] to RootContext&amp;quot;);
+                }
+            }
+        }
+        try {
+            return invoker.invoke(invocation); // 业务方法的调用
+
+        } finally {
+            if (bind) { // Provider：调用完成后，对 XID 的清理
+                String unbindXid = RootContext.unbind();
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(&amp;quot;unbind[&amp;quot; + unbindXid + &amp;quot;] from RootContext&amp;quot;);
+                }
+                if (!rpcXid.equalsIgnoreCase(unbindXid)) {
+                    LOGGER.warn(&amp;quot;xid in change during RPC from &amp;quot; + rpcXid + &amp;quot; to &amp;quot; + unbindXid);
+                    if (unbindXid != null) { // 调用过程有新的事务上下文开启，则不能清除
+                        RootContext.bind(unbindXid);
+                        LOGGER.warn(&amp;quot;bind [&amp;quot; + unbindXid + &amp;quot;] back to RootContext&amp;quot;);
+                    }
+                }
+            }
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;3-tcc-模式&#34;&gt;3. TCC 模式
+&lt;/h1&gt;&lt;p&gt;&lt;strong&gt;Try&lt;/strong&gt;（尝试执行）、&lt;strong&gt;Confirm&lt;/strong&gt;（确认执行）、&lt;strong&gt;Cancel&lt;/strong&gt;（取消执行）。它要求业务服务提供者定义这些阶段的具体实现。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Try&lt;/strong&gt; 阶段：进行业务操作的预留资源操作。例如，扣款、锁库存等操作。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Confirm&lt;/strong&gt; 阶段：在所有服务都成功执行 &lt;strong&gt;Try&lt;/strong&gt; 后，正式执行操作（如，扣款成功并提交）。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Cancel&lt;/strong&gt; 阶段：如果任何服务失败，回滚所有已做的操作（如，取消扣款、释放库存等）。&lt;/p&gt;
+&lt;h1 id=&#34;4-saga--长事务模式&#34;&gt;4. SAGA  长事务模式
+&lt;/h1&gt;&lt;pre&gt;&lt;code&gt;SAGA 模式是一种**基于补偿机制**的分布式事务模型，通过将**长事务分解为多个子事务（也叫局部事务）**，每个局部事务都可以独立提交。每当一个子事务失败时，SAGA 会触发补偿事务，回滚之前的事务，从而实现最终一致性。 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;事务模式&lt;/th&gt;
+          &lt;th&gt;适用场景&lt;/th&gt;
+          &lt;th&gt;优缺点&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;AT 模式&lt;/td&gt;
+          &lt;td&gt;&lt;/td&gt;
+          &lt;td&gt;简单、易用，适合无需精细控制的场景，但不适合多数据库&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;TCC 模式&lt;/td&gt;
+          &lt;td&gt;适用于需要精确控制的复杂业务流程&lt;/td&gt;
+          &lt;td&gt;高度灵活，但需要开发者实现 Try、Confirm、Cancel  方法&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;SAGA 模式&lt;/td&gt;
+          &lt;td&gt;长时间的业务流程、需要逐步执行的事务&lt;/td&gt;
+          &lt;td&gt;适合长事务，支持补偿，但实现复杂，性能相对较低&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;XA 模式&lt;/td&gt;
+          &lt;td&gt;跨数据库、分布式消息队列等全局事务场景&lt;/td&gt;
+          &lt;td&gt;保证全局一致性，但实现复杂、性能较低&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h1 id=&#34;5-xa&#34;&gt;5. XA
+&lt;/h1&gt;&lt;p&gt;XA模式使用两阶段提交来保证所有资源同时提交或回滚任何特定的事务。第一阶段，事务协调者通知每个事务参与者执行本地事务，本地事务执行完成后报告事务执行状态给事务协调者，此时事务不提交，继续持有数据库锁。第二阶段，根据第一阶段的执行结果而决定，==如果一阶段都成功，则通知所有事务参与者提交事务；如果一阶段任意一个参与者失败，则通知所有事务参与者回滚事务==&lt;/p&gt;
+&lt;p&gt;TM: 事务管理器&lt;/p&gt;
+&lt;p&gt;RM: 资源管理器&lt;/p&gt;
+&lt;h1 id=&#34;6-二阶段提交和三阶段提交&#34;&gt;6. 二阶段提交和三阶段提交
+&lt;/h1&gt;&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;特性&lt;/th&gt;
+          &lt;th&gt;两阶段提交（2PC）&lt;/th&gt;
+          &lt;th&gt;三阶段提交（3PC）&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;事务一致性&lt;/td&gt;
+          &lt;td&gt;提供强一致性&lt;/td&gt;
+          &lt;td&gt;提供强一致性&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;容错性&lt;/td&gt;
+          &lt;td&gt;如果协调器宕机或网络分区，可能造成死锁&lt;/td&gt;
+          &lt;td&gt;增加超时回滚机制，降低死锁风险&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;性能开销&lt;/td&gt;
+          &lt;td&gt;较低（两轮通信）&lt;/td&gt;
+          &lt;td&gt;较高（三轮通信）&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;资源锁定&lt;/td&gt;
+          &lt;td&gt;一阶段锁定资源直到二阶段完成&lt;/td&gt;
+          &lt;td&gt;仅在预提交阶段锁定资源&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;==二阶段提交流程==&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;第一阶段（Prepare 阶段）&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;事务管理器（TM）向所有参与的资源管理器（RM）发送 &lt;code&gt;Prepare&lt;/code&gt; 请求，询问它们是否可以提交事务。&lt;/li&gt;
+&lt;li&gt;参与者（RM）会执行事务操作但不提交，并将操作的锁定资源、事务状态等持久化。&lt;/li&gt;
+&lt;li&gt;如果所有参与者都返回成功，第一阶段完成。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;第二阶段（Commit 或 Rollback 阶段）&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果第一阶段所有参与者都成功，TM 向所有 RM 发送 &lt;code&gt;Commit&lt;/code&gt; 请求，要求它们正式提交事务。&lt;/li&gt;
+&lt;li&gt;如果任何参与者在第一阶段失败，TM 会发送 &lt;code&gt;Rollback&lt;/code&gt; 请求，要求所有参与者回滚已执行的事务操作。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;==三阶段提交流程==&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;CanCommit（询问阶段）&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;协调者询问所有参与者&lt;strong&gt;是否可以提交事务&lt;/strong&gt;，参与者仅反馈“是”或“否”，并不锁定资源。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;PreCommit（预提交阶段）&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果所有参与者答复“是”，协调者发送“预提交”请求，==参与者锁定资源并将事务状态设置为“准备提交”==，但尚未正式提交。&lt;/li&gt;
+&lt;li&gt;如果任何参与者答复“否”，协调者发送“回滚”指令，所有参与者释放资源。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;DoCommit（正式提交阶段）&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;协调者在预提交阶段成功后，发送“提交”指令，所有参与者正式完成事务。&lt;/li&gt;
+&lt;li&gt;如果协调者未能发送指令，参与者会超时自动回滚（进一步提高容错能力）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;seata&#34;&gt;Seata
+&lt;/h1&gt;&lt;p&gt;简介&lt;/p&gt;
+&lt;p&gt;2019 年 1 月，阿里巴巴中间件团队发起了开源项目 &lt;a class=&#34;link&#34; href=&#34;https://www.oschina.net/p/fescar&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;em&gt;Fescar&lt;/em&gt;&lt;/a&gt;&lt;em&gt;（Fast &amp;amp; Easy Commit And Rollback）&lt;/em&gt;，和社区一起共建开源分布式事务解决方案。Fescar 的愿景是让分布式事务的使用像本地事务的使用一样，简单和高效，并逐步解决开发者们遇到的分布式事务方面的所有难题。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Fescar 开源后，蚂蚁金服加入 Fescar 社区参与共建，并在 Fescar 0.4.0 版本中贡献了 TCC 模式。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;为了打造更中立、更开放、生态更加丰富的分布式事务开源社区，经过社区核心成员的投票，大家决定对 Fescar 进行品牌升级，并更名为 &lt;strong&gt;Seata&lt;/strong&gt;，意为：&lt;strong&gt;Simple Extensible Autonomous Transaction Architecture&lt;/strong&gt;，是一套一站式分布式事务解决方案。&lt;/p&gt;
+&lt;p&gt;Seata 融合了阿里巴巴和蚂蚁金服在分布式事务技术上的积累，并沉淀了新零售、云计算和新金融等场景下丰富的实践经验。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;核心组件：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Transaction Coordinator (TC)： 事务协调器，维护全局事务的运行状态，负责协调并驱动全局事务的提交或回滚。&lt;/li&gt;
+&lt;li&gt;Transaction Manager (TM)： 控制全局事务的边界，负责开启一个全局事务，并最终发起全局提交或全局回滚的决议。&lt;/li&gt;
+&lt;li&gt;Resource Manager (RM)： 控制分支事务，负责分支注册、状态汇报，并接收事务协调器的指令，驱动分支（本地）事务的提交和回滚。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;工作流程：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;TM 向 TC 申请开启一个全局事务，全局事务创建成功并生成一个全局唯一的事务ID（XID），XID 在微服务调用链路的上下文中传播。&lt;/li&gt;
+&lt;li&gt;RM 向 TC 注册分支事务，接着执行这个分支事务并提交事务（==重点：RM在此阶段就已经执行了本地事务的提交/回滚==），最后将执行结果汇报给TC。&lt;/li&gt;
+&lt;li&gt;TM 根据 TC 中所有的分支事务的执行情况，发起全局提交或回滚决议。&lt;/li&gt;
+&lt;li&gt;TC 调度 XID 下管辖的全部分支事务完成提交或回滚请求。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/333.png&#34;
+	width=&#34;960&#34;
+	height=&#34;551&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;174&#34;
+		data-flex-basis=&#34;418px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;262-seata支持的模式&#34;&gt;2.6.2 Seata支持的模式
+&lt;/h4&gt;&lt;p&gt;seata中有两种常见分布式事务实现方案，AT及TCC&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;AT模式：赖于RM拥有本地数据库事务的能力，对于客户业务无侵入性&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/222.png&#34;
+	width=&#34;721&#34;
+	height=&#34;260&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;277&#34;
+		data-flex-basis=&#34;665px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;TCC 模式&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;263-seata的优点&#34;&gt;2.6.3 Seata的优点
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;对业务无侵入&lt;/strong&gt;：即减少技术架构上的微服务化所带来的分布式事务问题对业务的侵入
+&lt;strong&gt;高性能&lt;/strong&gt;：减少分布式事务解决方案所带来的性能消耗(2PC)&lt;/p&gt;
+&lt;h4 id=&#34;264-at模式&#34;&gt;2.6.4 AT模式
+&lt;/h4&gt;&lt;p&gt;Seata AT模式是基于XA事务演进而来的一个分布式事务中间件，XA是一个基于数据库实现的分布式事务协议，本质上和两阶段提交一样，需要数据库支持，Mysql5.6以上版本支持XA协议，其他数据库如Oracle，DB2也实现了XA接口。&lt;/p&gt;
+&lt;p&gt;AT模式分为两个阶段，如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;第一阶段：本地数据备份阶段&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;Seata 的 JDBC 数据源代理通过对业务 SQL 的解析，把==业务数据在变化前后的数据镜像组织成回滚日志==（XID/分支事务ID（Branch ID/变化前的数据/变化后的数据）。&lt;/li&gt;
+&lt;li&gt;将回滚日志存入一张日志表UNDO_LOG（==需要手动创建==）,并对UNDO_LOG表中的这条数据形成行锁（for update）。&lt;/li&gt;
+&lt;li&gt;若锁定失败，说明有其他事务在操作这条数据，它会在一段时间内重试，重试失败则回滚本地事务，并向TC汇报本地事务执行失败。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这样，可以保证：&lt;strong&gt;任何提交的业务数据的更新一定有相应的回滚日志存在&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/1565820909345.png&#34;
+	width=&#34;1132&#34;
+	height=&#34;378&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565820909345&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;299&#34;
+		data-flex-basis=&#34;718px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;目的：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;基于这样的机制，分支的本地事务便可以在全局事务的第一阶段提交，并马上释放本地事务锁定的资源。&lt;/li&gt;
+&lt;li&gt;有了回滚日志之后，可以在第一阶段释放对资源的锁定，降低了锁范围，提高效率，即使第二阶段发生异常需要回滚，只需找对undolog中对应数据并反解析成sql来达到回滚目的。&lt;/li&gt;
+&lt;li&gt;Seata通过代理数据源（DataSource-&amp;gt;DataSourceProxy）将业务sql的执行解析成undolog来与业务数据的更新同时入库，达到了对业务无侵入的效果&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;第二阶段：全局事务提交/回滚&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;全局提交&lt;/strong&gt;：
+&lt;ol&gt;
+&lt;li&gt;所有分支事务此时已经完成提交，所有分支事务提交都正常。&lt;/li&gt;
+&lt;li&gt;==TM从TC获知后会决议执行====全局提交====，TC异步通知所有的RM释放UNDO_LOG表中的行锁==，同时清理掉UNDO_LOG表中刚才释放锁的那条数据。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/1565821037492.png&#34;
+	width=&#34;1218&#34;
+	height=&#34;525&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565821037492&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;232&#34;
+		data-flex-basis=&#34;556px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;全局回滚&lt;/strong&gt;：
+&lt;ol&gt;
+&lt;li&gt;若任何一个RM一阶段事务提交失败，通知TC提交失败。&lt;/li&gt;
+&lt;li&gt;==TM从TC获知后会决议执行全局回滚====，====TC向所有的RM发送回滚请求==。&lt;/li&gt;
+&lt;li&gt;RM通过XID和Branch ID找到相应的回滚日志记录，&lt;strong&gt;通过回滚记录生成反向的更新 SQL 并执行&lt;/strong&gt;，以完成分支的回滚，同时释放锁，清除UNDO_LOG表中释放锁的那条数据。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/1565821069728.png&#34;
+	width=&#34;1207&#34;
+	height=&#34;564&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565821069728&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;214&#34;
+		data-flex-basis=&#34;513px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;265-tcc模式&#34;&gt;2.6.5 TCC模式
+&lt;/h4&gt;&lt;p&gt;seata也针对TCC做了适配兼容，支持TCC事务方案，原理前面已经介绍过，基本思路就是使用侵入业务上的补偿及事务管理器的协调来达到全局事务的一起提交及回滚。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/1565821173446.png&#34;
+	width=&#34;1223&#34;
+	height=&#34;615&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565821173446&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;198&#34;
+		data-flex-basis=&#34;477px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;27-跨mysql-ip测试&#34;&gt;2.7 跨mysql ip测试
+&lt;/h2&gt;&lt;p&gt;插入数据库&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/seata-16312535244541.png&#34;
+	width=&#34;1204&#34;
+	height=&#34;610&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;seata&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;197&#34;
+		data-flex-basis=&#34;473px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;undo_log 表&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/seata_undo_log.png&#34;
+	width=&#34;1750&#34;
+	height=&#34;438&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;seata_undo_log&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;399&#34;
+		data-flex-basis=&#34;958px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;发生异常&amp;ndash;回滚&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/seata/images/seata%E5%9B%9E%E6%BB%9A.png&#34;
+	width=&#34;1724&#34;
+	height=&#34;747&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;seata回滚&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;230&#34;
+		data-flex-basis=&#34;553px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;数据库可以看到之前被修改的数据被回滚了&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

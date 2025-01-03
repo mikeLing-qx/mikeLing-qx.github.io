@@ -1,0 +1,598 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>分布式事务 on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/</link>
+        <description>Recent content in 分布式事务 on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Wed, 13 Jul 2022 19:53:40 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>分布式事务</title>
+        <link>https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/</link>
+        <pubDate>Wed, 13 Jul 2022 19:53:40 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/</guid>
+        <description>&lt;h1 id=&#34;分布式事务&#34;&gt;分布式事务
+&lt;/h1&gt;&lt;h2 id=&#34;学习目标&#34;&gt;学习目标
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;什么是事务&lt;/li&gt;
+&lt;li&gt;什么是分布式事务&lt;/li&gt;
+&lt;li&gt;分布式事务的产生过程&lt;/li&gt;
+&lt;li&gt;==什么是CAP定理（面试）==&lt;/li&gt;
+&lt;li&gt;==分布式事务解决方案（面试）==&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;1-分布式事务介绍&#34;&gt;1 分布式事务介绍
+&lt;/h2&gt;&lt;h3 id=&#34;11-什么是事务&#34;&gt;1.1 什么是事务
+&lt;/h3&gt;&lt;p&gt;数据库事务(简称：事务，Transaction)是指数据库执行过程中的一个逻辑单位，由一个有限的数据库操作序列构成[由当前业务逻辑多个不同操作构成]。&lt;/p&gt;
+&lt;p&gt;事务拥有以下四个特性，习惯上被称为ACID特性：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;原子性(Atomicity)&lt;/strong&gt;：事务作为一个整体被执行，包含在其中的对数据库的操作要么全部被执行，要么都不执行。==记录之前的版本，允许回滚。==&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;一致性(Consistency)&lt;/strong&gt;：一致性是指事务使得系统从一个一致的状态转换到另一个一致状态。事务的一致性决定了一个系统设计和实现的复杂度，也导致了事务的不同隔离级别。==事务开始和结束之间的中间状态不会被其他事务看到。==&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;隔离性(Isolation)&lt;/strong&gt;：多个事务并发执行时，并发事务之间互相影响的程度，比如一个事务会不会读取到另一个未提交的事务修改的数据。==适当的破坏一致性来提升性能与并行度==&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;持久性(Durability)&lt;/strong&gt;：已被提交的事务对数据库的修改应该永久保存在数据库中。==每一次的事务提交后就会保证不会丢失。==&lt;/p&gt;
+&lt;p&gt;延申拓展：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;事务隔离性(面试)：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;脏读&lt;/strong&gt;：事务A修改了一个数据，但未提交，事务B读到了事务A未提交的更新结果，如果事务A提交失败，事务B读到的就是脏数据。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;幻读&lt;/strong&gt;：在同一个事务中，同一个查询多次返回的结果不一致。事务A新增了一条记录，事务B在事务A==新增==提交前后各执行了一次查询操作，发现后一次比前一次多了一条记录。幻读是由于并发事务增加记录导致的，这个不能像不可重复读通过记录加锁解决，因为对于新增的记录根本无法加锁。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;不可重复读&lt;/strong&gt;：在同一个事务中，对于同一份数据读取到的结果不一致。比如，事务B在事务A==更新或删除==提交前读到的结果，和提交后读到的结果可能不同。不可重复读出现的原因就是事务并发修改记录，要避免这种情况，最简单的方法就是对要修改的记录加锁，这会导致锁竞争加剧，影响性能。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;事务的隔离级别(面试)：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Read Uncommitted&lt;/strong&gt;(读未提交)：最低的隔离级别，什么都不需要做，一个事务可以读到另一个事务未提交的结果。所有的并发事务问题都会发生。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Read Committed&lt;/strong&gt;(读已提交)：只有在事务提交后，其更新结果才会被其他事务看见。可以解决脏读问题。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Repeated Read&lt;/strong&gt;(可重复读)：在一个事务中，对于同一份数据的读取结果总是相同的，无论是否有其他事务对这份数据进行操作，以及这个事务是否提交。可以解决脏读、不可重复读。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Serialization&lt;/strong&gt;：事务串行化执行，隔离级别最高，牺牲了系统的并发性。可以解决并发事务的所有问题。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;自行复习/了解：spring事务的传播机制(spring事务面试必问)&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;12-什么是分布式事务&#34;&gt;1.2 什么是分布式事务
+&lt;/h3&gt;&lt;p&gt;分布式事务指事务的参与者、支持事务的服务器、资源服务器以及事务管理器分别位于不同的分布式系统的不同节点之上，且属于不同的应用，分布式事务需要保证这些操作要么全部成功，要么全部失败。本质上来说，分布式事务就是为了保证不同数据库的数据一致性。&lt;/p&gt;
+&lt;h3 id=&#34;13-事务的演变&#34;&gt;1.3 事务的演变
+&lt;/h3&gt;&lt;h4 id=&#34;131-单服务单数据库的本地事务&#34;&gt;1.3.1 单服务单数据库的本地事务
+&lt;/h4&gt;&lt;p&gt;事务仅限于对单一数据库资源的访问控制,架构服务化以后，事务的概念延伸到了服务中。倘若将一个单一的服务操作作为一个事务，那么整个服务操作只能涉及一个单一的数据库资源,这类基于单个服务单一数据库资源访问的事务，被称为本地事务(Local Transaction)。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1553290426650.png&#34;
+	width=&#34;1164&#34;
+	height=&#34;279&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1553290426650&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;417&#34;
+		data-flex-basis=&#34;1001px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;132-单一服务多数据库的分布式事务&#34;&gt;1.3.2 单一服务多数据库的分布式事务
+&lt;/h4&gt;&lt;p&gt;最早的分布式事务应用架构很简单，不涉及服务间的访问调用，仅仅是服务内操作涉及到对多个数据库资源的访问。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1553290753247.png&#34;
+	width=&#34;1149&#34;
+	height=&#34;432&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1553290753247&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;265&#34;
+		data-flex-basis=&#34;638px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;133-多服务多数据库的分布式事务&#34;&gt;1.3.3 多服务多数据库的分布式事务
+&lt;/h4&gt;&lt;p&gt;当一个服务操作访问不同的数据库资源，又希望对它们的访问具有事务特性时，就需要采用分布式事务来协调所有的事务参与者。在这种情况下，起始于某个服务的事务在调用另外一个服务的时候，需要以某种机制流转到另外一个服务，从而使被调用的服务访问的资源也自动加入到该事务当中来。下图反映了这样一个跨越多个服务的分布式事务：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1553291001209.png&#34;
+	width=&#34;1267&#34;
+	height=&#34;412&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1553291001209&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;307&#34;
+		data-flex-basis=&#34;738px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;134-多服务多数据源的分布式事务&#34;&gt;1.3.4 多服务多数据源的分布式事务
+&lt;/h4&gt;&lt;p&gt;如果将上面这两种场景(一个服务可以调用多个数据库资源，也可以调用其他服务)结合在一起，对此进行延伸，整个分布式事务的参与者将会组成如下图所示的树形拓扑结构。在一个跨服务的分布式事务中，事务的发起者和提交均系同一个，它可以是整个调用的客户端，也可以是客户端最先调用的那个服务。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1553291217001.png&#34;
+	width=&#34;1261&#34;
+	height=&#34;589&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1553291217001&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;214&#34;
+		data-flex-basis=&#34;513px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;较之基于单一数据库资源访问的本地事务，分布式事务的应用架构更为复杂。在不同的分布式应用架构下，实现一个分布式事务要考虑的问题并不完全一样，比如对多资源的协调、事务的跨服务传播等，实现机制也是复杂多变。&lt;/p&gt;
+&lt;p&gt;事务的作用：==保证每个事务的数据一致性。==&lt;/p&gt;
+&lt;h3 id=&#34;14-cap定理面试&#34;&gt;1.4 CAP定理（面试）
+&lt;/h3&gt;&lt;p&gt;CAP 定理，又被叫作布鲁尔定理。对于设计分布式系统(不仅仅是分布式事务)的架构师来说，CAP 就是你的入门理论。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/cap.png&#34;
+	width=&#34;559&#34;
+	height=&#34;537&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;104&#34;
+		data-flex-basis=&#34;249px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;**C (一致性)：**对某个指定的客户端来说，读操作能返回最新的写操作。&lt;/p&gt;
+&lt;p&gt;对于数据分布在不同节点上的数据来说，如果在某个节点更新了数据，那么在其他节点如果都能读取到这个最新的数据，那么就称为强一致，如果有某个节点没有读取到，那就是分布式不一致。&lt;/p&gt;
+&lt;p&gt;**A (可用性)：**非故障的节点在合理的时间内返回合理的响应(不是错误和超时的响应)。可用性的两个关键一个是合理的时间，一个是合理的响应。&lt;/p&gt;
+&lt;p&gt;合理的时间指的是请求不能无限被阻塞，应该在合理的时间给出返回。合理的响应指的是系统应该明确返回结果并且结果是正确的，这里的正确指的是比如应该返回 50，而不是返回 40。&lt;/p&gt;
+&lt;p&gt;**P (网络分区容错性)：**当出现网络分区后，系统能够继续工作。打个比方，这里集群有多台机器，有台机器网络出现了问题，但是这个集群仍然可以正常工作。&lt;/p&gt;
+&lt;p&gt;CAP定理中: 所有架构只能够满足C A P 三个中间的两个!&lt;/p&gt;
+&lt;h2 id=&#34;2-分布式事务解决方案面试&#34;&gt;2 分布式事务解决方案（面试）
+&lt;/h2&gt;&lt;p&gt;1.XA两段提交(强一致)&lt;/p&gt;
+&lt;p&gt;2.TCC三段提交(强一致)&lt;/p&gt;
+&lt;p&gt;3.本地消息表(MQ+Table)(最终一致)&lt;/p&gt;
+&lt;p&gt;4.事务消息(RocketMQ[alibaba])(最终一致)&lt;/p&gt;
+&lt;p&gt;==5.Seata(alibaba)==&lt;/p&gt;
+&lt;p&gt;6.RabbitMQ的ACK机制实现分布式事务(拓展)&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;一致性拓展：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;强一致性&lt;/strong&gt;：只要系统提供服务，那么数据一定一致的。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;弱一致性&lt;/strong&gt;：系统提供服务的时候，数据有可能不是一致的，而是要等待一段时间才能一致。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;最终一致性&lt;/strong&gt;：是弱一致性的特例，数据最终总会一致的，但是需要一定时间。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;21--基于xa协议的两阶段提交2pc&#34;&gt;2.1  基于XA协议的两阶段提交(2PC)
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;X/Open 组织（即现在的 Open Group ）定义了分布式事务处理模型&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;XA协议&lt;/strong&gt;：XA 是 X/Open 定义的交易中间件与数据库之间的接口规范（即接口函数），交易中间件用它来通知数据库事务的开始、结束以及提交、回滚等， XA 接口函数由数据库厂商提供。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;两阶段提交协议(Two Phase Commitment Protocol)中，涉及到两种角色&lt;/p&gt;
+&lt;p&gt;一个事务协调者（coordinator）：负责协调多个参与者进行事务投票及提交(回滚)
+多个事务参与者（participants）：即本地事务执行者&lt;/p&gt;
+&lt;p&gt;总共处理步骤有两个
+（1）投票阶段（voting phase）：协调者将通知事务参与者准备提交或取消事务，然后进入表决过程。参与者将告知协调者自己的决策：同意（事务参与者本地事务执行成功，但未提交）或取消（本地事务执行故障）；
+（2）提交阶段（commit phase）：收到参与者的通知后，协调者再向参与者发出通知，根据反馈情况决定各参与者是否要提交还是回滚；&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565819561657.png&#34;
+	width=&#34;1128&#34;
+	height=&#34;474&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565819561657&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;237&#34;
+		data-flex-basis=&#34;571px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565819640025.png&#34;
+	width=&#34;1187&#34;
+	height=&#34;461&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565819640025&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;257&#34;
+		data-flex-basis=&#34;617px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;如果任一资源管理器在第一阶段返回准备失败，那么事务管理器会要求所有资源管理器在第二阶段执行回滚操作。通过事务管理器的两阶段协调，最终所有资源管理器要么全部提交，要么全部回滚，最终状态都是一致的&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;优点：&lt;/strong&gt; 尽量保证了数据的强一致（无法完全保证），适合对数据强一致要求很高的关键领域。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;缺点：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;**同步阻塞问题：**执行过程中，所有参与节点都是事务阻塞型的。当参与者占有公共资源时，其他第三方节点访问公共资源不得不处于阻塞状态。&lt;/li&gt;
+&lt;li&gt;**单点故障：**由于协调者的重要性，一旦协调者发生故障。参与者会一直阻塞下去。尤其在第二阶段，协调者发生故障，那么所有的参与者还都处于锁定事务资源的状态中，而无法继续完成事务操作。（如果是协调者挂掉，可以重新选举一个协调者，但是无法解决因为协调者宕机导致的参与者处于阻塞状态的问题）&lt;/li&gt;
+&lt;li&gt;**数据不一致：**在二阶段提交的阶段二中，当协调者向参与者发送commit请求之后，发生了局部网络异常或者在发送commit请求过程中协调者发生了故障，这回导致只有一部分参与者接受到了commit请求。而在这部分参与者接到commit请求之后就会执行commit操作。但是其他部分未接到commit请求的机器则无法执行事务提交。于是整个分布式系统便出现了数据不一致性的现象。&lt;/li&gt;
+&lt;li&gt;**==二阶段无法解决的问题：==**协调者再发出commit消息之后宕机，而唯一接收到这条消息的参与者同时也宕机了。那么即使协调者通过选举协议产生了新的协调者，这条事务的状态也是不确定的，没人知道事务是否被已经提交&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;22-三段提交3pc&#34;&gt;2.2 三段提交（3PC）
+&lt;/h3&gt;&lt;p&gt;三段提交是两段提交的升级版&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;CanCommit阶段：询问阶段&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/555.png&#34;
+	width=&#34;876&#34;
+	height=&#34;262&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;334&#34;
+		data-flex-basis=&#34;802px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;类似2PC的准备阶段，协调者向参与者发送CanCommit请求，询问是否可以执行事务提交操作，然后开始等待参与者的响应。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;PreCommit阶段：事务执行但不提交阶段&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/666.png&#34;
+	width=&#34;996&#34;
+	height=&#34;281&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;354&#34;
+		data-flex-basis=&#34;850px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;协调者根据参与者的反应情况来决定是否可以进行事务的PreCommit操作：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;协调者从所有的参与者获得的反馈都是Yes响应
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;发送预提交请求协调者向参与者发送PreCommit请求；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;参与者接收到PreCommit请求后，执行事务操作，并将undo（执行前数据）和redo（执行后数据）信息记录到事务日志中；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;参与者成功的执行了事务操作，则返回ACK（确认机制：已确认执行）响应，同时开始等待最终指令。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;有任何一个参与者向协调者发送了No响应，或者等待超时
+&lt;ol&gt;
+&lt;li&gt;协调者向所有参与者发送中断请求请求。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;参与者收到来自协调者的中断请求之后（或超时之后，仍未收到协调者的请求），执行事务的中断。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;doCommit阶段：事务提交阶段&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/444.png&#34;
+	width=&#34;996&#34;
+	height=&#34;297&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;335&#34;
+		data-flex-basis=&#34;804px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;执行提交&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;协调接收到所有参与者返回的ACK响应后，协调者向所有参与者发送doCommit请求。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;参与者接收到doCommit请求之后，执行最终事务提交，事务提交完之后，向协调者发送Ack响应并释放所有事务资源。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;协调者接收到所有参与者的ACK响应之后，完成事务。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;中断事务&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;协调者没有接收到参与者发送的ACK响应（可能是接受者发送的不是ACK响应，也可能响应超时），协调者向所有参与者发送中断请求；&lt;/li&gt;
+&lt;li&gt;参与者接收到中断请求之后，利用其在阶段二记录的undo信息来执行事务的回滚操作，并在完成回滚之后，向协调者发送ACK消息，释放所有的事务资源。&lt;/li&gt;
+&lt;li&gt;协调者接收到参与者反馈的ACK消息之后，执行事务的中断。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;**优点：**相对于2PC，3PC主要解决的单点故障问题，并减少阻塞，因为一旦参与者无法及时收到来自协调者的信息之后，他会默认执行commit。而不会一直持有事务资源并处于阻塞状态。&lt;/p&gt;
+&lt;p&gt;**缺点：**会导致数据一致性问题。由于网络原因，协调者发送的中断响应没有及时被参与者接收到，那么参与者在等待超时之后执行了commit操作。这样就和其他接到中断命令并执行回滚的参与者之间存在数据不一致的情况。&lt;/p&gt;
+&lt;h3 id=&#34;23-tcc补偿机制&#34;&gt;2.3 TCC补偿机制
+&lt;/h3&gt;&lt;p&gt;TCC 其实就是采用的补偿机制，其核心思想是：==针对每个操作，都要注册一个与其对应的确认和补偿（撤销）操作==。三个阶段如下：&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th style=&#34;text-align: left&#34;&gt;操作方法&lt;/th&gt;
+          &lt;th&gt;含义&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Try&lt;/td&gt;
+          &lt;td&gt;预留业务资源/数据效验-尝试检查当前操作是否可执行&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Confirm&lt;/td&gt;
+          &lt;td&gt;确认执行业务操作，实际提交数据，不做任何业务检查。try成功，confirm必定成功&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td style=&#34;text-align: left&#34;&gt;Cancel&lt;/td&gt;
+          &lt;td&gt;执行业务出错时，需要回滚数据的状态下执行的业务逻辑&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;其核心在于将业务分为两个操作步骤完成。==不依赖事务协调器对分布式事务的支持，而是通过对业务逻辑的分解来实现分布式事务==。&lt;/p&gt;
+&lt;img src=&#34;images\1565819838546.png&#34; alt=&#34;1565819838546&#34; style=&#34;zoom:200%;&#34; /&gt;
+&lt;p&gt;例如： 小红要向小白转账100元，执行流程：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;首先在 Try 阶段，要先调用远程接口检查小红的账户余额是否大于等于100元，若足够则对余额进行冻结，检查小白的账户状态是否正常。&lt;/li&gt;
+&lt;li&gt;在 Confirm 阶段，执行远程调用的转账的操作，扣除小红账户100元，小白账户加100元。&lt;/li&gt;
+&lt;li&gt;如果第2步执行成功，那么转账成功，小红账户解冻，流程结束。&lt;/li&gt;
+&lt;li&gt;如果第二步执行失败，则调用服务A的Cancel方法，账户余额回滚100元及解冻小红账户，同时调用服务B的Cancel方法，账户扣除100元。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;优点：&lt;/strong&gt; 跟2PC比起来，实现以及流程相对简单了一些。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;缺点：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;在2 3 4步中都有可能失败，从而导致数据不一致。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;TCC属于应用层的一种补偿方式，需要程序员在实现的时候多写很多补偿的代码，复杂业务场景下代码逻辑非常复杂。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;幂等性无法确保。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;24-本地消息表异步确保&#34;&gt;2.4 本地消息表（异步确保）
+&lt;/h3&gt;&lt;p&gt;本地消息表这种实现方式应该是业界使用最多的，其核心思想是将==分布式事务拆分成本地事务进行处理==，这种思路是来源于ebay。我们可以从下面的流程图中看出其中的一些细节：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1553321000110.png&#34;
+	width=&#34;801&#34;
+	height=&#34;367&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1553321000110&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;218&#34;
+		data-flex-basis=&#34;523px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;工作流程：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;==消息生产方，需要额外建一个消息表==，并记录消息发送状态。消息表和业务数据要在一个事务里提交，也就是说他们要在一个数据库里面。然后消息会经过MQ发送到消息的消费方。如果消息发送失败，会进行重试发送。&lt;/li&gt;
+&lt;li&gt;==消息消费方，需要处理这个消息==，并完成自己的业务逻辑。此时如果本地事务处理成功，表明已经处理成功了，如果处理失败， 果是业务上面的失败，可以给生产方发送一个业务补偿消息，通知生产方进行回滚等操作。&lt;/li&gt;
+&lt;li&gt;生产方和消费方定时扫描本地消息表，把还没处理完成的消息或者失败的消息再发送一遍。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;优点：&lt;/strong&gt; 一种非常经典的实现，避免了分布式事务，实现了最终一致性。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;缺点：&lt;/strong&gt; 消息表会耦合到业务系统中，如果没有封装好的解决方案，会有很多杂活需要处理。&lt;/p&gt;
+&lt;h3 id=&#34;25-mq-事务消息&#34;&gt;2.5 MQ 事务消息
+&lt;/h3&gt;&lt;p&gt;有一些第三方的MQ是支持事务消息的，比如RocketMQ，他们支持事务消息的方式也是类似于采用的二阶段提交，但是市面上一些主流的MQ都是不支持事务消息的，比如 RabbitMQ 和 Kafka 都不支持（RabbitMQ、Kafka基于ACK机制）。&lt;/p&gt;
+&lt;p&gt;以阿里的 RocketMQ 中间件为例，流程为：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;发送一个事务消息，这个时候，RocketMQ将消息状态标记为Prepared，注意此时这条消息消费者是无法消费到的。&lt;/li&gt;
+&lt;li&gt;执行业务代码逻辑。&lt;/li&gt;
+&lt;li&gt;确认发送消息，RocketMQ将消息状态标记为可消费，这个时候消费者才能真正消费到这条消息。&lt;/li&gt;
+&lt;li&gt;如果步骤3确认消息发送失败，RocketMQ会定期扫描消息集群中的事务消息，如果发现了Prepared消息，它会向消息发送端(生产者)确认。RocketMQ会根据发送端设置的策略来决定是回滚还是继续发送确认消息。这样就保证了消息发送与本地事务同时成功或同时失败。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;正常流程图：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/111.png&#34;
+	width=&#34;800&#34;
+	height=&#34;363&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;220&#34;
+		data-flex-basis=&#34;528px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;完整流程图：&lt;/strong&gt;&lt;/p&gt;
+&lt;img src=&#34;images\1.jpg&#34; style=&#34;zoom:200%;&#34; /&gt;
+&lt;p&gt;&lt;strong&gt;优点：&lt;/strong&gt; 实现了最终一致性，不需要依赖本地数据库事务。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;缺点：&lt;/strong&gt; 目前主流MQ中只有RocketMQ支持事务消息。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;延申拓展：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;u&gt;MQ非事务消息实现：&lt;/u&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;u&gt;方案一：创建独立消息服务&lt;/u&gt;&lt;/li&gt;
+&lt;li&gt;&lt;u&gt;方案二：使用非事务MQ（RabbitMQ/Kafka）的ACK机制&lt;/u&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;26-seata&#34;&gt;2.6 Seata
+&lt;/h3&gt;&lt;h4 id=&#34;261-seata简介&#34;&gt;2.6.1 Seata简介
+&lt;/h4&gt;&lt;p&gt;2019 年 1 月，阿里巴巴中间件团队发起了开源项目 &lt;a class=&#34;link&#34; href=&#34;https://www.oschina.net/p/fescar&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;em&gt;Fescar&lt;/em&gt;&lt;/a&gt;&lt;em&gt;（Fast &amp;amp; Easy Commit And Rollback）&lt;/em&gt;，和社区一起共建开源分布式事务解决方案。Fescar 的愿景是让分布式事务的使用像本地事务的使用一样，简单和高效，并逐步解决开发者们遇到的分布式事务方面的所有难题。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Fescar 开源后，蚂蚁金服加入 Fescar 社区参与共建，并在 Fescar 0.4.0 版本中贡献了 TCC 模式。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;为了打造更中立、更开放、生态更加丰富的分布式事务开源社区，经过社区核心成员的投票，大家决定对 Fescar 进行品牌升级，并更名为 &lt;strong&gt;Seata&lt;/strong&gt;，意为：&lt;strong&gt;Simple Extensible Autonomous Transaction Architecture&lt;/strong&gt;，是一套一站式分布式事务解决方案。&lt;/p&gt;
+&lt;p&gt;Seata 融合了阿里巴巴和蚂蚁金服在分布式事务技术上的积累，并沉淀了新零售、云计算和新金融等场景下丰富的实践经验。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;核心组件：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Transaction Coordinator (TC)： 事务协调器，维护全局事务的运行状态，负责协调并驱动全局事务的提交或回滚。&lt;/li&gt;
+&lt;li&gt;Transaction Manager (TM)： 控制全局事务的边界，负责开启一个全局事务，并最终发起全局提交或全局回滚的决议。&lt;/li&gt;
+&lt;li&gt;Resource Manager (RM)： 控制分支事务，负责分支注册、状态汇报，并接收事务协调器的指令，驱动分支（本地）事务的提交和回滚。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;工作流程：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;TM 向 TC 申请开启一个全局事务，全局事务创建成功并生成一个全局唯一的事务ID（XID），XID 在微服务调用链路的上下文中传播。&lt;/li&gt;
+&lt;li&gt;RM 向 TC 注册分支事务，接着执行这个分支事务并提交事务（==重点：RM在此阶段就已经执行了本地事务的提交/回滚==），最后将执行结果汇报给TC。&lt;/li&gt;
+&lt;li&gt;TM 根据 TC 中所有的分支事务的执行情况，发起全局提交或回滚决议。&lt;/li&gt;
+&lt;li&gt;TC 调度 XID 下管辖的全部分支事务完成提交或回滚请求。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/333.png&#34;
+	width=&#34;960&#34;
+	height=&#34;551&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;174&#34;
+		data-flex-basis=&#34;418px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;262-seata支持的模式&#34;&gt;2.6.2 Seata支持的模式
+&lt;/h4&gt;&lt;p&gt;seata中有两种常见分布式事务实现方案，AT及TCC&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;AT模式：赖于RM拥有本地数据库事务的能力，对于客户业务无侵入性&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/222.png&#34;
+	width=&#34;721&#34;
+	height=&#34;260&#34;
+	
+	loading=&#34;lazy&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;277&#34;
+		data-flex-basis=&#34;665px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;TCC 模式&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;263-seata的优点&#34;&gt;2.6.3 Seata的优点
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;对业务无侵入&lt;/strong&gt;：即减少技术架构上的微服务化所带来的分布式事务问题对业务的侵入
+&lt;strong&gt;高性能&lt;/strong&gt;：减少分布式事务解决方案所带来的性能消耗(2PC)&lt;/p&gt;
+&lt;h4 id=&#34;264-at模式&#34;&gt;2.6.4 AT模式
+&lt;/h4&gt;&lt;p&gt;Seata AT模式是基于XA事务演进而来的一个分布式事务中间件，XA是一个基于数据库实现的分布式事务协议，本质上和两阶段提交一样，需要数据库支持，Mysql5.6以上版本支持XA协议，其他数据库如Oracle，DB2也实现了XA接口。&lt;/p&gt;
+&lt;p&gt;AT模式分为两个阶段，如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;第一阶段：本地数据备份阶段&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;Seata 的 JDBC 数据源代理通过对业务 SQL 的解析，把==业务数据在变化前后的数据镜像组织成回滚日志==（XID/分支事务ID（Branch ID/变化前的数据/变化后的数据）。&lt;/li&gt;
+&lt;li&gt;将回滚日志存入一张日志表UNDO_LOG（==需要手动创建==）,并对UNDO_LOG表中的这条数据形成行锁（for update）。&lt;/li&gt;
+&lt;li&gt;若锁定失败，说明有其他事务在操作这条数据，它会在一段时间内重试，重试失败则回滚本地事务，并向TC汇报本地事务执行失败。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这样，可以保证：&lt;strong&gt;任何提交的业务数据的更新一定有相应的回滚日志存在&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565820909345.png&#34;
+	width=&#34;1132&#34;
+	height=&#34;378&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565820909345&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;299&#34;
+		data-flex-basis=&#34;718px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;目的：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;基于这样的机制，分支的本地事务便可以在全局事务的第一阶段提交，并马上释放本地事务锁定的资源。&lt;/li&gt;
+&lt;li&gt;有了回滚日志之后，可以在第一阶段释放对资源的锁定，降低了锁范围，提高效率，即使第二阶段发生异常需要回滚，只需找对undolog中对应数据并反解析成sql来达到回滚目的。&lt;/li&gt;
+&lt;li&gt;Seata通过代理数据源（DataSource-&amp;gt;DataSourceProxy）将业务sql的执行解析成undolog来与业务数据的更新同时入库，达到了对业务无侵入的效果&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;第二阶段：全局事务提交/回滚&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;全局提交&lt;/strong&gt;：
+&lt;ol&gt;
+&lt;li&gt;所有分支事务此时已经完成提交，所有分支事务提交都正常。&lt;/li&gt;
+&lt;li&gt;==TM从TC获知后会决议执行====全局提交====，TC异步通知所有的RM释放UNDO_LOG表中的行锁==，同时清理掉UNDO_LOG表中刚才释放锁的那条数据。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565821037492.png&#34;
+	width=&#34;1218&#34;
+	height=&#34;525&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565821037492&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;232&#34;
+		data-flex-basis=&#34;556px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;全局回滚&lt;/strong&gt;：
+&lt;ol&gt;
+&lt;li&gt;若任何一个RM一阶段事务提交失败，通知TC提交失败。&lt;/li&gt;
+&lt;li&gt;==TM从TC获知后会决议执行全局回滚====，====TC向所有的RM发送回滚请求==。&lt;/li&gt;
+&lt;li&gt;RM通过XID和Branch ID找到相应的回滚日志记录，&lt;strong&gt;通过回滚记录生成反向的更新 SQL 并执行&lt;/strong&gt;，以完成分支的回滚，同时释放锁，清除UNDO_LOG表中释放锁的那条数据。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565821069728.png&#34;
+	width=&#34;1207&#34;
+	height=&#34;564&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565821069728&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;214&#34;
+		data-flex-basis=&#34;513px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;265-tcc模式&#34;&gt;2.6.5 TCC模式
+&lt;/h4&gt;&lt;p&gt;seata也针对TCC做了适配兼容，支持TCC事务方案，原理前面已经介绍过，基本思路就是使用侵入业务上的补偿及事务管理器的协调来达到全局事务的一起提交及回滚。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565821173446.png&#34;
+	width=&#34;1223&#34;
+	height=&#34;615&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1565821173446&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;198&#34;
+		data-flex-basis=&#34;477px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;27-跨mysql-ip测试&#34;&gt;2.7 跨mysql ip测试
+&lt;/h2&gt;&lt;p&gt;插入数据库&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/seata-16312535244541.png&#34;
+	width=&#34;1204&#34;
+	height=&#34;610&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;seata&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;197&#34;
+		data-flex-basis=&#34;473px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;undo_log 表&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/seata_undo_log.png&#34;
+	width=&#34;1750&#34;
+	height=&#34;438&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;seata_undo_log&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;399&#34;
+		data-flex-basis=&#34;958px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;发生异常&amp;ndash;回滚&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/seata%E5%9B%9E%E6%BB%9A.png&#34;
+	width=&#34;1724&#34;
+	height=&#34;747&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;seata回滚&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;230&#34;
+		data-flex-basis=&#34;553px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;数据库可以看到之前被修改的数据被回滚了&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

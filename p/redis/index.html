@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="1. 概览 1.什么是 redis？它能做什么？ 2.redis 有哪八种数据类型？有哪些应用场景？ 3.redis为什么这么快？ 4.听说 redis 6.0之后又使用了多线程，不会有线程安全的问题吗？ 5.redis 的持久化机制有哪些？优缺点说说 \\6. Redis的过期键的删除策略有哪些？ \\7. Redis的内存满了怎么办？ 8.Redis 的热 key 问题怎么解决？ 9.缓存击穿、缓存穿透、缓存雪崩是什么？怎么解决呢？ 10.Redis 有哪些部署方式？ 11.哨兵有哪些作用？ 12.哨兵选举过程是怎么样的？ 13.cluster集群模式是怎么存放数据的？ 14.cluster的故障恢复是怎么做的？ 15.主从同步原理是怎样的？ 16.无硬盘复制是什么？ 2. Redis 的数据类型 基本\n">
+<title>Redis</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/redis/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Redis">
+<meta property='og:description' content="1. 概览 1.什么是 redis？它能做什么？ 2.redis 有哪八种数据类型？有哪些应用场景？ 3.redis为什么这么快？ 4.听说 redis 6.0之后又使用了多线程，不会有线程安全的问题吗？ 5.redis 的持久化机制有哪些？优缺点说说 \\6. Redis的过期键的删除策略有哪些？ \\7. Redis的内存满了怎么办？ 8.Redis 的热 key 问题怎么解决？ 9.缓存击穿、缓存穿透、缓存雪崩是什么？怎么解决呢？ 10.Redis 有哪些部署方式？ 11.哨兵有哪些作用？ 12.哨兵选举过程是怎么样的？ 13.cluster集群模式是怎么存放数据的？ 14.cluster的故障恢复是怎么做的？ 15.主从同步原理是怎样的？ 16.无硬盘复制是什么？ 2. Redis 的数据类型 基本\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/redis/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='redis' /><meta property='article:tag' content='nosql' /><meta property='article:published_time' content='2020-07-07T19:21:43&#43;08:00'/><meta property='article:modified_time' content='2020-07-07T19:21:43&#43;08:00'/>
+<meta name="twitter:title" content="Redis">
+<meta name="twitter:description" content="1. 概览 1.什么是 redis？它能做什么？ 2.redis 有哪八种数据类型？有哪些应用场景？ 3.redis为什么这么快？ 4.听说 redis 6.0之后又使用了多线程，不会有线程安全的问题吗？ 5.redis 的持久化机制有哪些？优缺点说说 \\6. Redis的过期键的删除策略有哪些？ \\7. Redis的内存满了怎么办？ 8.Redis 的热 key 问题怎么解决？ 9.缓存击穿、缓存穿透、缓存雪崩是什么？怎么解决呢？ 10.Redis 有哪些部署方式？ 11.哨兵有哪些作用？ 12.哨兵选举过程是怎么样的？ 13.cluster集群模式是怎么存放数据的？ 14.cluster的故障恢复是怎么做的？ 15.主从同步原理是怎样的？ 16.无硬盘复制是什么？ 2. Redis 的数据类型 基本\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-概览">1. 概览</a></li>
+    <li><a href="#2-redis-的数据类型">2. Redis 的数据类型</a></li>
+    <li><a href="#3-redis-为什么快">3. redis 为什么快</a></li>
+    <li><a href="#4-redis-60-后用多线程-会线程不安全吗">4. redis 6.0 后用多线程, 会线程不安全吗?</a></li>
+    <li><a href="#5-redis-的持久化机制有哪些-优缺点">5. redis 的持久化机制有哪些? 优缺点</a>
+      <ul>
+        <li><a href="#一-aof">一. AOF</a></li>
+        <li><a href="#二-rdb-快照">二. RDB (快照)</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-redis-的过期键的删除策略">6. Redis 的过期键的删除策略</a></li>
+    <li><a href="#8-热key问题">8. 热key问题</a></li>
+    <li><a href="#9-缓存击穿-缓存穿透-缓存雪崩">9. 缓存击穿; 缓存穿透; 缓存雪崩</a></li>
+    <li><a href="#10-redis-部署方式">10. Redis 部署方式</a></li>
+    <li><a href="#13-cluster-集群存放数据方式">13. Cluster 集群存放数据方式</a></li>
+    <li><a href="#14-cluster-的故障恢复过程">14. cluster 的故障恢复过程</a></li>
+    <li><a href="#15-主从同步原理是怎样的">15. 主从同步原理是怎样的?</a></li>
+    <li><a href="#16-无硬盘辅助">16. 无硬盘辅助</a></li>
+    <li><a href="#17-redis-的槽">17. Redis 的槽</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#槽的分配与迁移"><strong>槽的分配与迁移</strong></a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#18-redission">18. redission</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/redis/" >
+                Redis
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/redis/">Redis</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jul 07, 2020</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 7 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="1-概览">1. 概览
+</h1><ul>
+<li>1.什么是 redis？它能做什么？</li>
+<li>2.redis 有哪八种数据类型？有哪些应用场景？</li>
+<li>3.redis为什么这么快？</li>
+<li>4.听说 redis 6.0之后又使用了多线程，不会有线程安全的问题吗？</li>
+<li>5.redis 的持久化机制有哪些？优缺点说说</li>
+<li>\6. Redis的过期键的删除策略有哪些？</li>
+<li>\7. Redis的内存满了怎么办？</li>
+<li>8.Redis 的热 key 问题怎么解决？</li>
+<li>9.缓存击穿、缓存穿透、缓存雪崩是什么？怎么解决呢？</li>
+<li>10.Redis 有哪些部署方式？</li>
+<li>11.哨兵有哪些作用？</li>
+<li>12.哨兵选举过程是怎么样的？</li>
+<li>13.cluster集群模式是怎么存放数据的？</li>
+<li>14.cluster的故障恢复是怎么做的？</li>
+<li>15.主从同步原理是怎样的？</li>
+<li>16.无硬盘复制是什么？</li>
+</ul>
+<h1 id="2-redis-的数据类型">2. Redis 的数据类型
+</h1><p>基本</p>
+<blockquote>
+<p>string:  存储计数器，粉丝数; ==分布式锁也会用到该类型==</p>
+<p>hashmap:  key - value 形式的，value 是一个map</p>
+<p>list:  基本的数据类型，列表。在 Redis 中可以把 list 用作栈、队列、阻塞队列</p>
+<p>set: 集合，不能有重复元素，可以做点赞，收藏等</p>
+<p>zsat: 有序集合，不能有重复元素，有序集合中的每个元 素都需要指定一个分数，根据分数对元素进行升序排序。可以做排行榜</p>
+</blockquote>
+<p>特殊数据类型</p>
+<blockquote>
+<ul>
+<li><strong>1.geospatial</strong>: Redis 在 3.2 推出 ==Geo 类型==，该功能==<strong>可以推算出地理位置信息，两地之间的距离</strong>==。</li>
+<li><strong>2.hyperloglog</strong>: 基数：数学上集合的元素个数，是不能重复的。这个数据结构<strong>常用于统计网站的 UV</strong>。</li>
+<li><strong>3.bitmap</strong>: bitmap 就是通过最小的单位 bit 来进行0或者1的设置，表示某个元素对应的值或者状态。一个 bit 的值，或者是0，或者是1；也就是说一个 bit 能存储的最多信息是2。bitmap <strong>常用于统计用户信息比如活跃粉丝和不活跃粉丝、登录和未登录、是否打卡等</strong></li>
+</ul>
+</blockquote>
+<h1 id="3-redis-为什么快">3. redis 为什么快
+</h1><pre><code class="language-properties">1. 完全基于内存操作
+2. 使用单线程模型来处理客户端的请求, 避免上下文切换
+3. IO 多路复用机制
+4. 自身使用C语言编写, 有很多优化机制
+</code></pre>
+<h1 id="4-redis-60-后用多线程-会线程不安全吗">4. redis 6.0 后用多线程, 会线程不安全吗?
+</h1><p>不会</p>
+<p>其实 redis <strong>还是使用单线程模型来处理客户端的请求</strong>，只是使用多线程来处理数据的读写和协议解析，执行命令还是使用单线程，所以是不会有线程安全的问题。</p>
+<p>==就相当与还是只有一个医生就诊, 但是会有多个护士将病人带给医生==</p>
+<p>之所以加入了多线程因为 redis 的性能瓶颈在于网络IO而非CPU，使用多线程能提升IO读写的效率，从而整体提高redis的性能。</p>
+<h1 id="5-redis-的持久化机制有哪些-优缺点">5. redis 的持久化机制有哪些? 优缺点
+</h1><h2 id="一-aof">一. AOF
+</h2><ul>
+<li>redis ==每次执行一个命令时==,都会把这个「命令原本的语句记录到一个.aod的文件当中,然后通过fsync策略,将命令执行后的数据==持久化到磁盘==中」(不包括读命令)，</li>
+</ul>
+<p>优点</p>
+<ul>
+<li>1.AOF可以「更好的保护数据不丢失」，==一般AOF会以每隔1秒==，通过后台的一个线程去执行一次fsync操作，如果redis进程挂掉，==<strong>最多丢失1秒的数据</strong>==</li>
+<li>2.AOF是将命令直接==追加在文件末尾==的,==<strong>「写入性能非常高」</strong>==</li>
+<li>3.AOF日志文件的命令通过非常==可读的方式==进行记录，这个非常「==<strong>适合做灾难性的误删除紧急恢复」</strong>==，如果某人不小心用 flushall 命令清空了所有数据，只要这个时候还没有执行 rewrite，那么就可以将日志文件中的 flushall 删除，进行恢复</li>
+</ul>
+<h2 id="二-rdb-快照">二. RDB (快照)
+</h2><p>==优点==</p>
+<ol>
+<li>将某一时间点redis 内的所有数据保存, 大型数据的恢复, RDB 的恢复速度会很快</li>
+<li>对读写影响较小</li>
+</ol>
+<p>==缺点==</p>
+<ul>
+<li>
+<ol>
+<li>==「有可能会产生长时间的数据丢失」==</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>可能会有长时间停顿:我们前面讲了,fork 子进程这个过程是和 redis 的数据量有很大关系的,==<strong>如果「数据量很大,那么很有可能会使redis暂停几秒」</strong>==</li>
+</ol>
+</li>
+</ul>
+<h1 id="6-redis-的过期键的删除策略">6. Redis 的过期键的删除策略
+</h1><ol>
+<li><strong>定时过期</strong>：<strong>每个设置过期时间的key都需要创建一个定时器，到过期时间就会立即清除</strong></li>
+<li><strong>惰性过期</strong>：只有当<strong>访问一个key时，才会判断该key是否已过期</strong>，过期则清除。</li>
+<li><strong>定期过期</strong>：<strong>每隔一定的时间，会扫描一定数量的数据库的expires字典中一定数量的key，并清除其中已过期的key</strong>。</li>
+</ol>
+<h1 id="8-热key问题">8. 热key问题
+</h1><p>某一时刻, 有非常多的请求访问某个key, 流量过大, 导致该redis 服务器宕机</p>
+<p>方案</p>
+<ul>
+<li>可以将结果缓存到本地内存</li>
+<li>将热key 分散到不同的服务器</li>
+<li>设置永不过期</li>
+</ul>
+<h1 id="9-缓存击穿-缓存穿透-缓存雪崩">9. 缓存击穿; 缓存穿透; 缓存雪崩
+</h1><p>缓存穿透: 没有的数据, 不存在的数据, 每次 都请求到达数据库</p>
+<blockquote>
+<ol>
+<li>存一个空对象, 设置一个比较短的过期时间</li>
+<li>布隆过滤器
+<ul>
+<li>访问缓存层和存储层之前，将存在的key用布隆过滤器提前保存起来</li>
+<li><img src="/p/redis/images/image-20220228175217072.png"
+	width="504"
+	height="458"
+	
+	loading="lazy"
+	
+		alt="image-20220228175217072"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="110"
+		data-flex-basis="264px"
+	
+></li>
+</ul>
+</li>
+</ol>
+</blockquote>
+<p>缓存击穿: 一个key 非常热门, 失效的瞬间, 持续的请求就到了数据库</p>
+<blockquote>
+<p>永不过期</p>
+</blockquote>
+<p>缓存雪崩: <strong>不同的数据大批量到过期时间</strong></p>
+<blockquote>
+<p>设置不同的过期时间</p>
+</blockquote>
+<h1 id="10-redis-部署方式">10. Redis 部署方式
+</h1><ol>
+<li>单机模式:</li>
+<li>哨兵模式:</li>
+<li>cluster集群模式: 3.0版本; 自动将数据进行分片, 每个master 放一部分数据</li>
+<li>主从复制: 主数据库负责 ==读写操作==, 从数据库 负责==读操作==</li>
+</ol>
+<h1 id="13-cluster-集群存放数据方式">13. Cluster 集群存放数据方式
+</h1><p>一个cluster集群中总共有16384个节点，集群会<strong>将这16384个节点平均分配给每个==主节点==</strong></p>
+<p><img src="/p/redis/images/image-20220228191503147.png"
+	width="578"
+	height="281"
+	
+	loading="lazy"
+	
+		alt="image-20220228191503147"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="205"
+		data-flex-basis="493px"
+	
+></p>
+<h1 id="14-cluster-的故障恢复过程">14. cluster 的故障恢复过程
+</h1><ol>
+<li>
+<p>每个节点会向其他节点发送ping命令, 通过有没有收到回复来判断其他节点是否已经下线;</p>
+</li>
+<li>
+<p>如果长时间没有收到回复, <strong>那么发起ping命令的节点就会认为目标节点疑似下线</strong>,</p>
+<ul>
+<li>1.当A节点发现目标节点疑似下线，就会向==集群中的其他节点散播消息==，其他节点就会向目标节点发送命令，判断目标节点是否下线</li>
+<li>2.如果集群中==半数以上的节点都认为目标节点下线==，就会对目标节点标记为下线，从而告诉其他节点，让目标节点在整个集群中都下线</li>
+</ul>
+</li>
+</ol>
+<h1 id="15-主从同步原理是怎样的">15. 主从同步原理是怎样的?
+</h1><ul>
+<li>1.当一个从数据库启动时，它会向==<strong>主数据库发送一个SYNC命令</strong>==，master收到后，在后台保存==快照==，也就是我们说的==RDB持久化==，当然保存快照是需要消耗时间的，并且redis是单线程的，在==保存快照期间redis受到的命令会缓存起来==</li>
+<li>2.快照完成后会==<strong>将缓存的命令以及快照一起打包发给slave节点</strong>==，从而保证主从数据库的一致性。</li>
+<li>3.从数据库接受到快照以及缓存的命令后会将这部分数据==<strong>写入到硬盘上的临时文件当中</strong>==，写入完成后会用这份文件去替换掉RDB快照文件，当然，这个操作是不会阻塞的，可以继续接收命令执行，具体原因其实就是fork了一个子进程，用子进程去完成了这些功能。</li>
+</ul>
+<h1 id="16-无硬盘辅助">16. 无硬盘辅助
+</h1><p>我们刚刚说了主从之间是通过RDB快照来交互的，虽然看来逻辑很简单，但是还是会存在一些问题，但是会存在着一些问题。</p>
+<ul>
+<li>1.master禁用了RDB快照时，发生了主从同步(复制初始化)操作，也会生成RDB快照，但是之后如果master发成了重启，就会用RDB快照去恢复数据，这份数据可能已经很久了，中间就会丢失数据</li>
+<li>2.在这种一主多从的结构中，master每次和slave同步数据都要进行一次快照，从而在硬盘中生成RDB文件，会影响性能</li>
+</ul>
+<p>为了解决这种问题，redis在后续的更新中也加入了无硬盘复制功能，也就是说<strong>直接通过网络发送给slave</strong>，避免了和硬盘交互，但是也是有io消耗</p>
+<h1 id="17-redis-的槽">17. Redis 的槽
+</h1><h3 id="槽的分配与迁移"><strong>槽的分配与迁移</strong>
+</h3><ol>
+<li><strong>槽分配</strong>：
+<ul>
+<li>Redis 集群启动时，所有的槽需要分配给集群中的节点。</li>
+<li>例如：
+<ul>
+<li>节点 A 管理槽 <code>0-5460</code>。</li>
+<li>节点 B 管理槽 <code>5461-10922</code>。</li>
+<li>节点 C 管理槽 <code>10923-16383</code>。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>槽的迁移</strong>：
+<ul>
+<li>当集群中新增或移除节点时，Redis 会重新分配槽。</li>
+<li>数据迁移仅发生在重新分配的槽对应的数据上，减少迁移量。</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li>槽是 Redis 集群用来分布和管理数据的==逻辑分区==，数量固定为 16384 个。</li>
+<li>每个键通过哈希算法映射到一个槽上，但槽本身不是存储数据的实体，而是一个==分区标识==。</li>
+</ul>
+<p><strong>每个槽可以存储任意数量的键值对</strong>：</p>
+<ul>
+<li>槽相当于一个“桶”，每个槽可以包含非常多的键。</li>
+<li>数据的实际存储仍然由分配该槽的 Redis 节点负责。</li>
+<li>例如：
+<ul>
+<li>槽 <code>0</code> 可能存储 1 万个键；</li>
+<li>槽 <code>1</code> 可能存储 100 万个键。</li>
+</ul>
+</li>
+</ul>
+<p><strong>键到槽的映射</strong>：</p>
+<ul>
+<li>Redis 使用哈希算法（<code>CRC16(key) % 16384</code>）计算每个键对应的槽。</li>
+<li>同一个槽中的键分配到相同的 Redis 节点管理。</li>
+</ul>
+<h1 id="18-redission">18. redission
+</h1><p><strong>分布式数据结构</strong>
+提供对 Redis 中数据结构的封装，如：</p>
+<ul>
+<li>基本类型（Map、Set、List、Queue、Deque 等）</li>
+<li>高级数据结构（BloomFilter、Geo 等）</li>
+<li>锁相关数据结构（BitSet、CountDownLatch 等）</li>
+</ul>
+<p><strong>分布式锁和同步器</strong>
+Redisson 提供强大的分布式锁功能，包括：</p>
+<ul>
+<li>公平锁</li>
+<li>读写锁</li>
+<li>可重入锁</li>
+<li>联锁（MultiLock）</li>
+<li>红锁（RedLock） <strong>在分布式环境中，确保在多个 Redis 实例上获取锁的一致性，防止单点故障和锁的竞争问题。</strong></li>
+</ul>
+<p><strong>分布式服务</strong></p>
+<ul>
+<li><strong>对象存储服务</strong>：可以直接将对象映射到 Redis。</li>
+<li><strong>远程服务调用（RRemoteService）</strong>：通过 Redis 实现微服务间的远程调用。</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/redis/">Redis</a>
+        
+            <a href="/tags/nosql/">Nosql</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Redis集群搭建</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

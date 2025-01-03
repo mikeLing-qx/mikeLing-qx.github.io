@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Mybatis on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/tags/mybatis/</link>
+        <description>Recent content in Mybatis on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Thu, 10 Nov 2022 14:55:11 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/tags/mybatis/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Mybatis</title>
+        <link>https://mikeLing-qx.github.io/p/mybatis/</link>
+        <pubDate>Thu, 10 Nov 2022 14:55:11 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/mybatis/</guid>
+        <description>&lt;h1 id=&#34;1-拦截器&#34;&gt;1. 拦截器
+&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;参考资料: &lt;a class=&#34;link&#34; href=&#34;https://www.cnblogs.com/monkeydai/p/16625918.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.cnblogs.com/monkeydai/p/16625918.html&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;==Mybatis拦截器应用场景==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Sql摘要统计/监控&lt;/li&gt;
+&lt;li&gt;动态分页&lt;/li&gt;
+&lt;li&gt;多租户&lt;/li&gt;
+&lt;li&gt;脱敏&lt;/li&gt;
+&lt;li&gt;加解密
+&lt;ul&gt;
+&lt;li&gt;使用场景是什么, 支持自定义加解密处理器&lt;/li&gt;
+&lt;li&gt;可以通过注解@ScheField 指定不同的加解密 方式, 默认方式为DefaultSecureHandler 返回原字符串, , 注解上也可以配置自定义的加解密处理器,继承 SecureFiledHandler, 里面有两抽象方法, encrypt 和decrypt&lt;/li&gt;
+&lt;li&gt;需要把加解密处理器注入到spring中, 在调用的时候会通过class 去获取实例, 通过反射去执行相关的加解密方法&lt;/li&gt;
+&lt;li&gt;同时并不是所有的查询和插入操作都走拦截器只有在 mapper 类上有 @SecureMapper 注解时才走&lt;/li&gt;
+&lt;li&gt;对接中山密评的. 因为sdk的调用不允许多线程, 因此创建PasswordSdkManager, 里面一个固定大小的线程池, 把sdk实例, 创放到Threadlocal 中,&lt;/li&gt;
+&lt;li&gt;通过config.properties 动态加载配置(不通过spring管理PasswordSdkManager)&lt;/li&gt;
+&lt;li&gt;WcspSdkHandler 密码处理器中, 通过 PasswordSdkManager.submitTask(new Callable&lt;String&gt;() {..}) 调用sdk 获取加解密的数据, 但是在这里sdk调用的耗时比较长, 已经严重影响到了性能&lt;/li&gt;
+&lt;li&gt;现在我的疑问是: 在结果处理 或者 参数处理的时候, 如何提高性能
+&lt;ul&gt;
+&lt;li&gt;使用Methodhandle来替换反射调用, 比传统的反射更加灵活, 性能更高&lt;/li&gt;
+&lt;li&gt;使用redis 缓存&lt;/li&gt;
+&lt;li&gt;定位到问题就是调用第三方sdk 的时候耗时较长
+&lt;ul&gt;
+&lt;li&gt;多线程 ?  &amp;ndash; 在listDecrypt 和 listEncrypt 进行处理&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;可不可以集成为spring-boot-starter ? 具体使用步骤&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;冗余字段新增&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;mybatis拦截器的密文处理器
+现在因为, 密码sdk是不允许多线程调用的,
+我的设想是创建一个固定大小的线程池, 核心线程数等于最大线程数, 线程初始化的时候同时实例化密码sdk对象, 把它放到线程ThreadLocal中, 这样是否可以解决 密码sdk是不允许多线程调用的 线程安全问题?
+
+如果可以提供代码参考示例, 使用
+
+密码sdk实例的创建如下
+​```LightDataService ldService = LightDataService.getInstance(TENANT_ID, APPID, params, SECRET);```
+
+这是我的完整密文处理器
+
+​```@Component
+public class WcspSdkHandler extends SecureFieldHandler {
+
+    private final String TENANT_ID = &amp;quot;xj4xq38bzxtscgh9&amp;quot;;
+    private final String APPID = &amp;quot;35a06ef5d23c46b38504d49eb6153b35&amp;quot;;
+    private final String SECRET = &amp;quot;C20D60D04D9CE7E2D95B1C35ACD49445&amp;quot;;
+
+    private final static HashMap&amp;lt;String, Object&amp;gt; params = new HashMap&amp;lt;&amp;gt;();
+
+    static {
+        params.put(CryptoServicePlatform.INIT_PARAM_URL, &amp;quot;https://wcsp.k8s.dev:32443&amp;quot;);
+        params.put(CryptoServicePlatform.INIT_PARAM_WORKDIR, &amp;quot;E:\\develop\\zs-ipr-secret\\&amp;quot;);
+    }
+
+    @Override
+    String encrypt(String data2Encrypt) {
+        String encData;
+        try {
+            LightDataService ldService = LightDataService.getInstance(TENANT_ID, APPID, params, SECRET);
+            encData = Data.toBase64String(ldService.encrypt(Data.fromUTF8String(data2Encrypt)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return encData;
+    }
+
+    @Override
+    String decrypt(String data2Decrypt) {
+        String decData;
+        try {
+            LightDataService ldService = LightDataService.getInstance(TENANT_ID, APPID, params, SECRET);
+            decData = Data.toUTF8String(ldService.decrypt(Data.fromBase64String(data2Decrypt)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return decData;
+    }
+}```
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;==mybatis interceptor==&lt;/p&gt;
+&lt;p&gt;只需要写一个类,然后继承mybatis的Interceptor方法,然后==使用@Intercepts注解==说明需要拦截的类和方法即可.可以在@Intercepts中==配置多个类和方法==,用于拦截多个方法.然后把我们定义的类定义到mybatis的配置文件的&lt;plugins&gt;&lt;plugin&gt;元素中 或者 添加到 sqlSessionFactoryList .&lt;/p&gt;
+&lt;p&gt;　　mybatis在解析配置文件的时候会自动的为我们生成代理,拦截我们需要拦截的方法.&lt;/p&gt;
+&lt;p&gt;　　mybatis中==只能拦截下面类中的方法,其他的都不会进行拦截==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Executor 执行器(update, query, flushStatements, commit, rollback, getTransaction, close, isClosed)
+&lt;ul&gt;
+&lt;li&gt;insert、update和delete这三种操作在数据库层面都是对数据进行修改，所以在Executor接口中，MyBatis只定义了一个update方法用来执行这三种操作&lt;/li&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;ParameterHandler 参数处理器 (getParameterObject, setParameters)&lt;/li&gt;
+&lt;li&gt;ResultSetHandler 结果处理器(handleResultSets, handleOutputParameters)&lt;/li&gt;
+&lt;li&gt;StatementHandler  sql 语法构建器(prepare, parameterize, batch, update, query)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;常见的mybatis 用法&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;// 大家经常见到的mybatis的用法
+public static void main(String[] args) throws IOException {
+        SqlSession session = null;
+        try {
+            // ①：加载Mybatis配置文件
+            InputStream inputStream = Resources.getResourceAsStream(&amp;quot;mybatis-config.xml&amp;quot;);
+            // ②：构建SqlSessionFactory
+            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+            // ③：获取SqlSession并获取代理对象查询
+            session = sqlSessionFactory.openSession();
+            ProductDao mapper = session.getMapper(ProductDao.class);
+            System.out.println(mapper.findById(100001L));
+        } finally {
+            if (!ObjectUtils.isEmpty(session)) {
+                session.close();
+            }
+        }
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;demo&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;/**
+ * @author Duansg
+ * @date 2022-10-08 11:45 下午
+ */
+@Intercepts(value = {
+    @Signature(type = Executor.class, method = &amp;quot;query&amp;quot;,
+            args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class}),
+    @Signature(type = Executor.class, method = &amp;quot;query&amp;quot;,
+            args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class})}
+)
+public class ExampleInterceptor implements Interceptor {
+    @Override
+    public Object intercept(Invocation invocation) throws Throwable {
+
+        System.err.println(&amp;quot;晓断测试Interceptor&amp;quot;);
+        return invocation.proceed();
+    }
+
+    @Override
+    public Object plugin(Object target) {
+        return Plugin.wrap(target, this);
+    }
+
+    @Override
+    public void setProperties(Properties properties) {
+        System.err.println(&amp;quot;晓断测试Interceptor-Properties&amp;quot; + JSON.toJSONString(properties));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;==添加到 sqlSessionFactoryList==&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Configuration
+@AutoConfigureAfter(PageHelperAutoConfiguration.class)
+public class MyBatisConfig {
+    @Autowired
+    private List&amp;lt;SqlSessionFactory&amp;gt; sqlSessionFactoryList;
+
+    @PostConstruct
+    public void addMyInterceptor() {
+        MybatisInterceptor e = new MybatisInterceptor();
+        for (SqlSessionFactory sqlSessionFactory : sqlSessionFactoryList) {
+            sqlSessionFactory.getConfiguration().addInterceptor(e);
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​	Interceptor拦截器的实现需要实现Mybatis提供的Interceptor接口，并重写其中的三个方法：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;intercept：拦截方法，用于在执行SQL语句前后进行处理。&lt;/li&gt;
+&lt;li&gt;plugin：用于生成代理对象，将拦截器应用到Mybatis中。&lt;/li&gt;
+&lt;li&gt;setProperties：用于设置拦截器的属性。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;==拦截器的执行顺序==&lt;/p&gt;
+&lt;p&gt;Executor首先执行的是没有问题的。ParameterHandler -&amp;gt; ResultHandler 的先后顺序也没有问题&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果你拦截的是StatementHandler.query()方法，那么顺序是Executor -&amp;gt; ParameterHandler -&amp;gt; StatementHandler -&amp;gt; ResultHandler。&lt;/li&gt;
+&lt;li&gt;如果你拦截的是StatementHandler.prepare()方法，那么顺序是Executor -&amp;gt; StatementHandler-&amp;gt; ParameterHandler -&amp;gt; ResultHandler&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;通过注解的方式
+必须要加类上的注解, 不然不生效
+
+1. 测试各种情况下的拦截
+   a. 只更新指定的加密字段
+   b. 更新非加密字段
+   c. sql 
+   	a. 单String
+   	b. List&amp;lt;String&amp;gt;
+   	c. 多String
+   	d. Map
+   	e. Bean对象
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;2-mybatis-执行过程&#34;&gt;2. mybatis 执行过程
+&lt;/h1&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mybatis/images/image-20240301101525801.png&#34;
+	width=&#34;972&#34;
+	height=&#34;762&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240301101525801&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;127&#34;
+		data-flex-basis=&#34;306px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mybatis/images/image-20240301110649360.png&#34;
+	width=&#34;767&#34;
+	height=&#34;945&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240301110649360&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;81&#34;
+		data-flex-basis=&#34;194px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;3-mybatis-主要成员&#34;&gt;3. mybatis 主要成员
+&lt;/h1&gt;&lt;h2 id=&#34;configuration&#34;&gt;Configuration
+&lt;/h2&gt;&lt;p&gt;MyBatis所有的&lt;strong&gt;配置信息&lt;/strong&gt;都保存在Configuration对象中，配置文件中的大部分配置都会 存储到该类中&lt;/p&gt;
+&lt;h2 id=&#34;sqlsession&#34;&gt;SqlSession
+&lt;/h2&gt;&lt;p&gt;作为MyBatis工作的主要顶层API，&lt;strong&gt;表示和数据库交互时的会话，完成必要数据库增删改查功能&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;根据statement id，在mybatis配置对象&lt;strong&gt;configuration&lt;/strong&gt;中获取到对应的&lt;strong&gt;mappedstatement&lt;/strong&gt;对象，然后调用执行器来执行具体操作&lt;/p&gt;
+&lt;p&gt;sqlSession虽然叫程序和数据库之间的SQL会话，但是它并没有具体去执行sql语句，最终的sql语句的执行是由执行器Executor执行的，而==SqlSession的作用只是创建了MappedStatement对象以及调用执行器去执行SQL,他的commit、rollback方法同样最终都是调用的执行器Executor的对应的方法==&lt;/p&gt;
+&lt;h2 id=&#34;executor&#34;&gt;Executor
+&lt;/h2&gt;&lt;p&gt;MyBatis执行器，是MyBatis调度的核心，&lt;strong&gt;负责sql语句的生成和查询缓存的维护&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;根据传递的参数，完成sql语句的动态解析，生成BoundSql对象，供StatementHandler使用&lt;/li&gt;
+&lt;li&gt;为查询创建缓存，以提高性能&lt;/li&gt;
+&lt;li&gt;创建JDBC的Statement链接对象，传递给StatementHandler对象，返回List查询结果&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Executor是跟SqlSession绑定在一起的，每一个SqlSession都拥有一个新的Executor对象，由Configuration创建。&lt;/p&gt;
+&lt;p&gt;Executor接口的实现类有==BaseExecutor和CachingExecutor==，而BaseExecutor的子类又有SimpleExecutor、ReuseExecutor和BatchExecutor，但==BaseExecutor是一个抽象类==，其只实现了一些公共的封装，而把真正的核心实现都==通过方法抽象出来给子类实现==，如doUpdate()、doQuery()；CachingExecutor只是在Executor的基础上加入了缓存的功能，底层还是通过Executor调用的，所以真正有作用的Executor只有SimpleExecutor、ReuseExecutor和BatchExecutor。它们都是自己实现的Executor核心功能，没有借助任何其它的Executor实现，它们是实现不同也就注定了它们的功能也是不一样的。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mybatis/images/image-20240301175035782.png&#34;
+	width=&#34;1006&#34;
+	height=&#34;354&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240301175035782&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;284&#34;
+		data-flex-basis=&#34;682px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;statementhandler&#34;&gt;StatementHandler
+&lt;/h2&gt;&lt;p&gt;封装了JDBC Statement操作，负责对JDBC statement的操作，如设置参数等&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;1. 对于JDBC的preparedStatement类型的对象，创建过程中，sql语句字符串会包含若干个？占位符，然后再赋值。
+2. StatementHandler通过parameterize（statement）方法对statement进行设值
+ StatementHandler通过List query(Statement statement,ResultHandler resultHandler)方法来完成执行Statement，和将Statement对象返回的resultSet封装成List
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/mybatis/images/image-20240304100611518.png&#34;
+	width=&#34;992&#34;
+	height=&#34;515&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240304100611518&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;192&#34;
+		data-flex-basis=&#34;462px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;statementHandler接口的实现大致有四个，其中三个实现类都是和JDBC中的Statement响对应的：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;SimpleStatementHandler，这个很简单了，就是对应我们JDBC中常用的Statement接口，用于简单SQL的处理；&lt;/li&gt;
+&lt;li&gt;PreparedStatementHandler，这个对应JDBC中的PreparedStatement，预编译SQL的接口；&lt;/li&gt;
+&lt;li&gt;CallableStatementHandler，这个对应JDBC中CallableStatement，用于执行存储过程相关的接口；&lt;/li&gt;
+&lt;li&gt;RoutingStatementHandler，这个接口是以上三个接口的路由，没有实际操作，只是负责上面三个StatementHandler的创建及调用。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;parameterhandler&#34;&gt;ParameterHandler
+&lt;/h2&gt;&lt;p&gt;负责对用户传递的参数转换成JDBC Statement所对应的数据类型，对statement对象的？占位符进行赋值&lt;/p&gt;
+&lt;h2 id=&#34;resultsethandler&#34;&gt;ResultSetHandler
+&lt;/h2&gt;&lt;p&gt;负责将JDBC返回的ResultSet结果集对象转换成List类型的集合&lt;/p&gt;
+&lt;h2 id=&#34;typehandler&#34;&gt;TypeHandler
+&lt;/h2&gt;&lt;p&gt;负责java数据类型和jdbc数据类型（也可以说是数据表列类型）之间的映射和转换&lt;/p&gt;
+&lt;h2 id=&#34;mappedstatement&#34;&gt;MappedStatement
+&lt;/h2&gt;&lt;p&gt;MappedStatement维护一条==&amp;lt;select|update|delete|insert&amp;gt;节点的封装==&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;MappedStatement&lt;/code&gt; 中包含了一条SQL语句操作所需要的全部信息，如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;id&lt;/code&gt; ：对应的SQL语句ID。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;sqlSource&lt;/code&gt; ：SQL语句的封装。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;commandType&lt;/code&gt;：Sql命令类型，取值INSERT, UPDATE, DELETE, SELECT, FLUSH。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;resource&lt;/code&gt;：对应的Mapper.xml的路径。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;parameterMap&lt;/code&gt;：参数映射。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;resultMaps&lt;/code&gt;：结果映射。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;timeout&lt;/code&gt;：超时时间。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;statementType&lt;/code&gt;：语句类型，取值STATEMENT, PREPARED, CALLABLE。表示对应的jdbc statement类型。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;fetchSize&lt;/code&gt;：FetchSize大小。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;resultSetType&lt;/code&gt;：结果集类型，取值FORWARD_ONLY,SCROLL_SENSITIVE, SCROLL_INSENSITIVE 或者null。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;有了&lt;code&gt;MappedStatement&lt;/code&gt;，当执行一个SQL语句时，Mybatis就能知道应该如何去操作数据库，这些SQL语句被封装成&lt;code&gt;MappedStatement&lt;/code&gt;后，存放在Configuration对象的mappedStatements属性中，供MyBatis在进行数据库操作时使用。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;getBoundSql()&lt;/code&gt;方法是&lt;code&gt;MappedStatement&lt;/code&gt;类的一个方法，它用来获取&lt;code&gt;BoundSql&lt;/code&gt;对象。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;BoundSql&lt;/code&gt;是MyBatis的核心处理单元之一，你可以理解为它代表了一段已准备好待执行的SQL语句。主要包含以下信息：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;sql&lt;/code&gt;: 实际的SQL语句，所有的参数都已经被替换成？问号作为占位符。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;parameterObject&lt;/code&gt;: 参数对象，用来替换SQL中的问号。可以是一个简单类型如String、Integer或者是一个POJO类或者Map等复合类型。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;parameterMappings&lt;/code&gt;: 一个ParameterMapping对象的列表，每个ParameterMapping对象代表一个?占位符及其映射。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;additionalParameters&lt;/code&gt;: 额外的参数，通常我们不需要关心。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;getBoundSql()&lt;/code&gt;方法接收一个参数对象，该参数对象通过&lt;code&gt;sqlSource.getBoundSql(parameterObject)&lt;/code&gt;获取&lt;code&gt;BoundSql&lt;/code&gt;对象。&lt;/p&gt;
+&lt;p&gt;为了以后可能需要重用SQL，这部分信息被封装到&lt;code&gt;BoundSql&lt;/code&gt;类中，并在&lt;code&gt;StatementHandler&lt;/code&gt;下一步需要准备（Prepare）Statement时被使用。&lt;/p&gt;
+&lt;h2 id=&#34;sqlsource&#34;&gt;SqlSource
+&lt;/h2&gt;&lt;p&gt;负责根据用户传递的parameterObject，动态的生成SQL语句，将信息封装到BoundSql对象中并返回&lt;/p&gt;
+&lt;h2 id=&#34;boundsql&#34;&gt;BoundSql
+&lt;/h2&gt;&lt;p&gt;表示动态生成的SQL语句以及相应的参数信息&lt;/p&gt;
+&lt;p&gt;代表了一段已准备好待执行的SQL语句。主要包含以下信息：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;sql&lt;/code&gt;: 实际的SQL语句，所有的参数都已经被替换成？问号作为占位符。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;parameterObject&lt;/code&gt;: 参数对象，用来替换SQL中的问号。可以是一个简单类型如String、Integer或者是一个POJO类或者Map等复合类型。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;parameterMappings&lt;/code&gt;: 一个ParameterMapping对象的列表，每个ParameterMapping对象代表一个?占位符及其映射。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;additionalParameters&lt;/code&gt;: 额外的参数，通常我们不需要关心。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;getBoundSql()&lt;/code&gt;方法接收一个参数对象，该参数对象通过&lt;code&gt;sqlSource.getBoundSql(parameterObject)&lt;/code&gt;获取&lt;code&gt;BoundSql&lt;/code&gt;对象。&lt;/p&gt;
+&lt;p&gt;为了以后可能需要重用SQL，这部分信息被封装到&lt;code&gt;BoundSql&lt;/code&gt;类中，并在&lt;code&gt;StatementHandler&lt;/code&gt;下一步需要准备（Prepare）Statement时被使用。&lt;/p&gt;
+&lt;h1 id=&#34;3-常用-sql&#34;&gt;3. 常用 sql
+&lt;/h1&gt;&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;!--热门套餐，查询前5条--&amp;gt;
+    &amp;lt;select id=&amp;quot;findHotSetmeal&amp;quot; resultType=&amp;quot;map&amp;quot;&amp;gt;
+        select s.name, count(o.id) setmeal_count ,count(o.id)/t.total proportion,s.remark
+        from t_order o, t_setmeal s,(select count(id) total from t_order) t
+        where s.id = o.setmeal_id
+        group by o.setmeal_id
+        order by setmeal_count desc limit 0,4
+    &amp;lt;/select&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;    &amp;lt;!--新增--&amp;gt;
+    &amp;lt;insert id=&amp;quot;add&amp;quot; parameterType=&amp;quot;Order&amp;quot;&amp;gt;
+        &amp;lt;selectKey resultType=&amp;quot;java.lang.Integer&amp;quot; order=&amp;quot;AFTER&amp;quot; keyProperty=&amp;quot;id&amp;quot;&amp;gt;
+            SELECT LAST_INSERT_ID()
+        &amp;lt;/selectKey&amp;gt;
+        insert into t_order(member_id,orderDate,orderType,orderStatus,setmeal_id)
+        values (#{memberId},#{orderDate},#{orderType},#{orderStatus},#{setmealId})
+    &amp;lt;/insert&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;条件 choose, otherwise&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;select id=&amp;quot;listEnforceAction&amp;quot; parameterType=&amp;quot;map&amp;quot; resultType=&amp;quot;map&amp;quot;&amp;gt;
+    SELECT ea.*,b.name,b.id_code
+    FROM enforce_action ea
+    LEFT JOIN account b on ea.account_id = b.id
+    WHERE ea.status !=0
+
+    &amp;lt;if test=&amp;quot;params.accountId != null&amp;quot;&amp;gt;
+      &amp;lt;choose&amp;gt;
+        &amp;lt;when test=&amp;quot;params.cid == null and  params.did == null&amp;quot;&amp;gt;
+          AND ea.id IN (
+          SELECT p.action_id
+          FROM enforce_participate p
+          LEFT JOIN enforce_action a
+          ON p.action_id = a.id
+          WHERE p.account_id = #{params.accountId}
+          AND p.status != 0
+          ORDER BY a.start_time DESC
+          )
+        &amp;lt;/when&amp;gt;
+        &amp;lt;otherwise&amp;gt;
+          &amp;lt;if test=&amp;quot;params.actionIds != null and params.actionIds.size&amp;gt;0&amp;quot;&amp;gt;
+            AND ea.id IN (
+            &amp;lt;foreach collection=&amp;quot;params.actionIds&amp;quot; item=&amp;quot;item&amp;quot; separator=&amp;quot;,&amp;quot; &amp;gt;
+              #{item}
+            &amp;lt;/foreach&amp;gt;
+            )
+          &amp;lt;/if&amp;gt;
+        &amp;lt;/otherwise&amp;gt;
+      &amp;lt;/choose&amp;gt;
+    &amp;lt;/if&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

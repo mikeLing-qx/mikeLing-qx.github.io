@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>SpringBoot on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/categories/springboot/</link>
+        <description>Recent content in SpringBoot on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Fri, 03 Jan 2025 19:21:43 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/categories/springboot/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>SpringBoot</title>
+        <link>https://mikeLing-qx.github.io/p/springboot/</link>
+        <pubDate>Fri, 03 Jan 2025 19:21:43 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/springboot/</guid>
+        <description>&lt;h1 id=&#34;1-spring-boot&#34;&gt;1. Spring boot
+&lt;/h1&gt;&lt;p&gt;问题0: 什么是springboot 的自动配置&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;它是指基于你引入的依赖的jar包, 对spring boot 应用进行自动配置&lt;/li&gt;
+&lt;li&gt;它为springboot ==&amp;ldquo;开箱即用&amp;rdquo; 提供了基础支撑==&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;问题1: 为什么导入dependency时不需要指定版本?&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;父依赖启动器中进行了统一的版本管理&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;问题2: 项目运行依赖的JAR包是哪里来的&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;基于maven的依赖传递特性, 导入starter 之后, 依赖传递了很多jar包&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;问题3: springboot 如何完成的自动配置? 自动过程中都会将那些组件添加到容器中?&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;SpringApplication.run() 会完成bean对象的创建&lt;/p&gt;
+&lt;p&gt;自动配置的原理: @SpringBootApplication 注解&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;启动流程简化&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20221219162849170.png&#34;
+	width=&#34;876&#34;
+	height=&#34;518&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221219162849170&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;169&#34;
+		data-flex-basis=&#34;405px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20221219162934481.png&#34;
+	width=&#34;992&#34;
+	height=&#34;483&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221219162934481&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;205&#34;
+		data-flex-basis=&#34;492px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;2-spring-boot-加载配置类的方式&#34;&gt;2. spring boot 加载配置类的方式
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20221219164807084.png&#34;
+	width=&#34;593&#34;
+	height=&#34;301&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221219164807084&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;197&#34;
+		data-flex-basis=&#34;472px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;==@Import 注解, 它提供了一种显示地从其它地方加载配置类的方式, 避免了效率较差的组件扫描 (Component Scan)==&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20221219163931844.png&#34;
+	width=&#34;655&#34;
+	height=&#34;166&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221219163931844&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;394&#34;
+		data-flex-basis=&#34;946px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;实例2: 通过 @Import 导入接口ImportSelector 实现类&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20221219164103998.png&#34;
+	width=&#34;861&#34;
+	height=&#34;350&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221219164103998&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;246&#34;
+		data-flex-basis=&#34;590px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20221219165054295.png&#34;
+	width=&#34;960&#34;
+	height=&#34;501&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221219165054295&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;191&#34;
+		data-flex-basis=&#34;459px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20221219165231684.png&#34;
+	width=&#34;681&#34;
+	height=&#34;165&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221219165231684&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;412&#34;
+		data-flex-basis=&#34;990px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;核心逻辑是&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;从classpath 中读取到所有Jar 包中的配置文件 META-INF/spring.factories. 然后根据指定的 key 从配置文件中解析出对应的value 值&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;3-spi-和-spring-factories的对比&#34;&gt;3. SPI 和 spring factories的对比
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20221219165557086.png&#34;
+	width=&#34;980&#34;
+	height=&#34;522&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221219165557086&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;187&#34;
+		data-flex-basis=&#34;450px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;4-spring-conditional-常用&#34;&gt;4. spring conditional 常用
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20221219170152880.png&#34;
+	width=&#34;953&#34;
+	height=&#34;455&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221219170152880&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;209&#34;
+		data-flex-basis=&#34;502px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;5-enableconfigurationproperties&#34;&gt;5. EnableConfigurationProperties
+&lt;/h2&gt;&lt;p&gt;如果一个配置类只配置@ConfigurationProperties注解，而没有使用@Component，那么在IOC容器中是获取不到properties 配置文件转化的bean。说白了 @EnableConfigurationProperties 相当于把使用 @ConfigurationProperties 的类进行了一次注入。&lt;/p&gt;
+&lt;h1 id=&#34;2-enableautoconfig&#34;&gt;2. EnableAutoConfig
+&lt;/h1&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20221219170053352.png&#34;
+	width=&#34;692&#34;
+	height=&#34;206&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221219170053352&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;335&#34;
+		data-flex-basis=&#34;806px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20221219170059951.png&#34;
+	width=&#34;972&#34;
+	height=&#34;418&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221219170059951&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;232&#34;
+		data-flex-basis=&#34;558px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;注解&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20220308153619488.png&#34;
+	width=&#34;651&#34;
+	height=&#34;58&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220308153619488&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;1122&#34;
+		data-flex-basis=&#34;2693px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;Spring 中Enable 开头的注解&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20220308153459616.png&#34;
+	width=&#34;392&#34;
+	height=&#34;173&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220308153459616&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;226&#34;
+		data-flex-basis=&#34;543px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;作用流程&lt;/p&gt;
+&lt;p&gt;SpringApplication.run 在启动过程中对核心启动类进行解析, 并且解析类上的注解&lt;/p&gt;
+&lt;p&gt;SpringBootApplication 这个组合注解&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;@SpringBootConfiguration // 标明该类为配置类
+@EnableAutoConfiguration // 启动自动配置功能
+@ComponentScan 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;EnableAutoConfiguration 用@Import向容器中导入一个AutoConfigurationImportSelector 组件类&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;这个组件的process 方法, 会在springApplication.run 启动过程中会被调用, 它会加载 所有jar包下 的META-inf/ spring.factories 文件, 在加载文件之后&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;找到EnableAutoConfiguration 根据这个接口的类全路径为key&lt;/p&gt;
+&lt;p&gt;找到所有可以进行自动配置工厂类的类全路径&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;​	&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20220308165447771.png&#34;
+	width=&#34;651&#34;
+	height=&#34;108&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220308165447771&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;602&#34;
+		data-flex-basis=&#34;1446px&#34;
+	
+&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;再根据@Conditional这个注解进行过滤, 最终把满足自动配置的工厂类的全路径进行了返回. 存入到了一个list 集合中&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;SPI 就是一种服务发现&lt;/p&gt;
+&lt;p&gt;从run方法 构建springApplication 对象, 调用run 方法&lt;/p&gt;
+&lt;p&gt;进行一些赋值操作, 监听器&lt;/p&gt;
+&lt;p&gt;==SPI配置文件中先加载的为准, 后加载的不会覆盖后加载的==&lt;/p&gt;
+&lt;p&gt;流程总结&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20221219170249654.png&#34;
+	width=&#34;1006&#34;
+	height=&#34;477&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221219170249654&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;210&#34;
+		data-flex-basis=&#34;506px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;3-自定义starter&#34;&gt;3. 自定义starter
+&lt;/h1&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20221219172141951.png&#34;
+	width=&#34;765&#34;
+	height=&#34;206&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221219172141951&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;371&#34;
+		data-flex-basis=&#34;891px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;结构&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20221219172250620.png&#34;
+	width=&#34;1004&#34;
+	height=&#34;427&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221219172250620&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;235&#34;
+		data-flex-basis=&#34;564px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;maven 中的可选依赖: 主要作用是阻断了依赖传递&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/springboot/images/image-20221219172439760.png&#34;
+	width=&#34;983&#34;
+	height=&#34;483&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221219172439760&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;203&#34;
+		data-flex-basis=&#34;488px&#34;
+	
+&gt;&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

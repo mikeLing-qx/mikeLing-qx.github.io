@@ -1,0 +1,793 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Stream on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/tags/stream/</link>
+        <description>Recent content in Stream on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Fri, 03 Apr 2020 09:21:43 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/tags/stream/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Lamda</title>
+        <link>https://mikeLing-qx.github.io/p/lamda/</link>
+        <pubDate>Fri, 03 Apr 2020 09:21:43 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/lamda/</guid>
+        <description>&lt;h1 id=&#34;1-函数式接口&#34;&gt;1. 函数式接口
+&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;函数接口是==只有一个抽象方法的接口==，用作 Lambda 表达式的类型。使用@FunctionalInterface注解修饰的类，编译器会检测该类是否只有一个抽象方法或接口，否则，会报错。可以有多个默认方法，静态方法。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;11-常用的函数式接口&#34;&gt;1.1 常用的函数式接口
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/lamda/images/image-20221124154243782.png&#34;
+	width=&#34;950&#34;
+	height=&#34;369&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221124154243782&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;257&#34;
+		data-flex-basis=&#34;617px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Test {
+    public static void main(String[] args) {
+        Predicate&amp;lt;Integer&amp;gt; predicate = x -&amp;gt; x &amp;gt; 185;
+        Student student = new Student(&amp;quot;9龙&amp;quot;, 23, 175);
+        System.out.println(
+            &amp;quot;9龙的身高高于185吗？：&amp;quot; + predicate.test(student.getStature()));
+
+        Consumer&amp;lt;String&amp;gt; consumer = System.out::println;
+        consumer.accept(&amp;quot;命运由我不由天&amp;quot;);
+
+        Function&amp;lt;Student, String&amp;gt; function = Student::getName;
+        String name = function.apply(student);
+        System.out.println(name);
+
+        Supplier&amp;lt;Integer&amp;gt; supplier = 
+            () -&amp;gt; Integer.valueOf(BigDecimal.TEN.toString());
+        System.out.println(supplier.get());
+
+        UnaryOperator&amp;lt;Boolean&amp;gt; unaryOperator = uglily -&amp;gt; !uglily;
+        Boolean apply2 = unaryOperator.apply(true);
+        System.out.println(apply2);
+
+        BinaryOperator&amp;lt;Integer&amp;gt; operator = (x, y) -&amp;gt; x * y;
+        Integer integer = operator.apply(2, 3);
+        System.out.println(integer);
+
+        test(() -&amp;gt; &amp;quot;我是一个演示的函数式接口&amp;quot;);
+    }
+
+    /**
+     * 演示自定义函数式接口使用
+     *
+     * @param worker
+     */
+    public static void test(Worker worker) {
+        String work = worker.work();
+        System.out.println(work);
+    }
+
+    public interface Worker {
+        String work();
+    }
+}
+//9龙的身高高于185吗？：false
+//命运由我不由天
+//9龙
+//10
+//false
+//6
+//我是一个演示的函数式接口
+
+Student::getName例子中这种编写lambda表达式的方式称为方法引用。格式为ClassNmae::methodName
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;12-惰性求值-及早求值&#34;&gt;1.2 惰性求值, 及早求值
+&lt;/h2&gt;&lt;p&gt;惰性求值：只描述Stream，操作的结果也是Stream，这样的操作称为惰性求值。惰性求值可以像建造者模式一样链式使用，最后再使用及早求值得到最终结果。&lt;/p&gt;
+&lt;p&gt;及早求值：得到最终的结果而不是Stream，这样的操作称为及早求值。&lt;/p&gt;
+&lt;h1 id=&#34;2-常用流&#34;&gt;2. 常用流
+&lt;/h1&gt;&lt;h2 id=&#34;20-创建流&#34;&gt;2.0 创建流
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/lamda/images/image-20221212105100904.png&#34;
+	width=&#34;720&#34;
+	height=&#34;472&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221212105100904&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;152&#34;
+		data-flex-basis=&#34;366px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;单列集合: 集合对象.stream();&lt;/p&gt;
+&lt;p&gt;数组: Arrays.stream(arr) 和 Stream.of(arr)&lt;/p&gt;
+&lt;p&gt;双列集合: 转换成单列集合后再创建&lt;/p&gt;
+&lt;p&gt;==peek 中间操作符, 可以用来调试==&lt;/p&gt;
+&lt;h2 id=&#34;21-collectcollectorstolist&#34;&gt;2.1 collect(Collectors.toList())
+&lt;/h2&gt;&lt;p&gt;将流转换为list。还有toSet()，toMap()等。及早求值。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class TestCase {
+    public static void main(String[] args) {
+        List&amp;lt;Student&amp;gt; studentList = Stream.of(new Student(&amp;quot;路飞&amp;quot;, 22, 175),
+                new Student(&amp;quot;红发&amp;quot;, 40, 180),
+                new Student(&amp;quot;白胡子&amp;quot;, 50, 185)).collect(Collectors.toList());
+        System.out.println(studentList);
+    }
+}
+//输出结果
+//[Student{name=&#39;路飞&#39;, age=22, stature=175, specialities=null}, 
+//Student{name=&#39;红发&#39;, age=40, stature=180, specialities=null}, 
+//Student{name=&#39;白胡子&#39;, age=50, stature=185, specialities=null}]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;22-filter&#34;&gt;2.2 filter
+&lt;/h2&gt;&lt;p&gt;起过滤筛选的作用。==符合条件(为true)才能保存在流当中, 内部就是Predicate接口==。惰性求值。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class TestCase {
+    public static void main(String[] args) {
+        List&amp;lt;Student&amp;gt; students = new ArrayList&amp;lt;&amp;gt;(3);
+        students.add(new Student(&amp;quot;路飞&amp;quot;, 22, 175));
+        students.add(new Student(&amp;quot;红发&amp;quot;, 40, 180));
+        students.add(new Student(&amp;quot;白胡子&amp;quot;, 50, 185));
+
+        List&amp;lt;Student&amp;gt; list = students.stream()
+            .filter(stu -&amp;gt; stu.getStature() &amp;lt; 180)
+            .collect(Collectors.toList());
+        System.out.println(list);
+    }
+}
+//输出结果
+//[Student{name=&#39;路飞&#39;, age=22, stature=175, specialities=null}]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;23-map&#34;&gt;2.3 map
+&lt;/h2&gt;&lt;p&gt;==内部就是Function接口.== 惰性求值&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class TestCase {
+    public static void main(String[] args) {
+        List&amp;lt;Student&amp;gt; students = new ArrayList&amp;lt;&amp;gt;(3);
+        students.add(new Student(&amp;quot;路飞&amp;quot;, 22, 175));
+        students.add(new Student(&amp;quot;红发&amp;quot;, 40, 180));
+        students.add(new Student(&amp;quot;白胡子&amp;quot;, 50, 185));
+
+        List&amp;lt;String&amp;gt; names = students.stream().map(student -&amp;gt; student.getName())
+                .collect(Collectors.toList());
+        System.out.println(names);
+    }
+}
+//输出结果
+//[路飞, 红发, 白胡子]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;24-flatmap&#34;&gt;2.4 flatMap
+&lt;/h2&gt;&lt;p&gt;==将多个Stream 合并成一个 Stream==, 惰性求值&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/lamda/images/image-20221124155110782.png&#34;
+	width=&#34;443&#34;
+	height=&#34;122&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221124155110782&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;363&#34;
+		data-flex-basis=&#34;871px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public class TestCase {
+    public static void main(String[] args) {
+        List&amp;lt;Student&amp;gt; students = new ArrayList&amp;lt;&amp;gt;(3);
+        students.add(new Student(&amp;quot;路飞&amp;quot;, 22, 175));
+        students.add(new Student(&amp;quot;红发&amp;quot;, 40, 180));
+        students.add(new Student(&amp;quot;白胡子&amp;quot;, 50, 185));
+
+        List&amp;lt;Student&amp;gt; studentList = Stream.of(students,
+                asList(new Student(&amp;quot;艾斯&amp;quot;, 25, 183),
+                        new Student(&amp;quot;雷利&amp;quot;, 48, 176)))
+                .flatMap(students1 -&amp;gt; students1.stream()).collect(Collectors.toList());
+        System.out.println(studentList);
+    }
+}
+//输出结果
+//[Student{name=&#39;路飞&#39;, age=22, stature=175, specialities=null}, 
+//Student{name=&#39;红发&#39;, age=40, stature=180, specialities=null}, 
+//Student{name=&#39;白胡子&#39;, age=50, stature=185, specialities=null}, 
+//Student{name=&#39;艾斯&#39;, age=25, stature=183, specialities=null},
+//Student{name=&#39;雷利&#39;, age=48, stature=176, specialities=null}]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;25-max-min&#34;&gt;2.5 max min
+&lt;/h2&gt;&lt;p&gt;集合中求最大最小值, 及早求值&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class TestCase {
+    public static void main(String[] args) {
+        List&amp;lt;Student&amp;gt; students = new ArrayList&amp;lt;&amp;gt;(3);
+        students.add(new Student(&amp;quot;路飞&amp;quot;, 22, 175));
+        students.add(new Student(&amp;quot;红发&amp;quot;, 40, 180));
+        students.add(new Student(&amp;quot;白胡子&amp;quot;, 50, 185));
+
+        Optional&amp;lt;Student&amp;gt; max = students.stream()
+            .max(Comparator.comparing(stu -&amp;gt; stu.getAge()));
+        Optional&amp;lt;Student&amp;gt; min = students.stream()
+            .min(Comparator.comparing(stu -&amp;gt; stu.getAge()));
+        //判断是否有值
+        if (max.isPresent()) {
+            System.out.println(max.get());
+        }
+        if (min.isPresent()) {
+            System.out.println(min.get());
+        }
+    }
+}
+//输出结果
+//Student{name=&#39;白胡子&#39;, age=50, stature=185, specialities=null}
+//Student{name=&#39;路飞&#39;, age=22, stature=175, specialities=null}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;jmax, min 接受一个Comparator（例子中使用java8自带的静态函数，只需要传进需要比较值即可。）并且返回一个Optional对象&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;26-count&#34;&gt;2.6 count
+&lt;/h2&gt;&lt;p&gt;一般结合filter 使用, 及早求值&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class TestCase {
+    public static void main(String[] args) {
+        List&amp;lt;Student&amp;gt; students = new ArrayList&amp;lt;&amp;gt;(3);
+        students.add(new Student(&amp;quot;路飞&amp;quot;, 22, 175));
+        students.add(new Student(&amp;quot;红发&amp;quot;, 40, 180));
+        students.add(new Student(&amp;quot;白胡子&amp;quot;, 50, 185));
+
+        long count = students.stream().filter(s1 -&amp;gt; s1.getAge() &amp;lt; 45).count();
+        System.out.println(&amp;quot;年龄小于45岁的人数是：&amp;quot; + count);
+    }
+}
+//输出结果
+//年龄小于45岁的人数是：2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;27--distinct&#34;&gt;2.7  distinct
+&lt;/h2&gt;&lt;p&gt;本质是通过equals方法和hashcode 判断是否是同个对象, 中间方法&lt;/p&gt;
+&lt;h2 id=&#34;28-sorted&#34;&gt;2.8 sorted
+&lt;/h2&gt;&lt;p&gt;两个重载方法&lt;/p&gt;
+&lt;p&gt;元素对象实现comparable接口, 或者调用时传入&lt;/p&gt;
+&lt;h2 id=&#34;29-limit&#34;&gt;2.9 limit
+&lt;/h2&gt;&lt;p&gt;设置最大长度, 可以大于集合长度, 多出会被移除&lt;/p&gt;
+&lt;h2 id=&#34;30-skip&#34;&gt;3.0 skip
+&lt;/h2&gt;&lt;p&gt;跳过流中的前n个元素, 返回剩下的元素&lt;/p&gt;
+&lt;h2 id=&#34;28-reduce&#34;&gt;2.8 reduce
+&lt;/h2&gt;&lt;p&gt;对流中的数据按照你指定的计算方式得到一个结果, 可以传入一个初始化值&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;{@code
+	U result = identity;
+	for (T element : this stream)
+		result = accumulator.apply(result, element)
+	return result;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/lamda/images/image-20221212183613671.png&#34;
+	width=&#34;485&#34;
+	height=&#34;96&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221212183613671&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;505&#34;
+		data-flex-basis=&#34;1212px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;==实现从一组值中生成一个值==, 上述中的max, min, count 这些方法都是reduce, 及早求值&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/lamda/images/image-20221125112751287.png&#34;
+	width=&#34;391&#34;
+	height=&#34;285&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221125112751287&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;137&#34;
+		data-flex-basis=&#34;329px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class TestCase {
+    public static void main(String[] args) {
+        Integer reduce = Stream.of(1, 2, 3, 4).reduce(0, (acc, x) -&amp;gt; acc+ x);
+        System.out.println(reduce);
+    }
+}
+//输出结果
+//10
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;reduce接收了一个==初始值为0的累加器==，依次取出值与累加器相加，最后累加器的值就是最终的结果&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;3-高级集合类及收集器&#34;&gt;3. 高级集合类及收集器
+&lt;/h1&gt;&lt;h2 id=&#34;31-转换成值&#34;&gt;3.1. 转换成值
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;收集器: 一种通用的, 从流生成复杂值的结构,  &lt;strong&gt;收集器可以从 java.util.stream.Collectors 类中静态导入的&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class CollectorsTest {
+    public static void main(String[] args) {
+        List&amp;lt;Student&amp;gt; students1 = new ArrayList&amp;lt;&amp;gt;(3);
+        students1.add(new Student(&amp;quot;路飞&amp;quot;, 23, 175));
+        students1.add(new Student(&amp;quot;红发&amp;quot;, 40, 180));
+        students1.add(new Student(&amp;quot;白胡子&amp;quot;, 50, 185));
+
+        OutstandingClass ostClass1 = new OutstandingClass(&amp;quot;一班&amp;quot;, students1);
+        //复制students1，并移除一个学生
+        List&amp;lt;Student&amp;gt; students2 = new ArrayList&amp;lt;&amp;gt;(students1);
+        students2.remove(1);
+        OutstandingClass ostClass2 = new OutstandingClass(&amp;quot;二班&amp;quot;, students2);
+        //将ostClass1、ostClass2转换为Stream
+        Stream&amp;lt;OutstandingClass&amp;gt; classStream = Stream.of(ostClass1, ostClass2);
+        OutstandingClass outstandingClass = biggestGroup(classStream);
+        System.out.println(&amp;quot;人数最多的班级是：&amp;quot; + outstandingClass.getName());
+
+        System.out.println(&amp;quot;一班平均年龄是：&amp;quot; + averageNumberOfStudent(students1));
+    }
+
+    /**
+     * 获取人数最多的班级
+     */
+    private static OutstandingClass biggestGroup(Stream&amp;lt;OutstandingClass&amp;gt; outstandingClasses) {
+        return outstandingClasses.collect(
+                maxBy(comparing(ostClass -&amp;gt; ostClass.getStudents().size())))
+                .orElseGet(OutstandingClass::new);
+    }
+
+    /**
+     * 计算平均年龄
+     */
+    private static double averageNumberOfStudent(List&amp;lt;Student&amp;gt; students) {
+        return students.stream().collect(averagingInt(Student::getAge));
+    }
+}
+//输出结果
+//人数最多的班级是：一班
+//一班平均年龄是：37.666666666666664
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;32-转换成块-partitioningby&#34;&gt;3.2. 转换成块 partitioningBy
+&lt;/h2&gt;&lt;p&gt;将流分解成两个集合, Collectors.partitioningBy 接受一个==Predicate 函数式接口==&lt;/p&gt;
+&lt;p&gt;分成两块 一个 true 一块, false 一块&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/lamda/images/image-20221125115926929.png&#34;
+	width=&#34;513&#34;
+	height=&#34;278&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221125115926929&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;184&#34;
+		data-flex-basis=&#34;442px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class PartitioningByTest {
+    public static void main(String[] args) {
+        //省略List&amp;lt;student&amp;gt; students的初始化
+        Map&amp;lt;Boolean, List&amp;lt;Student&amp;gt;&amp;gt; listMap = students.stream().collect(
+            Collectors.partitioningBy(student -&amp;gt; student.getSpecialities().
+                                      contains(SpecialityEnum.SING)));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;32-数据分组-groupingby&#34;&gt;3.2 数据分组 groupingBy
+&lt;/h2&gt;&lt;p&gt;==Collectors.groupingBy== 接受一个Function 做转换; 与sql 中的 group by 操作是一样的&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/lamda/images/image-20221125120437684.png&#34;
+	width=&#34;501&#34;
+	height=&#34;264&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20221125120437684&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;189&#34;
+		data-flex-basis=&#34;455px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class GroupingByTest {
+    public static void main(String[] args) {
+        //省略List&amp;lt;student&amp;gt; students的初始化
+         Map&amp;lt;SpecialityEnum, List&amp;lt;Student&amp;gt;&amp;gt; listMap = 
+             students.stream().collect(
+             Collectors.groupingBy(student -&amp;gt; student.getSpecialities().get(0)));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// 按照字符串长度进行分组    符合条件的元素将组成一个 List 映射到以条件长度为key 的 Map&amp;lt;Integer, List&amp;lt;String&amp;gt;&amp;gt; 中
+servers.stream().collect(Collectors.groupingBy(String::length))
+
+// 上面的写法等同于
+Supplier&amp;lt;Map&amp;lt;Integer,List&amp;lt;String&amp;gt;&amp;gt;&amp;gt; mapSupplier = HashMap::new;
+        Map&amp;lt;Integer,List&amp;lt;String&amp;gt;&amp;gt; collect = servers.stream().collect(Collectors.groupingBy(String::length, mapSupplier, Collectors.toSet()));
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;34-字符串拼接-joining&#34;&gt;3.4 字符串拼接 joining
+&lt;/h2&gt;&lt;p&gt;通常只能创建一个StringBuilder，循环拼接。使用Stream，使用Collectors.joining()简单容易&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class JoiningTest {
+    public static void main(String[] args) {
+        List&amp;lt;Student&amp;gt; students = new ArrayList&amp;lt;&amp;gt;(3);
+        students.add(new Student(&amp;quot;路飞&amp;quot;, 22, 175));
+        students.add(new Student(&amp;quot;红发&amp;quot;, 40, 180));
+        students.add(new Student(&amp;quot;白胡子&amp;quot;, 50, 185));
+
+         String names = students.stream()
+             .map(Student::getName).collect(Collectors.joining(&amp;quot;,&amp;quot;,&amp;quot;[&amp;quot;,&amp;quot;]&amp;quot;));
+        System.out.println(names);
+    }
+}
+//输出结果
+//[路飞,红发,白胡子]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;35-collectingandthen&#34;&gt;3.5 collectingAndThen
+&lt;/h2&gt;&lt;p&gt;该方法先执行了一个归纳操作，然后再对归纳的结果进行 &lt;code&gt;Function&lt;/code&gt; 函数处理输出一个新的结果&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;servers.stream.collect(Collectors.collectingAndThen(Collectors.joining(&amp;quot;,&amp;quot;), String::toUpperCase));
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        <item>
+        <title>Stream</title>
+        <link>https://mikeLing-qx.github.io/p/stream/</link>
+        <pubDate>Tue, 03 Mar 2020 12:21:43 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/stream/</guid>
+        <description>&lt;h1 id=&#34;1-概述&#34;&gt;1. 概述
+&lt;/h1&gt;&lt;p&gt;Stream的操作符大体上分为两种：中间操作符和终止操作符&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/stream/images/image-20220705104939760.png&#34;
+	width=&#34;944&#34;
+	height=&#34;416&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220705104939760&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;226&#34;
+		data-flex-basis=&#34;544px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;11-中间操作符&#34;&gt;1.1 中间操作符
+&lt;/h2&gt;&lt;p&gt;对于数据流来说，中间操作符在执行制定处理程序后，数据流依然可以传递给下一级的操作符。&lt;/p&gt;
+&lt;p&gt;中间操作符包含8种(排除了parallel,sequential,这两个操作并不涉及到对数据流的加工操作)：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;map(mapToInt,mapToLong,mapToDouble) 转换操作符，把比如A-&amp;gt;B，这里默认提供了转int，long，double的操作符。&lt;/li&gt;
+&lt;li&gt;flatmap(flatmapToInt,flatmapToLong,flatmapToDouble) 拍平操作比如把 int[]{2,3,4} 拍平 变成 2，3，4 也就是从原来的一个数据变成了3个数据，这里默认提供了拍平成int,long,double的操作符。&lt;/li&gt;
+&lt;li&gt;limit 限流操作，比如数据流中有10个 我只要出前3个就可以使用。&lt;/li&gt;
+&lt;li&gt;distint 去重操作，对重复元素去重，底层使用了equals方法。&lt;/li&gt;
+&lt;li&gt;filter 过滤操作，把不想要的数据过滤。&lt;/li&gt;
+&lt;li&gt;peek 挑出操作，如果想对数据进行某些操作，如：读取、编辑修改等。&lt;/li&gt;
+&lt;li&gt;skip 跳过操作，跳过某些元素。&lt;/li&gt;
+&lt;li&gt;sorted(unordered) 排序操作，对元素排序，前提是实现Comparable接口，当然也可以自定义比较器。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;12--终止操作符&#34;&gt;1.2  终止操作符
+&lt;/h2&gt;&lt;p&gt;数据经过中间加工操作，就轮到终止操作符上场了；终止操作符就是用来对数据进行收集或者消费的，数据到了终止操作这里就不会向下流动了，终止操作符只能使用一次。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;collect 收集操作，将所有数据收集起来，这个操作非常重要，官方的提供的Collectors 提供了非常多收集器，可以说Stream 的核心在于Collectors。&lt;/li&gt;
+&lt;li&gt;count 统计操作，统计最终的数据个数。&lt;/li&gt;
+&lt;li&gt;findFirst、findAny 查找操作，查找第一个、查找任何一个 返回的类型为Optional。&lt;/li&gt;
+&lt;li&gt;noneMatch、allMatch、anyMatch 匹配操作，数据流中是否存在符合条件的元素 返回值为bool 值。&lt;/li&gt;
+&lt;li&gt;min、max 最值操作，需要自定义比较器，返回数据流中最大最小的值。&lt;/li&gt;
+&lt;li&gt;reduce 规约操作，将整个数据流的值规约为一个值，count、min、max底层就是使用reduce。&lt;/li&gt;
+&lt;li&gt;forEach、forEachOrdered 遍历操作，这里就是对最终的数据进行消费了。&lt;/li&gt;
+&lt;li&gt;toArray 数组操作，将数据流的元素转换成数组。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这里只介绍了Stream，并没有涉及到IntStream、LongStream、DoubleStream，这三个流实现了一些特有的操作符，我将在后续文章中介绍到。&lt;/p&gt;
+&lt;p&gt;说了这么多，只介绍这些操作符还远远不够；俗话说，实践出真知。那么，Let‘s go。&lt;/p&gt;
+&lt;h1 id=&#34;2-代码演练&#34;&gt;2. 代码演练
+&lt;/h1&gt;&lt;h2 id=&#34;21-map&#34;&gt;2.1 map
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;Stream 的一系列操作必须要使用终止操作，否者整个数据流是不会流动起来的，即处理操作不会执行。&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;==map==，可以看到 map 操作符要求输入一个Function的函数是接口实例，功能是将T类型转换成R类型的&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;map操作将原来的单词 转换成了每个字符串的长度，利用了String自身的length()方法，该方法返回类型为int。这里我直接使用了lambda表达式，关于lambda表达式 还请读者们自行了解吧&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Main {
+
+    public static void main(String[] args) {
+        Stream.of(&amp;quot;apple&amp;quot;,&amp;quot;banana&amp;quot;,&amp;quot;orange&amp;quot;,&amp;quot;waltermaleon&amp;quot;,&amp;quot;grape&amp;quot;)
+                .map(e-&amp;gt;e.length()) //转成单词的长度 int
+                .forEach(e-&amp;gt;System.out.println(e)); //输出
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;当然也可以这样，这里使用了成员函数引用，为了便于读者们理解，后续的例子中将使用lambda表达式而非函数引用。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Main {
+
+    public static void main(String[] args) {
+         Stream.of(&amp;quot;apple&amp;quot;,&amp;quot;banana&amp;quot;,&amp;quot;orange&amp;quot;,&amp;quot;waltermaleon&amp;quot;,&amp;quot;grape&amp;quot;)
+                .map(String::length) //转成单词的长度 int
+                .forEach(System.out::println);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;结果&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;C:%5cUsers%5c86189%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20201119141759716.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20201119141759716&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;mapToInt 将数据流中得元素转成Int，这限定了转换的类型Int，最终产生的流为IntStream，及结果只能转化成int。&lt;/p&gt;
+&lt;p&gt;mapTolong&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+         Stream.of(&amp;quot;apple&amp;quot;, &amp;quot;banana&amp;quot;, &amp;quot;orange&amp;quot;, &amp;quot;waltermaleon&amp;quot;, &amp;quot;grape&amp;quot;)
+                .mapToLong(e -&amp;gt; e.length()) //转成long ,本质上是int 但是存在类型自动转换
+                .forEach(e -&amp;gt; System.out.println(e));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;mapToDouble&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+         Stream.of(&amp;quot;apple&amp;quot;, &amp;quot;banana&amp;quot;, &amp;quot;orange&amp;quot;, &amp;quot;waltermaleon&amp;quot;, &amp;quot;grape&amp;quot;)
+                .mapToDouble(e -&amp;gt; e.length()) //转成Double ，自动类型转换成Double
+                .forEach(e -&amp;gt; System.out.println(e));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;==flatmap== 作用就是将元素拍平拍扁 ，将拍扁的元素重新组成Stream，并将这些Stream 串行合并成一条Stream ;  flatmapToInt、flatmapToLong、flatmapToDouble 跟flatMap 都类似的，只是类型被限定了，这里就不在举例子了。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;
+public class Main {
+
+    public static void main(String[] args) {
+        Stream.of(&amp;quot;a-b-c-d&amp;quot;,&amp;quot;e-f-i-g-h&amp;quot;)
+                .flatMap(e-&amp;gt;Stream.of(e.split(&amp;quot;-&amp;quot;)))
+                .forEach(e-&amp;gt;System.out.println(e));
+
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;==limit==限制元素的个数，只需传入 long 类型 表示限制的最大数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+        Stream.of(1,2,3,4,5,6)
+                .limit(3) //限制三个
+                .forEach(e-&amp;gt;System.out.println(e)); //将输出 前三个 1，2，3
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;==distinct== 去重&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+
+        Stream.of(1,2,3,1,2,5,6,7,8,0,0,1,2,3,1)
+                .distinct() //去重
+                .forEach(e-&amp;gt;System.out.println(e));
+
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;==filter== 对某些元素进行过滤，不符合筛选条件的将无法进入流的下游&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+        Stream.of(1,2,3,1,2,5,6,7,8,0,0,1,2,3,1)
+                .filter(e-&amp;gt;e&amp;gt;=5) //过滤小于5的
+                .forEach(e-&amp;gt;System.out.println(e));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;==peek==挑选 ，将元素挑选出来，可以理解为提前消费&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+
+        User w = new User(&amp;quot;w&amp;quot;,10);
+        User x = new User(&amp;quot;x&amp;quot;,11);
+        User y = new User(&amp;quot;y&amp;quot;,12);
+
+        Stream.of(w,x,y)
+                .peek(e-&amp;gt;{e.setName(e.getAge()+e.getName());}) //重新设置名字 变成 年龄+名字
+                .forEach(e-&amp;gt;System.out.println(e.toString()));
+
+    }
+
+    static class User {
+
+        private String name;
+
+        private int age;
+
+        public User(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+        public void setAge(int age) {
+            this.age = age;
+        }
+
+        @Override
+        public String toString() {
+            return &amp;quot;User{&amp;quot; +
+                    &amp;quot;name=&#39;&amp;quot; + name + &#39;\&#39;&#39; +
+                    &amp;quot;, age=&amp;quot; + age +
+                    &#39;}&#39;;
+        }
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;==skip== 跳过 元素&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+        Stream.of(1,2,3,4,5,6,7,8,9)
+                .skip(4) //跳过前四个
+                .forEach(e-&amp;gt;System.out.println(e)); //输出的结果应该只有5，6，7，8，9
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;==sorted==排序 底层依赖Comparable 实现，也可以提供自定义比较器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;ublic class Main {
+
+    public static void main(String[] args) {
+
+        User x = new User(&amp;quot;x&amp;quot;,11);
+        User y = new User(&amp;quot;y&amp;quot;,12);
+        User w = new User(&amp;quot;w&amp;quot;,10);
+
+        Stream.of(w,x,y)
+                .sorted((e1,e2)-&amp;gt;e1.age&amp;gt;e2.age?1:e1.age==e2.age?0:-1)
+                .forEach(e-&amp;gt;System.out.println(e.toString()));
+
+    }
+
+    static class User {
+
+        private String name;
+
+        private int age;
+
+        public User(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+        public void setAge(int age) {
+            this.age = age;
+        }
+
+        @Override
+        public String toString() {
+            return &amp;quot;User{&amp;quot; +
+                    &amp;quot;name=&#39;&amp;quot; + name + &#39;\&#39;&#39; +
+                    &amp;quot;, age=&amp;quot; + age +
+                    &#39;}&#39;;
+        }
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;==collect== 收集，使用系统提供的收集器可以将最终的数据流收集到List，Set，Map等容器中。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;不是说终止操作符只能使用一次吗，为什么这里调用了forEach 呢？forEach不仅仅是是Stream 中得操作符还是各种集合中得一个语法糖&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+        Stream.of(&amp;quot;apple&amp;quot;, &amp;quot;banana&amp;quot;, &amp;quot;orange&amp;quot;, &amp;quot;waltermaleon&amp;quot;, &amp;quot;grape&amp;quot;)
+                .collect(Collectors.toSet()) //set 容器
+                .forEach(e -&amp;gt; System.out.println(e));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;==count== 统计数据流中的元素个数，返回的是long 类型&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;==noneMatch== 数据流中得没有一个元素与条件匹配的&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;allMatch和anyMatch 一个是全匹配，一个是任意匹配 和noneMatch 类似，这里就不在举例了。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;min 最小的一个，传入比较器，也可能没有(如果数据流为空)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+
+        Optional&amp;lt;Integer&amp;gt; integerOptional = Stream.of(0,9,8,4,5,6,-1)
+                .min((e1,e2)-&amp;gt;e1.compareTo(e2));
+
+        integerOptional.ifPresent(e-&amp;gt;System.out.println(e));
+
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;max 元素中最大的，需要传入比较器，也可能没有（流为Empty时）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;
+public class Main {
+
+    public static void main(String[] args) {
+
+        Optional&amp;lt;Integer&amp;gt; integerOptional = Stream.of(0,9,8,4,5,6,-1)
+                .max((e1,e2)-&amp;gt;e1.compareTo(e2));
+
+        integerOptional.ifPresent(e-&amp;gt;System.out.println(e));
+
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;reduce 是一个规约操作，所有的元素归约成一个，比如对所有元素求和，乘啊等&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Main {
+    public static void main(String[] args) {
+
+        int sum = Stream.of(0,9,8,4,5,6,-1)
+              .reduce(0,(e1,e2)-&amp;gt;e1+e2);
+        System.out.println(sum);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;// filter 去重&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;List&amp;lt;BizList&amp;gt; distinctBizLists = bizList.stream().filter(distinctByKey(BizList::getItem)).collect(Collectors.toList());
+
+
+public static &amp;lt;T&amp;gt; Predicate&amp;lt;T&amp;gt; distinctByKey(Function&amp;lt;? super T, ?&amp;gt; keyExtractor) {
+        Set&amp;lt;Object&amp;gt; seen = ConcurrentHashMap.newKeySet();
+        return t -&amp;gt; seen.add(keyExtractor.apply(t));
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

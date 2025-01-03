@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="方式一: linux 搭建 redis集群 效果: 三个主节点;每个主节点有1个从节点\nredis 和哨兵 集群的搭建 (用原生的cluster; ==实现数据的分片==)\n可选的三个插件: 官方的cluster 和 豌豆荚 ; trainProxy 一个redis ==gem 包== ; 一个redis==源码包== 上传到服务器; 版本号要匹配\n">
+<title>Redis集群搭建</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Redis集群搭建">
+<meta property='og:description' content="方式一: linux 搭建 redis集群 效果: 三个主节点;每个主节点有1个从节点\nredis 和哨兵 集群的搭建 (用原生的cluster; ==实现数据的分片==)\n可选的三个插件: 官方的cluster 和 豌豆荚 ; trainProxy 一个redis ==gem 包== ; 一个redis==源码包== 上传到服务器; 版本号要匹配\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='redis' /><meta property='article:published_time' content='2020-09-09T14:35:17&#43;08:00'/><meta property='article:modified_time' content='2020-09-09T14:35:17&#43;08:00'/>
+<meta name="twitter:title" content="Redis集群搭建">
+<meta name="twitter:description" content="方式一: linux 搭建 redis集群 效果: 三个主节点;每个主节点有1个从节点\nredis 和哨兵 集群的搭建 (用原生的cluster; ==实现数据的分片==)\n可选的三个插件: 官方的cluster 和 豌豆荚 ; trainProxy 一个redis ==gem 包== ; 一个redis==源码包== 上传到服务器; 版本号要匹配\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#方式一-linux-搭建-redis集群">方式一: linux 搭建 redis集群</a>
+      <ul>
+        <li><a href="#redis-集群搭建-详细步骤">redis 集群搭建 详细步骤</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-方式二-docker-安装redis集群">2. 方式二: docker 安装redis集群</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#21-通过docker-compose搭建">2.1 通过docker compose搭建</a></li>
+            <li><a href="#22-直接搭建">2.2 直接搭建</a>
+              <ul>
+                <li><a href="#221--环境准备">2.2.1  环境准备;</a></li>
+                <li><a href="#222-创建多个redis容器并启动">2.2.2 创建多个redis容器并启动</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/redis/" >
+                Redis
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/">Redis集群搭建</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Sep 09, 2020</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 3 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="方式一-linux-搭建-redis集群">方式一: linux 搭建 redis集群
+</h1><p>效果: 三个主节点;每个主节点有1个从节点</p>
+<p>redis 和哨兵 集群的搭建  (用原生的cluster; ==实现数据的分片==)</p>
+<pre><code>可选的三个插件: 官方的cluster 和 豌豆荚 ; trainProxy
+</code></pre>
+<blockquote>
+<ol>
+<li>
+<p>一个redis ==gem 包== ; 一个redis==源码包== 上传到服务器; 版本号要匹配</p>
+</li>
+<li>
+<p>然后服务器上需要准备好 c++  ; ruby; rubyBem 环境</p>
+</li>
+<li>
+<p>安装好 redis 的 gem;</p>
+</li>
+<li>
+<p>进到redis 源码包里面 用make命令进行安装Redis</p>
+</li>
+</ol>
+<p>编辑配置文件 ; 开启集群 ; 配置端口; 允许后台启动</p>
+<ol start="5">
+<li>
+<p>创建一个 redis- cluster 文件夹; 里面 存放6个文件夹 ; redis1 到 6</p>
+</li>
+<li>
+<p>在 安装好的单机用make install 指定要安装Redis在 1到6 的文件夹下面</p>
+</li>
+<li>
+<p>拷贝redis.conf 配置文件到 各个文件夹下</p>
+</li>
+<li>
+<p>再编辑每个配置文件的端口</p>
+</li>
+<li>
+<p>启动所有的redis服务</p>
+<ol>
+<li>在redis 源码包src目录下 用 redis.trip.rb 脚本 去 创建集群; 设置一个节主点有两个从节点</li>
+<li>连接的 ./redis-cli -c -p 7002</li>
+</ol>
+</li>
+</ol>
+</blockquote>
+<p>sentinel 哨兵集群的搭建( 为每一个主节点配置一个哨兵)</p>
+<blockquote>
+<p>sentinel .conf 包里面</p>
+<p>设置其要监控的主节点的ip 地址 和端口号 ; 有多少个从节点</p>
+</blockquote>
+<h2 id="redis-集群搭建-详细步骤">redis 集群搭建 详细步骤
+</h2><p>(1) 安装gcc</p>
+<p>Redis 是 c 语言开发的。安装 redis 需要 c 语言的编译环境</p>
+<pre><code>yum install gcc-c++
+</code></pre>
+<p>(2)  使用yum命令安装 ruby  （我们需要使用ruby脚本来实现集群搭建）</p>
+<pre><code>yum install ruby
+yum install rubygems
+</code></pre>
+<p><img src="/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/images/%E5%AE%89%E8%A3%85ruby%E8%AF%AD%E8%A8%80%E7%8E%AF%E5%A2%83-16342817194591.png"
+	width="445"
+	height="341"
+	
+	loading="lazy"
+	
+		alt="安装ruby语言环境"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="130"
+		data-flex-basis="313px"
+	
+></p>
+<p>(3) 将redis 源码包上传到linux, 解压; 进入源码文件夹; 执行命令</p>
+<pre><code>// 解压
+tar  tar -xzvf redis.tar.gz
+make  安装
+</code></pre>
+<p>(4)  创建目录/usr/local/redis-cluster目录，  安装6个redis实例 ; 用以下命令根据不同的文件夹 , 执行6 次, 注意</p>
+<pre><code>make install PREFIX=/usr/local/redis-cluster/redis-1
+</code></pre>
+<p><img src="/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/images/%E5%AE%89%E8%A3%856%E4%B8%AAredis%E5%AE%9E%E4%BE%8B-16342817471132.png"
+	width="581"
+	height="364"
+	
+	loading="lazy"
+	
+		alt="安装6个redis实例"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="159"
+		data-flex-basis="383px"
+	
+></p>
+<p><img src="/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/images/%E5%88%9B%E5%BB%BA6%E4%B8%AAredis%E5%AE%9E%E4%BE%8B-16342817649753.png"
+	width="423"
+	height="292"
+	
+	loading="lazy"
+	
+		alt="创建6个redis实例"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="144"
+		data-flex-basis="347px"
+	
+></p>
+<p>(5 修改配置文件</p>
+<pre><code>daemonize yes # 后台启动
+cluster-enabled yes # 开启集群功能
+</code></pre>
+<p><img src="/images/%e4%bf%ae%e6%94%b9%e7%ab%af%e5%8f%a3-16342817841374.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="修改端口"
+	
+	
+></p>
+<p>(5) 复制配置文件到 各个实例中</p>
+<p><img src="/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/images/%E5%A4%8D%E5%88%B6%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6-16342818068905.png"
+	width="577"
+	height="104"
+	
+	loading="lazy"
+	
+		alt="复制配置文件"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="554"
+		data-flex-basis="1331px"
+	
+></p>
+<p>(6)  进入各个实例的配置文件中修改端口</p>
+<pre><code>port 7001 # 端口
+</code></pre>
+<p>(7)  在redis-cluster 文件夹 创建脚本文件start-all.sh; 以便同时启动redis服务</p>
+<pre><code>cd redis-1/bin/
+./redis-server redis.conf
+cd ../..
+cd redis-2/bin/
+./redis-server redis.conf
+cd ../..
+cd redis-3/bin/
+./redis-server redis.conf
+cd ../..
+cd redis-4/bin/
+./redis-server redis.conf
+cd ../..
+cd redis-5/bin/
+./redis-server redis.conf
+cd ../..
+cd redis-6/bin/
+./redis-server redis.conf
+cd ../..
+</code></pre>
+<p>(8) 执行脚本文件 ;  查看进程</p>
+<pre><code>ps -ef | grep redis
+
+</code></pre>
+<p><img src="/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/images/%E6%9F%A5%E7%9C%8Bredis%E8%BF%9B%E7%A8%8B-16342818250836.png"
+	width="577"
+	height="150"
+	
+	loading="lazy"
+	
+		alt="查看redis进程"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="384"
+		data-flex-basis="923px"
+	
+></p>
+<p>(9) 加入集群环境; 复制redis源码包 下的src 目录下的ruby脚本 redis-trib.rb 到redis-cluster 包下</p>
+<p>![复制ruby脚本到 redis-cluster文件夹下](images/复制ruby脚本到 redis-cluster文件夹下-16342818506617.png)</p>
+<p>(10) 执行ruby 脚本 (ip 为服务器ip)</p>
+<pre><code class="language-xml"># 先赋权
+chomd u+x redis-trib.rb
+
+./redis-trib.rb create --replicas 1 192.168.182.129:7001 192.168.182.129:7002 192.168.182.129:7003 192.168.182.129:7004 192.168.182.129:7005 192.168.182.129:7006
+
+</code></pre>
+<p><img src="/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/images/%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA%E6%88%90%E5%8A%9F-16342818654228.png"
+	width="504"
+	height="654"
+	
+	loading="lazy"
+	
+		alt="集群搭建成功"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="77"
+		data-flex-basis="184px"
+	
+></p>
+<p>==可以看到 7001, 7002, 7003 是主节点; 7004是 7001的从节点; 7005是 7002的从节点; 7006是 7003的从节点;==</p>
+<p>(11) 测试redis 集群 (正常运行)</p>
+<pre><code>进入任意redis文件夹执行菜单
+./redis-cli -p ip地址 -p 端口 -c
+-c 代表连接的是集群
+
+</code></pre>
+<p><img src="/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/images/%E6%B5%8B%E8%AF%95redis%E9%9B%86%E7%BE%A4-16342818816289.png"
+	width="473"
+	height="295"
+	
+	loading="lazy"
+	
+		alt="测试redis集群"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="160"
+		data-flex-basis="384px"
+	
+></p>
+<p>(12) springboot 配置redis集群</p>
+<pre><code> redis:
+    cluster:
+      nodes:
+      - 192.168.182.129:7001
+      - 192.168.182.129:7002
+      - 192.168.182.129:7003
+      - 192.168.182.129:7004
+      - 192.168.182.129:7005
+      - 192.168.182.129:7006
+
+</code></pre>
+<h1 id="2-方式二-docker-安装redis集群">2. 方式二: docker 安装redis集群
+</h1><h3 id="21-通过docker-compose搭建">2.1 通过docker compose搭建
+</h3><ol>
+<li>安装依赖项</li>
+</ol>
+<pre><code>yum install -y epel-release
+yum install -y python-pip python-devel gcc
+pip install --upgrade pip -vvv
+
+</code></pre>
+<ol start="2">
+<li>安装 docker-compose</li>
+</ol>
+<pre><code>pin install docker-compose
+
+</code></pre>
+<p>查看docker 的 多个容器的ip</p>
+<pre><code>docker inspect containerName XXX XXX | grep IPA
+
+</code></pre>
+<p><img src="/p/redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/images/%E6%9F%A5%E7%9C%8B%E5%A4%9A%E4%B8%AA%E5%AE%B9%E5%99%A8%E7%9A%84ip%E9%85%8D%E7%BD%AE-163428190766110.png"
+	width="734"
+	height="404"
+	
+	loading="lazy"
+	
+		alt="查看多个容器的ip配置"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="181"
+		data-flex-basis="436px"
+	
+></p>
+<h3 id="22-直接搭建">2.2 直接搭建
+</h3><h4 id="221--环境准备">2.2.1  环境准备;
+</h4><pre><code>1. 安装docker：
+2. 下载reids镜像：docker pull redis
+3. 下载ruby镜像：docker pull ruby   
+
+</code></pre>
+<h4 id="222-创建多个redis容器并启动">2.2.2 创建多个redis容器并启动
+</h4><ol>
+<li>在/usr/local/src目录下创建redis-cluster文件夹，并创建配置文件redis-cluster.conf</li>
+</ol>
+<pre><code>cd /usr/local/src &amp;&amp; mkdir redis-cluster &amp;&amp; cd ./redis-cluster &amp;&amp; touch redis-cluster.conf
+redis-cluster.conf的内容如下：
+ 
+port ${PORT}
+cluster-enabled yes
+cluster-config-file nodes.conf
+cluster-node-timeout 5000
+#对外ip
+cluster-announce-ip 写你的ip (用ifconfig 查看宿主机ip)
+cluster-announce-port ${PORT}
+cluster-announce-bus-port 1${PORT}
+appendonly yes
+
+</code></pre>
+<ol start="2">
+<li>使用脚本创建 集群 (==待优化完善==)</li>
+</ol>
+<p>192.168.182.129</p>
+<pre><code class="language-properties">redis-cli --cluster create 172.18.0.2:6000 172.18.0.3:6001 172.18.0.4:6002 172.18.0.5:6003 172.18.0.6:6004 172.18.0.7:6005  --cluster-replicas 1
+
+</code></pre>
+<pre><code>redis-cli --cluster create 192.168.182.129:6000 192.168.182.129:6001 192.168.182.129:6002 192.168.182.129:6003 192.168.182.129:6004 192.168.182.129:6005  --cluster-replicas 1
+
+</code></pre>
+<pre><code>redis-cli --cluster create ip:6000 ip:6001 ip:6002 ip:6003 ip:6004 ip:6005  --cluster-replicas 1
+
+</code></pre>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/redis/">Redis</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/redis/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Redis</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

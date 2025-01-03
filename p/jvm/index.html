@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="1. 运行时数据区 简述一下 运行时数据区的结构和各部分的作用 结构图\n虚拟机栈 是一个栈结构, 线程每执行一个方法都会有一个栈帧入栈, 方法执行结束后栈帧出栈, 栈帧中存储的是方法所需要的数据 (局部变量表, 操作数栈, 动态连接, 方法出口)\n">
+<title>Jvm</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/jvm/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Jvm">
+<meta property='og:description' content="1. 运行时数据区 简述一下 运行时数据区的结构和各部分的作用 结构图\n虚拟机栈 是一个栈结构, 线程每执行一个方法都会有一个栈帧入栈, 方法执行结束后栈帧出栈, 栈帧中存储的是方法所需要的数据 (局部变量表, 操作数栈, 动态连接, 方法出口)\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/jvm/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='JVM' /><meta property='article:published_time' content='2025-01-03T19:21:43&#43;08:00'/><meta property='article:modified_time' content='2025-01-03T19:21:43&#43;08:00'/>
+<meta name="twitter:title" content="Jvm">
+<meta name="twitter:description" content="1. 运行时数据区 简述一下 运行时数据区的结构和各部分的作用 结构图\n虚拟机栈 是一个栈结构, 线程每执行一个方法都会有一个栈帧入栈, 方法执行结束后栈帧出栈, 栈帧中存储的是方法所需要的数据 (局部变量表, 操作数栈, 动态连接, 方法出口)\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-运行时数据区">1. 运行时数据区</a>
+      <ul>
+        <li><a href="#虚拟机栈">虚拟机栈</a></li>
+        <li><a href="#本地方法栈">本地方法栈</a></li>
+        <li><a href="#程序计数器">程序计数器</a></li>
+        <li><a href="#方法区">方法区</a>
+          <ul>
+            <li><a href="#运行时常量池"><strong>运行时常量池</strong></a></li>
+          </ul>
+        </li>
+        <li><a href="#堆"><strong>堆</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#2-对象">2. 对象</a></li>
+    <li><a href="#3-字节码">3. 字节码</a></li>
+    <li><a href="#4-类加载">4. 类加载</a>
+      <ul>
+        <li><a href="#加载">加载</a></li>
+        <li><a href="#验证"><strong>验证</strong></a></li>
+        <li><a href="#准备">准备</a></li>
+        <li><a href="#解析">解析</a></li>
+        <li><a href="#初始化">初始化</a></li>
+        <li><a href="#双亲委派模型">双亲委派模型</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-gc">5. GC</a>
+      <ul>
+        <li><a href="#可达性分析">可达性分析</a></li>
+        <li><a href="#常见的回收算法">常见的回收算法</a>
+          <ul>
+            <li><a href="#复制算法">复制算法</a></li>
+            <li><a href="#标记清除算法">标记清除算法</a></li>
+            <li><a href="#标记整理法">标记整理法</a></li>
+          </ul>
+        </li>
+        <li><a href="#回收器">回收器</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/jvm/" >
+                JVM
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/jvm/">Jvm</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jan 03, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 9 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="1-运行时数据区">1. 运行时数据区
+</h1><ol>
+<li>简述一下 运行时数据区的结构和各部分的作用</li>
+</ol>
+<p>结构图</p>
+<p><img src="/images/image-20220215101317324.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20220215101317324"
+	
+	
+></p>
+<h2 id="虚拟机栈">虚拟机栈
+</h2><p>是一个栈结构, 线程每执行一个方法都会有一个栈帧入栈, 方法执行结束后栈帧出栈, 栈帧中存储的是方法所需要的数据 (局部变量表, 操作数栈, 动态连接, 方法出口)</p>
+<ul>
+<li>
+<p>==虚拟机栈是基于线程的==: 只有一个main()方法, 也是以线程的方式运行的, 在线程的生命周期中, 参与执行的方法栈帧会频繁地入栈和出栈, 虚拟机栈的生命周期和线程一样</p>
+</li>
+<li>
+<p>栈大小: 每个虚拟机栈==大小1M==</p>
+</li>
+<li>
+<p>堆栈溢出: 栈帧深度压栈但并不出栈, 导致栈空间不足, 抛出StackOverFlowError, ==典型的就是递归调用==</p>
+</li>
+<li>
+<p>栈帧的组成:</p>
+<ul>
+<li>
+<p>局部变量表：存放我们的局部变量的（方法内的变量）。首先它是一个32 位的长度，主要存放我们的 Java 的八大基础数据类型，一般 32 位就可以存放下，如果是 64 位的就使用高低位占用两个也可以存放下，如果是局部变量是一个对象，存放的一个引用地址即可。</p>
+</li>
+<li>
+<p>操作数栈：存放 java 方法执行的操作数的，它也是一个栈，操作的元素可以是任意的 java 数据类型，一个方法刚刚开始的时候操作数栈为空，操作数栈本质上是JVM执行引擎的一个工作区，方法在执行，才会对操作数栈进行操作。</p>
+</li>
+<li>
+<p>动态链接：Java 语言特性多态</p>
+</li>
+<li>
+<p>完成出口：正常返回（调用程序计数器中的地址作为返回）、异常的话（通过异常处理器表&lt;非栈帧中的&gt;来确定）</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="/images/image-20220215095617369.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20220215095617369"
+	
+	
+></p>
+<h2 id="本地方法栈">本地方法栈
+</h2><p>本地方法栈和虚拟机栈类似，具备线程隔离的特性，不同的是，==本地方法栈服务的对象是JVM执行的native方法==，而虚拟机栈服务的是JVM执行的java方法，虚拟机规范里对这块所用的语言、数据结构、没有强制规定，虚拟机可以自由实现它，==hotspot把它和虚拟机栈合并成了1个==</p>
+<h2 id="程序计数器">程序计数器
+</h2><p>较小的内存空间，存储当前线程执行的字节码的偏移量；各线程之间独立存储，互不影响</p>
+<h2 id="方法区">方法区
+</h2><p>方法区（Method Area）是==可供各线程共享的运行时内存区域==，主要用来存储==已被虚拟机加载的类信息、常量、静态变量、JIT编译器编译后的代码缓存等等==，它有个别名叫做：非堆（non-heap），主要是为了和堆区分开。</p>
+<p>方法区中存储的信息大致可分以下两类：</p>
+<p>1、类信息：主要指类相关的版本、字段、方法、接口描述、引用等</p>
+<p>2、运行时常量池：编译阶段生成的常量与符号引用、运行时加入的动态变量</p>
+<h3 id="运行时常量池"><strong>运行时常量池</strong>
+</h3><p>在jvm规范中，方法区除了存储类信息之外，还包含了运行时常量池。这里首先要来讲一下常量池的分类</p>
+<p>常量池可分两类：</p>
+<p>1、Class常量池（静态常量池）</p>
+<p>2、运行时常量池</p>
+<p>3、字符串常量池（没有明确的官方定义，其目的是为了更好的使用</p>
+<p>String ，真实的存储位置在堆）</p>
+<h2 id="堆"><strong>堆</strong>
+</h2><p>1、堆被划分为新生代和老年代（ Tenured ），</p>
+<p>2、新生代与老年代的比例的值为 1:2 ，该值可以通过参数</p>
+<p>–XX:NewRatio 来指定</p>
+<p>3、新生代又被进一步划分为 Eden 和 Survivor 区， Survivor 由 From Survivor 和 To Survivor 组成，eden，from，to的大小比例为：8：1：1；可通过参数 **-**XX:SurvivorRatio 来指定</p>
+<h1 id="2-对象">2. 对象
+</h1><ol>
+<li>JVM 对象内存布局, new 一个对象有多大</li>
+<li>阐述对象的分配策略</li>
+<li>new 一个对象都有哪些步骤 User user01 = new User()</li>
+</ol>
+<p>对象内存布局</p>
+<p><img src="/images/image-20220215113501440.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20220215113501440"
+	
+	
+></p>
+<p>对象头: 8 字节</p>
+<p>对象头-类型指针: 4字节</p>
+<p>数组多一个数组长度: 4字节</p>
+<p>对象创建过程</p>
+<p><img src="/images/image-20220215114002022.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20220215114002022"
+	
+	
+></p>
+<h1 id="3-字节码">3. 字节码
+</h1><h1 id="4-类加载">4. 类加载
+</h1><p>JVM 类加载机制说一下</p>
+<p>一个java 类在整个运行时会经过的阶段</p>
+<p><img src="/images/image-20220215120641279.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20220215120641279"
+	
+	
+></p>
+<h2 id="加载">加载
+</h2><p>加载 loading”是整个类加载（class loading）过程的一个阶段，<strong>加载阶段</strong></p>
+<p><strong>虚拟机需要完成以下</strong> <strong>3</strong> <strong>件事情：</strong></p>
+<p>1）通过==一个类的全限定名来获取定义此类的二进制字节流==。</p>
+<p>2）将这个字节流所代表的==静态存储结构转化==为方法区的运行时数据结构。</p>
+<p>3）在内存中生成一个代表这个类的 java.lang.Class 对象，作为方法区这个类的各种数据的访问入口。</p>
+<p><img src="/images/image-20220215120958934.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20220215120958934"
+	
+	
+></p>
+<p>注意：</p>
+<ul>
+<li>加载的字节码来源，不一定非得是class文件，可以是符合字节码规范的任意地方，甚至二进制流等</li>
+<li>从字节码到内存，是由加载器（ClassLoader）完成的，下面我们详细看一下加载器相关内容</li>
+</ul>
+<h2 id="验证"><strong>验证</strong>
+</h2><p>例如：</p>
+<p>1、文件格式验证（版本号，是不是CAFEBABYE开头，&hellip;&hellip;&hellip;.）</p>
+<p>2、元数据验证（验证属性、字段、类关系、方法等是否合规）</p>
+<p>3、字节码验证</p>
+<p>4、符号引用验证</p>
+<h2 id="准备">准备
+</h2><p>为class中定义的各种类变量（<strong>静态变量</strong>）==分配内存，并赋初始值==，注意是对应类型的初始值，赋具体值在后面的初始化阶段。注意！即便是static变量，它在这个阶段初始化进内存的依然是该类型的初始值！而不是用户代码里的初始值。</p>
+<pre><code class="language-java">//类变量：在准备阶段为它开辟内存空间，但是它是int的初始值，也就是 0，而真正123的赋值，是在下面的初始化阶段 
+public static int a = 123; 
+
+//类成员变量(实例变量)的赋值是在类对象被构造时才会赋值 
+public String address = &quot;北京&quot;; 
+
+//final修饰的类变量，编译成字节码后，是一个ConstantValue类型,在准 备阶段，直接给定值123，后期也没有二次初始化一说 
+public static final int b = 123;
+</code></pre>
+<h2 id="解析">解析
+</h2><p>将常量池内的符号引用替换为直接引用的过程</p>
+<h2 id="初始化">初始化
+</h2><p>类加载的最后一个步骤，经过这个步骤后，类信息完全进入了jvm内存，直到它被垃圾回收器回收</p>
+<p>1、前面几个阶段都是虚拟机来搞定的。我们也干涉不了，从代码上只能遵从它的语法要求。而这个阶段，是初始化赋值，java虚拟机才真正开始执行类中编写的java程序代码，将主导权移交给应用程序。</p>
+<p>2、在准备阶段，静态变量已经赋过一次系统要求的初始值了，而在初始化阶段要执行初始化函数 <clinit> 函数，注意 <clinit> 并不是程序员在代码中编写的，而是由 javac 编译器自动生成的，</p>
+<p>3、 <clinit> 函数是由编译器自动收集类中的所有静态变量的赋值动作和静态语句块（ static 代码块）中的语句合并产生的。</p>
+<p>4、 <clinit> 函数与类的构造函数（虚拟机视角的 <init> 函数）是不同的， <init> 函数是在运行期创建对象时才执行，而 <clinit> 在类加载的时候就执行了。</p>
+<p>5、虚拟机能保障父类的 <clinit> 函数优先于子类 <clinit> 函数的执行。</p>
+<p>6、在 <clinit> 函数中会对类变量赋具体的值，也就是我们说的：</p>
+<pre><code>public static int a = 123; 
+</code></pre>
+<p>这行代码的123才真正赋值完成</p>
+<h2 id="双亲委派模型">双亲委派模型
+</h2><p><img src="/images/image-20220215140254599.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20220215140254599"
+	
+	
+></p>
+<p>类加载器加载某个类的时候，因为有多个加载器，甚至可以有各种自定义的，他们呈父子关系。这给人一种印象，子类的加载会覆盖父类，其实恰恰相反！</p>
+<p>与普通类继承属性不同，==类加载器会优先调父类的 loadClass 方法，如果父类能加载，直接用父类的==，否则最后一步才是自己尝试加载，从源代码上可以验证</p>
+<p>采用双亲委派模式的是好处是Java类随着它的类加载器一起具备了一种带有优先级的层次关系，通过这种层级关可以==避免类的重复加载==，当父加载器已经加载了该类时，就没有必要子加载器再加载一次。</p>
+<p>其次是考虑到==安全因素==，java核心api中定义类型不会被随意替换，假设通过网络传递一个名为 java.lang.Integer 的类，通过双亲委派模型传递到启动类加载器，而启动类加载器发现这个名字的类，发现该类已被加载，就不会重新加载网络传递过来的 java.lang.Integer ，而直接返回已加载过的Integer.class ，这样便可以==防止核心API库被随意篡改==</p>
+<p>双亲委派是可以被打破的</p>
+<p>tomcat 类加载的层次结构</p>
+<p><img src="/images/image-20220215141605296.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20220215141605296"
+	
+	
+></p>
+<p>为什么要打破该模型</p>
+<p>tomcat 启动后会启一个jvm进程的, 它支持多个web应用部署到同一个tomcat里</p>
+<p>1、对于不同的web应用中的class和外部jar包，需要相互隔离，不能因为不同的web应用引用了相同的jar或者有相同的class导致一个加载成功了另一个加载不了。</p>
+<p>2、web容器支持jsp文件修改后不用重启，jsp文件也是要编译成.class文件的，每一个jsp文件对应一个JspClassLoader，它的加载范围仅仅是这个jsp文件所编译出来的那一个.class文件，当Web容器检测到jsp文件被修改时，会替换掉目前JasperLoader的实例，并通过再建立一个新的Jsp类加载器来实现JSP文件的热部署功能。</p>
+<h1 id="5-gc">5. GC
+</h1><ol>
+<li>
+<p>JVM怎么判断一个类是不是垃圾？  引用计数 (弱引用); 可达性分析 GC ROOTS</p>
+</li>
+<li>
+<p>说到GC ROOTS，你知道Java中哪些对象可作为GC ROOTS吗？</p>
+</li>
+<li>
+<p>对象不可达是不是立即被回收死亡？</p>
+</li>
+<li>
+<p>CMS垃圾回收器的回收过程</p>
+</li>
+<li>
+<p>如何解决跨代引用？</p>
+</li>
+<li>
+<p>CMS收集器的流程，缺点；G1收集器的流程，相对于CMS收集器的优点</p>
+</li>
+<li>
+<p>G1了解不，说说G1</p>
+</li>
+<li>
+<p>并发标记的过程是怎么样的？</p>
+</li>
+</ol>
+<h2 id="可达性分析">可达性分析
+</h2><p>来判定对象是否存活的。这个算法的基本思路就是通过一系列的称为==“GC Roots”的对象作为起始点，从这些节点开始向下搜索，搜索所走过的路径称为引用链（ Reference Chain ），当一个对象到 GC Roots 没有任何引用链相连时，则证明此对象是不可用的==。</p>
+<p>作为 GC Roots 的对象包括下面几种（重点是前面 4 种）：</p>
+<ul>
+<li>
+<p>虚拟机栈（栈帧中的本地变量表）中引用的对象；各个线程调用方法堆栈中使用到的参数、局部变量、临时变量等。</p>
+</li>
+<li>
+<p>方法区中类静态属性引用的对象；java 类的引用类型静态变量。</p>
+</li>
+<li>
+<p>方法区中常量引用的对象；比如：字符串常量池里的引用。</p>
+</li>
+<li>
+<p>本地方法栈中 JNI（即一般说的 Native 方法）引用的对象。</p>
+</li>
+<li>
+<p>JVM 的内部引用（ class 对象、异常对象 NullPointException 、 OutofMemoryError ，系统类加载器）。（非重点）</p>
+</li>
+<li>
+<p>所有被同步锁( synchronized )持有的对象。（非重点）</p>
+</li>
+<li>
+<p>JVM 内部的 JMXBean 、 JVMTI 中注册的回调、本地代码缓存等（非重点）</p>
+</li>
+<li>
+<p>JVM 实现中的“临时性”对象，跨代引用的对象（在使用分代模型回收时只回收部分代的对象）（非重点）</p>
+</li>
+</ul>
+<p>除了这些固定的 GC Roots 集合以外，跟进用户选用的垃圾回收器以及当前回收的内存区域不同，还可能会有其他对象&quot;临时&quot;加入成为 GC Roots 。</p>
+<p><img src="/images/image-20220216142940342.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20220216142940342"
+	
+	
+></p>
+<p>被标记为finalize 之后并不是非死不可,  真正的死亡需要经过两次标记过程,</p>
+<ol>
+<li>没有找到GC ROOTS 的引用链, 它将第一次标记</li>
+<li>随后进行一次筛选, 如果对象覆盖了finalize, 可以再finalize 中拯救 , 俗称对象的自我救赎</li>
+</ol>
+<p>注意:</p>
+<ul>
+<li>finalize 只会执行一次, 不会执行多次</li>
+<li>不建议使用finalize, 因为不太可靠</li>
+</ul>
+<h2 id="常见的回收算法">常见的回收算法
+</h2><h3 id="复制算法">复制算法
+</h3><ol>
+<li>将内存按容量划分为大小相等的两块, 每次只使用其中的一块</li>
+<li>当其中一块内存用完了, 就将还存活的对象复制到另一块, 原来的内存空间清理</li>
+</ol>
+<p>带来的<strong>好处</strong>是：</p>
+<p>1、实现简单，运行高效，</p>
+<p>2、每次都是对整个半区进行内存回收，内存分配时也就不用考虑内存碎片等复杂情况，只要按顺序分配内存即可，</p>
+<p>存在的<strong>弊端</strong>是：</p>
+<p>1、内存的使用率缩小为原来的一半。</p>
+<p>2、内存移动是必须实打实的移动（复制），所以对应的引用（直接指针）</p>
+<p>==适用于新生代==</p>
+<h3 id="标记清除算法">标记清除算法
+</h3><p><img src="/images/image-20220216155353396.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20220216155353396"
+	
+	
+></p>
+<p>1、回收效率略低，如果大部分对象是朝生夕死，那么回收效率降低，因为==需要大量标记对象和回收对象==，对比复制回收效率要低，所以该算法不适合新生代。</p>
+<p>2、它的主要问题是在标记清除之后会==产生大量不连续的内存碎片==，空间碎片太多可能会导致以后在程序运行过程中需要==分配较大对象时==，无法找到足够的连续内存而不得不提前触发另一次垃圾回收动作。</p>
+<p>3、标记清除算法适用于老年代</p>
+<h3 id="标记整理法">标记整理法
+</h3><ol>
+<li>标记处所有需要回收的对象</li>
+<li>标记成功后, 后续步骤不是直接对对象进行清理, 而是让所有存活的对象都向一端移动</li>
+<li>然后直接清理掉端边界以外的内存</li>
+</ol>
+<p><img src="/images/image-20220216162113407.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="image-20220216162113407"
+	
+	
+></p>
+<p>1、标记整理需要扫描两遍</p>
+<p>2、标记整理与标记清除算法的区别主要在于对象的移动。对象移动不单单会加重系统负担，同时需要全程暂停户线程才能进行，同时所有引用对象的地方都需要更新（直接指针需要调整）。</p>
+<p>3、标记整理算法不会产生内存碎片，但是效率偏低。</p>
+<p>4、标记整理算法适用于老年代。</p>
+<h2 id="回收器">回收器
+</h2>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/jvm/">JVM</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

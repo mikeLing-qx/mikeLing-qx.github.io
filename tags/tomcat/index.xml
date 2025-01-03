@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Tomcat on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/tags/tomcat/</link>
+        <description>Recent content in Tomcat on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Fri, 03 Jan 2025 19:19:15 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/tags/tomcat/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Tomcat</title>
+        <link>https://mikeLing-qx.github.io/p/tomcat/</link>
+        <pubDate>Fri, 03 Jan 2025 19:19:15 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/tomcat/</guid>
+        <description>&lt;h1 id=&#34;目录&#34;&gt;目录
+&lt;/h1&gt;&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;* Tomcat功能需求分析
+* Tomcat套娃式架构设计（Connector层次架构、容器层次结构） 
+* Tomcat源码构建 
+* Tomcat源码剖析-链式初始化过程 
+* Tomcat流程剖析-Servlet请求处理链路追踪
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;1-tomcat架构设计&#34;&gt;1. Tomcat架构设计
+&lt;/h1&gt;&lt;p&gt;Http服务器和具体业务类是解耦的, Http服务器把请求交给Servlet容器来处理, 容器通过Servlet 接口调用业务类&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/tomcat/images/image-20220718100231673.png&#34;
+	width=&#34;963&#34;
+	height=&#34;431&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220718100231673&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;223&#34;
+		data-flex-basis=&#34;536px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;Tomcat两个非常重要的功能（身份)&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Http服务器功能：Socket通信（TCP/IP）、解析Http报文&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Servlet容器功能：有很多Servlet（自带系统级Servlet+自定义Servlet），Servlet处理具体的业务逻辑&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;11-设计实现&#34;&gt;1.1 设计实现
+&lt;/h2&gt;&lt;h3 id=&#34;1-基础架构&#34;&gt;1. 基础架构
+&lt;/h3&gt;&lt;p&gt;核心功能&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;处理&lt;/strong&gt; &lt;strong&gt;Socket&lt;/strong&gt; &lt;strong&gt;连接，负责网络字节流与&lt;/strong&gt; &lt;strong&gt;Request&lt;/strong&gt; &lt;strong&gt;和&lt;/strong&gt; &lt;strong&gt;Response&lt;/strong&gt; &lt;strong&gt;对象的转化。&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;加载和管理 Servlet，以及具体处理Request请求&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;所以Tomcat 设计了两个核心组件&lt;/p&gt;
+&lt;p&gt;==连接器负责对外交流, 容器负责内部处理==&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/tomcat/images/image-20220718101048544.png&#34;
+	width=&#34;812&#34;
+	height=&#34;419&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220718101048544&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;193&#34;
+		data-flex-basis=&#34;465px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;Tomcat中一个容器可能对接多个连接器，每一个连接器都对应某种协议某种IO模型,Tomcat将多个连接器和单个容器组成一个service组件，一个tomcat中可能存在多个Service组件&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Connector：将不同协议不同IO模型的请求转换为标准的标准的 ServletRequest 对象交给容器处理。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Container：Container本质上是一个Servlet容器,负责servelt的加载和管理，处理请求ServletRequest，并返回标准的 ServletResponse 对象给连接器。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2-连接器是如何设计的&#34;&gt;2. 连接器是如何设计的
+&lt;/h3&gt;&lt;h4 id=&#34;21-铺垫支持协议io模型&#34;&gt;2.1 铺垫：支持协议&amp;amp;IO模型
+&lt;/h4&gt;&lt;p&gt;Tomcat 是支持多种I/O模型和应用层协议的&lt;/p&gt;
+&lt;p&gt;==Tomcat 支持的 I/O 模型有==：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;NIO：非阻塞 I/O，采用 Java NIO 类库实现&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;NIO.2：异步 I/O，采用 JDK 7 最新的 NIO.2 类库实现&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;APR：采用 Apache 可移植运行库实现，是 C/C++ 编写的本地库&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;==Tomcat 支持的应用层协议有==：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;HTTP/1.1：这是大部分 Web 应用采用的访问协议&lt;/li&gt;
+&lt;li&gt;AJP：用于和 Web 服务器集成（如 Apache）&lt;/li&gt;
+&lt;li&gt;HTTP/2：HTTP 2.0 大幅度的提升了 Web 性能&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;22-连接器结构分析&#34;&gt;2.2 连接器结构分析
+&lt;/h4&gt;&lt;p&gt;Tomcat 为了实现支持多种 I/O 模型和应用层协议，一个容器可能对接多个连接器，就==好比一个房间有多个门==。但是单独的连接器或者容器都不能对外提供服务，需要把它们==组装起来才能工作==，组装后这个整体叫作 Service 组件。这里请注意，Service 本身没有做什么重要的事情，只是在连接器和容器外面多包了一层，把它们组装在一起。==Tomcat 内可能有多个 Service==，这样的设计也是出于灵活性的考虑。通过在==Tomcat 中配置多个 Service，可以实现通过不同的端口号来访问同一台机器上部署的不同应用==&lt;/p&gt;
+&lt;h3 id=&#34;3-核心功能&#34;&gt;3. 核心功能
+&lt;/h3&gt;&lt;p&gt;==连接器对 Servlet 容器屏蔽了协议及 I/O 模型等的区别==，无论是 HTTP 还是 AJP，在容器中获取到的都是一个标准的 ==ServletRequest 对象==。我们可以把连接器的功能需求进一步细化，比如：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;监听网络端口。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;接受网络连接请求。读取网络请求字节流。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;根据具体应用层协议（HTTP/AJP）解析字节流，生成统一的 Tomcat Request 对象。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;将 Tomcat Request 对象转成标准的 ServletRequest。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;调用 Servlet 容器，得到 ServletResponse。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;将 ServletResponse 转成 Tomcat Response 对象。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;将 Tomcat Response 转成网络字节流。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;将响应字节流写回给浏览器。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;12-连接器&#34;&gt;1.2 连接器
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/tomcat/images/image-20220718104021227.png&#34;
+	width=&#34;751&#34;
+	height=&#34;363&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220718104021227&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;206&#34;
+		data-flex-basis=&#34;496px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Endpoint内部Acceptor组件用于监听Socket 连接请求，当发送客户端连接到服务端Acceptor组件负责与客户端建立连接创建Socket,==每当连接客户端发起请求，Endpoint会创建一个SocketProcessor对象SocketProcessor 用于处理接收到的 Socket 请求，它实现 Runnable 接口==，在 run 方法里调用协议处理组件 Processor 进行处理。为了提高处理能力，SocketProcessor 被提交到线程池来执行。而这个线程池叫作执行器（Executor)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Processor 接收来自 Endpoint 的 Socket，读取字节流解析成 Tomcat Request 和 Response 对象，接着会调用 Adapter 的 Service 方法。并通过 Adapter 将其提交到容器处理&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;连接器调用 CoyoteAdapter 的 sevice 方法，传入的是 Tomcat Request 对象，CoyoteAdapter 负责将 Tomcat Request 转成 ServletRequest，再调用容器的 service 方法。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;13--容器&#34;&gt;1.3  容器
+&lt;/h2&gt;&lt;p&gt;Container 本质上市一个Servlet 容器, 负责servlet的加载和管理, 处理请求Servlertrequest, 返回标准的ServletResponse d对象给连接器&lt;/p&gt;
+&lt;h3 id=&#34;131--容器的工作流程&#34;&gt;1.3.1  容器的工作流程
+&lt;/h3&gt;&lt;p&gt;当客户请求某个资源时，HTTP 服务器会用一个 ServletRequest 对象把客户的请求信息封装起来，然后调用 Servlet 容器的 service 方法，==Servlet 容器拿到请求后，根据请求的 URL 和 Servlet 的映射关系，找到相应的 Servlet==，如果 Servlet ==还没有被加载==，就用==反射机制创建==这个 Servlet，并调用 Servlet 的&lt;/p&gt;
+&lt;p&gt;==init 方法来完成初始化==，接着调用 Servlet 的 service 方法来处理请求，把 ServletResponse 对象返回给HTTP 服务器，HTTP 服务器会把响应发送给客户端&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/tomcat/images/image-20220718104520746.png&#34;
+	width=&#34;748&#34;
+	height=&#34;351&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220718104520746&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;213&#34;
+		data-flex-basis=&#34;511px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;132-容器层次结构&#34;&gt;1.3.2 容器层次结构
+&lt;/h3&gt;&lt;p&gt;​	Tomcat 设计了 4 种容器组件，分别是 ==Engine、Host、Context 和 Wrapper==。这 4 种容器不是平行关系，而是父子关系。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/tomcat/images/image-20220718181857188.png&#34;
+	width=&#34;581&#34;
+	height=&#34;349&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220718181857188&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;166&#34;
+		data-flex-basis=&#34;399px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Wrapper:表示一个 Servlet&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Context:表示一个 Web 应用程序，一个 Web 应用程序中可能会有多个 Servlet&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Host:表示的是一个虚拟主机，或者说一个站点，可以给 Tomcat 配置多个虚拟主机地址，而一个虚拟主机下可以部署多个 Web 应用程序&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Engine:表示引擎，用来管理多个虚拟站点，一个 Service 最多只能有一个 Engine。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

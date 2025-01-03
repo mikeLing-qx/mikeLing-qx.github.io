@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="分布式事务 学习目标 什么是事务 什么是分布式事务 分布式事务的产生过程 ==什么是CAP定理（面试）== ==分布式事务解决方案（面试）== 1 分布式事务介绍 1.1 什么是事务 数据库事务(简称：事务，Transaction)是指数据库执行过程中的一个逻辑单位，由一个有限的数据库操作序列构成[由当前业务逻辑多个不同操作构成]。\n">
+<title>分布式事务</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="分布式事务">
+<meta property='og:description' content="分布式事务 学习目标 什么是事务 什么是分布式事务 分布式事务的产生过程 ==什么是CAP定理（面试）== ==分布式事务解决方案（面试）== 1 分布式事务介绍 1.1 什么是事务 数据库事务(简称：事务，Transaction)是指数据库执行过程中的一个逻辑单位，由一个有限的数据库操作序列构成[由当前业务逻辑多个不同操作构成]。\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='分布式事务' /><meta property='article:tag' content='分布式' /><meta property='article:tag' content='并发编程' /><meta property='article:published_time' content='2022-07-13T19:53:40&#43;08:00'/><meta property='article:modified_time' content='2022-07-13T19:53:40&#43;08:00'/>
+<meta name="twitter:title" content="分布式事务">
+<meta name="twitter:description" content="分布式事务 学习目标 什么是事务 什么是分布式事务 分布式事务的产生过程 ==什么是CAP定理（面试）== ==分布式事务解决方案（面试）== 1 分布式事务介绍 1.1 什么是事务 数据库事务(简称：事务，Transaction)是指数据库执行过程中的一个逻辑单位，由一个有限的数据库操作序列构成[由当前业务逻辑多个不同操作构成]。\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#分布式事务">分布式事务</a>
+      <ul>
+        <li><a href="#学习目标">学习目标</a></li>
+        <li><a href="#1-分布式事务介绍">1 分布式事务介绍</a>
+          <ul>
+            <li><a href="#11-什么是事务">1.1 什么是事务</a></li>
+            <li><a href="#12-什么是分布式事务">1.2 什么是分布式事务</a></li>
+            <li><a href="#13-事务的演变">1.3 事务的演变</a>
+              <ul>
+                <li><a href="#131-单服务单数据库的本地事务">1.3.1 单服务单数据库的本地事务</a></li>
+                <li><a href="#132-单一服务多数据库的分布式事务">1.3.2 单一服务多数据库的分布式事务</a></li>
+                <li><a href="#133-多服务多数据库的分布式事务">1.3.3 多服务多数据库的分布式事务</a></li>
+                <li><a href="#134-多服务多数据源的分布式事务">1.3.4 多服务多数据源的分布式事务</a></li>
+              </ul>
+            </li>
+            <li><a href="#14-cap定理面试">1.4 CAP定理（面试）</a></li>
+          </ul>
+        </li>
+        <li><a href="#2-分布式事务解决方案面试">2 分布式事务解决方案（面试）</a>
+          <ul>
+            <li><a href="#21--基于xa协议的两阶段提交2pc">2.1  基于XA协议的两阶段提交(2PC)</a></li>
+            <li><a href="#22-三段提交3pc">2.2 三段提交（3PC）</a></li>
+            <li><a href="#23-tcc补偿机制">2.3 TCC补偿机制</a></li>
+            <li><a href="#24-本地消息表异步确保">2.4 本地消息表（异步确保）</a></li>
+            <li><a href="#25-mq-事务消息">2.5 MQ 事务消息</a></li>
+            <li><a href="#26-seata">2.6 Seata</a>
+              <ul>
+                <li><a href="#261-seata简介">2.6.1 Seata简介</a></li>
+                <li><a href="#262-seata支持的模式">2.6.2 Seata支持的模式</a></li>
+                <li><a href="#263-seata的优点">2.6.3 Seata的优点</a></li>
+                <li><a href="#264-at模式">2.6.4 AT模式</a></li>
+                <li><a href="#265-tcc模式">2.6.5 TCC模式</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#27-跨mysql-ip测试">2.7 跨mysql ip测试</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/" >
+                分布式事务
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/">分布式事务</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jul 13, 2022</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 16 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="分布式事务">分布式事务
+</h1><h2 id="学习目标">学习目标
+</h2><ul>
+<li>什么是事务</li>
+<li>什么是分布式事务</li>
+<li>分布式事务的产生过程</li>
+<li>==什么是CAP定理（面试）==</li>
+<li>==分布式事务解决方案（面试）==</li>
+</ul>
+<h2 id="1-分布式事务介绍">1 分布式事务介绍
+</h2><h3 id="11-什么是事务">1.1 什么是事务
+</h3><p>数据库事务(简称：事务，Transaction)是指数据库执行过程中的一个逻辑单位，由一个有限的数据库操作序列构成[由当前业务逻辑多个不同操作构成]。</p>
+<p>事务拥有以下四个特性，习惯上被称为ACID特性：</p>
+<p><strong>原子性(Atomicity)</strong>：事务作为一个整体被执行，包含在其中的对数据库的操作要么全部被执行，要么都不执行。==记录之前的版本，允许回滚。==</p>
+<p><strong>一致性(Consistency)</strong>：一致性是指事务使得系统从一个一致的状态转换到另一个一致状态。事务的一致性决定了一个系统设计和实现的复杂度，也导致了事务的不同隔离级别。==事务开始和结束之间的中间状态不会被其他事务看到。==</p>
+<p><strong>隔离性(Isolation)</strong>：多个事务并发执行时，并发事务之间互相影响的程度，比如一个事务会不会读取到另一个未提交的事务修改的数据。==适当的破坏一致性来提升性能与并行度==</p>
+<p><strong>持久性(Durability)</strong>：已被提交的事务对数据库的修改应该永久保存在数据库中。==每一次的事务提交后就会保证不会丢失。==</p>
+<p>延申拓展：</p>
+<blockquote>
+<p><strong>事务隔离性(面试)：</strong></p>
+<ul>
+<li><strong>脏读</strong>：事务A修改了一个数据，但未提交，事务B读到了事务A未提交的更新结果，如果事务A提交失败，事务B读到的就是脏数据。</li>
+<li><strong>幻读</strong>：在同一个事务中，同一个查询多次返回的结果不一致。事务A新增了一条记录，事务B在事务A==新增==提交前后各执行了一次查询操作，发现后一次比前一次多了一条记录。幻读是由于并发事务增加记录导致的，这个不能像不可重复读通过记录加锁解决，因为对于新增的记录根本无法加锁。</li>
+<li><strong>不可重复读</strong>：在同一个事务中，对于同一份数据读取到的结果不一致。比如，事务B在事务A==更新或删除==提交前读到的结果，和提交后读到的结果可能不同。不可重复读出现的原因就是事务并发修改记录，要避免这种情况，最简单的方法就是对要修改的记录加锁，这会导致锁竞争加剧，影响性能。</li>
+</ul>
+<p><strong>事务的隔离级别(面试)：</strong></p>
+<ul>
+<li><strong>Read Uncommitted</strong>(读未提交)：最低的隔离级别，什么都不需要做，一个事务可以读到另一个事务未提交的结果。所有的并发事务问题都会发生。</li>
+<li><strong>Read Committed</strong>(读已提交)：只有在事务提交后，其更新结果才会被其他事务看见。可以解决脏读问题。</li>
+<li><strong>Repeated Read</strong>(可重复读)：在一个事务中，对于同一份数据的读取结果总是相同的，无论是否有其他事务对这份数据进行操作，以及这个事务是否提交。可以解决脏读、不可重复读。</li>
+<li><strong>Serialization</strong>：事务串行化执行，隔离级别最高，牺牲了系统的并发性。可以解决并发事务的所有问题。</li>
+</ul>
+<p><strong>自行复习/了解：spring事务的传播机制(spring事务面试必问)</strong></p>
+</blockquote>
+<h3 id="12-什么是分布式事务">1.2 什么是分布式事务
+</h3><p>分布式事务指事务的参与者、支持事务的服务器、资源服务器以及事务管理器分别位于不同的分布式系统的不同节点之上，且属于不同的应用，分布式事务需要保证这些操作要么全部成功，要么全部失败。本质上来说，分布式事务就是为了保证不同数据库的数据一致性。</p>
+<h3 id="13-事务的演变">1.3 事务的演变
+</h3><h4 id="131-单服务单数据库的本地事务">1.3.1 单服务单数据库的本地事务
+</h4><p>事务仅限于对单一数据库资源的访问控制,架构服务化以后，事务的概念延伸到了服务中。倘若将一个单一的服务操作作为一个事务，那么整个服务操作只能涉及一个单一的数据库资源,这类基于单个服务单一数据库资源访问的事务，被称为本地事务(Local Transaction)。</p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1553290426650.png"
+	width="1164"
+	height="279"
+	
+	loading="lazy"
+	
+		alt="1553290426650"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="417"
+		data-flex-basis="1001px"
+	
+></p>
+<h4 id="132-单一服务多数据库的分布式事务">1.3.2 单一服务多数据库的分布式事务
+</h4><p>最早的分布式事务应用架构很简单，不涉及服务间的访问调用，仅仅是服务内操作涉及到对多个数据库资源的访问。</p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1553290753247.png"
+	width="1149"
+	height="432"
+	
+	loading="lazy"
+	
+		alt="1553290753247"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="265"
+		data-flex-basis="638px"
+	
+></p>
+<h4 id="133-多服务多数据库的分布式事务">1.3.3 多服务多数据库的分布式事务
+</h4><p>当一个服务操作访问不同的数据库资源，又希望对它们的访问具有事务特性时，就需要采用分布式事务来协调所有的事务参与者。在这种情况下，起始于某个服务的事务在调用另外一个服务的时候，需要以某种机制流转到另外一个服务，从而使被调用的服务访问的资源也自动加入到该事务当中来。下图反映了这样一个跨越多个服务的分布式事务：</p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1553291001209.png"
+	width="1267"
+	height="412"
+	
+	loading="lazy"
+	
+		alt="1553291001209"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="307"
+		data-flex-basis="738px"
+	
+></p>
+<h4 id="134-多服务多数据源的分布式事务">1.3.4 多服务多数据源的分布式事务
+</h4><p>如果将上面这两种场景(一个服务可以调用多个数据库资源，也可以调用其他服务)结合在一起，对此进行延伸，整个分布式事务的参与者将会组成如下图所示的树形拓扑结构。在一个跨服务的分布式事务中，事务的发起者和提交均系同一个，它可以是整个调用的客户端，也可以是客户端最先调用的那个服务。</p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1553291217001.png"
+	width="1261"
+	height="589"
+	
+	loading="lazy"
+	
+		alt="1553291217001"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="214"
+		data-flex-basis="513px"
+	
+></p>
+<p>较之基于单一数据库资源访问的本地事务，分布式事务的应用架构更为复杂。在不同的分布式应用架构下，实现一个分布式事务要考虑的问题并不完全一样，比如对多资源的协调、事务的跨服务传播等，实现机制也是复杂多变。</p>
+<p>事务的作用：==保证每个事务的数据一致性。==</p>
+<h3 id="14-cap定理面试">1.4 CAP定理（面试）
+</h3><p>CAP 定理，又被叫作布鲁尔定理。对于设计分布式系统(不仅仅是分布式事务)的架构师来说，CAP 就是你的入门理论。</p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/cap.png"
+	width="559"
+	height="537"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="104"
+		data-flex-basis="249px"
+	
+></p>
+<p>**C (一致性)：**对某个指定的客户端来说，读操作能返回最新的写操作。</p>
+<p>对于数据分布在不同节点上的数据来说，如果在某个节点更新了数据，那么在其他节点如果都能读取到这个最新的数据，那么就称为强一致，如果有某个节点没有读取到，那就是分布式不一致。</p>
+<p>**A (可用性)：**非故障的节点在合理的时间内返回合理的响应(不是错误和超时的响应)。可用性的两个关键一个是合理的时间，一个是合理的响应。</p>
+<p>合理的时间指的是请求不能无限被阻塞，应该在合理的时间给出返回。合理的响应指的是系统应该明确返回结果并且结果是正确的，这里的正确指的是比如应该返回 50，而不是返回 40。</p>
+<p>**P (网络分区容错性)：**当出现网络分区后，系统能够继续工作。打个比方，这里集群有多台机器，有台机器网络出现了问题，但是这个集群仍然可以正常工作。</p>
+<p>CAP定理中: 所有架构只能够满足C A P 三个中间的两个!</p>
+<h2 id="2-分布式事务解决方案面试">2 分布式事务解决方案（面试）
+</h2><p>1.XA两段提交(强一致)</p>
+<p>2.TCC三段提交(强一致)</p>
+<p>3.本地消息表(MQ+Table)(最终一致)</p>
+<p>4.事务消息(RocketMQ[alibaba])(最终一致)</p>
+<p>==5.Seata(alibaba)==</p>
+<p>6.RabbitMQ的ACK机制实现分布式事务(拓展)</p>
+<blockquote>
+<p><strong>一致性拓展：</strong></p>
+<ul>
+<li><strong>强一致性</strong>：只要系统提供服务，那么数据一定一致的。</li>
+<li><strong>弱一致性</strong>：系统提供服务的时候，数据有可能不是一致的，而是要等待一段时间才能一致。</li>
+<li><strong>最终一致性</strong>：是弱一致性的特例，数据最终总会一致的，但是需要一定时间。</li>
+</ul>
+</blockquote>
+<h3 id="21--基于xa协议的两阶段提交2pc">2.1  基于XA协议的两阶段提交(2PC)
+</h3><blockquote>
+<p>X/Open 组织（即现在的 Open Group ）定义了分布式事务处理模型</p>
+<p><strong>XA协议</strong>：XA 是 X/Open 定义的交易中间件与数据库之间的接口规范（即接口函数），交易中间件用它来通知数据库事务的开始、结束以及提交、回滚等， XA 接口函数由数据库厂商提供。</p>
+</blockquote>
+<p>两阶段提交协议(Two Phase Commitment Protocol)中，涉及到两种角色</p>
+<p>一个事务协调者（coordinator）：负责协调多个参与者进行事务投票及提交(回滚)
+多个事务参与者（participants）：即本地事务执行者</p>
+<p>总共处理步骤有两个
+（1）投票阶段（voting phase）：协调者将通知事务参与者准备提交或取消事务，然后进入表决过程。参与者将告知协调者自己的决策：同意（事务参与者本地事务执行成功，但未提交）或取消（本地事务执行故障）；
+（2）提交阶段（commit phase）：收到参与者的通知后，协调者再向参与者发出通知，根据反馈情况决定各参与者是否要提交还是回滚；</p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565819561657.png"
+	width="1128"
+	height="474"
+	
+	loading="lazy"
+	
+		alt="1565819561657"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="237"
+		data-flex-basis="571px"
+	
+></p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565819640025.png"
+	width="1187"
+	height="461"
+	
+	loading="lazy"
+	
+		alt="1565819640025"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="257"
+		data-flex-basis="617px"
+	
+></p>
+<p>如果任一资源管理器在第一阶段返回准备失败，那么事务管理器会要求所有资源管理器在第二阶段执行回滚操作。通过事务管理器的两阶段协调，最终所有资源管理器要么全部提交，要么全部回滚，最终状态都是一致的</p>
+<p><strong>优点：</strong> 尽量保证了数据的强一致（无法完全保证），适合对数据强一致要求很高的关键领域。</p>
+<p><strong>缺点：</strong></p>
+<ul>
+<li>**同步阻塞问题：**执行过程中，所有参与节点都是事务阻塞型的。当参与者占有公共资源时，其他第三方节点访问公共资源不得不处于阻塞状态。</li>
+<li>**单点故障：**由于协调者的重要性，一旦协调者发生故障。参与者会一直阻塞下去。尤其在第二阶段，协调者发生故障，那么所有的参与者还都处于锁定事务资源的状态中，而无法继续完成事务操作。（如果是协调者挂掉，可以重新选举一个协调者，但是无法解决因为协调者宕机导致的参与者处于阻塞状态的问题）</li>
+<li>**数据不一致：**在二阶段提交的阶段二中，当协调者向参与者发送commit请求之后，发生了局部网络异常或者在发送commit请求过程中协调者发生了故障，这回导致只有一部分参与者接受到了commit请求。而在这部分参与者接到commit请求之后就会执行commit操作。但是其他部分未接到commit请求的机器则无法执行事务提交。于是整个分布式系统便出现了数据不一致性的现象。</li>
+<li>**==二阶段无法解决的问题：==**协调者再发出commit消息之后宕机，而唯一接收到这条消息的参与者同时也宕机了。那么即使协调者通过选举协议产生了新的协调者，这条事务的状态也是不确定的，没人知道事务是否被已经提交</li>
+</ul>
+<h3 id="22-三段提交3pc">2.2 三段提交（3PC）
+</h3><p>三段提交是两段提交的升级版</p>
+<p><strong>CanCommit阶段：询问阶段</strong></p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/555.png"
+	width="876"
+	height="262"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="334"
+		data-flex-basis="802px"
+	
+></p>
+<p>类似2PC的准备阶段，协调者向参与者发送CanCommit请求，询问是否可以执行事务提交操作，然后开始等待参与者的响应。</p>
+<p><strong>PreCommit阶段：事务执行但不提交阶段</strong></p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/666.png"
+	width="996"
+	height="281"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="354"
+		data-flex-basis="850px"
+	
+></p>
+<p>协调者根据参与者的反应情况来决定是否可以进行事务的PreCommit操作：</p>
+<ul>
+<li>协调者从所有的参与者获得的反馈都是Yes响应
+<ol>
+<li>
+<p>发送预提交请求协调者向参与者发送PreCommit请求；</p>
+</li>
+<li>
+<p>参与者接收到PreCommit请求后，执行事务操作，并将undo（执行前数据）和redo（执行后数据）信息记录到事务日志中；</p>
+</li>
+<li>
+<p>参与者成功的执行了事务操作，则返回ACK（确认机制：已确认执行）响应，同时开始等待最终指令。</p>
+</li>
+</ol>
+</li>
+<li>有任何一个参与者向协调者发送了No响应，或者等待超时
+<ol>
+<li>协调者向所有参与者发送中断请求请求。</li>
+</ol>
+</li>
+</ul>
+<ol start="2">
+<li>参与者收到来自协调者的中断请求之后（或超时之后，仍未收到协调者的请求），执行事务的中断。</li>
+</ol>
+<p><strong>doCommit阶段：事务提交阶段</strong></p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/444.png"
+	width="996"
+	height="297"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="335"
+		data-flex-basis="804px"
+	
+></p>
+<ul>
+<li>
+<p><strong>执行提交</strong></p>
+<ol>
+<li>
+<p>协调接收到所有参与者返回的ACK响应后，协调者向所有参与者发送doCommit请求。</p>
+</li>
+<li>
+<p>参与者接收到doCommit请求之后，执行最终事务提交，事务提交完之后，向协调者发送Ack响应并释放所有事务资源。</p>
+</li>
+<li>
+<p>协调者接收到所有参与者的ACK响应之后，完成事务。</p>
+</li>
+</ol>
+</li>
+<li>
+<p><strong>中断事务</strong></p>
+<ol>
+<li>协调者没有接收到参与者发送的ACK响应（可能是接受者发送的不是ACK响应，也可能响应超时），协调者向所有参与者发送中断请求；</li>
+<li>参与者接收到中断请求之后，利用其在阶段二记录的undo信息来执行事务的回滚操作，并在完成回滚之后，向协调者发送ACK消息，释放所有的事务资源。</li>
+<li>协调者接收到参与者反馈的ACK消息之后，执行事务的中断。</li>
+</ol>
+</li>
+</ul>
+<p>**优点：**相对于2PC，3PC主要解决的单点故障问题，并减少阻塞，因为一旦参与者无法及时收到来自协调者的信息之后，他会默认执行commit。而不会一直持有事务资源并处于阻塞状态。</p>
+<p>**缺点：**会导致数据一致性问题。由于网络原因，协调者发送的中断响应没有及时被参与者接收到，那么参与者在等待超时之后执行了commit操作。这样就和其他接到中断命令并执行回滚的参与者之间存在数据不一致的情况。</p>
+<h3 id="23-tcc补偿机制">2.3 TCC补偿机制
+</h3><p>TCC 其实就是采用的补偿机制，其核心思想是：==针对每个操作，都要注册一个与其对应的确认和补偿（撤销）操作==。三个阶段如下：</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th style="text-align: left">操作方法</th>
+          <th>含义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">Try</td>
+          <td>预留业务资源/数据效验-尝试检查当前操作是否可执行</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Confirm</td>
+          <td>确认执行业务操作，实际提交数据，不做任何业务检查。try成功，confirm必定成功</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Cancel</td>
+          <td>执行业务出错时，需要回滚数据的状态下执行的业务逻辑</td>
+      </tr>
+  </tbody>
+</table></div>
+<p>其核心在于将业务分为两个操作步骤完成。==不依赖事务协调器对分布式事务的支持，而是通过对业务逻辑的分解来实现分布式事务==。</p>
+<img src="images\1565819838546.png" alt="1565819838546" style="zoom:200%;" />
+<p>例如： 小红要向小白转账100元，执行流程：</p>
+<ol>
+<li>首先在 Try 阶段，要先调用远程接口检查小红的账户余额是否大于等于100元，若足够则对余额进行冻结，检查小白的账户状态是否正常。</li>
+<li>在 Confirm 阶段，执行远程调用的转账的操作，扣除小红账户100元，小白账户加100元。</li>
+<li>如果第2步执行成功，那么转账成功，小红账户解冻，流程结束。</li>
+<li>如果第二步执行失败，则调用服务A的Cancel方法，账户余额回滚100元及解冻小红账户，同时调用服务B的Cancel方法，账户扣除100元。</li>
+</ol>
+<p><strong>优点：</strong> 跟2PC比起来，实现以及流程相对简单了一些。</p>
+<p><strong>缺点：</strong></p>
+<ul>
+<li>
+<p>在2 3 4步中都有可能失败，从而导致数据不一致。</p>
+</li>
+<li>
+<p>TCC属于应用层的一种补偿方式，需要程序员在实现的时候多写很多补偿的代码，复杂业务场景下代码逻辑非常复杂。</p>
+</li>
+<li>
+<p>幂等性无法确保。</p>
+</li>
+</ul>
+<h3 id="24-本地消息表异步确保">2.4 本地消息表（异步确保）
+</h3><p>本地消息表这种实现方式应该是业界使用最多的，其核心思想是将==分布式事务拆分成本地事务进行处理==，这种思路是来源于ebay。我们可以从下面的流程图中看出其中的一些细节：</p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1553321000110.png"
+	width="801"
+	height="367"
+	
+	loading="lazy"
+	
+		alt="1553321000110"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="218"
+		data-flex-basis="523px"
+	
+></p>
+<p><strong>工作流程：</strong></p>
+<ol>
+<li>==消息生产方，需要额外建一个消息表==，并记录消息发送状态。消息表和业务数据要在一个事务里提交，也就是说他们要在一个数据库里面。然后消息会经过MQ发送到消息的消费方。如果消息发送失败，会进行重试发送。</li>
+<li>==消息消费方，需要处理这个消息==，并完成自己的业务逻辑。此时如果本地事务处理成功，表明已经处理成功了，如果处理失败， 果是业务上面的失败，可以给生产方发送一个业务补偿消息，通知生产方进行回滚等操作。</li>
+<li>生产方和消费方定时扫描本地消息表，把还没处理完成的消息或者失败的消息再发送一遍。</li>
+</ol>
+<p><strong>优点：</strong> 一种非常经典的实现，避免了分布式事务，实现了最终一致性。</p>
+<p><strong>缺点：</strong> 消息表会耦合到业务系统中，如果没有封装好的解决方案，会有很多杂活需要处理。</p>
+<h3 id="25-mq-事务消息">2.5 MQ 事务消息
+</h3><p>有一些第三方的MQ是支持事务消息的，比如RocketMQ，他们支持事务消息的方式也是类似于采用的二阶段提交，但是市面上一些主流的MQ都是不支持事务消息的，比如 RabbitMQ 和 Kafka 都不支持（RabbitMQ、Kafka基于ACK机制）。</p>
+<p>以阿里的 RocketMQ 中间件为例，流程为：</p>
+<ol>
+<li>发送一个事务消息，这个时候，RocketMQ将消息状态标记为Prepared，注意此时这条消息消费者是无法消费到的。</li>
+<li>执行业务代码逻辑。</li>
+<li>确认发送消息，RocketMQ将消息状态标记为可消费，这个时候消费者才能真正消费到这条消息。</li>
+<li>如果步骤3确认消息发送失败，RocketMQ会定期扫描消息集群中的事务消息，如果发现了Prepared消息，它会向消息发送端(生产者)确认。RocketMQ会根据发送端设置的策略来决定是回滚还是继续发送确认消息。这样就保证了消息发送与本地事务同时成功或同时失败。</li>
+</ol>
+<p><strong>正常流程图：</strong></p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/111.png"
+	width="800"
+	height="363"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="220"
+		data-flex-basis="528px"
+	
+></p>
+<p><strong>完整流程图：</strong></p>
+<img src="images\1.jpg" style="zoom:200%;" />
+<p><strong>优点：</strong> 实现了最终一致性，不需要依赖本地数据库事务。</p>
+<p><strong>缺点：</strong> 目前主流MQ中只有RocketMQ支持事务消息。</p>
+<p><strong>延申拓展：</strong></p>
+<p><u>MQ非事务消息实现：</u></p>
+<ul>
+<li><u>方案一：创建独立消息服务</u></li>
+<li><u>方案二：使用非事务MQ（RabbitMQ/Kafka）的ACK机制</u></li>
+</ul>
+<h3 id="26-seata">2.6 Seata
+</h3><h4 id="261-seata简介">2.6.1 Seata简介
+</h4><p>2019 年 1 月，阿里巴巴中间件团队发起了开源项目 <a class="link" href="https://www.oschina.net/p/fescar"  target="_blank" rel="noopener"
+    ><em>Fescar</em></a><em>（Fast &amp; Easy Commit And Rollback）</em>，和社区一起共建开源分布式事务解决方案。Fescar 的愿景是让分布式事务的使用像本地事务的使用一样，简单和高效，并逐步解决开发者们遇到的分布式事务方面的所有难题。</p>
+<p><strong>Fescar 开源后，蚂蚁金服加入 Fescar 社区参与共建，并在 Fescar 0.4.0 版本中贡献了 TCC 模式。</strong></p>
+<p>为了打造更中立、更开放、生态更加丰富的分布式事务开源社区，经过社区核心成员的投票，大家决定对 Fescar 进行品牌升级，并更名为 <strong>Seata</strong>，意为：<strong>Simple Extensible Autonomous Transaction Architecture</strong>，是一套一站式分布式事务解决方案。</p>
+<p>Seata 融合了阿里巴巴和蚂蚁金服在分布式事务技术上的积累，并沉淀了新零售、云计算和新金融等场景下丰富的实践经验。</p>
+<p><strong>核心组件：</strong></p>
+<ul>
+<li>Transaction Coordinator (TC)： 事务协调器，维护全局事务的运行状态，负责协调并驱动全局事务的提交或回滚。</li>
+<li>Transaction Manager (TM)： 控制全局事务的边界，负责开启一个全局事务，并最终发起全局提交或全局回滚的决议。</li>
+<li>Resource Manager (RM)： 控制分支事务，负责分支注册、状态汇报，并接收事务协调器的指令，驱动分支（本地）事务的提交和回滚。</li>
+</ul>
+<p><strong>工作流程：</strong></p>
+<ol>
+<li>TM 向 TC 申请开启一个全局事务，全局事务创建成功并生成一个全局唯一的事务ID（XID），XID 在微服务调用链路的上下文中传播。</li>
+<li>RM 向 TC 注册分支事务，接着执行这个分支事务并提交事务（==重点：RM在此阶段就已经执行了本地事务的提交/回滚==），最后将执行结果汇报给TC。</li>
+<li>TM 根据 TC 中所有的分支事务的执行情况，发起全局提交或回滚决议。</li>
+<li>TC 调度 XID 下管辖的全部分支事务完成提交或回滚请求。</li>
+</ol>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/333.png"
+	width="960"
+	height="551"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="174"
+		data-flex-basis="418px"
+	
+></p>
+<h4 id="262-seata支持的模式">2.6.2 Seata支持的模式
+</h4><p>seata中有两种常见分布式事务实现方案，AT及TCC</p>
+<ul>
+<li>
+<p>AT模式：赖于RM拥有本地数据库事务的能力，对于客户业务无侵入性</p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/222.png"
+	width="721"
+	height="260"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="277"
+		data-flex-basis="665px"
+	
+></p>
+</li>
+<li>
+<p>TCC 模式</p>
+</li>
+</ul>
+<h4 id="263-seata的优点">2.6.3 Seata的优点
+</h4><p><strong>对业务无侵入</strong>：即减少技术架构上的微服务化所带来的分布式事务问题对业务的侵入
+<strong>高性能</strong>：减少分布式事务解决方案所带来的性能消耗(2PC)</p>
+<h4 id="264-at模式">2.6.4 AT模式
+</h4><p>Seata AT模式是基于XA事务演进而来的一个分布式事务中间件，XA是一个基于数据库实现的分布式事务协议，本质上和两阶段提交一样，需要数据库支持，Mysql5.6以上版本支持XA协议，其他数据库如Oracle，DB2也实现了XA接口。</p>
+<p>AT模式分为两个阶段，如下：</p>
+<ul>
+<li><strong>第一阶段：本地数据备份阶段</strong></li>
+</ul>
+<ol>
+<li>Seata 的 JDBC 数据源代理通过对业务 SQL 的解析，把==业务数据在变化前后的数据镜像组织成回滚日志==（XID/分支事务ID（Branch ID/变化前的数据/变化后的数据）。</li>
+<li>将回滚日志存入一张日志表UNDO_LOG（==需要手动创建==）,并对UNDO_LOG表中的这条数据形成行锁（for update）。</li>
+<li>若锁定失败，说明有其他事务在操作这条数据，它会在一段时间内重试，重试失败则回滚本地事务，并向TC汇报本地事务执行失败。</li>
+</ol>
+<p>这样，可以保证：<strong>任何提交的业务数据的更新一定有相应的回滚日志存在</strong></p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565820909345.png"
+	width="1132"
+	height="378"
+	
+	loading="lazy"
+	
+		alt="1565820909345"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="299"
+		data-flex-basis="718px"
+	
+></p>
+<p><strong>目的：</strong></p>
+<ol>
+<li>基于这样的机制，分支的本地事务便可以在全局事务的第一阶段提交，并马上释放本地事务锁定的资源。</li>
+<li>有了回滚日志之后，可以在第一阶段释放对资源的锁定，降低了锁范围，提高效率，即使第二阶段发生异常需要回滚，只需找对undolog中对应数据并反解析成sql来达到回滚目的。</li>
+<li>Seata通过代理数据源（DataSource-&gt;DataSourceProxy）将业务sql的执行解析成undolog来与业务数据的更新同时入库，达到了对业务无侵入的效果</li>
+</ol>
+<p><strong>第二阶段：全局事务提交/回滚</strong></p>
+<ul>
+<li><strong>全局提交</strong>：
+<ol>
+<li>所有分支事务此时已经完成提交，所有分支事务提交都正常。</li>
+<li>==TM从TC获知后会决议执行====全局提交====，TC异步通知所有的RM释放UNDO_LOG表中的行锁==，同时清理掉UNDO_LOG表中刚才释放锁的那条数据。</li>
+</ol>
+</li>
+</ul>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565821037492.png"
+	width="1218"
+	height="525"
+	
+	loading="lazy"
+	
+		alt="1565821037492"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="232"
+		data-flex-basis="556px"
+	
+></p>
+<ul>
+<li><strong>全局回滚</strong>：
+<ol>
+<li>若任何一个RM一阶段事务提交失败，通知TC提交失败。</li>
+<li>==TM从TC获知后会决议执行全局回滚====，====TC向所有的RM发送回滚请求==。</li>
+<li>RM通过XID和Branch ID找到相应的回滚日志记录，<strong>通过回滚记录生成反向的更新 SQL 并执行</strong>，以完成分支的回滚，同时释放锁，清除UNDO_LOG表中释放锁的那条数据。</li>
+</ol>
+</li>
+</ul>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565821069728.png"
+	width="1207"
+	height="564"
+	
+	loading="lazy"
+	
+		alt="1565821069728"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="214"
+		data-flex-basis="513px"
+	
+></p>
+<h4 id="265-tcc模式">2.6.5 TCC模式
+</h4><p>seata也针对TCC做了适配兼容，支持TCC事务方案，原理前面已经介绍过，基本思路就是使用侵入业务上的补偿及事务管理器的协调来达到全局事务的一起提交及回滚。</p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/1565821173446.png"
+	width="1223"
+	height="615"
+	
+	loading="lazy"
+	
+		alt="1565821173446"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="198"
+		data-flex-basis="477px"
+	
+></p>
+<h2 id="27-跨mysql-ip测试">2.7 跨mysql ip测试
+</h2><p>插入数据库</p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/seata-16312535244541.png"
+	width="1204"
+	height="610"
+	
+	loading="lazy"
+	
+		alt="seata"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="197"
+		data-flex-basis="473px"
+	
+></p>
+<p>undo_log 表</p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/seata_undo_log.png"
+	width="1750"
+	height="438"
+	
+	loading="lazy"
+	
+		alt="seata_undo_log"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="399"
+		data-flex-basis="958px"
+	
+></p>
+<p>发生异常&ndash;回滚</p>
+<p><img src="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/images/seata%E5%9B%9E%E6%BB%9A.png"
+	width="1724"
+	height="747"
+	
+	loading="lazy"
+	
+		alt="seata回滚"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="230"
+		data-flex-basis="553px"
+	
+></p>
+<p>数据库可以看到之前被修改的数据被回滚了</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/">分布式事务</a>
+        
+            <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
+        
+            <a href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">并发编程</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">分布式锁</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

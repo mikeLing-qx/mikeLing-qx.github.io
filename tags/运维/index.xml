@@ -1,0 +1,1540 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>运维 on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/tags/%E8%BF%90%E7%BB%B4/</link>
+        <description>Recent content in 运维 on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Sat, 27 Apr 2024 15:39:00 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/tags/%E8%BF%90%E7%BB%B4/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Nginx</title>
+        <link>https://mikeLing-qx.github.io/p/nginx/</link>
+        <pubDate>Sat, 27 Apr 2024 15:39:00 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/nginx/</guid>
+        <description>&lt;h1 id=&#34;0-nginx-配置&#34;&gt;0. nginx 配置
+&lt;/h1&gt;&lt;p&gt;nginx配置文件主要分成四个部分：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;main，全局设置，影响其它部分所有设置&lt;/li&gt;
+&lt;li&gt;server，主机服务相关设置，主要用于指定虚拟主机域名、IP和端口&lt;/li&gt;
+&lt;li&gt;location，URL匹配特定位置后的设置，反向代理、内容篡改相关设置&lt;/li&gt;
+&lt;li&gt;upstream，上游服务器设置，负载均衡相关配置&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;server继承main，location继承server；upstream既不会继承指令也不会被继承。&lt;/p&gt;
+&lt;p&gt;​	在这四个部分当中，每个部分都包含若干指令，这些指令主要包含Nginx的主模块指令、事件模块 指令、HTTP核心模块指令，同时每个部分还可以使用其他HTTP模块指令，例如Http SSL模块、 HttpGzip Static模块和Http Addition模块等。&lt;/p&gt;
+&lt;p&gt;nginx 在 linux 的安装位置 一般为 /etc/nginx&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240805162750043.png&#34;
+	width=&#34;1139&#34;
+	height=&#34;708&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240805162750043&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;160&#34;
+		data-flex-basis=&#34;386px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;示例配置&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;# 全局块配置
+user administrator administrators; # 配置用户或者组，默认为nobody nobody。
+worker_processes 2; # 允许生成的进程数，默认为1
+pid /nginx/pid/nginx.pid; # 指定nginx进程运行文件存放地址
+
+events {
+    accept_mutex on; # 设置网路连接序列化，防止惊群现象发生，默认为on
+    multi_accept on; # 设置一个进程是否同时接受多个网络连接，默认为off
+    worker_connections 1024; # 最大连接数，默认为512
+    # use epoll; # 事件驱动模型，可选select|poll|kqueue|epoll等
+}
+
+http {
+    include mime.types; # 文件扩展名与文件类型映射表
+    default_type application/octet-stream; # 默认文件类型，默认为text/plain
+
+    # access_log off; # 取消服务日志
+    log_format myFormat &#39;$remote_addr–$remote_user [$time_local] $request &#39;
+                      &#39;$status $body_bytes_sent $http_referer $http_user_agent &#39;
+                      &#39;$http_x_forwarded_for&#39;;
+    # 自定义格式
+    access_log log/access.log myFormat; # combined为日志格式的默认值
+
+    sendfile on; # 允许sendfile方式传输文件，默认为off
+    sendfile_max_chunk 100k; # 每个进程每次调用传输数量不能大于设定的值，默认为0
+
+    keepalive_timeout 65; # 连接超时时间，默认为75s
+
+    upstream mysvr {
+        server 127.0.0.1:7878;
+        server 192.168.10.121:3333 backup; # 热备
+    }
+
+    error_page 404 https://www.baidu.com;  # 错误页重定向
+
+    server {
+        keepalive_requests 120; # 单连接请求上限次数
+        listen 4545; # 监听端口
+        server_name 127.0.0.1; # 监听地址
+
+        location ~*^.+$ { # 请求的url过滤，正则匹配
+            # root path; # 根目录
+            # index vv.txt; # 设置默认页
+            proxy_pass http://mysvr; # 请求转向mysvr 定义的服务器列表
+            deny 127.0.0.1; # 拒绝的ip
+            allow 172.18.5.54; # 允许的ip
+        }
+    }
+}
+
+error_log log/error.log debug; # 指定日志路径和级别
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;1-upstream-负载均衡策略&#34;&gt;1. upstream 负载均衡策略
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;#动态服务器组
+upstream dynamicserver {
+	server 192.168.64.1:9001; #tomcat 1
+	server 192.168.64.1:9002; #tomcat 2
+	server 192.168.64.1:9003; #tomcat 3
+	server 192.168.64.1:9004; #tomcat 4
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240805165324863.png&#34;
+	width=&#34;791&#34;
+	height=&#34;503&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240805165324863&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;157&#34;
+		data-flex-basis=&#34;377px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240805165337592.png&#34;
+	width=&#34;800&#34;
+	height=&#34;393&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240805165337592&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;203&#34;
+		data-flex-basis=&#34;488px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;在轮询中，==如果服务器down掉了，会自动剔除该服务器==。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;默认配置就是轮询策略。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;此策略适合服务器配置相当，无状态且短平快的服务使用&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;==weight权重方式==&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-conf&#34;&gt;#动态服务器组
+upstream dynamicserver {
+	server 192.168.64.1:9001 weight=2; #tomcat 1
+	server 192.168.64.1:9002; #tomcat 2
+	server 192.168.64.1:9003 backup; #tomcat 3
+	server 192.168.64.1:9004 max_fails=3 fail_timeout=20s; #tomcat 4
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;权重越高分配到需要处理的请求越多。&lt;/li&gt;
+&lt;li&gt;此策略可以与least_conn和ip_hash结合使用。&lt;/li&gt;
+&lt;li&gt;此策略比较适合服务器的硬件配置差别比较大的情况。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;==&lt;strong&gt;ip_hash&lt;/strong&gt;==&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;指定负载均衡器按照基于客户端IP的分配方式，这个方法确保了相同的客户端的请求一直发送到相&lt;/p&gt;
+&lt;p&gt;同的服务器，以保证session会话。这样每个访客都固定访问一个后端服务器，可以解决session不&lt;/p&gt;
+&lt;p&gt;能跨服务器的问题。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;upstream dynamicserver {
+	ip_hash; #保证每个访客固定访问一个后端服务器
+	server 192.168.64.1:9001 weight=2; #tomcat 1
+	server 192.168.64.1:9002; #tomcat 2
+	server 192.168.64.1:9003 backup; #tomcat 3
+	server 192.168.64.1:9004 max_fails=3 fail_timeout=20s; #tomcat 4
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;在nginx版本1.3.1之前，不能在ip_hash中使用权重（weight）。&lt;/li&gt;
+&lt;li&gt;ip_hash不能与backup同时使用。&lt;/li&gt;
+&lt;li&gt;此策略适合有状态服务，比如session。&lt;/li&gt;
+&lt;li&gt;当有服务器需要剔除，必须手动down掉。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;least_conn&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;把==请求转发给连接数较少的后端服务器==。轮询算法是把请求平均的转发给各个后端，使它们的负载&lt;/p&gt;
+&lt;p&gt;大致相同；但是，有些请求占用的时间很长，会导致其所在的后端负载较高。这种情况下， least_conn这种方式就可以达到更好的负载均衡效&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;upstream dynamicserver {
+	least_conn; #把请求转发给连接数较少的后端服务器
+	server 192.168.64.1:9001 weight=2; #tomcat 1
+	server 192.168.64.1:9002; #tomcat 2
+	server 192.168.64.1:9003 backup; #tomcat 3
+	server 192.168.64.1:9004 max_fails=3 fail_timeout=20s; #tomcat 4
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;==重试策略==&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;upstream dynamicserver {
+	server 192.168.64.1:9001 fail_timeout=60s max_fails=3; #Server A
+	server 192.168.64.1:9002 fail_timeout=60s max_fails=3; #Server B
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;可以配置nginx 能够到其它的服务器进行重试, 并且可以配置指定的错误码&lt;/p&gt;
+&lt;p&gt;官方说明&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Syntax: proxy_next_upstream error | timeout | invalid_header | http_500 | 
+
+http_502 | http_503 | http_504 | http_403 | http_404 | off ...; 
+
+Default: proxy_next_upstream error timeout; 
+
+Context: http, server, location
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;upstream dynamicserver {
+	server 192.168.64.1:9001 fail_timeout=60s max_fails=3; #tomcat 1
+	server 192.168.64.1:9002 fail_timeout=60s max_fails=3; #tomcat 2
+}
+server {
+	server_name www.itcast.com;
+	default_type text/html;
+	charset utf-8;
+	location ~ .*$ {
+	index index.jsp index.html;
+	proxy_pass http://dynamicserver;
+	#下一节点重试的错误状态
+	proxy_next_upstream error timeout http_500 http_502 http_503
+	http_504;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-跨域配置&#34;&gt;2. 跨域配置
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;server {
+    listen 80;
+    server_name test.cross.com;
+
+    if ($host ~ (.*).cross.com) {
+        set $domain $1; ##记录二级域名值
+    }
+
+    # 是否允许请求带有验证信息
+    add_header Access-Control-Allow-Credentials true;
+
+    # 允许跨域访问的域名,可以是一个域的列表，也可以是通配符*
+    add_header Access-Control-Allow-Origin http://static.enjoy.com;
+
+    # 允许脚本访问的返回头
+    add_header Access-Control-Allow-Headers &#39;x-requested-with,content-type,Cache-Control,Pragma,Date,x-timestamp&#39;;
+
+    # 允许使用的请求方法，以逗号隔开
+    add_header Access-Control-Allow-Methods &#39;POST,GET,OPTIONS,PUT,DELETE&#39;;
+
+    # 允许自定义的头部，以逗号隔开,大小写不敏感
+    add_header Access-Control-Expose-Headers &#39;WWW-Authenticate,Server-Authorization&#39;;
+
+    # P3P支持跨域cookie操作
+    add_header P3P &#39;policyref=&amp;quot;/w3c/p3p.xml&amp;quot;, CP=&amp;quot;NOI DSP PSAa OUR BUS IND ONL UNI COM NAV INT LOC&amp;quot;&#39;;
+
+    if ($request_method = &#39;OPTIONS&#39;) { ##OPTIONS类的请求，是跨域先验请求
+        return 204; ##204代表ok
+    }
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;1-nginx-安装&#34;&gt;1. nginx 安装
+&lt;/h1&gt;&lt;pre&gt;&lt;code&gt;# 下载nginx
+wget http://nginx.org/download/nginx-1.21.1.tar.gz
+# 解压nginx
+tar -zxvf
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;进入auto目录&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240805152526474.png&#34;
+	width=&#34;643&#34;
+	height=&#34;623&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240805152526474&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;103&#34;
+		data-flex-basis=&#34;247px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;​	cc是用于编译的，对所有的操作系统的判断在os里面，其他所有文件都是为了辅助configure文件在 执行的时候去判定支持哪些模块，当前的操作系统有哪些特性可以供nginx使用 然后我们在看图1中，conf是配置文件的示例文件，方便我们在安装完以后可以直接把conf里面的 配置文件复制到安装目录下面, CHANGES这个文件里面描述了nginx的哪些特性,CHANGES.ru是一个俄罗 斯版本的描述，因为nginx的作者是一个俄罗斯人，configure是一个用来生成中间文件进行编译前的一 个必备动作 接下来我们通过 ./configure &amp;ndash;help | more 命令来查看一下&lt;/p&gt;
+&lt;h1 id=&#34;2-nginx-常用命令&#34;&gt;2. nginx 常用命令
+&lt;/h1&gt;&lt;pre&gt;&lt;code&gt;nginx -s reload #重新加载配置文件
+nginx -t -c /路径/nginx.conf # 检查配置文件是否正确
+nginx -v
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;3-openresty&#34;&gt;3. openresty
+&lt;/h1&gt;&lt;h2 id=&#34;1-yum-安装&#34;&gt;1. yum 安装
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;sudo yum install yum-utils
+
+sudo yum-config-manager --add-repo https://openresty.org/package/centos/openresty.repo
+
+sudo yum install openresty
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;环境设置&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;vi /etc/profile ##加入path路径
+export PATH=$PATH:/usr/local/openresty/nginx/sbin
+source /etc/profile ##生效配置
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;查看&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;nginx -v
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-常用命令&#34;&gt;2. 常用命令
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240805192301330.png&#34;
+	width=&#34;722&#34;
+	height=&#34;617&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240805192301330&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;117&#34;
+		data-flex-basis=&#34;280px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;3-商品详情页--架构&#34;&gt;3. 商品详情页&amp;ndash;架构
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240805192555827.png&#34;
+	width=&#34;924&#34;
+	height=&#34;468&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240805192555827&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;197&#34;
+		data-flex-basis=&#34;473px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;把商品详情页直接做成一个静态页面，&lt;/li&gt;
+&lt;li&gt;然后这样子每次全量的更新，把数据全部静态放 到 redis 里面，&lt;/li&gt;
+&lt;li&gt;每次数据变化的时候，我们就通过一个Java服务去渲染这个数据&lt;/li&gt;
+&lt;li&gt;然后把这个静态页面 推送到到文件服务器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;缺点&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;这种方案的缺点，如果商品很多，那么渲染的时间会很长，达不到实时的效果&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;文件服务器性能高，tomcat性能差，压力都在Tomcat服务器了&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;只能处理一些静态的东西，如果动态数据很多，比如有库存的，你不可能说每次去渲染，然后推送&lt;/p&gt;
+&lt;p&gt;到文件服务器，那不是更加慢？&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;通过openresty 改造的&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240805192746412.png&#34;
+	width=&#34;962&#34;
+	height=&#34;555&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240805192746412&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;173&#34;
+		data-flex-basis=&#34;416px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;生成静态页&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;添加修改页面的时候生成静态页，这个地方生成的是一个通用的静态页，敏感数据比如 价格，商品&lt;/p&gt;
+&lt;p&gt;名称等，通过占位符来替换，然后将生成的静态页的链接，以及敏感数据同步到redis中，如果只修改价&lt;/p&gt;
+&lt;p&gt;格不需要重新生成静态页，只需要修改redis敏感数据即可。&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;&lt;strong&gt;推送到文件服务器&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;这个的文件服务器泛指能够提供静态文件处理的文件服务器，nginx代理静态文件，tomcat，以及&lt;/p&gt;
+&lt;p&gt;OSS等都算静态文件服务器，生成完静态文件后将文件推送到文件服务器，==并将请求连接存放进redis中==&lt;/p&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;&lt;strong&gt;布隆过滤器过滤请求&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Redis和nginx的速度很快，但是如果有人恶意请求不存在的请求会造成redis很大的开销，那么可以&lt;/p&gt;
+&lt;p&gt;采用布隆过滤器将不存在的请求过滤出去。&lt;/p&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;&lt;strong&gt;lua直连Redis读取数据&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;因为java连接Reids进行操作并发性能很弱，相对于OpenResty来说性能差距很大，这里使用&lt;/p&gt;
+&lt;p&gt;OpenResty，读取Redis中存放的URL以及敏感数据。&lt;/p&gt;
+&lt;ol start=&#34;5&#34;&gt;
+&lt;li&gt;&lt;strong&gt;OpenResty渲染数据&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;从Redis获取到URL后lua脚本抓取模板页面内容，==然后通过redis里面的敏感数据进行渲染==然后返回&lt;/p&gt;
+&lt;p&gt;前端，因为都是lua脚本操作性能会很高&lt;/p&gt;
+&lt;h2 id=&#34;4-redis布隆过滤器&#34;&gt;4. redis布隆过滤器
+&lt;/h2&gt;&lt;p&gt;==它用于高效地判断一个元素是否在一个集合中，特别适用于需要快速判断大量数据的场景==&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240806093230755.png&#34;
+	width=&#34;966&#34;
+	height=&#34;529&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240806093230755&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;182&#34;
+		data-flex-basis=&#34;438px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;布隆过滤器的原理&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;布隆过滤器其==本质就是一个只包含0和1的数组==。具体操作当一个元素被加入到集合里面后，该元素&lt;/p&gt;
+&lt;p&gt;通过K个Hash函数运算得到K个hash后的值，然后将K个值映射到这个位数组对应的位置，把对应位置的&lt;/p&gt;
+&lt;p&gt;值设置为1。查询是否存在时，我们就看对应的映射点位置如果全是1，他就很可能存在（跟hash函数的&lt;/p&gt;
+&lt;p&gt;个数和hash函数的设计有关），如果有一个位置是0，那这个元素就一定不存在&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;1-包安装&#34;&gt;1. 包安装
+&lt;/h3&gt;&lt;p&gt;创建目录&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;mkdir -p /tmp/etc/redis/
+mkdir -p /tmp/data/redis/node{1..6}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;redis 配置文件&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;cat &amp;gt; /tmp/etc/redis/redis.conf&amp;lt;&amp;lt; EOF
+protected-mode no
+port 6379
+tcp-backlog 511
+timeout 0
+tcp-keepalive 300
+daemonize no
+supervised no
+pidfile /var/run/redis_6379.pid
+loglevel notice
+logfile &amp;quot;&amp;quot;
+databases 1
+always-show-logo yes
+save 900 1
+save 300 10
+save 60 10000
+stop-writes-on-bgsave-error yes
+rdbcompression yes
+rdbchecksum yes
+dbfilename dump.rdb
+rdb-del-sync-files no
+dir ./
+replica-serve-stale-data yes
+replica-read-only yes
+repl-diskless-sync no
+repl-diskless-sync-delay 5
+repl-diskless-load disabled
+repl-disable-tcp-nodelay no
+replica-priority 100
+acllog-max-len 128
+lazyfree-lazy-eviction no
+lazyfree-lazy-expire no
+lazyfree-lazy-server-del no
+replica-lazy-flush no
+lazyfree-lazy-user-del no
+oom-score-adj no
+oom-score-adj-values 0 200 800
+appendonly yes
+appendfilename &amp;quot;appendonly.aof&amp;quot;
+appendfsync everysec
+no-appendfsync-on-rewrite no
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb
+aof-load-truncated yes
+aof-use-rdb-preamble yes
+lua-time-limit 5000
+cluster-enabled yes
+cluster-config-file nodes-6379.conf
+cluster-node-timeout 15000
+slowlog-log-slower-than 10000
+slowlog-max-len 128
+latency-monitor-threshold 0
+notify-keyspace-events &amp;quot;&amp;quot;
+hash-max-ziplist-entries 512
+hash-max-ziplist-value 64
+list-max-ziplist-size -2
+list-compress-depth 0
+set-max-intset-entries 512
+zset-max-ziplist-entries 128
+zset-max-ziplist-value 64
+hll-sparse-max-bytes 3000
+stream-node-max-bytes 4096
+stream-node-max-entries 100
+activerehashing yes
+client-output-buffer-limit normal 0 0 0
+client-output-buffer-limit replica 256mb 64mb 60
+client-output-buffer-limit pubsub 32mb 8mb 60
+hz 10
+dynamic-hz yes
+aof-rewrite-incremental-fsync yes
+rdb-save-incremental-fsync yes
+jemalloc-bg-thread yes
+loadmodule /etc/redis/redisbloom.so
+EOF
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;docker-compose.yml&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;version: &#39;2&#39;
+
+services:
+  redis01:
+    image: redis
+    hostname: redis01
+    container_name: redis01
+    networks:
+      docker-network:
+          ipv4_address: 172.31.0.2
+    ports:
+      - &amp;quot;7001:6379&amp;quot;
+    volumes:
+      - &amp;quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&amp;quot;
+      - &amp;quot;/tmp/data/redis/node1:/data&amp;quot;
+      - &amp;quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&amp;quot;
+    command: redis-server /etc/redis/redis.conf
+
+  redis02:
+    image: redis
+    hostname: redis02
+    container_name: redis02
+    networks:
+      docker-network:
+          ipv4_address: 172.31.0.3
+    ports:
+      - &amp;quot;7002:6379&amp;quot;
+    volumes:
+      - &amp;quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&amp;quot;
+      - &amp;quot;/tmp/data/redis/node2:/data&amp;quot;
+      - &amp;quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&amp;quot;
+    command: redis-server /etc/redis/redis.conf
+
+  redis03:
+    image: redis
+    hostname: redis03
+    container_name: redis03
+    networks:
+      docker-network:
+          ipv4_address: 172.31.0.4
+    ports:
+      - &amp;quot;7003:6379&amp;quot;
+    volumes:
+      - &amp;quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&amp;quot;
+      - &amp;quot;/tmp/data/redis/node3:/data&amp;quot;
+      - &amp;quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&amp;quot;
+    command: redis-server /etc/redis/redis.conf
+
+  redis04:
+    image: redis
+    hostname: redis04
+    container_name: redis04
+    networks:
+      docker-network:
+          ipv4_address: 172.31.0.5
+    ports:
+      - &amp;quot;7004:6379&amp;quot;
+    volumes:
+      - &amp;quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&amp;quot;
+      - &amp;quot;/tmp/data/redis/node4:/data&amp;quot;
+      - &amp;quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&amp;quot;
+    command: redis-server /etc/redis/redis.conf
+
+  redis05:
+    image: redis
+    hostname: redis05
+    container_name: redis05
+    networks:
+       docker-network:
+          ipv4_address: 172.31.0.6
+    ports:
+      - &amp;quot;7005:6379&amp;quot;
+    volumes:
+      - &amp;quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&amp;quot;
+      - &amp;quot;/tmp/data/redis/node5:/data&amp;quot;
+      - &amp;quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&amp;quot;
+    command: redis-server /etc/redis/redis.conf
+
+  redis06:
+    image: redis
+    hostname: redis06
+    container_name: redis06
+    networks:
+      docker-network:
+          ipv4_address: 172.31.0.7
+    ports:
+      - &amp;quot;7006:6379&amp;quot;
+    volumes:
+      - &amp;quot;/tmp/etc/redis/redis.conf:/etc/redis/redis.conf&amp;quot;
+      - &amp;quot;/tmp/data/redis/node6:/data&amp;quot;
+      - &amp;quot;/tmp/etc/redis/redisbloom.so:/etc/redis/redisbloom.so&amp;quot;
+    command: redis-server /etc/redis/redis.conf
+
+networks:
+  docker-network:
+    ipam:
+      config:
+        - subnet: 172.31.0.0/16
+          gateway: 172.31.0.1
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;2--docker-安装&#34;&gt;2.  docker 安装
+&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;docker run -d -p 6379:6379 --name redis-redisbloom redislabs/rebloom:latest
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;3-常用命令&#34;&gt;3. 常用命令
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/nginx/images/image-20240807190515768.png&#34;
+	width=&#34;739&#34;
+	height=&#34;730&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240807190515768&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;101&#34;
+		data-flex-basis=&#34;242px&#34;
+	
+&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>计算机网络</title>
+        <link>https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</link>
+        <pubDate>Mon, 25 Mar 2024 16:10:33 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/</guid>
+        <description>&lt;p&gt;入门&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;图解http&lt;/li&gt;
+&lt;li&gt;图解tcp/ip&lt;/li&gt;
+&lt;li&gt;网络是怎样连接的
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.bilibili.com/video/BV1c4411d7jb/?p=1&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.bilibili.com/video/BV1c4411d7jb/?p=1&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;资料:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;TCP 协议的 RFC文档: &lt;a class=&#34;link&#34; href=&#34;https://datatracker.ietf.org/doc/rfc1644/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://datatracker.ietf.org/doc/rfc1644/&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;如何判断一个IP是内网还是外网&lt;/p&gt;
+&lt;p&gt;IP地址分为3类：A类、B类和C类。这三类地址中的第一个字节，分别是1&lt;del&gt;126、128&lt;/del&gt;191、192~223&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;通常情况下，我们认为的内网IP地址都是从以下三个网段中获得：&lt;/p&gt;
+&lt;p&gt;10.0.0.0 ~ 10.255.255.255
+172.16.0.0 ~ 172.31.255.255
+192.168.0.0 ~ 192.168.255.255&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;1-浏览器网址&#34;&gt;1. 浏览器网址
+&lt;/h1&gt;&lt;p&gt;当在浏览器输入一个网址后发生了什么?&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;DNS解析获取IP&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;HTTP的传输工作就交给了操作系统中的==协议栈==, 调用操作系统API, Socket库, 委托协议栈工作,&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;协议栈上半有两部分 TCP 和UDP,  它们会接受应用层委托, ==执行收发数据的操作==&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;下半 是用IP协议, 控制网络包收发操作, 互联网上传数据时，数据会被切分成一块块的&lt;/p&gt;
+&lt;p&gt;网络包，而将网络包发送给对方的操作就是由 IP 负责的,==IP协议还包括ICMP 协议和 ARP 协议==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;​	==ICMP==用于告知网络包传送过程中==产生的错误以及各种控制信息==&lt;/li&gt;
+&lt;li&gt;​    ==ARP== 用于根据 IP 地址查询相应的以太网 MAC 地址&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;IP下面的==网卡驱动程序==负责控制 网卡硬件, ==物理硬件网卡==负责实际的收发操作, 也就是对网线中的信号执行发送和接收操作&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;封装IP报文, 包括: 源IP地址, 目标IP地址&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;生成了IP头部之后, 接下来网络包还需要在==IP头部的前面加上 MAC头部==&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;发送方, MAC 地址是在网卡生产时写入到 ROM 里的，只要将这个值读&lt;/p&gt;
+&lt;p&gt;取出来写入到 MAC 头部就可以了&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;接收方的MAC地址&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;发包时：先查询 ARP 缓存，如果其中已经保存了对方的 MAC 地址，就不需要发送 ARP 查询，直接使用ARP 缓存中的地址。&lt;/li&gt;
+&lt;li&gt;而当 ARP 缓存中不存在对方 MAC 地址时，则发送 ARP 广播查询。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;协议类型&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;然后通过交换机, 路由器, 层层转发, 源IP和目标IP是不变的, 但是MAC地址会不断转化&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;数据包抵达服务器之后, 服务器会查看数据包的 ==MAC 头部, 是否与自己的mac地址符合==, 匹配上就把包收起来, 接着继续查看 ==数据包的IP头, 发现目标地址是自己==, 然后查看==IP头中的协议项==, 知道是TCP协议, 打开TCP的头部, 里面有==序列号==, 如果是需要的就放入缓存中, 然后就返回一个ACK, 不是就丢弃, TCP头部里面还有==端口号==, HTTP的服务器正在监听这个端口号,  于是服务器就把 报发给HTTP 进程, 服务器的HTTP 进程看到这个请求要访问一个页面, 于是就把这个网页封装到 HTTP响应报文里面;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230228181603647.png&#34;
+	width=&#34;748&#34;
+	height=&#34;744&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230228181603647&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;100&#34;
+		data-flex-basis=&#34;241px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230302175155657.png&#34;
+	width=&#34;604&#34;
+	height=&#34;587&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230302175155657&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;102&#34;
+		data-flex-basis=&#34;246px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;2-tcp&#34;&gt;2. TCP
+&lt;/h1&gt;&lt;h2 id=&#34;0-概述&#34;&gt;0. 概述
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230301110206252.png&#34;
+	width=&#34;511&#34;
+	height=&#34;523&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230301110206252&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;97&#34;
+		data-flex-basis=&#34;234px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;TCP 是一个面向连接的, 可靠的 基于字节流的传输层协议, 它能确保==接收端==的网络包是==无损坏, 无间隔, 非冗余和按序的;&lt;/p&gt;
+&lt;p&gt;建立一个TCP连接需要客户端和服务端达成三个消息的共识&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Socket: 有IP地址和端口号组成&lt;/li&gt;
+&lt;li&gt;序列号: 用来解决乱序问题&lt;/li&gt;
+&lt;li&gt;窗口大小: 用来做流量控制&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;1-tcp-和-udp的区别&#34;&gt;1. TCP 和 UDP的区别
+&lt;/h2&gt;&lt;p&gt;&lt;em&gt;1.&lt;/em&gt;  ==连接==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TCP 是面向连接的传输层协议，传输数据前先要建立连接。&lt;/li&gt;
+&lt;li&gt;UDP 是不需要连接，即刻传输数据。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;2.&lt;/em&gt; ==服务对象==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TCP 是一对一的两点服务，即一条连接只有两个端点。&lt;/li&gt;
+&lt;li&gt;UDP 支持一对一、一对多、多对多的交互通信&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;3.&lt;/em&gt;  ==可靠性==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TCP 是可靠交付数据的，数据可以无差错、不丢失、不重复、按需到达。&lt;/li&gt;
+&lt;li&gt;UDP 是尽最大努力交付，不保证可靠交付数据。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;4.&lt;/em&gt; ==拥塞控制、流量控制==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TCP 有拥塞控制和流量控制机制，保证数据传输的安全性。&lt;/li&gt;
+&lt;li&gt;UDP 则没有，即使网络非常拥堵了，也不会影响 UDP 的发送速率。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;5.&lt;/em&gt; ==首部开销==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;TCP 首部长度较长，会有一定的开销，首部在没有使用「选项」字段时是 20 个字节，如果使&lt;/p&gt;
+&lt;p&gt;用了「选项」字段则会变长的。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;UDP 首部只有 8 个字节，并且是固定不变的，开销较小。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;6.&lt;/em&gt;  ==传输方式==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;TCP 是流式传输，没有边界，但保证顺序和可靠。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;UDP 是一个包一个包的发送，是有边界的，但可能会丢包和乱序。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;7.&lt;/em&gt; ==分片不同==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;TCP 的数据大小如果大于 MSS 大小，则会在传输层进行分片，目标主机收到后，也同样在传输&lt;/p&gt;
+&lt;p&gt;层组装 TCP 数据包，如果中途丢失了一个分片，只需要传输丢失的这个分片。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;UDP 的数据大小如果大于 MTU 大小，则会在 IP 层进行分片，目标主机收到后，在 IP 层组装完&lt;/p&gt;
+&lt;p&gt;数据，接着再传给传输层，但是如果中途丢了一个分片，则就需要重传所有的数据包，这样传输&lt;/p&gt;
+&lt;p&gt;效率非常差，所以通常 UDP 的报文应该小于 MTU。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;==应用场景的区分==&lt;/p&gt;
+&lt;p&gt;由于 TCP 是面向连接，能保证数据的可靠性交付，因此经常用于：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;FTP 文件传输&lt;/li&gt;
+&lt;li&gt;HTTP / HTTPS&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;由于 UDP 面向无连接，它可以随时发送数据，再加上UDP本身的处理既简单又高效，因此经常用于：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;包总量较少的通信，如 DNS 、 SNMP 等&lt;/li&gt;
+&lt;li&gt;视频、音频等多媒体通信&lt;/li&gt;
+&lt;li&gt;广播通信&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;2-三次握手&#34;&gt;2. 三次握手
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230302200810185.png&#34;
+	width=&#34;636&#34;
+	height=&#34;519&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230302200810185&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;122&#34;
+		data-flex-basis=&#34;294px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230302201257254.png&#34;
+	width=&#34;647&#34;
+	height=&#34;380&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230302201257254&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;170&#34;
+		data-flex-basis=&#34;408px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;客户端会随机初始化序号（ client_isn ），将此序号置于 TCP 首部的「序号」字段中，同时把SYN 标志位置为 1 ，表示 SYN 报文。接着第一个 SYN 报文发送给服务端，表示向服务端发起连接，该报文不包含应用层数据，之后客户端处于 SYN-SENT 状态。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230302201306357.png&#34;
+	width=&#34;639&#34;
+	height=&#34;372&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230302201306357&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;171&#34;
+		data-flex-basis=&#34;412px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;服务端收到客户端的 SYN 报文后，首先服务端也随机初始化自己的序号（ server_isn ），将此序号填入 TCP 首部的「序号」字段中，其次把 TCP 首部的「确认应答号」字段填入 client_isn +1 , 接着把 SYN 和 ACK 标志位置为 1 。最后把该报文发给客户端，该报文也不包含应用层数据，之后服务端处于 SYN-RCVD 状态&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230302201339999.png&#34;
+	width=&#34;605&#34;
+	height=&#34;367&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230302201339999&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;164&#34;
+		data-flex-basis=&#34;395px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;客户端收到服务端报文后，还要向服务端回应最后一个应答报文，首先该应答报文 TCP 首部ACK 标志位置为 1 ，其次「确认应答号」字段填入 server_isn + 1 ，最后把报文发送给服务端，这次报文可以携带客户到服务器的数据，之后客户端处于 ESTABLISHED 状态。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;服务器收到客户端的应答报文后，也进入 ESTABLISHED 状态。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;TCP 三次握手建立连接的过程, ==目的是&lt;strong&gt;保证双方都有发送和接收的能力&lt;/strong&gt;==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;一开始，客户端和服务端都处于 CLOSED 状态。先是服务端主动监听某个端口，处于 LISTEN状态。&lt;/li&gt;
+&lt;li&gt;然后客户端主动发起连接 SYN ，之后处于 SYN-SENT 状态。&lt;/li&gt;
+&lt;li&gt;服务端收到发起的连接，返回 SYN ，并且 ACK 客户端的 SYN ，之后处于 SYN-RCVD 状态。&lt;/li&gt;
+&lt;li&gt;客户端收到服务端发送的 SYN 和 ACK 之后，发送 ACK 的 ACK ，之后处于ESTABLISHED 状态，因为它一发一收成功了。&lt;/li&gt;
+&lt;li&gt;服务端收到 ACK 的 ACK 之后，处于 ESTABLISHED 状态，因为它也一发一收了。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;查看TCP的连接状态&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;netstat -napt
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;最主要的原因是 三次握手才可以 ==初始化Socket, 序列号, 和窗口大小, 并建立TCP连接==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;三次握手才可以==阻止重复历史连接的初始化==（主要原因）&lt;/li&gt;
+&lt;li&gt;三次握手才可以==同步双方的初始序列号==&lt;/li&gt;
+&lt;li&gt;三次握手才可以==避免资源浪费==&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;==原因一==:  ==阻止重复历史连接的初始化==&lt;/p&gt;
+&lt;p&gt;客户端连续发送多次 SYN 建立连接的报文，在&lt;strong&gt;网络拥堵&lt;/strong&gt;情况下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;一个「旧 SYN 报文」比「最新的 SYN 」 报文早到达了服务端；&lt;/li&gt;
+&lt;li&gt;那么此时服务端就会回一个 SYN + ACK 报文给客户端；&lt;/li&gt;
+&lt;li&gt;客户端收到后可以根据自身的上下文，判断这是一个历史连接（序列号过期或超时），那么客户&lt;/li&gt;
+&lt;li&gt;端就会发送 RST 报文给服务端，表示中止这一次连接。&lt;/li&gt;
+&lt;li&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;如果是两次握手连接，就不能判断当前连接是否是历史连接，三次握手则可以在客户端（发送方）准备&lt;/p&gt;
+&lt;p&gt;发送第三次报文时，==客户端因有足够的上下文==来判断当前连接是否是历史连接：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果是历史连接（序列号过期或超时），则第三次握手发送的报文是 RST 报文，==以此中止历史连接==；&lt;/li&gt;
+&lt;li&gt;如果不是历史连接，则==第三次发送的报文是 ACK 报文，通信双方就会成功建立连接==；&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;所以，TCP 使用三次握手建立连接的最主要原因是==&lt;strong&gt;防止历史连接初始化了连接。&lt;/strong&gt;==&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230301113254254.png&#34;
+	width=&#34;609&#34;
+	height=&#34;805&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230301113254254&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;75&#34;
+		data-flex-basis=&#34;181px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;==原因二:==  同步双方初始序列号&lt;/p&gt;
+&lt;p&gt;TCP 协议的通信双方， ==都必须维护一个「序列号」==， 序列号是可靠传输的一个关键因素，&lt;/p&gt;
+&lt;p&gt;它的作用：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;==接收方可以去除重复的数据==；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;接收方可以根据数据包的序列号按序接收；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;可以标识发送出去的数据包中， 哪些是已经被对方收到的；&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;​	可见，序列号在 TCP 连接中占据着非常重要的作用，所以当客户端发送携带「初始序列号」的 SYN&lt;/p&gt;
+&lt;p&gt;报文的时候，需要服务端回一个 ACK 应答报文，表示客户端的 SYN 报文已被服务端成功接收，那当&lt;/p&gt;
+&lt;p&gt;服务端发送==「初始序列号」==给客户端的时候，依然也要得到客户端的应答回应，==这样一来一回==，才能确&lt;/p&gt;
+&lt;p&gt;保双方的==初始序列号能被可靠的同步==&lt;/p&gt;
+&lt;p&gt;==原因三: 避免资源的浪费==&lt;/p&gt;
+&lt;h2 id=&#34;3-总结&#34;&gt;3. 总结
+&lt;/h2&gt;&lt;p&gt;TCP 建立连接时，通过三次握手&lt;strong&gt;能防止历史连接的建立，能减少双方不必要的资源开销，能帮助双方同&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;步初始化序列号&lt;/strong&gt;。序列号能够保证数据包不重复、不丢弃和按序传输。&lt;/p&gt;
+&lt;p&gt;不使用「两次握手」和「四次握手」的原因：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;「两次握手」：无法防止历史连接的建立，会造成双方资源的浪费，也无法可靠的同步双方序列号；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;「四次握手」：三次握手就已经理论上最少可靠连接建立，所以不需要使用更多的通信次数。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;4-四次挥手&#34;&gt;4. 四次挥手
+&lt;/h2&gt;&lt;p&gt;双方都可以主动断开连接, 断开连接后主机中的&amp;rsquo;资源&amp;rsquo; 将会被释放&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230301174133492.png&#34;
+	width=&#34;616&#34;
+	height=&#34;608&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230301174133492&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;101&#34;
+		data-flex-basis=&#34;243px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;客户端打算关闭连接，此时会发送一个 TCP 首部 FIN 标志位被置为 1 的报文，也即 FIN&lt;/p&gt;
+&lt;p&gt;报文，之后客户端进入 FIN_WAIT_1 状态。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;服务端收到该报文后，就向客户端发送 ACK 应答报文，接着服务端进入 CLOSED_WAIT 状&lt;/p&gt;
+&lt;p&gt;态。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;客户端收到服务端的 ACK 应答报文后，之后进入 FIN_WAIT_2 状态。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;等待服务端处理完数据后，也向客户端发送 FIN 报文，之后服务端进入 LAST_ACK 状态。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;客户端收到服务端的 FIN 报文后，回一个 ACK 应答报文，之后进入 TIME_WAIT 状态&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;服务器收到了 ACK 应答报文后，就进入了 CLOSED 状态，至此服务端已经完成连接的关闭。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;客户端在经过 2MSL 一段时间后，自动进入 CLOSED 状态，至此客户端也完成连接的关闭。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;==每个方向都需要&lt;strong&gt;一个&lt;/strong&gt; &lt;strong&gt;FIN&lt;/strong&gt; &lt;strong&gt;和一个&lt;/strong&gt; &lt;strong&gt;ACK&lt;/strong&gt;，因此通常被称为&lt;strong&gt;四次挥手&lt;/strong&gt;, &lt;strong&gt;主动关闭连接的，才有&lt;/strong&gt; &lt;strong&gt;TIME_WAIT&lt;/strong&gt; &lt;strong&gt;状态。&lt;/strong&gt;==&lt;/p&gt;
+&lt;h3 id=&#34;1-为什么是四次挥手&#34;&gt;1. ==为什么是四次挥手==
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;关闭连接时，客户端向服务端发送 FIN 时，仅仅表示==客户端不再发送数据了但是还能接收数据==。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;服务器收到客户端的 FIN 报文时，==先回一个 ACK 应答报文==，而==服务端可能还有数据需要处理和发送，等服务端不再发送数据时，才发送 FIN 报文给客户端来表示同意现在关闭连接==。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;从上面过程可知，服务端通常需要等待完成数据的发送和处理，所以服务端的 ACK 和 FIN 一般都会分开发送，从而比三次握手导致多了一次&lt;/p&gt;
+&lt;h3 id=&#34;2-为什么time_wait-等待的时间是2msl&#34;&gt;2. 为什么TIME_WAIT 等待的时间是2MSL
+&lt;/h3&gt;&lt;p&gt;​	MSL 是 Maximum Segment Lifetime，&lt;strong&gt;报文最大生存时间&lt;/strong&gt;，它是任何报文在网络上存在的最长时间，超过这个时间报文将被丢弃。因为 TCP 报文基于是 ==IP 协议的==，而 ==IP 头中有一个 TTL 字段，是 IP 数据报可以经过的最大路由数==，==每经过一个处理他的路由器此值就减 1，当此值为 0 则数据报将被丢弃，同时发送 ICMP 报文通知源主机==。&lt;/p&gt;
+&lt;p&gt;​	MSL 与 TTL 的区别： MSL 的单位是时间，而 TTL 是经过路由跳数。所以 &lt;strong&gt;MSL&lt;/strong&gt; &lt;strong&gt;应该要大于等于&lt;/strong&gt; &lt;strong&gt;TTL****消耗为&lt;/strong&gt; &lt;strong&gt;0&lt;/strong&gt; &lt;strong&gt;的时间&lt;/strong&gt;，以确保报文已被自然消亡。&lt;/p&gt;
+&lt;p&gt;​	TIME_WAIT 等待 2 倍的 MSL，比较合理的解释是： ==网络中可能存在来自发送方的数据包，当这些发送方的数据包被接收方处理后又会向对方发送响应，所以&lt;strong&gt;一来一回需要等待&lt;/strong&gt; &lt;strong&gt;2&lt;/strong&gt; &lt;strong&gt;倍的时间&lt;/strong&gt;==。&lt;/p&gt;
+&lt;p&gt;​    比如如果==被动关闭方没有收到断开连接的最后的 ACK 报文==，就会触发超时==重发 Fin 报文==，另一方接收到 ==FIN 后，会重发 ACK 给被动关闭方， 一来一去正好 2 个 MSL==。&lt;/p&gt;
+&lt;p&gt;​	2MSL 的时间是从&lt;strong&gt;客户端接收到&lt;/strong&gt; &lt;strong&gt;FIN&lt;/strong&gt; &lt;strong&gt;后发送&lt;/strong&gt; &lt;strong&gt;ACK&lt;/strong&gt; &lt;strong&gt;开始计时的&lt;/strong&gt;。如果在 TIME-WAIT 时间内，因为客户端的 ACK 没有传输到服务端，客户端又接收到了服务端重发的 FIN 报文，那么 &lt;strong&gt;2MSL&lt;/strong&gt; &lt;strong&gt;时间将重新计****时&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;在 Linux 系统里 ==2MSL 默认是 60 秒==，那么一个 MSL 也就是 30 秒。&lt;strong&gt;Linux&lt;/strong&gt; &lt;strong&gt;系统停留在****TIME_WAIT&lt;/strong&gt; &lt;strong&gt;的时间为固定的&lt;/strong&gt; &lt;strong&gt;60&lt;/strong&gt; &lt;strong&gt;秒&lt;/strong&gt;。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;其定义在 Linux 内核代码里的名称为 TCP_TIMEWAIT_LEN：
+
+\#define TCP_TIMEWAIT_LEN (60*HZ) /* how long to wait to destroy TIME-WAIT
+
+state, about 60 seconds */
+
+如果要修改 TIME_WAIT 的时间长度，只能修改 Linux 内核代码里 TCP_TIMEWAIT_LEN 的值，并重
+
+新编译 Linux 内核
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;3-如果已建立连接-客户端故障了怎么办&#34;&gt;3. 如果已建立连接, 客户端故障了怎么办?
+&lt;/h3&gt;&lt;p&gt;​	TCP 有一个机制是&lt;strong&gt;保活机制&lt;/strong&gt;。这个机制的原理是这样的：&lt;/p&gt;
+&lt;p&gt;​	==定义一个时间段，在这个时间段内，如果没有任何连接相关的活动，TCP 保活机制会开始作用，每隔一个时间间隔，发送一个探测报文，该探测报文包含的数据非常少，如果连续几个探测报文都没有得到响应，则认为当前的 TCP 连接已经死亡，系统内核将错误信息通知给上层应用程序==&lt;/p&gt;
+&lt;p&gt;​	在 Linux 内核可以有对应的参数可以设置保活时间、保活探测的次数、保活探测的时间间隔，以下都为&lt;/p&gt;
+&lt;p&gt;默认值：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;net.ipv4.tcp_keepalive_time=7200
+net.ipv4.tcp_keepalive_intvl=75
+net.ipv4.tcp_keepalive_probes=9
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;tcp_keepalive_time=7200：表示保活时间是 7200 秒（2小时），也就 2 小时内如果没有任何连接相关的活动，则会启动保活机制&lt;/li&gt;
+&lt;li&gt;tcp_keepalive_intvl=75：表示每次检测间隔 75 秒；&lt;/li&gt;
+&lt;li&gt;tcp_keepalive_probes=9：表示检测 9 次无响应，认为对方是不可达的，从而中断本次的连接。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;5-可靠性保证&#34;&gt;5. 可靠性保证
+&lt;/h2&gt;&lt;h3 id=&#34;0-ack&#34;&gt;0. ACK
+&lt;/h3&gt;&lt;p&gt;​	在TCP连接建立成功之后，发送方发送数据包到接收方。当接收方接收到数据包后，会向发送方发送一个ACK确认消息，表示已经接收到了数据包;&lt;/p&gt;
+&lt;p&gt;​	TCP使用累积确认机制，==即ACK消息不仅确认了接收到的最新数据包，还会确认之前已经接收到的所有数据包==&lt;/p&gt;
+&lt;p&gt;​	ACK消息中的确认序号指的是==期望收到的下一个数据包的序号==。当收到的数据包序号为n时，确认序号应该为n+1&lt;/p&gt;
+&lt;h3 id=&#34;1-重传机制&#34;&gt;1. 重传机制
+&lt;/h3&gt;&lt;p&gt;常见的重传机制&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;超时重传&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;快速重传&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;SACK&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;D-SACk&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;1-超时重传&#34;&gt;1. 超时重传
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;发送数据时, 设定一个==定时器==, 当超过指定的时间后, 没有收到对方的 ==ACK==应答报文,就会重发该数据&lt;/li&gt;
+&lt;li&gt;出现的情况
+&lt;ul&gt;
+&lt;li&gt;数据包丢失, (数据包没有到达接收方)&lt;/li&gt;
+&lt;li&gt;没有收到ack应答 (接收方ack应答包没有被发送方接收到)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;超时重传时间应该设置为多少
+&lt;ul&gt;
+&lt;li&gt;RTT(Round-trip time 往返时延) ==数据从网络一端到达另一端所需要的时间==&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230302194050574.png&#34;
+	width=&#34;623&#34;
+	height=&#34;434&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230302194050574&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;143&#34;
+		data-flex-basis=&#34;344px&#34;
+	
+&gt;&lt;/li&gt;
+&lt;li&gt;RTO (超时重传时间), 较为合理的是==超时重传时间要略大于往返时间延迟RTT==,
+&lt;ul&gt;
+&lt;li&gt;实际上「报文往返 RTT 的值」是经常变化的，因为我们的网络也是时常变化的。也就因为「报文往返RTT 的值」 是经常波动变化的，所以「超时重传时间 RTO 的值」应该是一个&lt;strong&gt;动态变化的值&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;如果超时重发的数据，再次超时的时候，又需要重传的时候，==TCP 的策略是**超时间隔加倍==。&lt;strong&gt;也就是&lt;/strong&gt;每当遇到一次超时重传的时候，都会将下一次超时时间间隔设为先前值的两倍。==两次超时，就说明网络环境差，不宜频繁反复发送==。&lt;/li&gt;
+&lt;li&gt;超时触发重传==存在的问题是，超时周期可能相对较长==。那是不是可以有==更快的方式==呢？于是就可以用「==快速重传==」机制来解决超时重发的时间等待。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;2-快速重传&#34;&gt;2. 快速重传
+&lt;/h4&gt;&lt;p&gt;==为什么会是相同的ack 确认序号?==&lt;/p&gt;
+&lt;p&gt;​    ==不以时间为驱动, 而是以数据驱动重传==&lt;/p&gt;
+&lt;p&gt;​	快速重传的工作方式是==当收到三个相同的 ACK 报文时，会在定时器过期之前，重传丢失的报文段==。&lt;/p&gt;
+&lt;p&gt;​	快速重传机制只解决了一个问题，就是超时时间的问题，但是它依然面临着另外一个问题。就是==&lt;strong&gt;重传的时候，是重传之前的一个，还是重传所有的问题。&lt;/strong&gt;==&lt;/p&gt;
+&lt;h4 id=&#34;3-sack&#34;&gt;3. SACK
+&lt;/h4&gt;&lt;p&gt;==选择性确认==, 如果要支持 SACK ，必须双方都要支持,&lt;/p&gt;
+&lt;p&gt;需要在TCP 头部[选项] 字段里面加一个 SACK, ==TCP SACK 将一个确认消息拆分成多个端, 每个段表示一个已经成功接收的数据包范围==, 使发送方 知道&lt;/p&gt;
+&lt;p&gt;​	TCP SACK可以改进TCP协议在网络中的性能和可靠性，特别是在高丢包率的网络环境下，能够减少不必要的数据重传和网络带宽的浪费。然而，由于TCP SACK需要在接收方和发送方之间进行协商和交互，所以它会带来一些额外的开销和复杂性。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;例如，如果接收方成功接收了数据包1、2和4，则可以向发送方发送一个SACK确认消息，其中包含两个段：[1,3]和[4,4]，表示数据包1、2和4已经成功接收，而数据包3还没有接收到。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4 id=&#34;4-duplicate-sack&#34;&gt;4. Duplicate SACK
+&lt;/h4&gt;&lt;p&gt;==要&lt;strong&gt;使用了&lt;/strong&gt; &lt;strong&gt;SACK&lt;/strong&gt; &lt;strong&gt;来告诉「发送方」有哪些数据被重复接收了。&lt;/strong&gt;==&lt;/p&gt;
+&lt;p&gt;​		当接收方发送重复的SACK段时，会在TCP头部中添加D-SACK选项字段，标识出哪些SACK段是重复的，告诉发送方这些SACK段已经被接收方重复发送。发送方在收到这些D-SACK选项字段后，就可以根据这些信息来调整重传决策，避免不必要的数据重传和网络带宽的浪费。&lt;/p&gt;
+&lt;h3 id=&#34;2-滑动窗口&#34;&gt;2. 滑动窗口
+&lt;/h3&gt;&lt;p&gt;我们知道==TCP 每发送一个数据,, 都要进行一次确认应答, 当上一个数据包收到了应答, 再发送下一个数据包==, 就好比如, 我和你面对面聊天，你一句我一句。但这种方式的缺点是效率比较低的。&lt;/p&gt;
+&lt;p&gt;==窗口大小就是, 无需等待确认应答, 而可以继续发送数据的最大值==, 窗口的实现实际是操作系统开辟的一个缓存空间, 如果按期收到确认应答, 那数据就可以从缓存区清除;&lt;/p&gt;
+&lt;p&gt;TCP头里面有一个字段叫Window, 也就是窗口大小,  通常是接收方决定的&lt;/p&gt;
+&lt;p&gt;==这个字段是接收端告诉发送端自己还有多少缓冲区可以接收数据。于是发送端就可以根据这个接收端的处理能力来发送数据，而不会导致接收端处理不过来==&lt;/p&gt;
+&lt;p&gt;假设窗口大小为 3 个 TCP 段，那么发送方就可以「连续发送」 3 个 TCP 段，并且中途若有 ACK丢失，可以通过「下一个确认应答进行确认」。如下图：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230303151403188.png&#34;
+	width=&#34;756&#34;
+	height=&#34;531&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230303151403188&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;142&#34;
+		data-flex-basis=&#34;341px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230303155803814.png&#34;
+	width=&#34;767&#34;
+	height=&#34;239&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230303155803814&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;320&#34;
+		data-flex-basis=&#34;770px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230303155757422.png&#34;
+	width=&#34;768&#34;
+	height=&#34;222&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230303155757422&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;345&#34;
+		data-flex-basis=&#34;830px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;3-流量控制&#34;&gt;3. 流量控制
+&lt;/h3&gt;&lt;p&gt;==&lt;strong&gt;TCP提供一种机制可以让「发送方」根据「接收方」的实际接收能力控制发送&lt;/strong&gt;的数据量，这就是所谓的流量控制==&lt;/p&gt;
+&lt;h4 id=&#34;1-滑动窗口与操作系统缓存&#34;&gt;1. 滑动窗口与操作系统缓存
+&lt;/h4&gt;&lt;p&gt;操作系统缓冲区与滑动窗口的关系;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;假定了发送窗口和接收窗口是不变的，但是实际上，发送窗口和接收窗口中所存放的字节数，都是放在操作系统内存缓冲区中的，而操作系统的缓冲区，==会&lt;strong&gt;被操作系统调整&lt;/strong&gt;==&lt;/p&gt;
+&lt;p&gt;当应用进程没办法及时读取缓冲区的内容时，也会对我们的缓冲区造成影响。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;为了防止这种情况发生，==TCP规定是不允许同时减少缓存又收缩窗口的，而是采用先收缩窗口，过段时间再减少缓存==，这样就可以避免了丢包情况。&lt;/strong&gt;&lt;/p&gt;
+&lt;h4 id=&#34;2-窗口关闭&#34;&gt;2. 窗口关闭
+&lt;/h4&gt;&lt;p&gt;TCP 通过接收方指定 希望从发送方接收的数据大小(窗口大小), ==&lt;strong&gt;如果窗口大小为&lt;/strong&gt; &lt;strong&gt;0&lt;/strong&gt; &lt;strong&gt;时，就会阻止发送方给接收方传递数据，直到窗口变为非&lt;/strong&gt; &lt;strong&gt;0&lt;/strong&gt; &lt;strong&gt;为止，这就是窗口关闭。&lt;/strong&gt;==&lt;/p&gt;
+&lt;p&gt;​	TCP 为每个连接设有一个持续定时器，==只要TCP连接一方收到对方的零窗口通知，就启动持续计时器==。&lt;/p&gt;
+&lt;p&gt;如果==持续计时器超时==, 就会发送==&lt;strong&gt;窗口探测&lt;/strong&gt; &lt;strong&gt;( Window probe )&lt;/strong&gt; &lt;strong&gt;报文&lt;/strong&gt;==, 而对方在确认这个探测报文时，给出自己现在的接收窗口大小。&lt;/p&gt;
+&lt;h4 id=&#34;3-糊涂窗口综合症&#34;&gt;3. &lt;strong&gt;糊涂窗口综合症&lt;/strong&gt;
+&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;如果接收方腾出几个字节并告诉发送方现在有几个字节的窗口，而发送方会义无反顾地发送这几个字节，这就是糊涂窗口综合症&lt;/strong&gt;。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;让接收方不通告小窗口&lt;/li&gt;
+&lt;li&gt;怎么让发送方避免发送小数据呢？&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;4-拥塞控制&#34;&gt;4. 拥塞控制
+&lt;/h3&gt;&lt;p&gt;==在网络出现拥堵时，如果继续发送大量数据包，可能会导致数据包时延、丢失等，这时TCP就会重传数据，但是一重传就会导致网络的负担更重，于是会导致更大的延迟以及更多的丢包，这个情况就会进入恶性循环被不断地放大==&lt;/p&gt;
+&lt;h1 id=&#34;3-抓包&#34;&gt;3. 抓包
+&lt;/h1&gt;&lt;h2 id=&#34;1-tcpdump&#34;&gt;1. tcpdump
+&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;# -i eth1 表示抓取eth1网口的数据包
+# icmp 表示抓取icmp协议的数据包
+# host 表示主机过滤, 抓取对应ip的数据包
+# -nn 表示不解析ip地址和端口号的名称
+
+tcpdump -i eth1 icmp and host 10.168.1.60 -nn
+
+#抓取到icmp数据包的输出格式:
+#时间戳  协议  源地址.源端口 &amp;gt; 目标地址.目标端口 网络包详细信息
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230302151539507.png&#34;
+	width=&#34;738&#34;
+	height=&#34;362&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230302151539507&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;203&#34;
+		data-flex-basis=&#34;489px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230302151424080.png&#34;
+	width=&#34;733&#34;
+	height=&#34;386&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230302151424080&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;189&#34;
+		data-flex-basis=&#34;455px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;2-wireshark&#34;&gt;2. wireshark
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;右键选择追踪流,&lt;/li&gt;
+&lt;li&gt;作为过滤器应用&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/amber_o0k/article/details/80380602&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://blog.csdn.net/amber_o0k/article/details/80380602&lt;/a&gt; 参考资料&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;快捷键&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Ctrl+Alt+Shift+H	 	HTTP 流	 	HTTP 流&lt;/li&gt;
+&lt;li&gt;Ctrl+Alt+Shift+S	 	SSL 流	 	SSL 流&lt;/li&gt;
+&lt;li&gt;Ctrl+Alt+Shift+T	 	TCP 流	 	TCP 流&lt;/li&gt;
+&lt;li&gt;Ctrl+Alt+Shift+U	 	UDP 流	 	UDP 流&lt;/li&gt;
+&lt;li&gt;ctrl + s	保存&lt;/li&gt;
+&lt;li&gt;ctrl + e   停止/开始&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;4-dhcp&#34;&gt;4. DHCP
+&lt;/h1&gt;&lt;p&gt;电脑通常都是通过 DHCP 动态获取 IP 地址，大大省去了配IP 信息繁琐的过程。&lt;/p&gt;
+&lt;p&gt;四个步骤&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;客户端首先发起DHC发现报文（DHCP DISCOVER） 的 IP 数据报，由于客户端没有 IP 地址，也不知道 DHCP 服务器的地址，所以使用的是 UDP 广播通信，其使用的广播目的地址是255.255.255.255（端口 67） 并且使用 0.0.0.0（端口 68） 作为源 IP 地址。DHCP 客户端将该IP 数据报传递给链路层，链路层然后将帧广播到所有的网络中设备。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;DHCP 服务器收到 DHCP 发现报文时，用DHCP提供报文（DHCP OFFER） 向客户端做出响应。该报文仍然使用 IP 广播地址 255.255.255.255，该报文信息携带服务器提供可租约的 IP 地址、子网掩码、默认网关、DNS 服务器以及 IP地址租用期。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;客户端收到一个或多个服务器的 DHCP 提供报文后，从中选择一个服务器，并向选中的服务器发送 DHCP请求报文（DHCP REQUEST进行响应，回显配置的参数。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;最后，服务端用 DHCP ACK报文对 DHCP 请求报文进行响应，应答所要求的参数。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;​	一旦==客户端收到 DHCP ACK 后，交互便完成了==，并且客户端能够在租用期内使用 DHCP 服务器分配的IP 地址。&lt;/p&gt;
+&lt;p&gt;​	如果租约的 DHCP IP 地址快期后，客户端会向服务器发送 DHCP 请求报文：&lt;/p&gt;
+&lt;p&gt;服务器如果同意继续租用，则用 DHCP ACK 报文进行应答，客户端就会延长租期。&lt;/p&gt;
+&lt;p&gt;​	服务器如果不同意继续租用，则用 DHCP NACK 报文，客户端就要停止使用租约的 IP 地址。&lt;/p&gt;
+&lt;p&gt;可以发现，DHCP 交互中，==全程都是使用 UDP 广播通信==。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;问题: DHCP 服务器和客户端==不是在同一个局域网内==，==路由器又不会转发广播包==，那不是每个网络都要配一个 DHCP 服务器？&lt;/p&gt;
+&lt;p&gt;==&lt;strong&gt;DHCP&lt;/strong&gt; &lt;strong&gt;中继代理&lt;/strong&gt;==。有了 DHCP 中继代理以后，&lt;strong&gt;对不同网段的&lt;/strong&gt; &lt;strong&gt;IP&lt;/strong&gt; &lt;strong&gt;地&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;址分配也可以由一个&lt;/strong&gt; &lt;strong&gt;DHCP&lt;/strong&gt; &lt;strong&gt;服务器统一进行管理。&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230303160650260.png&#34;
+	width=&#34;761&#34;
+	height=&#34;796&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230303160650260&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;95&#34;
+		data-flex-basis=&#34;229px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;DHCP 服务器即使不在同一个链路上也可以实现统一分配和管理IP地址。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;DHCP 客户端会向 DHCP 中继代理发送 DHCP 请求包，而 DHCP 中继代理在收到这个广播包以后，再以&lt;strong&gt;单播&lt;/strong&gt;的形式发给 DHCP 服务器。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;服务器端收到该包以后再向 DHCP 中继代理返回应答，并由 DHCP 中继代理将此包广播给DHCP 客户端 。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;5-icmp&#34;&gt;5. ICMP
+&lt;/h1&gt;&lt;p&gt;Internet Control Message Protocol，也就是互联网控制报文协议&lt;/p&gt;
+&lt;p&gt;==ICMP 主要的功能包括：确认 IP 包是否成功送达目标地址、报告发送过程中 IP 包被废弃的原因和改善网络设置等。==&lt;/p&gt;
+&lt;h1 id=&#34;6-nat&#34;&gt;6. NAT
+&lt;/h1&gt;&lt;p&gt;&lt;strong&gt;网络地址与端口转换&lt;/strong&gt; &lt;strong&gt;NAPT&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230303165749057.png&#34;
+	width=&#34;784&#34;
+	height=&#34;435&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230303165749057&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;180&#34;
+		data-flex-basis=&#34;432px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;​	两个私有 IP 地址都转换 IP 地址为公有地址 120.229.175.121，但是以不同的端口号作为区分。&lt;/p&gt;
+&lt;p&gt;存在的问题&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;外部无法主动与 NAT 内部服务器建立连接，因为 NAPT 转换表没有转换记录。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;转换表的生成与转换操作都会产生性能开销。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;通信过程中，如果 NAT 路由器重启了，所有的 TCP 连接都将被重置。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;解决方法&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;改用IPV6 , 可用范围非常大，以至于每台设备都可以配置一个公有 IP 地址&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;NAT 穿透&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;​	NAT 穿越技术拥有这样的功能，它能够让网络应用程序主动发现自己位于 NAT 设备之后，并且会主动获得 NAT 设备的公有 IP，并为自己建立端口映射条目，注意这些都是 NAT设备后的应用程序自动完成的。&lt;/p&gt;
+&lt;p&gt;​	也就是说，在 NAT 穿透技术中，NAT设备后的应用程序处于主动地位，它已经明确地知道 NAT 设备要修改它外发的数据包，于是它主动配合 NAT 设备的操作，主动地建立好映射，这样就不像以前由 NAT设备来建立映射了。&lt;/p&gt;
+&lt;p&gt;​	==说人话，就是客户端主动从 NAT 设备获取公有 IP 地址，然后自己建立端口映射条目，然后用这个条目对外通信，就不需要 NAT 设备来进行转换==了。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;7-arp&#34;&gt;7. ARP
+&lt;/h1&gt;&lt;p&gt;在传输一个 IP 数据报的时候，==确定了源 IP 地址和目标 IP 地址后，就会通过主机「路由表」确定 IP 数据包下一跳==。然而，网络层的下一层是数据链路层，所以我们还要知道==「下一跳」的 MAC 地址==。&lt;/p&gt;
+&lt;p&gt;由于主机的路由表中可以找到下一跳的 IP 地址，所以可以通过 &lt;strong&gt;ARP&lt;/strong&gt; &lt;strong&gt;协议&lt;/strong&gt;，求得下一跳的 MAC 地址。&lt;/p&gt;
+&lt;p&gt;ARP 是通过 ==ARP 请求和 ARP 响应==两种类型的包来确定MAC 地址的;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230303161548911.png&#34;
+	width=&#34;778&#34;
+	height=&#34;618&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230303161548911&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;125&#34;
+		data-flex-basis=&#34;302px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;主机会通过广播发送 ARP 请求，这个包中包含了想要知道的 MAC 地址的主机 IP 地址。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;当同个链路中的所有设备收到 ARP 请求时，会去拆开 ARP 请求包里的内容，如果 ARP 请求包中的目标 IP 地址与自己的 IP 地址一致，那么这个设备就将自己的 MAC 地址塞入 &lt;strong&gt;ARP&lt;/strong&gt; &lt;strong&gt;响应包&lt;/strong&gt;返回给主机&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;​	操作系统通常会把第一次通过 ARP 获取的 MAC 地址缓存起来，以便下次直接从缓存中找到对应 IP 地址的 MAC 地址。&lt;/p&gt;
+&lt;p&gt;==RARP==&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ARP 协议是已知 IP 地址求 MAC 地址，那 RARP 协议正好相反，它是==已知 MAC 地址求 IP 地址==。例如将打印机服务器等==小型嵌入式设备接入到网络时就经常会用得到。==&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;​	==这需要架设一台 RARP 服务器==，在这个服务器上注册设备的 MAC 地址及其 IP 地址。然后再将这个设备接入到网络，接着：&lt;/p&gt;
+&lt;p&gt;​	该设备会发送一条「我的 MAC 地址是XXXX，请告诉我，我的IP地址应该是什么」的请求信息。&lt;/p&gt;
+&lt;p&gt;​	RARP 服务器接到这个消息后返回「MAC地址为 XXXX 的设备，IP地址为 XXXX」的信息给这个设备。&lt;/p&gt;
+&lt;p&gt;最后，设备就根据从 RARP 服务器所收到的应答信息设置自己的 IP 地址。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230303165547790.png&#34;
+	width=&#34;765&#34;
+	height=&#34;390&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230303165547790&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;196&#34;
+		data-flex-basis=&#34;470px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;8-http-与-https&#34;&gt;8. http 与 https
+&lt;/h1&gt;&lt;h2 id=&#34;1-http-与https-的区别&#34;&gt;1. http 与https 的区别
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;HTTP 是超文本传输协议，信息是明文传输，存在安全风险的问题。HTTPS 则解决 HTTP 不安全的缺陷，在 TCP 和 HTTP 网络层之间加入了 SSL/TLS 安全协议，使得报文能够==加密传输==。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;HTTP 连接建立相对简单， TCP 三次握手之后便可进行 HTTP 的报文传输。而 ==HTTPS 在 TCP三次握手之后，还需进行 SSL/TLS 的握手过程==，才可进入加密报文传输。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;==HTTP 的端口号是 80，HTTPS 的端口号是 443==。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;HTTPS 协议需要向 CA（证书权威机构）==申请数字证书==，==来保证服务器的身份是可信的==。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;解决了http的哪些问题&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;窃听风险&lt;/strong&gt;，比如通信链路上可以获取通信内容，用户号容易没。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;篡改风险&lt;/strong&gt;，比如强制植入垃圾广告，视觉污染，用户眼容易瞎。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;冒充风险&lt;/strong&gt;，比如冒充淘宝网站，用户钱容易没。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;通过SSL/TSL协议&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;信息加密&lt;/strong&gt;：交互信息无法被窃取，但你的号会因为「自身忘记」账号而没。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;校验机制&lt;/strong&gt;：无法篡改通信内容，篡改了就不能正常显示，但百度「竞价排名」依然可以搜索垃圾广告。 ==通过摘要算法==&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;身份证书&lt;/strong&gt;：证明淘宝是真的淘宝网，但你的钱还是会因为「剁手」而没,  ==通过数字证书== , ==客户端先向服务器端索要公钥，然后用公钥加密信息，服务器收到密文后，用自己的私钥解密。==&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;HTTPS 采用的是&lt;strong&gt;对称加密&lt;/strong&gt;和&lt;strong&gt;非对称加密&lt;/strong&gt;结合的「混合加密」方式：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;在通信建立前采用&lt;strong&gt;非对称加密&lt;/strong&gt;的方式交换「会话秘钥」，后续就不再使用非对称加密。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在通信过程中全部使用&lt;strong&gt;对称加密&lt;/strong&gt;的「会话秘钥」的方式加密明文数据。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;采用「混合加密」的方式的原因：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;对称加密&lt;/strong&gt;只使用一个密钥，运算速度快，密钥必须保密，无法做到安全的密钥交换。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;非对称加密&lt;/strong&gt;使用两个密钥：公钥和私钥，公钥可以任意分发而私钥保密，解决了密钥交换问题但速度慢。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;==为了保证公钥不被篡改和信任度==&lt;/p&gt;
+&lt;p&gt;所以这里就需要借助第三方权威机构 CA （数字证书认证机构），将&lt;strong&gt;服务器公钥放在数字证书&lt;/strong&gt;（由数字证书认证机构颁发）中，只要证书是可信的，公钥就是可信的&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/images/image-20230307101637547.png&#34;
+	width=&#34;770&#34;
+	height=&#34;579&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20230307101637547&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;132&#34;
+		data-flex-basis=&#34;319px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;==SSL/TLS 协议基本流程：==&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;客户端向服务器索要并验证服务器的公钥。&lt;/p&gt;
+&lt;p&gt;双方协商生产「会话秘钥」。&lt;/p&gt;
+&lt;p&gt;双方采用「会话秘钥」进行加密通信&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;==会有四次通信==&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Arthas</title>
+        <link>https://mikeLing-qx.github.io/p/arthas/</link>
+        <pubDate>Sun, 22 Aug 2021 16:04:14 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/arthas/</guid>
+        <description>&lt;h1 id=&#34;arthas-使用入门&#34;&gt;Arthas 使用入门
+&lt;/h1&gt;&lt;h2 id=&#34;1-安装启动&#34;&gt;1 安装启动
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;下载并启动&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;curl -O https://alibaba.github.io/arthas/arthas-boot.jar
+
+java -jar arthas-boot.jar
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;选择需要attach的程序&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;2-常用命令&#34;&gt;2 常用命令
+&lt;/h2&gt;&lt;h3 id=&#34;21-dashboard&#34;&gt;2.1. dashboard
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;dashboard 命令可以查看当前系统的实时数据面板。可以查看到CPU、内存、GC、运行环境等信息。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;ctrl + c 可以退出dashboard 命令&lt;/p&gt;
+&lt;h3 id=&#34;22-thread&#34;&gt;2.2. Thread
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;thread {id} 命令会打印线程ID 的栈。用 thread 1 | grep &amp;lsquo;main(&amp;rsquo; 查找到main class。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;thread -b : 显示当前阻塞的线程&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;目前只支持找出synchronized关键字阻塞住的线程， 如果是java.util.concurrent.Lock， 目前还不支持
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;thread -i 1000 -n 3: 每过 1000 毫秒进行采样，显示最占 CPU 时间的前 3 个线程&lt;/p&gt;
+&lt;p&gt;thread &amp;ndash;state WAITING 查看处于等待状态的线程&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;23-trace&#34;&gt;2.3. trace
+&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;trace dh.webapi.form.controller.TemplateController getDetail
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;使用 trace 命令可以跟踪统计方法耗时。&lt;/p&gt;
+&lt;p&gt;继续跟踪耗时高的方法，然后再次访问。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;比如使用一个 Springboot 项目（当然，不想 Springboot 的话，你也可以直接在 UserController 里 main 方法启动）控制层 getUser 方法调用了 userService.get(uid);，这个方法中分别进行 check、service、redis、mysql 等操作操作。就可以根据这个命令跟踪出来哪里的耗时最长。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;24-jad--反编译指定已加载类的源码&#34;&gt;2.4. jad  反编译指定已加载类的源码
+&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;jad dh.webapi.form.biz.AreaBiz
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;25-monitor&#34;&gt;2.5. monitor
+&lt;/h3&gt;&lt;p&gt;每 2秒统计一次 dh.webapi.form.controller.TemplateController 类的 getDetail 方法执行情况：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;monitor -c 2 dh.webapi.form.controller.TemplateController getDetail
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;26-sc-sm-查找jvm里已加载的类&#34;&gt;2.6 sc/ sm 查找JVM里已加载的类
+&lt;/h3&gt;&lt;p&gt;sc 命令来查找JVM里已加载的类,通过-d参数，可以打印出类加载的具体信息，很方便查找类加载问题。并且支持统配  例如搜索 所有的 StringUtils , sc *StringUtils&lt;/p&gt;
+&lt;p&gt;sm 命令是查找类的具体函数;  -d参数可以打印函数的具体属性&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;sm -d java.math.RoundingMode
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;查找特定的函数，比如查找构造函数&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;sm java.math.RoundingMode &amp;lt;init&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;28-watch&#34;&gt;2.8. watch
+&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;watch dh.webapi.evidence.biz.EvidenceBiz doPostHashEvidence &amp;quot;{params,returnObj}&amp;quot; -x 5 -b -s
+
+watch dh.framework.starter.shiro.filter.ShiroAuthcFilter onAccessDenied &amp;quot;{params,returnObj}&amp;quot; -x 5 -b -s
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;dh.framework.starter.shiro.session.RedisSessionDao doReadSession
+dh.webapi.zhidun.dao.OwnerEvidenceMapper listEvidence
+dh.framework.common.util.Requests post(java.lang.String, java.lang.String)
+dh.webapi.evidence.biz.EvidenceBiz doPostHashEvidence
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

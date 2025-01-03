@@ -1,0 +1,1579 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Springcloud on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/categories/springcloud/</link>
+        <description>Recent content in Springcloud on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Thu, 12 Dec 2024 15:16:25 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/categories/springcloud/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Spring_cloud_nacos</title>
+        <link>https://mikeLing-qx.github.io/p/spring_cloud_nacos/</link>
+        <pubDate>Thu, 12 Dec 2024 15:16:25 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/spring_cloud_nacos/</guid>
+        <description>&lt;p&gt;参考文档&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://mp.weixin.qq.com/s/aX8XoccfwbjDwo8O8HRJRg&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://mp.weixin.qq.com/s/aX8XoccfwbjDwo8O8HRJRg&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;1-nacos-架构&#34;&gt;1. Nacos 架构
+&lt;/h1&gt;&lt;p&gt;namespace 层级关系&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;命名空间 namespace
+&lt;ul&gt;
+&lt;li&gt;​	组 group
+&lt;ul&gt;
+&lt;li&gt;dataId&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_nacos/images/640.png&#34;
+	width=&#34;1080&#34;
+	height=&#34;528&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;图片&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;204&#34;
+		data-flex-basis=&#34;490px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Provider APP：服务提供者&lt;/li&gt;
+&lt;li&gt;Consumer APP：服务消费者&lt;/li&gt;
+&lt;li&gt;Name Server：通过VIP（Virtual IP）或DNS的方式实现Nacos高可用集群的服务路由&lt;/li&gt;
+&lt;li&gt;Nacos Server：Nacos服务提供者，里面包含的Open API是功能访问入口，Conig Service、Naming Service 是Nacos提供的配置服务、命名服务模块。Consitency Protocol是一致性协议，用来实现Nacos集群节点的数据同步，这里使用的是Raft算法（Etcd、Redis哨兵选举）&lt;/li&gt;
+&lt;li&gt;Nacos Console：控制台&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;1-nacos-安装模式&#34;&gt;1. nacos 安装模式
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;pre&gt;&lt;code&gt;单机模式 Derby:
+ 这种模式是极简模式，数据没法持久化存储，适合开发环境。
+ 
+单机模式 MySQL:(支持MySQL5.7和MySQL8.0，我们这里学习MySQL5.7安装模式，因为当前主流还是MySQL5.7)
+ 这种模式支持数据持久化，数据会存储到MySQL中，适合生产环境。
+
+集群模式:
+ 这种模式适合生产环境并且服务节点个数较多，不存在单点故障问题。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;2-nacos-集群&#34;&gt;2. nacos 集群
+&lt;/h2&gt;&lt;h1 id=&#34;2-注册中心的原理&#34;&gt;2. 注册中心的原理
+&lt;/h1&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_nacos/images/640-16506099232572.png&#34;
+	width=&#34;1080&#34;
+	height=&#34;585&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;图片&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;184&#34;
+		data-flex-basis=&#34;443px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;==注册过程==&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;服务提供方 使用 OpenApi 发起服务注册, 并与注册中心建立心跳机制&lt;/li&gt;
+&lt;li&gt;服务消费放 查询服务提供方的 实例列表, 定时任务 每10s 拉取一次服务列表&lt;/li&gt;
+&lt;li&gt;注册中心检测到服务提供者异常, 会基于UDP 协议推送更新给消费者&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Nacos提供了SDK和Open API两种形式来实现服务注册。&lt;/p&gt;
+&lt;p&gt;OpenApi&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_nacos/images/image-20220426104742097.png&#34;
+	width=&#34;731&#34;
+	height=&#34;49&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220426104742097&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;1491&#34;
+		data-flex-basis=&#34;3580px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;SDK&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_nacos/images/image-20220426104817995.png&#34;
+	width=&#34;724&#34;
+	height=&#34;30&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220426104817995&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;2413&#34;
+		data-flex-basis=&#34;5792px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;==底层都是基于HTTP协议完成请求的==。所以注册服务就是发送一个HTTP请求：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;服务实例在启动时注册到服务注册列表, 并在关闭时注销&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;服务消费者查询服务注册列表, 获得可用实例&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;服务注册中心需要调用服务实例的健康检查API来验证它是否能够处理请求&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Nacos服务端收到请求后，做以下三件事：&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;ol&gt;
+&lt;li&gt;构建一个Service对象保存到ConcurrentHashMap集合中&lt;/li&gt;
+&lt;li&gt;使用定时任务对当前服务下的所有实例建立心跳检测机制&lt;/li&gt;
+&lt;li&gt;基于数据一致性协议 Nacos服务端 数据进行同步&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;0-nacos-服务动态更新原理&#34;&gt;0. Nacos 服务动态更新原理
+&lt;/h2&gt;&lt;p&gt;HostReactor类，它的功能是实现服务的动态更新，基本原理是：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;客户端发起时间订阅后，在HostReactor中有一个==UpdateTask线程==，每10s发送一次==Pull==请求，获得服务端最新的地址列表&lt;/li&gt;
+&lt;li&gt;对于Nacos服务端，它和服务提供者的实例之间维持了心跳检测，一旦服务提供者出现异常，则会发送一个Push消息给Nacos客户端，也就是服务端消费者&lt;/li&gt;
+&lt;li&gt;服务消费者收到请求之后，使用HostReactor中提供的processServiceJSON解析消息，并更新本地服务地址列表&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;1-负载均衡&#34;&gt;1. 负载均衡
+&lt;/h2&gt;&lt;p&gt;​     服务注册到Nacos中，有一个==权重属性==，这个权重属性就是Nacos的负载均衡机制，此时需要用到Nacos的负载均衡策略&lt;code&gt;NacosRule&lt;/code&gt;，我们可以在程序中先初始化负载均衡算法，再到bootstrap.yml中配置权重&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_nacos/images/image-20220425180648540.png&#34;
+	width=&#34;993&#34;
+	height=&#34;379&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220425180648540&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;262&#34;
+		data-flex-basis=&#34;628px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;hailtaxi-order中配置&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;初始化负载均衡算法&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;/***
+ * Nacos负载均衡算法
+ * @return
+ */
+@Bean
+@Scope(value=&amp;quot;prototype&amp;quot;)
+public IRule loadBalanceRule(){
+    return new NacosRule();
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;如果把算法NacosRule注释，默认就是和Ribbon集成，且默认开启，可以通过如下配置实现关闭或开启&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ribbon:
+nacos:
+enabled: true&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;权重配置&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;spring:
+  application:
+    name: hailtaxi-driver
+  cloud:
+    nacos:
+      discovery:
+        # nacos 服务注册地址
+        server-addr: 192.168.200.200:8848
+        weight: 1
+      config:
+        server-addr: 192.168.200.200:8848
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;并在VM Options 中进行配置&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_nacos/images/image-20220425180903264.png&#34;
+	width=&#34;822&#34;
+	height=&#34;170&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220425180903264&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;483&#34;
+		data-flex-basis=&#34;1160px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;2-配置中心&#34;&gt;2. 配置中心
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;spring:
+  application:
+    name: hailtaxi-driver
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      discovery:
+        # nacos 服务注册地址
+        server-addr: 192.168.200.200:8848
+        weight: 1
+        # 指定命名空间的id
+        namespace: 1ebba5f6-49da-40cc-950b-f75c8f7d07b3
+      config:
+        server-addr: 192.168.200.200:8848
+        # 指定命名空间的id
+        namespace: 1ebba5f6-49da-40cc-950b-f75c8f7d07b3
+        # 如果将配置信息保存到nacos，指定配置文件扩展名
+        file-extension: yaml
+        # nacos config dataid name 默认加载 ${spring.application.name}.${file-extension},当然也可指定
+        #name: hailtaxi-driver.yaml
+        # 加载共享配置信息
+        shared-configs[0]:
+          dataId: datasource.yaml
+          refresh: true
+        # 加载扩展配置
+        extension-configs:
+          - dataId: custom.yaml
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;1-配置刷新&#34;&gt;1. 配置刷新
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;nacos 控制台配置&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;app: 
+  name: itheima
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;项目中添加测试代码&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@SpringBootApplication
+@EnableDiscoveryClient
+@MapperScan(basePackages = &amp;quot;com.itheima.driver.mapper&amp;quot;)
+public class DriverApplication {
+
+    public static void main(String[] args) {
+        ApplicationContext applicationContext = SpringApplication.run(DriverApplication.class,args);
+
+        while(true) {
+            //当动态配置刷新时，会更新到 Enviroment中，
+            String name = applicationContext.getEnvironment().getProperty(&amp;quot;app.name&amp;quot;);
+            String version = applicationContext.getEnvironment().getProperty(&amp;quot;app.version&amp;quot;);
+            System.out.println(&amp;quot;app.name=&amp;quot;+name+&amp;quot;;app.version=&amp;quot; + version);
+            try {
+                TimeUnit.SECONDS.sleep(5); // 每隔5秒中从Enviroment中获取一下
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;默认情况下，&lt;code&gt;shared-configs&lt;/code&gt; 和 &lt;code&gt;extension-configs&lt;/code&gt; 是不自动刷新的，【其他配置可以】，如果要支持刷新，需要添加&lt;code&gt;refresh&lt;/code&gt;属性，如下&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;	        # 加载共享配置信息
+        shared-configs[0]:
+          dataId: datasource.yaml
+          refresh: true
+        # 加载扩展配置
+        extension-configs:
+          - dataId: custom.yaml
+            refresh: true
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;序中如果写了&lt;code&gt;@Value&lt;/code&gt;注解，可以采用&lt;code&gt;@RefreshScope&lt;/code&gt;实现刷新，只需要在指定类上添加该注解即可&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;3-spring-cloud-完成注册的时机&#34;&gt;3. Spring cloud 完成注册的时机
+&lt;/h1&gt;&lt;p&gt;在Spring-Cloud-Common包中有一个类&lt;code&gt;org.springframework.cloud. client.serviceregistry .ServiceRegistry&lt;/code&gt; ,它是Spring Cloud提供的服务注册的标准。==集成到Spring Cloud中实现服务注册的组件,都会实现该接口==&lt;/p&gt;
+&lt;p&gt;该接口有一个实现类是==NacoServiceRegistry==。&lt;/p&gt;
+&lt;p&gt;在spring-clou-commons包的META-INF/spring.factories中包含自动装配的配置信息如下&lt;/p&gt;
+&lt;img src=&#34;../../../../../../我的坚果云/spring_cloud/images/image-20220422163908062.png&#34; alt=&#34;image-20220422163908062&#34; style=&#34;zoom:400%;&#34; /&gt;
+&lt;p&gt;AutoServiceRegistrationAutoConfiguration 就是服务注册相关的配置类&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Configuration(
+    proxyBeanMethods = false
+)
+@Import({AutoServiceRegistrationConfiguration.class})
+@ConditionalOnProperty(
+    value = {&amp;quot;spring.cloud.service-registry.auto-registration.enabled&amp;quot;},
+    matchIfMissing = true
+)
+public class AutoServiceRegistrationAutoConfiguration {
+    @Autowired(
+        required = false
+    )
+    private AutoServiceRegistration autoServiceRegistration;
+    @Autowired
+    private AutoServiceRegistrationProperties properties;
+
+    public AutoServiceRegistrationAutoConfiguration() {
+    }
+
+    @PostConstruct
+    protected void init() {
+        if (this.autoServiceRegistration == null &amp;amp;&amp;amp; this.properties.isFailFast()) {
+            throw new IllegalStateException(&amp;quot;Auto Service Registration has been requested, but there is no AutoServiceRegistration bean&amp;quot;);
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;配置类中注入了 AutoServiceRegistration&lt;/p&gt;
+&lt;p&gt;AbstractAutoServiceRegistration抽象类实现了该接口,  NacosAutoServiceRegistration继承了AbstractAutoServiceRegistration&lt;/p&gt;
+&lt;p&gt;==AbstractAutoServiceRegistration抽象类== 关系图&lt;/p&gt;
+&lt;img src=&#34;../../../../../../我的坚果云/spring_cloud/images/image-20220422164747683.png&#34; alt=&#34;image-20220422164747683&#34; style=&#34;zoom:150%;&#34; /&gt;
+&lt;p&gt;EventListener 可知 Nacos是通过Spring的事件机制继承到SpringCloud中去的&lt;/p&gt;
+&lt;p&gt;AbstractAutoServiceRegistration实现了onApplicationEvent抽象方法,并且监听WebServerInitializedEvent事件(当Webserver初始化完成之后) , 调用this.bind ( event )方法。&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Spring_cloud_gateway</title>
+        <link>https://mikeLing-qx.github.io/p/spring_cloud_gateway/</link>
+        <pubDate>Sun, 01 Jan 2023 15:12:11 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/spring_cloud_gateway/</guid>
+        <description>&lt;h1 id=&#34;0-spring-cloud-gateway-概述&#34;&gt;0. Spring cloud gateway 概述
+&lt;/h1&gt;&lt;p&gt;&lt;strong&gt;Spring Cloud Gateway需要Spring Boot和Spring Webflux提供的Netty运行时。它不能在传统的Servlet容器中或作为WAR构建。&lt;/strong&gt;&lt;/p&gt;
+&lt;h1 id=&#34;1--执行流程&#34;&gt;1.  执行流程
+&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;1: Gateway的客户端回向Spring Cloud Gateway发起请求，请求首先会被
+==HttpWebHandlerAdapter进行提取组装成网关的上下文==，然后网关的上下文
+会==传递到DispatcherHandler==。&lt;/p&gt;
+&lt;p&gt;2: ==DispatcherHandler是所有请求的&lt;strong&gt;分发处理器&lt;/strong&gt;==，DispatcherHandler主
+要负责分发请求对应的处理器，比如将请求分发到对应	RoutePredicateHandlerMapping(==路由断言处理器映射器==）。&lt;/p&gt;
+&lt;p&gt;3:  &lt;strong&gt;路由断言处理映射器&lt;/strong&gt;主要用于路由的查找，以及找到路由后返回对应的
+FilteringWebHandler。&lt;/p&gt;
+&lt;p&gt;4: ==FilteringWebHandler主要负责组装Filter链表==并调用Filter执行一系
+列Filter处理，然后把请求转到后端对应的代理服务处理，处理完毕后，将
+Response返回到Gateway客户端。&lt;/p&gt;
+&lt;p&gt;在Filter链中，通过虚线分割Filter的原因是，==过滤器可以在转发请求之前
+处理或者接收到被代理服务的返回结果之后处理==。==所有的Pre类型的Filter
+执行完毕之后==，才会转发请求到被代理的服务处理。被代理的服务把所有请求
+完毕之后，才会执行==Post类型的后置过滤器==&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_gateway/images/image-20220808104142979.png&#34;
+	width=&#34;531&#34;
+	height=&#34;847&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220808104142979&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;62&#34;
+		data-flex-basis=&#34;150px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;2-gateway-路由&#34;&gt;2. Gateway 路由
+&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;Gateway路由配置分为基于配置的==静态路由设置==和==基于代码动态路由配
+置==，
+静态路由是指在application.yml中把路由信息配置好了，而动态路由则支
+持在代码中动态加载路由信息，更加灵活，我们接下来把这2种路由操作都实现一次。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;1:用户所有请求以/order开始的请求，都路由到 hailtaxi-order服务
+2:用户所有请求以/driver开始的请求，都路由到 hailtaxi-driver服务
+3:用户所有请求以/pay开始的请求，都路由到 hailtaxi-pay服务
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;21-配置文件路由&#34;&gt;2.1 配置文件路由
+&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;routes:路由配置
+- id:唯一标识符
+uri:路由地址，可以是 lb://IP:端口 也可以是
+lb://${spring.application.name}
+predicates:断言，是指路由条件
+- Path=/driver/**:路由条件。Predicate 接受一个输入参数，返回一
+个布尔值结果。这里表示匹配所有以driver开始的请求。
+filters:过滤器
+- StripPrefix=1:真实路由的时候，去掉第1个路径，路径个数以/分割区
+分
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;22-代码路由-routelocator&#34;&gt;2.2 代码路由 RouteLocator
+&lt;/h2&gt;&lt;p&gt;我们同样实现上面的功能，但这里基于代码方式实现。所有路由规则我们
+可以从==数据库中读取并加载到程序中==。基于代码的路由配置我们只需要创建
+==RouteLocator 并添加路由配置==即可，代码如下&lt;/p&gt;
+&lt;h2 id=&#34;23-gateway-predicate-路由断言&#34;&gt;2.3 Gateway-predicate 路由断言
+&lt;/h2&gt;&lt;p&gt;内置的predicate 实现&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_gateway/images/image-20211013164714622-16341807420521.png&#34;
+	width=&#34;1530&#34;
+	height=&#34;804&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20211013164714622&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;190&#34;
+		data-flex-basis=&#34;456px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;231--path&#34;&gt;2.3.1  Path
+&lt;/h3&gt;&lt;p&gt;其实就是路径匹配方式&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;id：我们自定义的路由 ID，保持唯一
+uri：目标服务地址
+predicates：路由条件，Predicate 接受一个输入参数，返回一个布尔值
+结果。该属性包含多种默认方法来将 Predicate 组合成其他复杂的逻辑
+（比如：与，或，非）
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;232-cookie&#34;&gt;2.3.2 Cookie
+&lt;/h3&gt;&lt;p&gt;通过对应的cookie name 和正则表达式去匹配&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;接受两个参数&lt;/p&gt;
+&lt;p&gt;​	cookie name&lt;/p&gt;
+&lt;p&gt;​	正则表达式&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;gateway:
+    routes:
+    - id: hailtaxi-driver
+        uri: lb://hailtaxi-driver
+        predicates:
+        - Path=/driver/**
+        - Cookie=username,itheima
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;233-header&#34;&gt;2.3.3 Header
+&lt;/h3&gt;&lt;p&gt;和Cookie匹配一样&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;gateway:
+    routes:
+    - id: hailtaxi-driver
+        uri: lb://hailtaxi-driver
+        predicates:
+        - Path=/driver/**
+        - Header=token,^(?!\d+$)[\da-zA-Z]+$
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;234-method&#34;&gt;2.3.4 Method
+&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;gateway:
+    routes:
+    - id: hailtaxi-driver
+        uri: lb://hailtaxi-driver
+        predicates:
+        - Path=/driver/**
+        - Method=GET,POST
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;[{&amp;quot;argsMap&amp;quot;:{&amp;quot;regexp&amp;quot;:&amp;quot;\\d+&amp;quot;,&amp;quot;header&amp;quot;:&amp;quot;Authorization&amp;quot;},&amp;quot;name&amp;quot;:&amp;quot;Header&amp;quot;,&amp;quot;type&amp;quot;:1},{&amp;quot;argsMap&amp;quot;:{&amp;quot;regexp&amp;quot;:&amp;quot;12345&amp;quot;,&amp;quot;name&amp;quot;:&amp;quot;sessionId&amp;quot;},&amp;quot;name&amp;quot;:&amp;quot;Cookie&amp;quot;,&amp;quot;type&amp;quot;:1},{&amp;quot;argsMap&amp;quot;:{&amp;quot;key-resolver&amp;quot;:&amp;quot;#{@ipKeyResolver}&amp;quot;,&amp;quot;redis-rate-limiter.burstCapacity&amp;quot;:&amp;quot;1&amp;quot;,&amp;quot;redis-rate-limiter.replenishRate&amp;quot;:&amp;quot;1&amp;quot;},&amp;quot;name&amp;quot;:&amp;quot;RequestRateLimiter&amp;quot;,&amp;quot;type&amp;quot;:2}
+]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;24-自定义断言&#34;&gt;2.4 自定义断言
+&lt;/h2&gt;&lt;p&gt;需求:  转发带token的请求到hailtaxi-drvier 服务中，这里定义请求带
+token是指包含某个请求头的请求，==至于是什么请求头可以由配置指定==&lt;/p&gt;
+&lt;p&gt;一. 修改配置文件&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;gateway:
+    #路由配置
+    routes:
+        #唯一标识符
+        - id: hailtaxi-driver
+        uri: lb://hailtaxi-driver
+        #路由断言
+        predicates:
+        # 自定义一个Token断言,如果请求包含Authorization的
+        token信息则通过
+        - Token=Authorization
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;二. 创建RoutePredicateFactory&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;==断言工厂默认命名规则必须按照&amp;quot;名称&amp;quot;+RoutePredicateFactory，如上
+TokenRoutePredicateFactory的断言名称为Token==&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Slf4j
+@Component
+public class TokenRoutePredicateFactory extends AbstractRoutePredicateFactory&amp;lt;TokenRoutePredicateFactory.Config&amp;gt; {
+
+
+    public TokenRoutePredicateFactory() {
+        super(Config.class);
+    }
+
+
+    public Predicate&amp;lt;ServerWebExchange&amp;gt; apply(Config config) {
+        return exchange -&amp;gt; {
+            // 打印配置文件参数值
+            String headerName = config.getHeaderName();
+            HttpHeaders headers = exchange.getRequest().getHeaders();
+            List&amp;lt;String&amp;gt; header = headers.get(headerName);
+            log.info(&amp;quot;Token Predicate headers:{}&amp;quot;, header);
+            // 断言返回的是boolean值
+            return header!=null &amp;amp;&amp;amp; header.size()&amp;gt;0;
+        };
+    }
+
+
+    @Override
+    public List&amp;lt;String&amp;gt; shortcutFieldOrder() {
+        // [&amp;quot;aaa&amp;quot;,&amp;quot;bbb&amp;quot;] Authorization,adfa
+        return Arrays.asList(&amp;quot;headerName&amp;quot;,&amp;quot;aaa&amp;quot;);
+    }
+
+    @Override
+    public ShortcutType shortcutType() {
+        return ShortcutType.DEFAULT;
+    }
+
+    @Data
+    public static class Config{
+        private String headerName;
+        private String aaa;
+    }
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;3-gateway-过滤器&#34;&gt;3. Gateway 过滤器
+&lt;/h1&gt;&lt;h2 id=&#34;31-简介&#34;&gt;3.1 简介
+&lt;/h2&gt;&lt;p&gt;过滤器分类&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;默认过滤器:出厂自带，实现好了拿来就用，不需要实现
+	全局默认过滤器
+	局部默认过滤器
+	
+自定义过滤器:根据需求自己实现，实现后需配置，然后才能用哦。
+	全局过滤器:作用在所有路由上。
+	局部过滤器:配置在具体路由下，只作用在当前路由上。
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Spring Cloud Gateway根据作用范围划分为GatewayFilter和
+GlobalFilter，二者区别如下：
+1.  GatewayFilter : ==需要通过spring.cloud.routes.filters 配置在具体路由
+下，只作用在&lt;em&gt;当前路由上&lt;/em&gt;== 或通过==spring.cloud.default-filters配置在全
+局==，作用在所有路由上；gateway内置了多种过滤器工厂，配套的过滤
+器可以直接使用&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;GlobalFilter : 全局过滤器，不需要在配置文件中配置，作用在所有的路由上，最终通过GatewayFilterAdapter包装成GatewayFilterChain
+可识别的过滤器，它为请求业务以及路由的URI转换为真实业务服务的
+请求地址的核心过滤器，不需要配置，系统初始化时加载，并作用在每
+&lt;ul&gt;
+&lt;li&gt;==全局过滤器功能: 请求鉴权, 服务调用时长统计, 修改请求 或相应header, 限流, 去除路径==&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_gateway/images/image-20211013173407173-16341807949002.png&#34;
+	width=&#34;1081&#34;
+	height=&#34;475&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20211013173407173&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;227&#34;
+		data-flex-basis=&#34;546px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;常见的过滤器&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_gateway/images/image-20211013173525424-16341808069263.png&#34;
+	width=&#34;743&#34;
+	height=&#34;392&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20211013173525424&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;189&#34;
+		data-flex-basis=&#34;454px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;32-默认过滤器的使用&#34;&gt;3.2 默认过滤器的使用
+&lt;/h2&gt;&lt;h3 id=&#34;1-添加相应头&#34;&gt;1. 添加相应头
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;AddResponseHeaderGatewayFilterFactory 属于 ==GatewayFilter==&lt;/p&gt;
+&lt;p&gt;对输出响应头设置属性，比如对输出的响应设置其头部属性名称为：XResponse-
+Default-MyName , 值为itheima&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;spring:
+    cloud:
+        gateway:
+        # 配置全局默认过滤器 作用在所有路由上，也可单独为某个路由配置
+        default-filters:
+            # 往响应过滤器中加入信息
+            - AddResponseHeader=X-Response-Default-
+            MyName,itheima
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;2-前缀处理&#34;&gt;2. 前缀处理
+&lt;/h3&gt;&lt;h4 id=&#34;1--路由去除&#34;&gt;1.  路由去除
+&lt;/h4&gt;&lt;p&gt;​	 我们很多时候需要统一API路径，比如统一以/api 开始的请求调用hailtaxi-driver 服务，但真实服务接口地址又没有/api 路径，我们可以使用Gateway的过滤器处理请求路径&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;gateway:
+    routes:
+    - id: hailtaxi-driver
+        uri: lb://hailtaxi-driver
+        predicates:
+       		- Path=/api/driver/**
+        filters:
+	        - StripPrefix=1  # 表示真实请求地址是当前用户请求以/api开始的uri去除第一个路径/api
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;2-简化请求&#34;&gt;2. 简化请求
+&lt;/h4&gt;&lt;blockquote&gt;
+&lt;p&gt;为了简化用户请求地址, 用户请求
+http://localhost:8001/info/1 我们想统一路由到
+http://localhost:18081/driver/info/1 ，可以使用==PrefixPath 过滤器增
+加前缀==。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;gateway:
+    routes:
+    - id: hailtaxi-driver
+        uri: lb://hailtaxi-driver
+        predicates:
+        	- Path=/**
+        filters:
+        	- PrefixPath=/driver
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;33-自定义filter&#34;&gt;3.3 自定义Filter
+&lt;/h2&gt;&lt;h4 id=&#34;1-gatefilter&#34;&gt;1. GateFilter
+&lt;/h4&gt;&lt;blockquote&gt;
+&lt;p&gt;GatewayFilter 一般作用在某一个路由上，==需要实例化创建才能使用==，局部过滤器需要实现接口==GatewayFilter、Ordered== 。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;实现接口GatewayFilter, Ordered&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class PayFilter implements GatewayFilter, Ordered {
+    @Override
+    public Mono&amp;lt;Void&amp;gt; filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        System.out.println(&amp;quot;GatewayFilter拦截器执行---pre-----PayFilter&amp;quot;);
+        return chain.filter(exchange).then(Mono.fromRunnable(()-&amp;gt;{
+            System.out.println(&amp;quot;GatewayFilter拦截器执行---post-----PayFilter&amp;quot;);
+        }));
+    }
+
+    @Override
+    public int getOrder() {
+        return 0;
+    }
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;继承AbstractGatewayFilterFactory, 交给spring容器管理&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;2-globalfilter&#34;&gt;2. GlobalFilter
+&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;GlobalFilter:过滤器拦截处理方法
+Ordered: 过滤器也有多个，这里主要定义过滤器执行顺序，里面有个方法
+getOrder()会返回过滤器执行顺序，返回值越小，越靠前执行
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;34-跨域配置&#34;&gt;3.4 跨域配置
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;出于浏览器的==同源策略限制==。同源策略（Sameoriginpolicy）是一种约
+定，它是浏览器==最核心也最基本的安全功能==，如果缺少了同源策略，则浏览器的正常功能可能都会受到影响。可以说Web是构建在同源策略基础之上的，浏览器只是针对同源策略的一种实现。==同源策略会阻止一个域的javascript脚本和另外一个域的内容进行交互==。&lt;/p&gt;
+&lt;p&gt;==所谓同源（即指在同一个域）就是两个页面具有
+相同的协议（protocol），主机（host）和端口号（port)==&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;4-源码导读&#34;&gt;4. 源码导读
+&lt;/h1&gt;&lt;h1 id=&#34;5-actuator-监听&#34;&gt;5. Actuator 监听
+&lt;/h1&gt;&lt;p&gt;​	/gateway的actuator端点允许监视Spring Cloud Gateway应用程序并与之交互。要进行远程访问，必须在应用程序属性中暴露HTTP或JMX 端口。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;management.endpoint.gateway.enabled=true # default value
+management.endpoints.web.exposure.include=gateway
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;management:
+  endpoint:
+    gateway:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: gateway
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;路径&lt;/th&gt;
+          &lt;th&gt;类型&lt;/th&gt;
+          &lt;th&gt;描述&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;route_id&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;String&lt;/td&gt;
+          &lt;td&gt;路线编号。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;route_object.predicate&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Object&lt;/td&gt;
+          &lt;td&gt;路由谓词。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;route_object.filters&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Array&lt;/td&gt;
+          &lt;td&gt;&lt;a class=&#34;link&#34; href=&#34;https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.2.0.RC1/reference/html/#gatewayfilter-factories&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;GatewayFilter工厂&lt;/a&gt;使用的路由。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;code&gt;order&lt;/code&gt;&lt;/td&gt;
+          &lt;td&gt;Number&lt;/td&gt;
+          &lt;td&gt;路线顺序。&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;/td&gt;
+          &lt;td&gt;&lt;/td&gt;
+          &lt;td&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;1-获取所有路由配置&#34;&gt;1. 获取所有路由配置
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;GET: http://localhost:8081/actuator/gateway/routes&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;[
+    {
+        &amp;quot;predicate&amp;quot;: &amp;quot;(((Paths: [/driver/**], match trailing slash: true &amp;amp;&amp;amp; Cookie: name=username regexp=itheima) &amp;amp;&amp;amp; Header: token regexp=123456) &amp;amp;&amp;amp; Methods: [GET, POST])&amp;quot;,
+        &amp;quot;route_id&amp;quot;: &amp;quot;hailtaxi-driver&amp;quot;,
+        &amp;quot;filters&amp;quot;: [
+            &amp;quot;[com.itheima.filter.PayMethodGatewayFilterFactory$$Lambda$883/0x0000000800671840@7670252b, order = 1]&amp;quot;,
+            &amp;quot;[org.springframework.cloud.gateway.filter.factory.RequestRateLimiterGatewayFilterFactory$$Lambda$896/0x0000000800675840@65e52e7, order = 2]&amp;quot;
+        ],
+        &amp;quot;uri&amp;quot;: &amp;quot;lb://hailtaxi-driver&amp;quot;,
+        &amp;quot;order&amp;quot;: 0
+    },
+    {
+        &amp;quot;predicate&amp;quot;: &amp;quot;Paths: [/order/**], match trailing slash: true&amp;quot;,
+        &amp;quot;route_id&amp;quot;: &amp;quot;hailtaxi-order&amp;quot;,
+        &amp;quot;filters&amp;quot;: [],
+        &amp;quot;uri&amp;quot;: &amp;quot;lb://hailtaxi-order&amp;quot;,
+        &amp;quot;order&amp;quot;: 0
+    },
+    {
+        &amp;quot;predicate&amp;quot;: &amp;quot;Paths: [/pay/**], match trailing slash: true&amp;quot;,
+        &amp;quot;route_id&amp;quot;: &amp;quot;hailtaxi-pay&amp;quot;,
+        &amp;quot;filters&amp;quot;: [],
+        &amp;quot;uri&amp;quot;: &amp;quot;lb://hailtaxi-pay&amp;quot;,
+        &amp;quot;order&amp;quot;: 0
+    }
+]
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-创建路由&#34;&gt;2. 创建路由
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;GET: /actuator/gateway/routes/{route_id_to_create}&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
+  &amp;quot;id&amp;quot;: &amp;quot;first_route&amp;quot;,
+  &amp;quot;predicates&amp;quot;: [{
+    &amp;quot;name&amp;quot;: &amp;quot;Path&amp;quot;,
+    &amp;quot;args&amp;quot;: {&amp;quot;_genkey_0&amp;quot;:&amp;quot;**/api/v1/hm&amp;quot;}
+  }],
+  &amp;quot;uri&amp;quot;: &amp;quot;http://localhost:8081&amp;quot;,
+  &amp;quot;order&amp;quot;: 0
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;3-删除路由&#34;&gt;3. 删除路由
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;DELETE: /actuator/gateway/routes/{id_route_to_create}&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;4-刷新路由缓存&#34;&gt;4. 刷新路由缓存
+&lt;/h2&gt;&lt;p&gt;路由规则创建和删除之后不会立即生效, 需要刷新才可以生效&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;POST: /actuator/gateway/refresh&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;6-自动刷新路由&#34;&gt;6. 自动刷新路由
+&lt;/h1&gt;&lt;p&gt;actuator&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;查询全局过滤器， http://localhost:9001/actuator/gateway/globalfilters
+查询路由中的过滤器， http://localhost:9001/actuator/gateway/routefilters
+刷新路由缓存， http://localhost:9001/actuator/gateway/refresh
+ 
+展示路由列表,  http://localhost:9001/actuator/gateway/routes
+获取单个路由的信息， http://localhost:9001/actuator/gateway/routes/host_route
+创建路由，发送Post请求，  ../actuator/gateway/routes/{id_route_to_create}
+删除路由，发送Delete请求： ../actuator/gateway/routes/{id_route_to_delete}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​		路由信息不论是通过yml 文件配置还是代码. 这些配置最终都是被封装到了RouteDefinition对象中,  所有路由信息在系统启动时就被加载装配好了, 并存到了内存中&lt;/p&gt;
+&lt;p&gt;四种实现方式&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;nacos 配置 + 事件监听 + 自动刷新&lt;/li&gt;
+&lt;li&gt;数据库配置 + 接口调用 + 自动刷新&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;changgou&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;spring:
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          &#39;[/**]&#39;: # 匹配所有请求
+            allowedOrigins: &amp;quot;*&amp;quot; #跨域处理 允许所有的域
+            allowedMethods: # 支持的方法
+              - GET
+              - POST
+              - PUT
+              - DELETE
+      routes:
+        # 配置 goods 服务通过 网关路由
+        - id: changgou_goods_route
+          uri: lb://goods
+          predicates:
+            - Path=/api/album/**,/api/brand/**,/api/cache/**,/api/categoryBrand/**,/api/category/**,/api/para/**,/api/pref/**,/api/sku/**,/api/spec/**,/api/spu/**,/api/stockBack/**,/api/template/**
+          filters:
+#            - PrefixPath=/brand
+            - StripPrefix=1
+            - name: RequestRateLimiter # 请求限流. 名字不能随意写
+              args:
+                key-resolver: &amp;quot;#{@ipKeyResolver}&amp;quot;
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
+        # 配置 user 服务通过 网关路由
+        - id: changgou_user_route
+          uri: lb://user
+          predicates:
+            - Path=/api/user/**,/api/address/**,/api/areas/**,/api/cities/**,/api/provinces/**
+          filters:
+            - StripPrefix=1
+        # 配置路由到订单微服务
+        - id: changgou_order_route
+          uri: lb://order
+          predicates:
+            - Path=/api/cart/**,/api/categoryReport/**,/api/orderConfig/**,/api/order/**,/api/orderItem/**,/api/orderLog/**,/api/preferential/**,/api/returnCause/**,/api/returnOrder/**,/api/returnOrderItem/**,/api/order
+          filters:
+            - StripPrefix=1
+  application:
+    name: gateway-web
+  # Redis配置
+  redis:
+    host: 192.168.211.132
+    port: 6379
+server:
+  port: 8001
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:7001/eureka
+  instance:
+    prefer-ip-address: true
+management:
+  endpoint:
+    gateway:
+      enabled: true
+    web:
+      exposure:
+        include: true
+
+# 超时设置
+ribbon:
+  ReadTimeout: 300000
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;0-yaml-配置转-json--mysql-record&#34;&gt;0. yaml 配置转 Json ; mysql record
+&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;gateway:
+    routes:
+    -   id: iam-service
+    uri: http://10.168.1.200:9000
+    predicates:
+    - Path=/api/v1/account/**
+    filters:
+    - StripPrefix=3
+    -   id: jc-service
+    uri: http://10.168.1.200:10101
+    predicates:
+    - Path=/api/v1/jc/**
+    filters:
+    - StripPrefix=3
+    -   id: dh-hongmeng-webapi
+    uri: lb://dh-hongmeng-webapi
+    predicates:
+    - Path=/api/v1/hm/**
+    # 云眼
+    -   id: yy-service
+    uri: http://10.168.1.200:30900
+    predicates:
+    - Path=/api/v1/eagle/**
+    filters:
+    - StripPrefix=3
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;1-nacos&#34;&gt;1. nacos
+&lt;/h2&gt;&lt;p&gt;通过配置文件刷新&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-mysql&#34;&gt;2. mysql
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;7-gateway集成权限&#34;&gt;7. gateway集成权限
+&lt;/h1&gt;</description>
+        </item>
+        <item>
+        <title>Spring_cloud_sentinel</title>
+        <link>https://mikeLing-qx.github.io/p/spring_cloud_sentinel/</link>
+        <pubDate>Sun, 01 Jan 2023 15:10:40 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/spring_cloud_sentinel/</guid>
+        <description>&lt;h1 id=&#34;1-demo&#34;&gt;1. Demo
+&lt;/h1&gt;&lt;p&gt;依赖&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;dependency&amp;gt;
+    &amp;lt;groupId&amp;gt;com.alibaba.csp&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;sentinel-core&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;1.8.1&amp;lt;/version&amp;gt;
+&amp;lt;/dependency&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;如何对下面这个接口进行限流?&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@RestController
+@RequestMapping(&amp;quot;/user&amp;quot;)
+public class UserController {
+    @Resource
+    private UserService userService;
+
+    @RequestMapping(&amp;quot;/list&amp;quot;)
+    public List&amp;lt;User&amp;gt; getUserList() {
+        return userService.getList();
+    }
+}
+
+@Service
+public class UserServiceImpl implements UserService {
+    //模拟查询数据库数据，返回结果
+    @Override
+    public List&amp;lt;User&amp;gt; getList() {
+        List&amp;lt;User&amp;gt; userList = new ArrayList&amp;lt;&amp;gt;();
+        userList.add(new User(&amp;quot;1&amp;quot;, &amp;quot;望月理奈&amp;quot;, 18));
+        userList.add(new User(&amp;quot;2&amp;quot;, &amp;quot;kotoko&amp;quot;, 20));
+        userList.add(new User(&amp;quot;3&amp;quot;, &amp;quot;花鸟玲爱&amp;quot;, 21));
+        return userList;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;1-抛出异常的方式&#34;&gt;1. 抛出异常的方式
+&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@RestController
+@RequestMapping(&amp;quot;/user&amp;quot;)
+public class UserController {
+ //资源名称
+    public static final String RESOURCE_NAME = &amp;quot;userList&amp;quot;;
+
+    @Resource
+    private UserService userService;
+
+    @RequestMapping(&amp;quot;/list&amp;quot;)
+    public List&amp;lt;User&amp;gt; getUserList() {
+        List&amp;lt;User&amp;gt; userList = null;
+        Entry entry = null;
+        try {
+            // 被保护的业务逻辑
+            entry = SphU.entry(RESOURCE_NAME);
+            userList = userService.getList();
+        } catch (BlockException e) {
+            // 资源访问阻止，被限流或被降级
+            return Collections.singletonList(new User(&amp;quot;xxx&amp;quot;, &amp;quot;资源访问被限流&amp;quot;, 0));
+        } catch (Exception e) {
+            // 若需要配置降级规则，需要通过这种方式记录业务异常
+            Tracer.traceEntry(e, entry);
+        } finally {
+            // 务必保证 exit，务必保证每个 entry 与 exit 配对
+            if (entry != null) {
+                entry.exit();
+            }
+        }
+        return userList;
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;同时需要定义限流的规则&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@SpringBootApplication
+public class SpringmvcApplication {
+
+    public static void main(String[] args) throws Exception {
+        SpringApplication.run(SpringmvcApplication.class, args);
+        //初始化限流规则
+        initFlowQpsRule();
+    }
+ //定义了每秒最多接收2个请求
+    private static void initFlowQpsRule() {
+        List&amp;lt;FlowRule&amp;gt; rules = new ArrayList&amp;lt;&amp;gt;();
+        FlowRule rule = new FlowRule(UserController.RESOURCE_NAME);
+        // set limit qps to 2
+        rule.setCount(2);
+        rule.setGrade(RuleConstant.FLOW_GRADE_QPS);
+        rule.setLimitApp(&amp;quot;default&amp;quot;);
+        rules.add(rule);
+        FlowRuleManager.loadRules(rules);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-注解方式&#34;&gt;2. 注解方式
+&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Service
+public class UserServiceImpl implements UserService {
+    //资源名称
+    public static final String RESOURCE_NAME_QUERY_USER_BY_NAME = &amp;quot;queryUserByUserName&amp;quot;;
+
+    //value是资源名称，是必填项。blockHandler填限流处理的方法名称
+    @Override
+    @SentinelResource(value = RESOURCE_NAME_QUERY_USER_BY_NAME, blockHandler = &amp;quot;queryUserByUserNameBlock&amp;quot;)
+    public User queryByUserName(String userName) {
+        return new User(&amp;quot;0&amp;quot;, userName, 18);
+    }
+
+    //注意细节，一定要跟原函数的返回值和形参一致，并且形参最后要加个BlockException参数
+    //否则会报错，FlowException: null
+    public User queryUserByUserNameBlock(String userName, BlockException ex) {
+        //打印异常
+        ex.printStackTrace();
+        return new User(&amp;quot;xxx&amp;quot;, &amp;quot;用户名称：{&amp;quot; + userName + &amp;quot;},资源访问被限流&amp;quot;, 0);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;2-sentinel&#34;&gt;2. Sentinel
+&lt;/h1&gt;&lt;p&gt;Sentinel 是面向分布式服务架构的流量控制组件，主要以流量为切入点，从限流、流量整形、熔断降级、系统负载保护、热点防护等多个维度来帮助开发者保障微服务的稳定性。&lt;/p&gt;
+&lt;h2 id=&#34;0-hystrix对比&#34;&gt;0. hystrix对比
+&lt;/h2&gt;&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;对比内容&lt;/th&gt;
+          &lt;th&gt;Sentinel&lt;/th&gt;
+          &lt;th&gt;Hystrix&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;隔离策略&lt;/td&gt;
+          &lt;td&gt;信号量隔离&lt;/td&gt;
+          &lt;td&gt;线程池隔离/信号量隔离&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;熔断降级策略&lt;/td&gt;
+          &lt;td&gt;基于响应时间或失败比率&lt;/td&gt;
+          &lt;td&gt;基于失败比率&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;实时指标实现&lt;/td&gt;
+          &lt;td&gt;滑动窗口&lt;/td&gt;
+          &lt;td&gt;滑动窗口（基于 RxJava）&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;规则配置&lt;/td&gt;
+          &lt;td&gt;支持多种数据源&lt;/td&gt;
+          &lt;td&gt;支持多种数据源&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;扩展性&lt;/td&gt;
+          &lt;td&gt;多个扩展点&lt;/td&gt;
+          &lt;td&gt;插件的形式&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;基于注解的支持&lt;/td&gt;
+          &lt;td&gt;支持&lt;/td&gt;
+          &lt;td&gt;支持&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;限流&lt;/td&gt;
+          &lt;td&gt;基于 QPS，支持基于调用关系的限流&lt;/td&gt;
+          &lt;td&gt;不支持&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;流量整形&lt;/td&gt;
+          &lt;td&gt;支持慢启动、匀速器模式&lt;/td&gt;
+          &lt;td&gt;不支持&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;系统负载保护&lt;/td&gt;
+          &lt;td&gt;支持&lt;/td&gt;
+          &lt;td&gt;不支持&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;控制台&lt;/td&gt;
+          &lt;td&gt;开箱即用，可配置规则、查看秒级监控、机器发现等&lt;/td&gt;
+          &lt;td&gt;不完善&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;常见框架的适配&lt;/td&gt;
+          &lt;td&gt;Servlet、Spring Cloud、Dubbo、gRPC 等&lt;/td&gt;
+          &lt;td&gt;Servlet、Spring Cloud Netflix&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;1-基本概念&#34;&gt;1. 基本概念
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;资源&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;资源是 Sentinel 的关键概念。它可以是 Java 应用程序中的任何内容，例如，由应用程序提供的服务，或由应用程序调用的其它应用提供的服务，甚至可以是一段代码。&lt;/p&gt;
+&lt;p&gt;==只要通过 Sentinel API 定义的代码，就是资源==，能够被 Sentinel 保护起来。大部分情况下，可以使用方法签名，URL，甚至服务名称作为资源名来标示资源。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;规则&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;pre&gt;&lt;code&gt;围绕资源的实时状态设定的规则，可以包括流量控制规则、熔断降级规则以及系统保护规则。所有规则可以动态实时调整。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;2-隔离机制-线程池信号量&#34;&gt;2. 隔离机制 (线程池/信号量)
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;==线程池隔离==顾名思义就是通过==Java的线程池进行隔离==，B服务调用C服务==给予固定的线程数量==比如10个线程，如果此时==C服务宕机了==就算大量的请求过来，==调用C服务的接口只会占用10个线程==不会占用其他工作线程资源，因此==B服务就不会出现级联故障==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;img src=&#34;https://segmentfault.com/img/bVbzoHN?w=710&amp;amp;h=369&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1570593867373.png&#34;
+	
+	
+&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;信号量隔离是使用&lt;code&gt;JUC&lt;/code&gt;下的Semaphore来实现的，当拿不到信号量的时候直接拒接因此不会出现超时占用其他工作线程的情况。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;Semaphore semaphore = new Semaphore(10,true);
+//获取信号量
+semaphore.acquire();
+//do something here
+//释放信号量
+semaphore.release();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;​    线程池隔离==针对不同的资源分别创建不同的线程池==，不同服务调用都发生在不同的线程池中，在线程池排队、超时等阻塞情况时可以快速失败。线程池隔离的好处是==隔离度比较高==，可以针对某个资源的线程池去进行处理而不影响其它资源，但是代价就是==线程上下文切换的 overhead 比较大==，特别是对==低延时的调用有比较大的影响==。而信号量隔离非常轻量级，仅限制对某个资源调用的并发数，而不是显式地去创建线程池，所以 overhead 比较小，但是效果不错，==也支持超时失败==。&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;比较项&lt;/th&gt;
+          &lt;th&gt;线程池隔离&lt;/th&gt;
+          &lt;th&gt;信号量隔离&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;线程&lt;/td&gt;
+          &lt;td&gt;与调用线程不同，使用的是线程池创建的线程&lt;/td&gt;
+          &lt;td&gt;与调用线程相同&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;开销&lt;/td&gt;
+          &lt;td&gt;排队，切换，调度等开销&lt;/td&gt;
+          &lt;td&gt;无线程切换性能更高&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;是否支持异步&lt;/td&gt;
+          &lt;td&gt;支持&lt;/td&gt;
+          &lt;td&gt;不支持&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;是否支持超时&lt;/td&gt;
+          &lt;td&gt;支持超时&lt;/td&gt;
+          &lt;td&gt;&lt;strong&gt;支持超时(&lt;a class=&#34;link&#34; href=&#34;https://link.segmentfault.com/?enc=Imh%2F5PAQf%2FqGbumG%2BmDraw%3D%3D.MhihHSpzk66D4ojh4IgB3DSU7zJZyhVy5v%2BvI9UmOPabeI2TGQTWQ88xH%2Bwwi3sB&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;新版本支持&lt;/a&gt;)&lt;/strong&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;并发支持&lt;/td&gt;
+          &lt;td&gt;支持通过线程池大小控制&lt;/td&gt;
+          &lt;td&gt;支持通过最大信号量控制&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;3-核心功能&#34;&gt;3. 核心功能
+&lt;/h2&gt;&lt;h3 id=&#34;31-流量控制&#34;&gt;3.1 流量控制
+&lt;/h3&gt;&lt;p&gt;​		流量控制在网络传输中是一个常用的概念，它用于==调整网络包的发送数据==。然而，从系统稳定性角度考虑，在处理请求的速度上，也有非常多的讲究。任意时间到来的请求往往是随机不可控的，而系统的处理能力是有限的。我们需要根据系统的处理能力对流量进行控制。Sentinel 作为一个调配器，可以根据需要把随机的请求调整成合适的形状，如下图所示：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_sentinel/images/1612941732991.png&#34;
+	width=&#34;994&#34;
+	height=&#34;525&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1612941732991&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;189&#34;
+		data-flex-basis=&#34;454px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;流量控制有以下几个角度:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;资源的调用关系，例如资源的调用链路，资源和资源之间的关系；&lt;/li&gt;
+&lt;li&gt;运行指标，例如 QPS、线程池、系统负载等；&lt;/li&gt;
+&lt;li&gt;控制的效果，例如直接限流、冷启动、排队等。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Sentinel 的设计理念是让您自由选择控制的角度，并进行灵活组合，从而达到想要的效果。&lt;/p&gt;
+&lt;h3 id=&#34;32-熔断降级&#34;&gt;3.2 熔断降级
+&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;	对调用链路中的不稳定因素进行熔断也是 Sentinel 的使命之一。由于调用关系的复杂性，如果调用链路中的某个资源出现了不稳定，可能会导致请求发生堆积，进而导致级联错误
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_sentinel/images/1612942002707.png&#34;
+	width=&#34;977&#34;
+	height=&#34;540&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1612942002707&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;180&#34;
+		data-flex-basis=&#34;434px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;​		Sentinel 和 Hystrix 的==原则是一致的==: 当检测到调用链路中某个资源出现不稳定的表现，例如请求响应时间长或异常比例升高的时候，则对这个资源的调用进行限制，==让请求快速失败==，避免影响到其它的资源而导致级联故障。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Sentinel熔断降级设计&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Hystrix 通过 线程池隔离 的方式，来对依赖（在 Sentinel 的概念中对应 资源）进行了隔离。这样做的好处是资源和资源之间做到了最彻底的隔离。缺点是除了==增加了线程切换的成本（过多的线程池导致线程数目过多）==，还需要预先给各个资源做线程池大小的分配。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Sentinel熔断降级设计：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;==并发线程数限制==:和资源池隔离的方法不同，Sentinel 通过==限制资源并发线程的数量，来减少不稳定资源对其它资源的影响==。这样不但没有线程切换的损耗，也不需要您预先分配线程池的大小。当某个资源出现不稳定的情况下，例如响应时间变长，对资源的直接影响就是会造成线程数的逐步堆积。当线程数在特定资源上堆积到一定的数量之后，对该资源的新请求就会被拒绝。堆积的线程完成任务后才开始继续接收请求。&lt;/p&gt;
+&lt;p&gt;==响应时间降级==:除了对并发线程数进行控制以外，Sentinel 还可以通过响应时间来快速降级不稳定的资源。当依赖的资源出现响应时间过长后，所有对该资源的访问都会被直接拒绝，直到过了指定的时间窗口之后才重新恢复。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;33-sentinel的规则&#34;&gt;3.3 Sentinel的规则
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;流量控制规则
+&lt;ol&gt;
+&lt;li&gt;QPS 流量控制&lt;/li&gt;
+&lt;li&gt;线程数流量控制&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;熔断降级规则&lt;/li&gt;
+&lt;li&gt;系统保护规则&lt;/li&gt;
+&lt;li&gt;访问控制规则&lt;/li&gt;
+&lt;li&gt;热点规则&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>Spring_cloud_feign</title>
+        <link>https://mikeLing-qx.github.io/p/spring_cloud_feign/</link>
+        <pubDate>Wed, 27 Apr 2022 10:11:27 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/spring_cloud_feign/</guid>
+        <description>&lt;h1 id=&#34;spring-cloud-feign&#34;&gt;Spring cloud Feign
+&lt;/h1&gt;&lt;h1 id=&#34;1-简介&#34;&gt;1. 简介
+&lt;/h1&gt;&lt;p&gt;配置nacos 配置中心&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;spring: 
+  cloud:
+     nacos:
+        discovery:
+          server-addr: 127.0.0.1:8848
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;11-feign&#34;&gt;1.1 Feign
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;Feign是Spring Cloud组件中的一个轻量级RESTful的HTTP服务客户端
+Feign==内置了Ribbon==，用来做客户端负载均衡，去调用服务注册中心的服
+务。
+Feign的使用方式是：==使用Feign的注解定义接口，调用这个接口，就可以调用服务注册中心的服务==
+Feign支持的注解和用法请参考官方文档：https://github.com/OpenFeig
+n/feign
+==Feign本身不支持Spring MVC的注解，它有一套自己的注解==&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;12-feign-日志配置&#34;&gt;1.2 Feign 日志配置
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;Feign支持4中级别：&lt;/p&gt;
+&lt;p&gt;NONE：不记录任何日志，默认值&lt;/p&gt;
+&lt;p&gt;BASIC：仅记录请求的方法，URL以及响应状态码和执行时间&lt;/p&gt;
+&lt;p&gt;HEADERS：在BASIC基础上，额外记录了请求和响应的头信息&lt;/p&gt;
+&lt;p&gt;FULL：记录所有请求和响应的明细，包括头信息、请求体、元数据&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;feign:
+  client:
+    config:
+      default: #这里default就是全局配置，如果是写服务名称，则是针对某个微服务的配置
+        LoggerLevel: FULL
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;13-feign-数据压缩&#34;&gt;1.3 Feign 数据压缩
+&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;feign:
+  compression:
+    request:
+      enabled: true
+      mime-types: text/html,application/xml,application/json # 设置压缩的数据类 型
+      min-request-size: 2048 # 触发压缩的大小下限
+    response:
+      enabled: true # 响应压缩
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;12-openfeign&#34;&gt;1.2 OpenFeign
+&lt;/h2&gt;&lt;p&gt;​	OpenFeign是Spring Cloud 在Feign的基础上支持了Spring MVC的注解，
+如@RequesMapping等，是一个轻量级的Http封装工具对象,大大简化了Http请
+求，使得我们对服务的调用转换成了对本地接口方法的调用。
+OpenFeign 的@FeignClient 可以解析SpringMVC的@RequestMapping
+注解下的接口，==并通过动态代理的方式产生实现类，实现类中做负载均衡并调用其他服务。==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;集成了Ribbon的负载均衡功能&lt;/li&gt;
+&lt;li&gt;集成Hystrix的熔断器功能&lt;/li&gt;
+&lt;li&gt;支持请求压缩&lt;/li&gt;
+&lt;li&gt;大大简化了远程调用的代码，同时功能还增强啦&lt;/li&gt;
+&lt;li&gt;以更加优雅的方式编写远程调用代码，并简化重复代码&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;2-openfeign-应用&#34;&gt;2. OpenFeign 应用
+&lt;/h1&gt;&lt;pre&gt;&lt;code&gt;1:导入openfeign依赖
+2:编写openfeign客户端接口-将请求地址写到该接口上
+3:消费者启动引导类开启openfeign功能注解 
+@EnableFeignClients(basePackages = {&amp;quot;com.itheima.driver.feign&amp;quot;})
+4:访问接口测试
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;流程分析&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;FeignClient 标注 对应的服务, 配置 fallback 降级
+&lt;ul&gt;
+&lt;li&gt;服务方法上通过spring mvc 的 注解 标注所要调用的方法&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;在启动类上标注EnableFeignClient
+&lt;ul&gt;
+&lt;li&gt;找到所有标注的了FeignClient  的接口生成代理&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;使用的时候通过@Autowired 自动注入 一个代理&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;依赖&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;&amp;lt;!--配置feign--&amp;gt;
+&amp;lt;dependency&amp;gt;
+    &amp;lt;groupId&amp;gt;org.springframework.cloud&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;spring-cloud-starter-openfeign&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;2.2.1.RELEASE&amp;lt;/version&amp;gt;
+&amp;lt;/dependency&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;创建Feign客户端接口&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@FeignClient(&amp;quot;hailtaxi-driver&amp;quot;)
+public interface DriverFeign {
+    // http://ip:port/driver/status/{id}/{status}
+    @PutMapping(value = &amp;quot;/driver/status/{id}/{status}&amp;quot;)
+    public Driver status(@PathVariable(value = &amp;quot;id&amp;quot;)String id, @PathVariable(value = &amp;quot;status&amp;quot;)Integer status);
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Feign会通过动态代理，帮我们生成实现类。
+注解@FeignClient声明Feign的客户端，==注解value指明服务名称==&lt;/p&gt;
+&lt;p&gt;接口定义的方法，采用SpringMVC的注解。Feign会根据注解帮我们生成URL
+地址 注解@RequestMapping中的/driver，不要忘记。==因为Feign需要拼接可访问地址==&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;3-源码解析&#34;&gt;3. 源码解析
+&lt;/h1&gt;&lt;p&gt;问:  和 Gateway 有什么区别吗?  Gateway 是通过 filter 转换成实际需要请求的地址&lt;/p&gt;
+&lt;h2 id=&#34;1-如何为接口生成代理并放入ioc-容器-重点&#34;&gt;1. 如何为接口生成代理并放入ioc 容器 (重点)
+&lt;/h2&gt;&lt;h3 id=&#34;1-注入feignclientfactorybean&#34;&gt;1. 注入FeignClientfactorybean
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;启动类上标注的 EnableFeignClients 为入口&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;@SpringBootApplication
+@EnableDiscoveryClient
+@EnableFeignClients(basePackages = {&amp;quot;com.itheima.driver.feign&amp;quot;})
+public class OrderApplication {
+	psvm
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;EnableFeignClients 源码&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;h1 id=&#34;import&#34;&gt;@Import
+&lt;/h1&gt;&lt;p&gt;@Import 注解支持==导入普通 java 类，并将其声明成一个bean==。主要用于将多个分散的 java config 配置类融合成一个更大的 config 类。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;@Import 注解在 4.2 之前只支持导入配置类。&lt;/li&gt;
+&lt;li&gt;在4.2之后 @Import 注解支持导入普通的 java 类,并将其声明成一个 bean。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+@Documented
+@Import({FeignClientsRegistrar.class})
+public @interface EnableFeignClients {
+    ....
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;启动扫描feign接口并注册&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;FeignClientsRegistrar#registerBeanDefinitions&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+        this.registerDefaultConfiguration(metadata, registry);
+        
+        // 这里会注册所有@FeignClient 修饰的接口
+        this.registerFeignClients(metadata, registry);
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;FeignClientsRegistrar#registerFeignClient&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;==每个标注了 @FeignClient的接口, 真正向容器中注册的其实是一个 绑定了该接口信息的 FeignClientFactoryBean==&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;  1. 创建 FeignClientFactoryBean 的 BeanDefinition
+  1. 向BeanDefinition 中填充相关属性, 属性来源于接口上@FeignClient 的属性信息
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;private void registerFeignClient(BeanDefinitionRegistry registry,
+			AnnotationMetadata annotationMetadata, Map&amp;lt;String, Object&amp;gt; attributes) {
+		// 接口全路径
+		String className = annotationMetadata.getClassName();
+		
+		/**
+		*  
+		*/
+		BeanDefinitionBuilder definition = BeanDefinitionBuilder
+				.genericBeanDefinition(FeignClientFactoryBean.class);
+		validate(attributes);
+		
+		....		
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;5&#34;&gt;
+&lt;li&gt;向容器中注入&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;beanName:  com.itheima.driver.feign.DriverFeign
+class: [org.springframework.cloud.openfeign.FeignClientFactoryBean]
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_feign/images/image-20220426144512671.png&#34;
+	width=&#34;1253&#34;
+	height=&#34;372&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220426144512671&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;336&#34;
+		data-flex-basis=&#34;808px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;2-feignclientfactorybean-获取代理对象&#34;&gt;2. FeignClientFactorybean 获取代理对象
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;代理对象是怎么生成的?&lt;/li&gt;
+&lt;li&gt;代理对象做了什么事?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;FeignClientFactoryBean#loadBalance&lt;/strong&gt;  默认的LoadBalance 是 Hystrix&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_feign/images/image-20220426160010570.png&#34;
+	width=&#34;1042&#34;
+	height=&#34;453&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220426160010570&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;230&#34;
+		data-flex-basis=&#34;552px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;代理对象Proxy 中&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_feign/images/image-20220426175939557.png&#34;
+	width=&#34;954&#34;
+	height=&#34;533&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220426175939557&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;178&#34;
+		data-flex-basis=&#34;429px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;总结&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;@EnableFeignClient 注解包下的 所有@FeignClient 接口都会封装成 FeignClientFactoryBean&lt;/li&gt;
+&lt;li&gt;FeignClientFactoryBean 的 getObject 方法会为 默认选择使用 Hrystrix 类型的 FeginLoadBalance  客户端  (可在配置文件中使用 Ribbon),使用jdk动态代理 生成代理对象,&lt;/li&gt;
+&lt;li&gt;在代理方法的 Handler 中
+&lt;ol&gt;
+&lt;li&gt;封装了Target (Feign就是实际需要调用的服务 名称 以及 url)&lt;/li&gt;
+&lt;li&gt;接口中所有方法 存储在 Dispatch 一个map中, key 是 method , value 是 该方法的处理器&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;2-代理拦截后如何走网络调用的&#34;&gt;2. 代理拦截后如何走网络调用的
+&lt;/h2&gt;&lt;h3 id=&#34;1-代理拦截&#34;&gt;1. 代理拦截
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;ReflectiveFeign.FeignInvocationHandler#invoke&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+      if (&amp;quot;equals&amp;quot;.equals(method.getName())) {
+        try {
+          Object otherHandler =
+              args.length &amp;gt; 0 &amp;amp;&amp;amp; args[0] != null ? Proxy.getInvocationHandler(args[0]) : null;
+          return equals(otherHandler);
+        } catch (IllegalArgumentException e) {
+          return false;
+        }
+      } else if (&amp;quot;hashCode&amp;quot;.equals(method.getName())) {
+        return hashCode();
+      } else if (&amp;quot;toString&amp;quot;.equals(method.getName())) {
+        return toString();
+      }
+	
+	  // 从map 集合中根据方法Method 获取该方法的处理器 handler (SynchronousMethodHandler), 然后执行
+      return dispatch.get(method).invoke(args);
+    }
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;2-方法处理器执行请求&#34;&gt;2. 方法处理器执行请求
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;SynchronousMethodHandler#invoke&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;client.execute(request, options); // 使用feign客户端发送请求获取响应
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_feign/images/image-20220427103610277.png&#34;
+	width=&#34;960&#34;
+	height=&#34;536&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220427103610277&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;179&#34;
+		data-flex-basis=&#34;429px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;3-进行负载均衡调用&#34;&gt;3. 进行负载均衡调用
+&lt;/h3&gt;&lt;p&gt;LoadBalancerFeignClient#execute&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_feign/images/image-20220427103940771.png&#34;
+	width=&#34;864&#34;
+	height=&#34;479&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220427103940771&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;180&#34;
+		data-flex-basis=&#34;432px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;4-ribbon-中进行实际地址的替换&#34;&gt;4. Ribbon 中进行实际地址的替换
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring_cloud_feign/images/image-20220427104033654.png&#34;
+	width=&#34;953&#34;
+	height=&#34;535&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220427104033654&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;178&#34;
+		data-flex-basis=&#34;427px&#34;
+	
+&gt;&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

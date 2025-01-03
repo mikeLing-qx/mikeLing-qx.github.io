@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="RabbitMQ高级特性（二） 课程回顾：消息队列MQ\n1、MQ的介绍\n概念：消息队列，在消息传输过程中用来保存消息的容器。 目的：完成应用间的相互通信。 使用场景： 业务的解耦 异步通信 流量削峰 产品：ActiveMQ、RabbitMQ、RocketMQ、Kafka 2、RabbitMQ介绍以及安装\n">
+<title>RabbitMq_2</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/rabbitmq_2/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="RabbitMq_2">
+<meta property='og:description' content="RabbitMQ高级特性（二） 课程回顾：消息队列MQ\n1、MQ的介绍\n概念：消息队列，在消息传输过程中用来保存消息的容器。 目的：完成应用间的相互通信。 使用场景： 业务的解耦 异步通信 流量削峰 产品：ActiveMQ、RabbitMQ、RocketMQ、Kafka 2、RabbitMQ介绍以及安装\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/rabbitmq_2/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='rabbitMq' /><meta property='article:tag' content='消息队列' /><meta property='article:published_time' content='2023-08-10T16:15:39&#43;08:00'/><meta property='article:modified_time' content='2023-08-10T16:15:39&#43;08:00'/>
+<meta name="twitter:title" content="RabbitMq_2">
+<meta name="twitter:description" content="RabbitMQ高级特性（二） 课程回顾：消息队列MQ\n1、MQ的介绍\n概念：消息队列，在消息传输过程中用来保存消息的容器。 目的：完成应用间的相互通信。 使用场景： 业务的解耦 异步通信 流量削峰 产品：ActiveMQ、RabbitMQ、RocketMQ、Kafka 2、RabbitMQ介绍以及安装\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#rabbitmq高级特性二">RabbitMQ高级特性（二）</a></li>
+    <li><a href="#1-消息的可靠性投递">1 消息的可靠性投递</a>
+      <ul>
+        <li><a href="#11-什么是可靠性投递">1.1 什么是可靠性投递</a></li>
+        <li><a href="#12-confirm模式">1.2 confirm模式</a>
+          <ul>
+            <li><a href="#121-创建工程">1.2.1 创建工程</a></li>
+            <li><a href="#122-编写启动类">1.2.2 编写启动类</a></li>
+            <li><a href="#123-编写创建队列的配置类">1.2.3 编写创建队列的配置类</a></li>
+            <li><a href="#124-添加yml文件">1.2.4 添加yml文件</a></li>
+            <li><a href="#125-编写单元测试">1.2.5 编写单元测试</a></li>
+            <li><a href="#126-测试结果">1.2.6 测试结果</a></li>
+          </ul>
+        </li>
+        <li><a href="#13-return模式">1.3 return模式</a>
+          <ul>
+            <li><a href="#131-创建队列">1.3.1 创建队列</a></li>
+            <li><a href="#132-编写yml文件">1.3.2 编写yml文件</a></li>
+            <li><a href="#133-编写单元测试">1.3.3 编写单元测试</a></li>
+            <li><a href="#134-测试结果">1.3.4 测试结果</a></li>
+          </ul>
+        </li>
+        <li><a href="#14-总结">1.4 总结</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-消费端ack机制">2 消费端ack机制</a>
+      <ul>
+        <li><a href="#21-什么是ack">2.1 什么是ack</a></li>
+        <li><a href="#22-ack代码实现">2.2 ack代码实现</a>
+          <ul>
+            <li><a href="#221-创建工程">2.2.1 创建工程</a></li>
+            <li><a href="#222-编写启动类">2.2.2 编写启动类</a></li>
+            <li><a href="#223-添加applicationyml文件">2.2.3 添加application.yml文件</a></li>
+            <li><a href="#224-编写监听器">2.2.4 编写监听器</a></li>
+            <li><a href="#225-测试">2.2.5 测试</a></li>
+          </ul>
+        </li>
+        <li><a href="#23-总结">2.3 总结</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-消费端限流">3 消费端限流</a>
+      <ul>
+        <li><a href="#31-限流介绍">3.1 限流介绍</a></li>
+        <li><a href="#32-代码实现">3.2 代码实现</a>
+          <ul>
+            <li><a href="#321-开启限流">3.2.1 开启限流</a></li>
+            <li><a href="#322-单元测试">3.2.2 单元测试</a>
+              <ul>
+                <li><a href="#3221-发送n条消息">3.2.2.1 发送n条消息</a></li>
+                <li><a href="#3222-修改监听器代码">3.2.2.2 修改监听器代码</a></li>
+                <li><a href="#3223-结果说明">3.2.2.3 结果说明</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#4-延时队列">4 延时队列</a>
+      <ul>
+        <li><a href="#41-ttl">4.1 TTL</a>
+          <ul>
+            <li><a href="#411-概念">4.1.1 概念</a></li>
+            <li><a href="#412-代码实现">4.1.2 代码实现</a>
+              <ul>
+                <li><a href="#4121-创建队列">4.1.2.1 创建队列</a></li>
+                <li><a href="#4122-编写单元测试">4.1.2.2 编写单元测试</a></li>
+              </ul>
+            </li>
+            <li><a href="#413-客户端创建队列了解">4.1.3 客户端创建队列【了解】</a></li>
+          </ul>
+        </li>
+        <li><a href="#42-dlx">4.2 DLX</a>
+          <ul>
+            <li><a href="#421-概念">4.2.1 概念</a></li>
+            <li><a href="#422-处理过程">4.2.2 处理过程</a></li>
+            <li><a href="#423-代码实现">4.2.3 代码实现</a></li>
+          </ul>
+        </li>
+        <li><a href="#43-延时队列">4.3 延时队列</a>
+          <ul>
+            <li><a href="#431-什么是延时队列">4.3.1 什么是延时队列</a></li>
+            <li><a href="#432-需求">4.3.2 需求</a></li>
+            <li><a href="#433-代码实现">4.3.3 代码实现</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#5-rabbitmq应用">5 RabbitMQ应用</a>
+      <ul>
+        <li><a href="#51-日志与监控">5.1 日志与监控</a>
+          <ul>
+            <li><a href="#511-日志">5.1.1 日志</a></li>
+            <li><a href="#512-管控台监控">5.1.2 管控台监控</a></li>
+          </ul>
+        </li>
+        <li><a href="#52-消息补偿-面试">5.2 消息补偿-面试</a></li>
+        <li><a href="#53-消息幂等性保障-面试">5.3 消息幂等性保障-面试</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-rabbitmq集群-了解">6 RabbitMQ集群-了解</a></li>
+    <li><a href="#总结mq的高级特性">总结：MQ的高级特性</a></li>
+    <li><a href="#7-rabbit-避免重复消费">7. Rabbit 避免重复消费;</a></li>
+    <li><a href="#8-保证消息的顺序">8. 保证消息的顺序</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/rabbitmq/" >
+                RabbitMq
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/rabbitmq_2/">RabbitMq_2</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Aug 10, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 16 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="rabbitmq高级特性二">RabbitMQ高级特性（二）
+</h1><p>课程回顾：消息队列MQ</p>
+<p>1、MQ的介绍</p>
+<ul>
+<li>概念：消息队列，在消息传输过程中用来<strong>保存消息的容器</strong>。 目的：完成应用间的相互通信。</li>
+<li>使用场景：
+<ul>
+<li>业务的解耦</li>
+<li>异步通信</li>
+<li>流量削峰</li>
+</ul>
+</li>
+<li>产品：ActiveMQ、RabbitMQ、RocketMQ、Kafka</li>
+</ul>
+<p>2、RabbitMQ介绍以及安装</p>
+<ul>
+<li>介绍：略（erlang语言开发的）</li>
+<li>安装：先安装erlang开发环境   +    再RabbitMQ【计算机名称不能为中文的】</li>
+<li>配置：用户名  、 虚拟主机</li>
+</ul>
+<p>3、RabbitMQ入门程序：使用的是MQ的简单模式</p>
+<p>4、RabbitMQ的通信方式：五种</p>
+<ul>
+<li>简单模式</li>
+<li>工作模式</li>
+<li>P/S模式：fanout，广播</li>
+<li>路由模式：Direct，定向      将消息进行分类，将消息发送到各个满足条件的队列中</li>
+<li>主题模式：Topic，主题        将消息进行分类，路由器是进行匹配规则    *：0个1个  #：0个1个多个</li>
+</ul>
+<p>5、SpringBoot集成RabbitMQ【目的：减少代码开发】</p>
+<ul>
+<li>编写生产者：略</li>
+<li>编写消费者：编写监听器     @RabbitListener</li>
+</ul>
+<p>课程计划：</p>
+<p>1、消息的可靠性投递</p>
+<p>2、消费端ack【确认】机制</p>
+<p>3、消费端限流</p>
+<p>4、延时队列【TTL、DLX】</p>
+<p>5、RabbitMQ相关应用问题【了解】</p>
+<p>6、RabbitMQ集群【了解】   运维人员</p>
+<h1 id="1-消息的可靠性投递">1 消息的可靠性投递
+</h1><h2 id="11-什么是可靠性投递">1.1 什么是可靠性投递
+</h2><p>在使用RabbitMQ的时候，作为消息的发送方希望杜绝任何<strong>消息丢失或者投递失败</strong>的场景。如果消息投递失败，RabbitMQ为我们提供了两种模式用来控制消息的可靠投递。</p>
+<ul>
+<li>confirm：确认模式</li>
+<li>return：退回模式</li>
+</ul>
+<p>-</p>
+<p>我们都知道MQ消息投递的流程，producer&mdash;&gt;exchange&mdash;&gt;routingKey&mdash;&gt;queue&mdash;&gt;consumer。如图所示：</p>
+<p><img src="/p/rabbitmq_2/assets/1589253589529.png"
+	width="919"
+	height="203"
+	
+	loading="lazy"
+	
+		alt="1589253589529"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="452"
+		data-flex-basis="1086px"
+	
+></p>
+<p>那么这两种模式又是如何工作的呢？</p>
+<ul>
+<li>
+<p>confirm模式：</p>
+<ul>
+<li>首先需要开启confirm模式</li>
+<li>消息<strong>从producer到达exchange</strong>后，会执行一个confirmCallback回调函数</li>
+<li>该回调函数的方法中有个ack参数
+<ul>
+<li>ack = true，则发送成功</li>
+<li>ack = false，则发送失败</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>return模式：</p>
+<ul>
+<li>首先需要开启return模式</li>
+<li>消息从exchange路由到queue后
+<ul>
+<li>如果投递成功，不会执行一个returnCallback回调函数</li>
+<li>如果投递失败，则会执行一个returnCallback回调函数</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="12-confirm模式">1.2 confirm模式
+</h2><h3 id="121-创建工程">1.2.1 创建工程
+</h3><p>创建<code>&lt;rabbitmq-day02-demo1-reliable&gt;</code>工程并且添加依赖</p>
+<p><img src="/p/rabbitmq_2/assets/1589255639549.png"
+	width="1129"
+	height="228"
+	
+	loading="lazy"
+	
+		alt="1589255639549"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="495"
+		data-flex-basis="1188px"
+	
+></p>
+<p>pom文件：</p>
+<pre><code class="language-xml">&lt;!--起步依赖--&gt;
+&lt;parent&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+    &lt;version&gt;2.1.4.RELEASE&lt;/version&gt;
+&lt;/parent&gt;
+&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-amqp&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+</code></pre>
+<h3 id="122-编写启动类">1.2.2 编写启动类
+</h3><p><code>&lt;com.itheima.ReliableApplication&gt;</code>编写启动类:</p>
+<p><img src="/p/rabbitmq_2/assets/1589982295928.png"
+	width="1401"
+	height="364"
+	
+	loading="lazy"
+	
+		alt="1589982295928"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="384"
+		data-flex-basis="923px"
+	
+></p>
+<pre><code class="language-java">@SpringBootApplication
+public class ReliableApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ReliableApplication.class, args);
+    }
+
+}
+</code></pre>
+<h3 id="123-编写创建队列的配置类">1.2.3 编写创建队列的配置类
+</h3><p>创建配置类<code>&lt;com.itheima.config.ConfirmQueueConfig&gt;</code>   或者 我们也可以在启动类中创建队列。</p>
+<p><img src="/p/rabbitmq_2/assets/1589982627103.png"
+	width="1368"
+	height="667"
+	
+	loading="lazy"
+	
+		alt="1589982627103"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="205"
+		data-flex-basis="492px"
+	
+></p>
+<pre><code class="language-java">@Configuration
+public class ConfirmQueueConfig {
+
+    // 创建队列
+    @Bean
+    public Queue confirmQueue(){
+        return new Queue(&quot;confirm-queue&quot;, true);
+    }
+
+    // 创建交换机
+    @Bean
+    public Exchange confirmExchange(){
+        return new DirectExchange(&quot;confirm-exchange&quot;, true, false);
+    }
+
+    // 队列绑定到交换机
+    @Bean
+    public Binding queueBindToExchange(Queue confirmQueue, Exchange confirmExchange){
+        return BindingBuilder.bind(confirmQueue).to(confirmExchange).with(&quot;confirm-routing-key&quot;).noargs();
+    }
+}
+	
+</code></pre>
+<h3 id="124-添加yml文件">1.2.4 添加yml文件
+</h3><p>在resources目录下添加application.yml文件：</p>
+<pre><code class="language-yaml">spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    # 开启confirm模式
+    publisher-confirms: true
+</code></pre>
+<p><img src="/p/rabbitmq_2/assets/1589260159231.png"
+	width="788"
+	height="255"
+	
+	loading="lazy"
+	
+		alt="1589260159231"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="309"
+		data-flex-basis="741px"
+	
+></p>
+<h3 id="125-编写单元测试">1.2.5 编写单元测试
+</h3><p>在test包下编写单元测试类：<code>&lt;com.itheima.ReliableTest&gt;</code></p>
+<pre><code class="language-java">@SpringBootTest
+@RunWith(SpringRunner.class)
+public class ReliableTest {
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    /**
+     * @author 栗子
+     * @Description confirm模式测试
+     * @Date 13:15 2020/5/12
+     * @param
+     * @return void
+     **/
+    @Test
+    public void testConfirm(){
+        // 1、设置回调函数
+        rabbitTemplate.setConfirmCallback(new RabbitTemplate.ConfirmCallback() {
+            /**
+             * @author 栗子
+             * @Description
+             * @Date 13:15 2020/5/12
+             * @param correlationData   其他相关属性
+             * @param ack               应答，成功或失败
+             * @param cause             失败原因
+             * @return void
+             **/
+            @Override
+            public void confirm(CorrelationData correlationData, boolean ack, String cause) {
+                if (ack){
+                    System.out.println(&quot;我成功接收到消息了。。。&quot;);
+                }else {
+                    System.out.println(&quot;我没有接收得到消息，原因是：&quot; + cause);
+                }
+            }
+        });
+        // 2-1、正确发送消息
+        rabbitTemplate.convertAndSend(&quot;confirm-exchange&quot;, &quot;confirm-routing-key&quot;, &quot;confirm确认模式。。。&quot;);
+        // 2-2、错误发送消息，我们可以指定一个不存在的交换机
+        // rabbitTemplate.convertAndSend(&quot;confirm-exchange-001&quot;, &quot;confirm-routing-key&quot;, &quot;confirm确认模式。。。&quot;);
+    }
+}
+</code></pre>
+<h3 id="126-测试结果">1.2.6 测试结果
+</h3><p>发送消息成功：</p>
+<p><img src="/p/rabbitmq_2/assets/1589261244520.png"
+	width="1394"
+	height="545"
+	
+	loading="lazy"
+	
+		alt="1589261244520"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="255"
+		data-flex-basis="613px"
+	
+></p>
+<p>发送消息失败：<strong>【温馨提示：confirm模式只针对交换机，因此在测试过程中指定错误路由则callback回调函数中的ack依然为true。】</strong></p>
+<p><img src="/p/rabbitmq_2/assets/1589261285720.png"
+	width="1403"
+	height="546"
+	
+	loading="lazy"
+	
+		alt="1589261285720"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="256"
+		data-flex-basis="616px"
+	
+></p>
+<h2 id="13-return模式">1.3 return模式
+</h2><h3 id="131-创建队列">1.3.1 创建队列
+</h3><p>编写创建队列的配置类<code>&lt;com.itheima.config.ReturnQueueConfig&gt;</code>。</p>
+<pre><code class="language-java">@Configuration
+public class ReturnQueueConfig {
+
+    // 创建队列
+    @Bean
+    public Queue returnQueue(){
+        return new Queue(&quot;return-queue&quot;, true);
+    }
+
+    // 创建交换机
+    @Bean
+    public Exchange returnExchange(){
+        return new DirectExchange(&quot;return-exchange&quot;, true, false);
+    }
+
+    // 队列绑定到交换机
+    @Bean
+    public Binding queueBindToExchangeByReturn(Queue returnQueue, Exchange returnExchange){
+        return BindingBuilder.bind(returnQueue).to(returnExchange).with(&quot;return-routing-key&quot;).noargs();
+    }
+}
+</code></pre>
+<h3 id="132-编写yml文件">1.3.2 编写yml文件
+</h3><p>开启return模式。</p>
+<pre><code class="language-yaml">spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    # 开启confirm模式
+    publisher-confirms: true
+    # 开启return模式
+    publisher-returns: true
+</code></pre>
+<p><img src="/p/rabbitmq_2/assets/1589266554102.png"
+	width="528"
+	height="245"
+	
+	loading="lazy"
+	
+		alt="1589266554102"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="215"
+		data-flex-basis="517px"
+	
+></p>
+<h3 id="133-编写单元测试">1.3.3 编写单元测试
+</h3><p>在<code>&lt;ReliableTest&gt;</code>测试类中添加方法：</p>
+<pre><code class="language-java">@Test
+public void testReturn(){
+    // 1、消息处理方式 true：消息通过交换机无法匹配到队列时会返回给生产者  false：匹配不到直接丢弃消息
+    //        rabbitTemplate.setMandatory(true); // 默认则为true，如果设置为false就算发送失败也不会执行callback方法，因为消息被丢弃
+    // 2、设置回调函数
+    rabbitTemplate.setReturnCallback(new RabbitTemplate.ReturnCallback() {
+        /**
+             * @author 栗子
+             * @Description
+             * @Date 15:08 2020/5/12
+             * @param message    消息体
+             * @param replyCode  响应码
+             * @param replyText  响应信息
+             * @param exchange
+             * @param routingKey
+             * @return void
+             **/
+        @Override
+        public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {
+            System.out.println(&quot;消息路由失败会执行该方法。。。&quot;);
+            System.out.println(&quot;发送的消息体：&quot; + new String(message.getBody()));
+            System.out.println(&quot;响应码：&quot; + replyCode);
+            System.out.println(&quot;响应信息：&quot; + replyText);
+        }
+    });
+    // 3-1、正确发送消息
+    //         rabbitTemplate.convertAndSend(&quot;test-return-exchange&quot;, &quot;test-return-routing-key&quot;, &quot;return退回模式。。。&quot;);
+    // 3-2、错误发送消息，我们可以指定一个不存在的路由
+    rabbitTemplate.convertAndSend(&quot;test-return-exchange&quot;, &quot;test-return-routing-key-001&quot;, &quot;return退回模式。。。&quot;);
+}
+</code></pre>
+<h3 id="134-测试结果">1.3.4 测试结果
+</h3><p>PS：当程序中指定一个不存在的routingKey的时候，发送失败则会触发returnCallback回调方法。（温馨提示：指定错误的exchange无效。）</p>
+<p><img src="/p/rabbitmq_2/assets/1589267616853.png"
+	width="1693"
+	height="561"
+	
+	loading="lazy"
+	
+		alt="1589267616853"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="301"
+		data-flex-basis="724px"
+	
+></p>
+<h2 id="14-总结">1.4 总结
+</h2><p>1、confirm确认模式：</p>
+<ul>
+<li>开启confirm模式（application.yml   <strong>spring.publisher-confirms=true</strong>）</li>
+<li>设置回调函数：rabbitTemplate.setConfirmCallback
+<ul>
+<li>若ack=true，消息投递成功</li>
+<li>若ack=false，消息投递失败</li>
+</ul>
+</li>
+</ul>
+<p>2、return退回模式：</p>
+<ul>
+<li>开启return模式（application.yml   <strong>spring.publisher-returns=true</strong>）</li>
+<li>设置消息处理方式：rabbitTemplate.setMandatory(true) 【可以省略，默认为true。】</li>
+<li>设置回调函数：rabbitTemplate.setReturnCallback
+<ul>
+<li>投递失败，则会执行该方法。</li>
+</ul>
+</li>
+</ul>
+<h1 id="2-消费端ack机制">2 消费端ack机制
+</h1><h2 id="21-什么是ack">2.1 什么是ack
+</h2><p>在第一章节中我们就生产者发送消息如何保证消息可靠性投递进行了处理，也就是说需要保证消息能够成功发送到broker中，但是如果消费者消费消息失败那又该如何处理呢？</p>
+<p>如果在处理消息的过程中，消费者的服务在处理消息的时候出现异常，那么可能这条正在处理的消息就没有完成消息消费，数据就会丢失。为了确保数据不会丢失，RabbitMQ支持<strong>确认机制</strong>ACK （Acknowledge）。</p>
+<p>消费端接收到消息后有三种ack方式：</p>
+<ul>
+<li>自动确认：ack = &ldquo;none&rdquo;</li>
+<li>手动确认：ack = &ldquo;manual&rdquo;</li>
+<li>根据异常确认（少，不考虑）：ack = &ldquo;auto&rdquo;</li>
+</ul>
+<p>自动确认是指，消息一旦被consumer接收到则自动确认收到，并将相应的message从RabbitMQ的消息缓存中移除。但是在实际的业务处理中，很可能是消息被接收到了，但是业务处理出现了异常，那么消息从缓存中移除即该消息就被丢弃了。如果设置了手动确认，则需要在业务处理成功后，调用<strong>channel.basicAck()方法手动签收</strong>，如果出现了异常，则调用<strong>channel.basicNack()方法，让其自动重发消息</strong>。</p>
+<p>总结：ack机制，确认机制（消费者对mq中的消息进行确认）</p>
+<ul>
+<li>
+<p>手动确认，获取到消息&mdash;&gt;消费消息【处理业务】</p>
+<ul>
+<li>消费成功：签收   <strong>channel.basicAck(id, true)</strong></li>
+<li>消费失败：将消息重回队列中  <strong>channel.basicNack()</strong></li>
+</ul>
+</li>
+</ul>
+<h2 id="22-ack代码实现">2.2 ack代码实现
+</h2><h3 id="221-创建工程">2.2.1 创建工程
+</h3><p>创建工程<code>&lt;rabbitmq-day02-demo2-ack&gt;</code>并且添加依赖。</p>
+<p><img src="/p/rabbitmq_2/assets/1589272481648.png"
+	width="1106"
+	height="189"
+	
+	loading="lazy"
+	
+		alt="1589272481648"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="585"
+		data-flex-basis="1404px"
+	
+></p>
+<p>pom.xml文件：</p>
+<pre><code class="language-xml">&lt;!--起步依赖--&gt;
+&lt;parent&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+    &lt;version&gt;2.1.4.RELEASE&lt;/version&gt;
+&lt;/parent&gt;
+&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-amqp&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+</code></pre>
+<h3 id="222-编写启动类">2.2.2 编写启动类
+</h3><p><img src="/p/rabbitmq_2/assets/1589272614817.png"
+	width="1190"
+	height="353"
+	
+	loading="lazy"
+	
+		alt="1589272614817"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="337"
+		data-flex-basis="809px"
+	
+></p>
+<pre><code class="language-java">@SpringBootApplication
+public class AckApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(AckApplication.class, args);
+    }
+}
+</code></pre>
+<h3 id="223-添加applicationyml文件">2.2.3 添加application.yml文件
+</h3><p>在resources目录下添加yml文件：</p>
+<pre><code class="language-yaml">spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    # 消息确认方式
+    listener:
+      simple:
+        acknowledge-mode: manual  # 手动确认
+</code></pre>
+<h3 id="224-编写监听器">2.2.4 编写监听器
+</h3><p>在<code>&lt;com.itheima.listener&gt;包下创建AckListener监听器</code></p>
+<pre><code class="language-java">@Component
+@RabbitListener(queues = {&quot;confirm-queue&quot;})
+public class AckListener {
+
+    @RabbitHandler
+    public void readMsg(String msg, Message message, Channel channel){
+        System.out.println(&quot;获取到的消息体：&quot; + new String(message.getBody()));
+        long id = message.getMessageProperties().getDeliveryTag();
+        try {
+            System.out.println(&quot;业务处理成功...&quot;);
+            // 业务处理成功：手动签收
+            channel.basicAck(id, true);
+        } catc h (Exception e) {
+            System.out.println(&quot;业务处理失败...&quot;);
+            try {
+                Thread.sleep(2000); // 消息每隔2s发送一次
+                // 业务处理失败：拒收，并且让消息重回队列
+                channel.basicNack(id, true, true);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }
+    }
+}
+</code></pre>
+<h3 id="225-测试">2.2.5 测试
+</h3><p>我们可以模拟一个业务处理失败的场景。例如：</p>
+<p><img src="/p/rabbitmq_2/assets/1589986335087.png"
+	width="953"
+	height="596"
+	
+	loading="lazy"
+	
+		alt="1589986335087"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="159"
+		data-flex-basis="383px"
+	
+></p>
+<h2 id="23-总结">2.3 总结
+</h2><pre><code class="language-properties">MQ消息的可靠性：
+1、持久化：exchange、queue、message都需要持久化
+2、生产者确保消息被成功发送，confirm
+3、消费者保证消息被消费，ack
+4、搭建Broker(mq服务)的高可用性
+</code></pre>
+<h1 id="3-消费端限流">3 消费端限流
+</h1><h2 id="31-限流介绍">3.1 限流介绍
+</h2><p>如果并发访问量大的情况下，生产方不停的发送消息，消费端可能处理不了那么多消息，此时消息在队列中堆积很多，当消费端启动，瞬间就会涌入很多消息，消费端有可能瞬间垮掉，这时我们可以在消费端进行限流操作，每秒钟拉取多少个消息。这样就可以进行并发量的控制，减轻系统的负载，提供系统的可用性，这种效果往往可以在秒杀和抢购中进行使用。rabbitmq中有限流的配置。</p>
+<p><img src="/p/rabbitmq_2/assets/1589288254017.png"
+	width="770"
+	height="372"
+	
+	loading="lazy"
+	
+		alt="1589288254017"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="206"
+		data-flex-basis="496px"
+	
+></p>
+<h2 id="32-代码实现">3.2 代码实现
+</h2><h3 id="321-开启限流">3.2.1 开启限流
+</h3><p>这里我们就不在单独的去创建工程了，我们在<code>&lt;rabbitmq-day02-demo2-ack&gt;</code>工程中application.yml中添加限流配置。</p>
+<pre><code class="language-yaml">spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    # 确认方式
+    listener:
+      simple:
+        acknowledge-mode: manual
+        # 每次最多处理消息的个数
+        prefetch: 5
+</code></pre>
+<p><img src="/p/rabbitmq_2/assets/1589986639903.png"
+	width="713"
+	height="293"
+	
+	loading="lazy"
+	
+		alt="1589986639903"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="243"
+		data-flex-basis="584px"
+	
+></p>
+<h3 id="322-单元测试">3.2.2 单元测试
+</h3><h4 id="3221-发送n条消息">3.2.2.1 发送n条消息
+</h4><p>在<code>&lt;rabbitmq-day02-demo1-reliable&gt;工程的测试类ReliableTest中添加测试方法</code></p>
+<pre><code class="language-java">// 发送10条消息
+@Test
+public void testSendMsg(){
+    for (int i = 1; i &lt;= 10; i++) {
+        rabbitTemplate.convertAndSend(&quot;confirm-exchange&quot;, &quot;confirm-routing-key&quot;, &quot;发送消息：&quot; + i);
+    }
+}
+
+</code></pre>
+<h4 id="3222-修改监听器代码">3.2.2.2 修改监听器代码
+</h4><p>修改<code>&lt;rabbitmq-day02-demo2-ack&gt;</code>工程中监听器代码</p>
+<ul>
+<li>删除异常代码<code>&lt;System.out.println(9/0)&gt;</code></li>
+<li>并且在try代码块让程序进行休眠，例如：休眠5s</li>
+</ul>
+<pre><code class="language-java">@Component
+@RabbitListener(queues = {&quot;confirm-queue&quot;})
+public class AckListener {
+
+    @RabbitHandler
+    public void readMsg(String msg, Message message, Channel channel){
+        System.out.println(&quot;获取到的消息体：&quot; + new String(message.getBody()));
+        long id = message.getMessageProperties().getDeliveryTag();
+        try {
+            Thread.sleep(5000);
+            System.out.println(&quot;业务处理成功...&quot;);
+            // 业务处理成功：手动签收签收
+            channel.basicAck(id, true);
+        } catch (Exception e) {
+
+            System.out.println(&quot;业务处理失败...&quot;);
+            try {
+                Thread.sleep(2000); // 消息每隔2s发送一次
+                // 业务处理失败：拒收，并且让消息重回队列
+                channel.basicNack(id, true, true);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }
+    }
+}
+</code></pre>
+<h4 id="3223-结果说明">3.2.2.3 结果说明
+</h4><p>生产者发送消息（没有启动消费者）：</p>
+<p><img src="/p/rabbitmq_2/assets/1589290150555.png"
+	width="906"
+	height="124"
+	
+	loading="lazy"
+	
+		alt="1589290150555"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="730"
+		data-flex-basis="1753px"
+	
+></p>
+<ul>
+<li>Ready：待消费的消息总数，10条</li>
+<li>Unacked：待应答的消息总数，0条</li>
+</ul>
+<p>启动消费端后：</p>
+<p><img src="/p/rabbitmq_2/assets/1589290236123.png"
+	width="907"
+	height="94"
+	
+	loading="lazy"
+	
+		alt="1589290236123"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="964"
+		data-flex-basis="2315px"
+	
+></p>
+<ul>
+<li>Ready：待消费的消息总数，5条</li>
+<li>Unacked：待应答的消息总数，5条</li>
+</ul>
+<h1 id="4-延时队列">4 延时队列
+</h1><p><strong>环境搭建：</strong></p>
+<p>创建<code>&lt;rabbitmq-day02-demo3-delay&gt;</code>工程并且添加依赖。</p>
+<pre><code class="language-xml">&lt;!--起步依赖--&gt;
+&lt;parent&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+    &lt;version&gt;2.1.4.RELEASE&lt;/version&gt;
+&lt;/parent&gt;
+&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-amqp&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+</code></pre>
+<p>编写启动类</p>
+<pre><code class="language-java">@SpringBootApplication
+public class DelayApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DelayApplication.class, args);
+    }
+}
+</code></pre>
+<p>编写application.yml文件</p>
+<pre><code class="language-yaml">spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+</code></pre>
+<h2 id="41-ttl">4.1 TTL
+</h2><h3 id="411-概念">4.1.1 概念
+</h3><ul>
+<li>
+<p>TTL：Time To Live（存活时间/过期时间）</p>
+</li>
+<li>
+<p>当消息到达存活时间后，该消息还没有被消费，会自动被清除</p>
+</li>
+<li>
+<p>RabbitMQ可以对消息设置过期时间也可以对整个队列设置过期时间</p>
+<ul>
+<li>如果都设置了，哪个时间先到则生效</li>
+</ul>
+</li>
+<li>
+<p>举个最常见了栗子：当我们在某个平台购买商品或者火车票、机票等，如果半个小时内没有支付，则该订单失效。</p>
+<p><img src="/p/rabbitmq_2/assets/1589291916403.png"
+	width="662"
+	height="232"
+	
+	loading="lazy"
+	
+		alt="1589291916403"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="285"
+		data-flex-basis="684px"
+	
+></p>
+</li>
+</ul>
+<h3 id="412-代码实现">4.1.2 代码实现
+</h3><h4 id="4121-创建队列">4.1.2.1 创建队列
+</h4><p>在工程中创建队列的配置类<code>&lt;com.itheima.config.TTLConfig&gt;</code></p>
+<pre><code class="language-java">@Configuration
+public class TTLConfig {
+
+    // 创建队列
+    @Bean
+    public Queue ttlQueue(){
+        // 创建队列，并且指定队列的过期时间
+        return QueueBuilder.durable(&quot;ttl-queue&quot;).withArgument(&quot;x-message-ttl&quot;, 10000).build();
+    }
+
+    @Bean
+    public Exchange ttlExchange(){
+        // 注意，由于routingkey我们使用了匹配，因此我们要创建topic类型的交换机
+        return new TopicExchange(&quot;ttl-exchange&quot;, true, false);
+    }
+
+    // 队列绑定到交换机
+    @Bean
+    public Binding queueBindToExchangeByTTL(Queue ttlQueue, Exchange ttlExchange){
+        return BindingBuilder.bind(ttlQueue).to(ttlExchange).with(&quot;ttl.#&quot;).noargs();
+    }
+}
+</code></pre>
+<h4 id="4122-编写单元测试">4.1.2.2 编写单元测试
+</h4><p>在工程的test包下创建测试类<code>&lt;com.itheima.DelayTest&gt;</code></p>
+<pre><code class="language-java">@Test
+public void testTTL(){
+    // 可以设置消息的属性消息
+    MessagePostProcessor messagePostProcessor = new MessagePostProcessor() {
+        @Override
+        public Message postProcessMessage(Message message) throws AmqpException {
+            // 设置消息的过期时间 5s
+            message.getMessageProperties().setExpiration(&quot;5000&quot;);
+            return message;
+        }
+    };
+    rabbitTemplate.convertAndSend(&quot;test-ttl-exchange&quot;,&quot;ttl.hehe&quot;, &quot;ttl消息&quot;, messagePostProcessor);
+}
+
+PS：温馨提示，如果同时设置了队列过期时间和消息的过期时间，那么时间越短的先生效。
+</code></pre>
+<h3 id="413-客户端创建队列了解">4.1.3 客户端创建队列【了解】
+</h3><p>1、创建队列</p>
+<p><img src="/p/rabbitmq_2/assets/1589294819246.png"
+	width="1059"
+	height="359"
+	
+	loading="lazy"
+	
+		alt="1589294819246"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="294"
+		data-flex-basis="707px"
+	
+></p>
+<p>2、创建交换机</p>
+<p><img src="/p/rabbitmq_2/assets/1589294871233.png"
+	width="839"
+	height="337"
+	
+	loading="lazy"
+	
+		alt="1589294871233"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="248"
+		data-flex-basis="597px"
+	
+></p>
+<p>3、队列绑定交换机</p>
+<p><img src="/p/rabbitmq_2/assets/1589294973845.png"
+	width="916"
+	height="414"
+	
+	loading="lazy"
+	
+		alt="1589294973845"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="221"
+		data-flex-basis="531px"
+	
+></p>
+<p>4、发送消息【PS：<strong>Delivery mode ：2 - Persistent，指定为消息持久化</strong>】</p>
+<p><img src="/p/rabbitmq_2/assets/1589989186990.png"
+	width="917"
+	height="490"
+	
+	loading="lazy"
+	
+		alt="1589989186990"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="187"
+		data-flex-basis="449px"
+	
+></p>
+<h2 id="42-dlx">4.2 DLX
+</h2><h3 id="421-概念">4.2.1 概念
+</h3><p>DLX：Dead-Letter-Exchange，死信交换机。当消息成为Dead Message后，可以被重新发送到另一个交换机，这个交换机就称为死信交换机。</p>
+<p>DLX其始就是一个Exchange，和一般的Exchange没有区别，仅仅只是设置某个队列的属性而已。当这个队列中有死信时，RabbitMQ就会自动的将这个消息重新发布到设置的Exchange上去，进而被路由到另一个队列。消费端可以监听这个队列中的消息做相应的处理。</p>
+<h3 id="422-处理过程">4.2.2 处理过程
+</h3><p>1、生成者将消息发送到交换机后，由交换机路由到指定的队列</p>
+<p>2、当该消息成为了死信后并且将该消息发送给DLX。PS：成为死信的三种情况</p>
+<ul>
+<li>队列消息长度达到限制</li>
+<li>消费者拒签消息</li>
+<li>原队列中存在消息过期设置，消息到达超时时间未被消费</li>
+</ul>
+<p>3、DLX再将这个消息路由给死信队列，并且由对应的消费者消费</p>
+<p><img src="/p/rabbitmq_2/assets/1590042255594.png"
+	width="878"
+	height="409"
+	
+	loading="lazy"
+	
+		alt="1590042255594"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="214"
+		data-flex-basis="515px"
+	
+></p>
+<p><img src="/p/rabbitmq_2/assets/1589341135991.png"
+	width="876"
+	height="300"
+	
+	loading="lazy"
+	
+		alt="1589341135991"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="292"
+		data-flex-basis="700px"
+	
+></p>
+<h3 id="423-代码实现">4.2.3 代码实现
+</h3><p>创建配置类：</p>
+<pre><code class="language-java">@Configuration
+public class DLXConfig {
+
+    // 创建交换机
+    @Bean
+    public Exchange delayExchange(){
+        return new DirectExchange(&quot;delay-exchange&quot;);
+    }
+    // 创建队列
+    @Bean
+    public Queue delayQueue(){
+        Map&lt;String, Object&gt; args = new HashMap&lt;&gt;();
+        args.put(&quot;x-message-ttl&quot;, 20000);           // 队列过期时间
+        args.put(&quot;x-max-length&quot;, 10000000);         // 队列中消息数量
+        args.put(&quot;x-dead-letter-exchange&quot;, &quot;dlx-exchange&quot;);       // 绑定死信交换机
+        args.put(&quot;x-dead-letter-routing-key&quot;, &quot;dlx-routing-key&quot;);    // 绑定死信路由器
+        return QueueBuilder.durable(&quot;delay-queue&quot;).withArguments(args).build();
+    }
+
+    // 将队列绑定到交换机
+    @Bean
+    public Binding delayBinding(Queue delayQueue, Exchange delayExchange){
+        return BindingBuilder.bind(delayQueue).to(delayExchange).with(&quot;delay-routing-key&quot;).noargs();
+    }
+
+    // 创建死信交换机
+    @Bean
+    public Exchange dlxExhange(){
+        return new DirectExchange(&quot;dlx-exchange&quot;);
+    }
+
+    // 创建死信队列
+    @Bean
+    public Queue dlxQueue(){
+        return new Queue(&quot;dlx-queue&quot;);
+    }
+
+    // 将死信队列绑定到死信交换机上
+    @Bean
+    public Binding dlxBinding(Queue dlxQueue, Exchange dlxExhange){
+        return BindingBuilder.bind(dlxQueue).to(dlxExhange).with(&quot;dlx-routing-key&quot;).noargs();
+    }
+
+}
+</code></pre>
+<p>单元测试：</p>
+<pre><code class="language-java">@Test
+public void testDLX(){
+    // 发送消息
+    rabbitTemplate.convertAndSend(&quot;delay-exchange&quot;,&quot;delay-routing-key&quot;, &quot;死信消息&quot;);
+}
+</code></pre>
+<p>发送消息：</p>
+<p><img src="/p/rabbitmq_2/assets/1589992130599.png"
+	width="1061"
+	height="160"
+	
+	loading="lazy"
+	
+		alt="1589992130599"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="663"
+		data-flex-basis="1591px"
+	
+></p>
+<p>20S后，我们再看：</p>
+<p><img src="/p/rabbitmq_2/assets/1589992207176.png"
+	width="1023"
+	height="161"
+	
+	loading="lazy"
+	
+		alt="1589992207176"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="635"
+		data-flex-basis="1524px"
+	
+></p>
+<h2 id="43-延时队列">4.3 延时队列
+</h2><h3 id="431-什么是延时队列">4.3.1 什么是延时队列
+</h3><p>延时队列，即消息进入队列后不会被立即消费，只有到达指定的时间后才会被消费。比较遗憾的是，RabbitMQ本身没有直接支持延迟队列的功能，但是可以通过TTL + DLX组合来实现延时队列的效果。</p>
+<h3 id="432-需求">4.3.2 需求
+</h3><p>例如：用户下单后，30分钟内未完成支付，取消订单回滚库存。</p>
+<p>解决方案：</p>
+<ul>
+<li>定时器</li>
+<li>延时队列</li>
+</ul>
+<p><img src="/p/rabbitmq_2/assets/1590044162041.png"
+	width="1156"
+	height="298"
+	
+	loading="lazy"
+	
+		alt="1590044162041"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="387"
+		data-flex-basis="931px"
+	
+></p>
+<h3 id="433-代码实现">4.3.3 代码实现
+</h3><p>在【4.2章节中】我们其始已实现了延时队列了。我们只需要去监听死信队列去消费消息即可。创建监听器，如下：</p>
+<pre><code class="language-java">@Component
+@RabbitListener(queues = {&quot;dlx-queue&quot;})
+public class DelayListener {
+
+    @RabbitHandler
+    public void readMsg(String msg){
+        SimpleDateFormat sdf = new SimpleDateFormat(&quot;yyyy-MM-dd hh:mm:ss&quot;);
+        System.out.println(&quot;消费消息时间：&quot; + sdf.format(new Date()));
+        System.out.println(&quot;获取到的消息为：&quot; + msg);
+    }
+}
+
+
+// 单元测试
+@Test
+public void testDLX(){
+    // 发送消息
+    rabbitTemplate.convertAndSend(&quot;delay-exchange&quot;,&quot;delay-routing-key&quot;, &quot;死信消息&quot;);
+    SimpleDateFormat sdf = new SimpleDateFormat(&quot;yyyy-MM-dd hh:mm:ss&quot;);
+    System.out.println(&quot;发送消息时间：&quot; + sdf.format(new Date()));
+}
+</code></pre>
+<h1 id="5-rabbitmq应用">5 RabbitMQ应用
+</h1><h2 id="51-日志与监控">5.1 日志与监控
+</h2><h3 id="511-日志">5.1.1 日志
+</h3><ul>
+<li>
+<p>Linux OS下：</p>
+<p>RabbitMQ默认存放日志的路径：/var/log/rabbitmq/rabbit@xxx.log</p>
+</li>
+<li>
+<p>Windows OS下，例如：</p>
+</li>
+</ul>
+<p><img src="/p/rabbitmq_2/assets/1589518752061.png"
+	width="855"
+	height="184"
+	
+	loading="lazy"
+	
+		alt="1589518752061"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="464"
+		data-flex-basis="1115px"
+	
+></p>
+<h3 id="512-管控台监控">5.1.2 管控台监控
+</h3><p><img src="/p/rabbitmq_2/assets/1589518528251.png"
+	width="1524"
+	height="683"
+	
+	loading="lazy"
+	
+		alt="1589518528251"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="223"
+		data-flex-basis="535px"
+	
+></p>
+<h2 id="52-消息补偿-面试">5.2 消息补偿-面试
+</h2><p>需求：100%保证消息发送成功</p>
+<p><img src="/p/rabbitmq_2/assets/1589518181167.png"
+	width="1009"
+	height="413"
+	
+	loading="lazy"
+	
+		alt="1589518181167"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="244"
+		data-flex-basis="586px"
+	
+></p>
+<h2 id="53-消息幂等性保障-面试">5.3 消息幂等性保障-面试
+</h2><p>思想一样。</p>
+<p>MySql的数据库引擎：InnoDB（默认）   +   MYISAM      建表：engines=MYISAM</p>
+<ul>
+<li>数据结构：InnoDB   B+T   B+T+链表</li>
+<li>不会进行全表扫描</li>
+</ul>
+<p><img src="/p/rabbitmq_2/assets/1590045582913.png"
+	width="1210"
+	height="311"
+	
+	loading="lazy"
+	
+		alt="1590045582913"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="389"
+		data-flex-basis="933px"
+	
+></p>
+<p>需求：数据 库存只有1件了。    显示10个人买。</p>
+<ul>
+<li>悲观锁：for update</li>
+<li>**乐视锁：**需要在表设计的时候添加一个额外的字段  version（1 -2）</li>
+</ul>
+<p>幂等性：指一次或多次请求某一个资源，对于资源本身应该具有同样的结果。也就是说，任意多次请求对资源本身所产生的影响均与一次请求所产生的影响相同。在MQ中，消费多条相同的消息，得到与消费该消息一次相同的结果。</p>
+<p><img src="/p/rabbitmq_2/assets/1589518408986.png"
+	width="1043"
+	height="467"
+	
+	loading="lazy"
+	
+		alt="1589518408986"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="223"
+		data-flex-basis="536px"
+	
+></p>
+<h1 id="6-rabbitmq集群-了解">6 RabbitMQ集群-了解
+</h1><p>没有意义：docker&mdash;部署集群的mq</p>
+<p>注意：在学习docker的时候我们在给大家演示如何搭建集群。</p>
+<h1 id="总结mq的高级特性">总结：MQ的高级特性
+</h1><p>1、消息的可靠性投递</p>
+<ul>
+<li>confirm：确认模式【交换机】</li>
+<li>return：退回模式【路由器】</li>
+</ul>
+<p>2、消息的确认机制【ack】  消费方</p>
+<ul>
+<li>自动确认：略</li>
+<li>手动确认：快递送到咱手中，本人需要签字。（买了华为P30     送了MP3：拒收，消息重回队列）</li>
+</ul>
+<p>3、消费端限流：配置限流【每次处理消息的最大个数】</p>
+<p>4、延时队列：TTL  + DLX</p>
+<ul>
+<li>TTL：过期</li>
+<li>DLX：死信交换机   死信队列</li>
+</ul>
+<p>5、RabbitMQ的应用</p>
+<ul>
+<li>日志和监控</li>
+<li>消息补偿：要求消息100%发送到队列中</li>
+<li>消息幂等性; 保障：乐视锁</li>
+</ul>
+<h1 id="7-rabbit-避免重复消费">7. Rabbit 避免重复消费;
+</h1><h1 id="8-保证消息的顺序">8. 保证消息的顺序
+</h1><p>大体来说主流的解决方案有两种：</p>
+<ul>
+<li>一种是使用单线程消费来保证消息的顺序性</li>
+<li>对消息进行编号，消费者处理时根据编号来判断顺序</li>
+</ul>
+<p>乍一看，觉得两种方案没有什么问题，但是深入了解下，觉得这两种解决方案并不能完全接保证消息的消费的顺序性问题。</p>
+<p>首先我们来分析下，是什么导致RabbitMQ消息的顺序性问题的，常见的有以下几种情形：</p>
+<ul>
+<li>消息生产者启用了发送确认机制，在发生超时、中断等，需要RabbitMQ补偿发送时，那么此时消息在源头就已经出现顺序混乱了，导致消息被消费时也是乱序的</li>
+<li>另一种情况，如果消息发送时，设置了超时时间，并且采用了死信队列，模拟了延时队列的效果，那么此时消息的顺序也时不能保证的</li>
+<li>还有一种情况，如果消息设置了优先级，那么在高并发的情况下，消息的顺序也是得不到保证的，消息的消费顺序也就不能保证了</li>
+</ul>
+<p>刚才我们分析了出现消息乱序的几种情况，这里我们首先排除了实用单线程来消费，原因很简单，发送的消息的顺序（源头数据的顺序出现了异常）出现了异常，单线程消费的顺序肯定也是异常的</p>
+<p>其次对消息进行编号，这个可以解决消息顺序的问题，但是对加大了对业务处理的复杂性</p>
+<p>messageId</p>
+<p><img src="/p/rabbitmq_2/images/image-20220104141506541.png"
+	width="521"
+	height="368"
+	
+	loading="lazy"
+	
+		alt="image-20220104141506541"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="141"
+		data-flex-basis="339px"
+	
+></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/rabbitmq/">RabbitMq</a>
+        
+            <a href="/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">消息队列</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/rabbitmq_1/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">RabbitMq_1</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

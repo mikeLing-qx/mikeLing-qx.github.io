@@ -1,0 +1,2230 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="0. mapping 1. 概述 2. 数据类型 3. dynamic Mapping 类型自动识别的方式\n4. mapping 的更改 只能新增, 不能修改\n5. 配置 1. 默认配置 2. null_value 需要对null 值实现搜索 只有 keyword 类型支持设定 null_value 3. 数组类型 ElasticSearch 不提供专门的数组类型, 但是任何字段, 都可以包含多个相同类类型的数值\n">
+<title>ElasticSearch进阶与开发实录</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="ElasticSearch进阶与开发实录">
+<meta property='og:description' content="0. mapping 1. 概述 2. 数据类型 3. dynamic Mapping 类型自动识别的方式\n4. mapping 的更改 只能新增, 不能修改\n5. 配置 1. 默认配置 2. null_value 需要对null 值实现搜索 只有 keyword 类型支持设定 null_value 3. 数组类型 ElasticSearch 不提供专门的数组类型, 但是任何字段, 都可以包含多个相同类类型的数值\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='ElasticSearch' /><meta property='article:published_time' content='2025-01-03T14:19:32&#43;08:00'/><meta property='article:modified_time' content='2025-01-03T14:19:32&#43;08:00'/>
+<meta name="twitter:title" content="ElasticSearch进阶与开发实录">
+<meta name="twitter:description" content="0. mapping 1. 概述 2. 数据类型 3. dynamic Mapping 类型自动识别的方式\n4. mapping 的更改 只能新增, 不能修改\n5. 配置 1. 默认配置 2. null_value 需要对null 值实现搜索 只有 keyword 类型支持设定 null_value 3. 数组类型 ElasticSearch 不提供专门的数组类型, 但是任何字段, 都可以包含多个相同类类型的数值\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#0-mapping">0. mapping</a>
+      <ul>
+        <li><a href="#1-概述">1. 概述</a></li>
+        <li><a href="#2-数据类型">2. 数据类型</a></li>
+        <li><a href="#3-dynamic-mapping">3. dynamic Mapping</a></li>
+        <li><a href="#4-mapping-的更改">4. mapping 的更改</a></li>
+        <li><a href="#5-配置">5. 配置</a>
+          <ul>
+            <li><a href="#1-默认配置">1. 默认配置</a></li>
+            <li><a href="#2-null_value">2. null_value</a></li>
+            <li><a href="#3-数组类型">3. 数组类型</a></li>
+            <li><a href="#4-copy-to">4. copy to</a></li>
+          </ul>
+        </li>
+        <li><a href="#6-多字段特性">6. 多字段特性</a></li>
+        <li><a href="#7-自定义分词">7. 自定义分词</a></li>
+      </ul>
+    </li>
+    <li><a href="#1-版本对照">1. 版本对照</a></li>
+    <li><a href="#2-常用分词器">2. 常用分词器</a></li>
+    <li><a href="#3-ik-分词器远程字典">3. ik 分词器远程字典</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#1-配置文件">1. 配置文件</a></li>
+            <li><a href="#2-接口实现">2. 接口实现</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#4-问题">4. 问题</a></li>
+    <li><a href="#5-精确搜索方案">5. 精确搜索方案</a>
+      <ul>
+        <li><a href="#1-multi_field">1. multi_field</a></li>
+        <li><a href="#2-standard-分词">2. Standard 分词</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-function_score">6. function_score</a>
+      <ul>
+        <li>
+          <ul>
+            <li>
+              <ul>
+                <li>
+                  <ul>
+                    <li>
+                      <ul>
+                        <li><a href="#参考资料-httpsjuejincnpost6844904022948724744">参考资料: <a href="https://juejin.cn/post/6844904022948724744">https://juejin.cn/post/6844904022948724744</a></a></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#7-constant_score--filter">7. constant_score + filter</a></li>
+    <li><a href="#8-bool">8. bool</a>
+      <ul>
+        <li><a href="#1-概述-1">1. 概述</a></li>
+        <li><a href="#2-多值精确匹配">2. 多值精确匹配</a></li>
+        <li><a href="#2--算分">2.  算分</a></li>
+      </ul>
+    </li>
+    <li><a href="#9-dix-max-query">9. dix max query</a></li>
+    <li><a href="#10-multi-match">10. multi match</a></li>
+    <li><a href="#11-termpharse-suggester">11. term&amp;pharse suggester</a></li>
+    <li><a href="#12-聚合分析">12. 聚合分析</a>
+      <ul>
+        <li><a href="#1-bucket--metric-aggregation">1. bucket &amp; metric aggregation</a>
+          <ul>
+            <li><a href="#1-metric-aggregation">1. metric aggregation</a></li>
+            <li><a href="#2-terms-aggregation">2. terms aggregation</a></li>
+            <li><a href="#3-range--histogram-aggregation">3. range &amp; histogram aggregation</a></li>
+            <li><a href="#4-bucket--metrix-aggregation">4. bucket + metrix aggregation</a></li>
+          </ul>
+        </li>
+        <li><a href="#2-pipeline-聚合">2. Pipeline 聚合</a></li>
+        <li><a href="#3-聚合作用范围">3. 聚合作用范围</a></li>
+        <li><a href="#4-聚合分析">4. 聚合分析</a></li>
+      </ul>
+    </li>
+    <li><a href="#13-数据建模">13. 数据建模</a>
+      <ul>
+        <li><a href="#1-字段">1. 字段</a></li>
+        <li><a href="#2-关联数据概述">2. 关联数据概述</a></li>
+        <li><a href="#3-nested-data-type">3. nested data type</a></li>
+        <li><a href="#4-父子文档">4. 父子文档</a></li>
+      </ul>
+    </li>
+    <li><a href="#14-query">14. query</a>
+      <ul>
+        <li><a href="#1-query-string">1. query String</a></li>
+        <li><a href="#2-simple-query-string">2. simple query String</a></li>
+      </ul>
+    </li>
+    <li><a href="#15-minimum_should_match">15. minimum_should_match</a></li>
+    <li><a href="#16-updatebyqueryreindex">16. updateByQuery&amp;reindex</a></li>
+    <li><a href="#17-ingest-node-painless">17. ingest node&amp; painless</a>
+      <ul>
+        <li><a href="#1-ingest-node">1. ingest node</a></li>
+        <li><a href="#2-painless">2. painless</a></li>
+      </ul>
+    </li>
+    <li><a href="#18-深度分页">18. 深度分页</a>
+      <ul>
+        <li><a href="#1-基本分页">1. 基本分页</a>
+          <ul>
+            <li><a href="#11-query-阶段">1.1 Query 阶段</a></li>
+            <li><a href="#12-fetch-阶段">1.2 Fetch 阶段</a></li>
+          </ul>
+        </li>
+        <li><a href="#方案">方案</a>
+          <ul>
+            <li>
+              <ul>
+                <li><a href="#1-使用-search_after">1. <strong>使用 <code>search_after</code></strong></a></li>
+                <li><a href="#2-使用-scroll-api">2. <strong>使用 <code>scroll</code> API</strong></a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#19-拼音中文搜索">19. 拼音中文搜索</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/elasticsearch/" >
+                ElasticSearch
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/">ElasticSearch进阶与开发实录</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jan 03, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 16 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="0-mapping">0. mapping
+</h1><h2 id="1-概述">1. 概述
+</h2><p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221013153414506.png"
+	width="580"
+	height="339"
+	
+	loading="lazy"
+	
+		alt="image-20221013153414506"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="171"
+		data-flex-basis="410px"
+	
+></p>
+<h2 id="2-数据类型">2. 数据类型
+</h2><p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221013153511735.png"
+	width="459"
+	height="314"
+	
+	loading="lazy"
+	
+		alt="image-20221013153511735"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="146"
+		data-flex-basis="350px"
+	
+></p>
+<h2 id="3-dynamic-mapping">3. dynamic Mapping
+</h2><p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221013153938176.png"
+	width="695"
+	height="335"
+	
+	loading="lazy"
+	
+		alt="image-20221013153938176"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="207"
+		data-flex-basis="497px"
+	
+></p>
+<p>类型自动识别的方式</p>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221013154041195.png"
+	width="634"
+	height="342"
+	
+	loading="lazy"
+	
+		alt="image-20221013154041195"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="185"
+		data-flex-basis="444px"
+	
+></p>
+<h2 id="4-mapping-的更改">4. mapping 的更改
+</h2><p>只能新增, 不能修改</p>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221013160351812.png"
+	width="641"
+	height="419"
+	
+	loading="lazy"
+	
+		alt="image-20221013160351812"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="152"
+		data-flex-basis="367px"
+	
+></p>
+<h2 id="5-配置">5. 配置
+</h2><h3 id="1-默认配置">1. 默认配置
+</h3><p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221013161750154.png"
+	width="572"
+	height="250"
+	
+	loading="lazy"
+	
+		alt="image-20221013161750154"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="228"
+		data-flex-basis="549px"
+	
+></p>
+<h3 id="2-null_value">2. null_value
+</h3><ul>
+<li>需要对null 值实现搜索</li>
+<li>只有 keyword 类型支持设定 null_value</li>
+</ul>
+<h3 id="3-数组类型">3. 数组类型
+</h3><p>ElasticSearch 不提供专门的数组类型, 但是任何字段, 都可以包含多个相同类类型的数值</p>
+<h3 id="4-copy-to">4. copy to
+</h3><p>在mapping 上进行配置, 搜索的时候 可以把两个字段的进行一个联合的搜索</p>
+<h2 id="6-多字段特性">6. 多字段特性
+</h2><p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221013170626069.png"
+	width="721"
+	height="328"
+	
+	loading="lazy"
+	
+		alt="image-20221013170626069"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="219"
+		data-flex-basis="527px"
+	
+></p>
+<pre><code>It is often useful to index the same field in different ways for different purposes. This is the purpose of multi-fields. For instance, a string field could be mapped as a text field for full-text search, and as a keyword field for sorting or aggregations:
+</code></pre>
+<h2 id="7-自定义分词">7. 自定义分词
+</h2><ul>
+<li>character filter</li>
+</ul>
+<p>在Tokenizer 之前对文本进行处理, 例如 增删替换字符串, 会影响tokenizer 的 position 和offset 信息</p>
+<p>自带的</p>
+<ol>
+<li>Html strip &ndash; 去除html 标签</li>
+<li>Mapping &ndash; 字符串替换</li>
+<li>Pattern -filter &ndash; 正则匹配替换</li>
+</ol>
+<ul>
+<li>tokenizer</li>
+</ul>
+<p>将原始的文本按照一定的规则, 切分为词 (term or token)</p>
+<p>有内置的, 也可以用 Java 开发插件, 实现自己的 Tokenizer</p>
+<ul>
+<li>token filter</li>
+</ul>
+<p>将Tokenizer 输出的单词, 进行增加, 修改, 删除</p>
+<p>自带的: lowercase /stop /synonym (添加近义词)</p>
+<h1 id="1-版本对照">1. 版本对照
+</h1><p>spring boot data elasticsearch 版本: 7.6.2</p>
+<p>项目spring boot version: 2.5.4</p>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> | Spring Data Release Train                                    | Spring Data Elasticsearch                                    | Elasticsearch | Spring Framework | Spring Boot |
+| &mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash; | &mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash; | &mdash;&mdash;&mdash;&mdash;- | &mdash;&mdash;&mdash;&mdash;&mdash;- | &mdash;&mdash;&mdash;&ndash; |
+| 2022.0 (Turing)                                              | 5.0.x                                                        | 8.4.2         | 6.0.x            | 3.0.x?      |
+| 2021.2 (Raj)                                                 | 4.4.x                                                        | 7.17.3        | 5.3.x            | 2.7.x       |
+| 2021.1 (Q)                                                   | 4.3.x                                                        | 7.15.2        | 5.3.x            | 2.6.x       |
+| 2021.0 (Pascal)                                              | 4.2.x[<a class="link" href="https://github.com/spring-projects/spring-data-elasticsearch/blob/main/src/main/asciidoc/preface.adoc#_footnotedef_1"  target="_blank" rel="noopener"
+    >1</a>] | 7.12.0        | 5.3.x            | 2.5.x       |
+| 2020.0 (Ockham)[<a class="link" href="https://github.com/spring-projects/spring-data-elasticsearch/blob/main/src/main/asciidoc/preface.adoc#_footnotedef_1"  target="_blank" rel="noopener"
+    >1</a>] | 4.1.x[<a class="link" href="https://github.com/spring-projects/spring-data-elasticsearch/blob/main/src/main/asciidoc/preface.adoc#_footnotedef_1"  target="_blank" rel="noopener"
+    >1</a>] | 7.9.3         | 5.3.2            | 2.4.x       |
+| Neumann[<a class="link" href="https://github.com/spring-projects/spring-data-elasticsearch/blob/main/src/main/asciidoc/preface.adoc#_footnotedef_1"  target="_blank" rel="noopener"
+    >1</a>] | 4.0.x[<a class="link" href="https://github.com/spring-projects/spring-data-elasticsearch/blob/main/src/main/asciidoc/preface.adoc#_footnotedef_1"  target="_blank" rel="noopener"
+    >1</a>] | 7.6.2         | 5.2.12           | 2.3.x       |
+| Moore[<a class="link" href="https://github.com/spring-projects/spring-data-elasticsearch/blob/main/src/main/asciidoc/preface.adoc#_footnotedef_1"  target="_blank" rel="noopener"
+    >1</a>] | 3.2.x[<a class="link" href="https://github.com/spring-projects/spring-data-elasticsearch/blob/main/src/main/asciidoc/preface.adoc#_footnotedef_1"  target="_blank" rel="noopener"
+    >1</a>] | 6.8.12        | 5.2.12           | 2.2.x       |
+| Lovelace[<a class="link" href="https://github.com/spring-projects/spring-data-elasticsearch/blob/main/src/main/asciidoc/preface.adoc#_footnotedef_1"  target="_blank" rel="noopener"
+    >1</a>] | 3.1.x[<a class="link" href="https://github.com/spring-projects/spring-data-elasticsearch/blob/main/src/main/asciidoc/preface.adoc#_footnotedef_1"  target="_blank" rel="noopener"
+    >1</a>] | 6.2.2         | 5.1.19           | 2.1.x       |
+| Kay[<a class="link" href="https://github.com/spring-projects/spring-data-elasticsearch/blob/main/src/main/asciidoc/preface.adoc#_footnotedef_1"  target="_blank" rel="noopener"
+    >1</a>] | 3.0.x[<a class="link" href="https://github.com/spring-projects/spring-data-elasticsearch/blob/main/src/main/asciidoc/preface.adoc#_footnotedef_1"  target="_blank" rel="noopener"
+    >1</a>] | 5.5.0         | 5.0.13           | 2.0.x       |
+| Ingalls[<a class="link" href="https://github.com/spring-projects/spring-data-elasticsearch/blob/main/src/main/asciidoc/preface.adoc#_footnotedef_1"  target="_blank" rel="noopener"
+    >1</a>] | 2.1.x[<a class="link" href="https://github.com/spring-projects/spring-data-elasticsearch/blob/main/src/main/asciidoc/preface.adoc#_footnotedef_1"  target="_blank" rel="noopener"
+    >1</a>] | 2.4.0         | 4.3.25           | 1.5.x       |</li>
+</ul>
+<p>提供操作es-api 的框架</p>
+<pre><code>spring-data
+
+sparkStreaming
+
+Flink
+</code></pre>
+<pre><code>https://blog.csdn.net/u011863024/article/details/115721328
+</code></pre>
+<h1 id="2-常用分词器">2. 常用分词器
+</h1><p>自带</p>
+<p><strong>Standard Analyzer</strong> - 默认分词器，按英文空格切分</p>
+<p>Simple Analyzer - 按照非字母切分(符号被过滤)</p>
+<p>Stop Analyzer - 小写处理，停用词过滤(the,a,is)</p>
+<p>Whitespace Analyzer - 按照空格切分，不转小写</p>
+<p>Keyword Analyzer - 不分词，直接将输入当作输出</p>
+<p>Patter Analyzer - 正则表达式，默认\W+(非字符分割)</p>
+<p>中文</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th><strong>分词器</strong></th>
+          <th><strong>优势</strong></th>
+          <th><strong>劣势</strong></th>
+          <th><strong>地址</strong></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>IK Analyzer</td>
+          <td>简单易用，支持自定义词典和远程词典</td>
+          <td>词库需要自行维护，不支持词性识别</td>
+          <td><a class="link" href="https://github.com/medcl/elasticsearch-analysis-ik"  target="_blank" rel="noopener"
+    >https://github.com/medcl/elasticsearch-analysis-ik</a></td>
+      </tr>
+      <tr>
+          <td>Ansj</td>
+          <td>分词精准度不错，支持词性识别</td>
+          <td>对标hanlp词库略少，学习成本高</td>
+          <td><a class="link" href="https://github.com/NLPchina/elasticsearch-analysis-ansj"  target="_blank" rel="noopener"
+    >https://github.com/NLPchina/elasticsearch-analysis-ansj</a></td>
+      </tr>
+      <tr>
+          <td>jieba</td>
+          <td>新词发现功能</td>
+          <td>不支持词性识别</td>
+          <td><a class="link" href="https://github.com/sing1ee/elasticsearch-jieba-plugin"  target="_blank" rel="noopener"
+    >https://github.com/sing1ee/elasticsearch-jieba-plugin</a></td>
+      </tr>
+      <tr>
+          <td>Smart Chinese Analyzer</td>
+          <td>官方插件</td>
+          <td>中文分词效果惨不忍睹</td>
+          <td><a class="link" href="https://artifacts.elastic.co/downloads/elasticsearch-plugins/analysis-smartcn/analysis-smartcn-7.16.1.zip"  target="_blank" rel="noopener"
+    >https://artifacts.elastic.co/downloads/elasticsearch-plugins/analysis-smartcn/analysis-smartcn-7.16.1.zip</a></td>
+      </tr>
+      <tr>
+          <td>Hanlp</td>
+          <td>目前词库最完善，支持的特性非常多</td>
+          <td>需要更优的分词效果，学习成本高</td>
+          <td><a class="link" href="https://github.com/hankcs/HanLP/releases"  target="_blank" rel="noopener"
+    >https://github.com/hankcs/HanLP/releases</a></td>
+      </tr>
+  </tbody>
+</table></div>
+<h1 id="3-ik-分词器远程字典">3. ik 分词器远程字典
+</h1><blockquote>
+<p>ik 分词器会==每隔 1 分钟调用一次 head 方法根据 etag 来判断字典是否更新了==，如果更新了的话才会调用 get 方法去下载字典。先调用 head 方法确认更新后再调用 get下载，这样就节省了带宽流量，也省的去更新词典了。</p>
+</blockquote>
+<h3 id="1-配置文件">1. 配置文件
+</h3><p>/xxx/elasticsearch-7.12.0/plugins/ik/config/IKAnalyzer.cfg.xml</p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE properties SYSTEM &quot;http://java.sun.com/dtd/properties.dtd&quot;&gt;
+&lt;properties&gt;
+	&lt;comment&gt;IK Analyzer 扩展配置&lt;/comment&gt;
+	&lt;!--用户可以在这里配置自己的扩展字典 --&gt;
+	&lt;entry key=&quot;ext_dict&quot;&gt;shfq_ext_dic.dic&lt;/entry&gt;
+	 &lt;!--用户可以在这里配置自己的扩展停止词字典--&gt;
+	&lt;entry key=&quot;ext_stopwords&quot;&gt;&lt;/entry&gt;
+	&lt;!--用户可以在这里配置远程扩展字典 --&gt;
+	&lt;entry key=&quot;remote_ext_dict&quot;&gt;http://localhost:8162/test/downloadExtDic?fileName=extWords.dic&lt;/entry&gt;
+	&lt;!--用户可以在这里配置远程扩展停止词字典--&gt;
+	&lt;entry key=&quot;remote_ext_stopwords&quot;&gt;http://localhost:8162/test/downloadExtDic?fileName=stopWords.dic&lt;/entry&gt;
+&lt;/properties&gt;
+
+</code></pre>
+<h3 id="2-接口实现">2. 接口实现
+</h3><p>在下载扩展、停用词典的接口里返回 Last-Modified 或 ETag responder header 。</p>
+<pre><code class="language-java">import com.huitongjy.common.util.LogUtils;
+import io.swagger.annotations.Api;
+import io.swagger.models.HttpMethod;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+
+@RestController
+@Api(value = &quot;PrivateController&quot;, tags = &quot;测试&quot;)
+
+public class TestController {
+    private static final Logger LOG = LoggerFactory.getLogger(PrivateController.class);
+
+    @RequestMapping(value = &quot;/test/downloadExtDic&quot;)
+    public ResponseEntity&lt;org.springframework.core.io.Resource&gt; downloadFileFromLocal(HttpServletRequest request, String fileName) {
+        if (StringUtils.isEmpty(fileName)) {
+            return null;
+        }
+        // 可以把字典的配置文件写到配置中心
+        String location = &quot;&quot;;
+        if (!location.endsWith(File.separator)) {
+            location += File.separator;
+        }
+        String method = request.getMethod();
+        boolean isHead = HttpMethod.HEAD.name().equals(method);
+        String pathStr = location + fileName;
+        File file = new File(pathStr);
+        if (!file.exists()) {
+            LogUtils.error(LOG, &quot;字典不存在&quot;, &quot;path&quot;, pathStr);
+            return null;
+        }
+
+        Path path = Paths.get(pathStr);
+        org.springframework.core.io.Resource resource = null;
+
+        try {
+            resource = new UrlResource(path.toUri());
+        } catch (MalformedURLException e) {
+            LogUtils.error(LOG, &quot;加载字典异常&quot;, e);
+            return null;
+        }
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, &quot;attachment; filename=\&quot;&quot; + fileName + &quot;\&quot;&quot;);
+        httpHeaders.add(HttpHeaders.ETAG, generateLastUpdateDate(path) + &quot;&quot;);
+        if (isHead) {
+            resource = null;
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_PLAIN)
+                .headers(httpHeaders)
+                .body(resource);
+    }
+
+    private long generateLastUpdateDate(Path path) {
+        try {
+            BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+            Long l = attr.lastModifiedTime().toMillis();
+            return l;
+        } catch (IOException e) {
+            return -1;
+        }
+
+    }
+
+}
+
+</code></pre>
+<h1 id="4-问题">4. 问题
+</h1><ol>
+<li>
+<p>默认的分词请求 最大字数为10000字, 如何修改</p>
+</li>
+<li>
+<p>分词相关参数的含义与使用</p>
+<ol>
+<li><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20220927121228770.png"
+	width="311"
+	height="182"
+	
+	loading="lazy"
+	
+		alt="image-20220927121228770"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="170"
+		data-flex-basis="410px"
+	
+></li>
+</ol>
+</li>
+</ol>
+<pre><code class="language-yaml"># 只能为指定的index进行分词
+PUT /analyze_sample
+{
+  &quot;settings&quot; : {
+    &quot;index.analyze.max_token_count&quot; : 100000
+  }
+}
+</code></pre>
+<ol start="3">
+<li>文档先于关键词添加, 倒排索引已经生成过了, 后续添加了关键词 之后进行搜索的时候能否命中?</li>
+</ol>
+<blockquote>
+<p>验证流程:</p>
+<ol>
+<li>先添加文章</li>
+<li>分词器&ndash;添加关键词</li>
+<li>搜索</li>
+<li>分析词条索引</li>
+</ol>
+</blockquote>
+<p>注意 : ==对新添加的索引数据就会按照扩展词典进行分词。但是原有的索引数据不会，需要对原有数据重新生成索引==</p>
+<ol start="4">
+<li>能否给ik分词器配置多个远程的拓展词库</li>
+</ol>
+<blockquote>
+<p>不行</p>
+</blockquote>
+<ol start="5">
+<li>ElasticsearchTemplate 注入失败的原因是什么?</li>
+</ol>
+<blockquote>
+<p>springboot集成es的版本更新很快，在7.x版本已经弃用了ElasticSearchTemplate，进而使用ElasticSearchRestTemplate</p>
+</blockquote>
+<ol start="6">
+<li>如何进行精确搜索?</li>
+</ol>
+<blockquote>
+<p>使用standard 分词, match_pharse 查询</p>
+</blockquote>
+<ol start="7">
+<li>
+<p>es 的index 名必须是小写的 !</p>
+</li>
+<li>
+<p>嵌套文档查询</p>
+</li>
+</ol>
+<blockquote>
+<p>nested中查询的是嵌套文档的内容，语法与正常查询时一致。</p>
+<p>文档的分数计算需注意</p>
+<ol>
+<li>nested 查询肯定可以匹配到多个嵌套的文档。每一个匹配的嵌套文档都有自己的相关度得分，但是这众多的分数最终需要汇聚为可供根文档使用的一个分数</li>
+<li>默认情况下，根文档的分数是这些嵌套文档分数的平均值。可以通过设置 score_mode 参数来控制这个得分策略，相关策略有 avg (平均值), max (最大值), sum (加和) 和 none (直接返回 1.0 常数值分数)。</li>
+</ol>
+</blockquote>
+<ol start="9">
+<li>词条出现次数统计</li>
+</ol>
+<p>​		配置termvectors, 本质还是空间换时间</p>
+<pre><code>POST message_index/_bulk
+{&quot;index&quot;:{&quot;_id&quot;:1}}
+{&quot;message&quot;:&quot;沉溺于「轻易获得高成就感」的事情：沉溺于有意无意地寻求用很小付出获得很大「huibao」的偏方，哪怕huibao是虚拟的&quot;}
+{&quot;index&quot;:{&quot;_id&quot;:2}}
+{&quot;message&quot;:&quot;过度追求“短期huibao”可以先思考这样一个问题：为什么玩王者荣耀沉溺我们总是停不下来huibao&quot;}
+{&quot;index&quot;:{&quot;_id&quot;:3}}
+{&quot;message&quot;:&quot;过度追求的努力无法带来超额的huibao，就因此放弃了努力。这点在聪明人身上尤其明显。以前念本科的时候身在沉溺&quot;}
+
+PUT message_index
+{
+  &quot;mappings&quot;: {
+    &quot;properties&quot;: {
+      &quot;message&quot;: {
+        &quot;type&quot;: &quot;text&quot;,
+        &quot;term_vector&quot;: &quot;with_positions_offsets_payloads&quot;,
+        &quot;store&quot;: true,
+        &quot;analyzer&quot;: &quot;ik_max_word&quot;
+      }
+    }
+  }
+}
+
+GET message_index/_termvectors/1?fields=message
+</code></pre>
+<ol start="10">
+<li>自动预警</li>
+</ol>
+<blockquote>
+<p>生效范围</p>
+<ol>
+<li>文件类型</li>
+<li>部门</li>
+<li>发布时间</li>
+</ol>
+</blockquote>
+<p>关键词</p>
+<p>首先 &ndash; &gt; IK 分词器拓展词 &ndash;&gt; 会使用所有启用的关键词</p>
+<p>方案1:</p>
+<ol>
+<li>
+<p>查询出文章对应的筛查关键词</p>
+</li>
+<li>
+<p>计算命中的关键词</p>
+</li>
+<li>
+<p>存储到 article_keyword</p>
+</li>
+</ol>
+<p>方案2:</p>
+<ol>
+<li>
+<p>直接存储到ES中</p>
+</li>
+<li>
+<p>根据每个关键词的生效策略, 使用DSL 语句筛查出对应的文章</p>
+</li>
+<li>
+<p>存储到 article_keyword</p>
+</li>
+<li>
+<p>如何打印执行的DSL 语句?</p>
+</li>
+</ol>
+<blockquote>
+<p>参考资料
+<a class="link" href="https://docs.spring.io/spring-data/elasticsearch/docs/current/reference/html/#repositories.definition"  target="_blank" rel="noopener"
+    >https://docs.spring.io/spring-data/elasticsearch/docs/current/reference/html/#repositories.definition</a></p>
+</blockquote>
+<p>简单处理</p>
+<pre><code class="language-java">Optional.ofNullable(searchQuery.getFilter()).ifPresent(r -&gt; log.info(&quot;DSL-filter:{}&quot;, r.toString()));
+
+Optional.ofNullable(searchQuery.getQuery()).ifPresent(r -&gt; log.info(&quot;DSL-query:{}&quot;, r.toString()));
+
+Optional.ofNullable(searchQuery.getElasticsearchSorts()).ifPresent(r -&gt; log.info(&quot;Sort-query:{}&quot;, r.toString()));
+</code></pre>
+<ol start="12">
+<li>专项筛查</li>
+</ol>
+<pre><code>GET article/_search
+{
+  &quot;query&quot;: {
+    &quot;bool&quot;: {
+      &quot;should&quot;: [
+        {
+          &quot;match_phrase&quot;: {
+            &quot;contentStandardAnalyzer&quot;: &quot;深圳创新&quot;
+          }
+        },
+        {
+          &quot;match_phrase&quot;: {
+            &quot;title&quot;: &quot;深圳创新&quot;
+          }
+        }
+      ],
+      &quot;must&quot;: [
+        {
+          &quot;range&quot;: {
+            &quot;publicationDate&quot;: {
+              &quot;gte&quot;: &quot;2022-09-29&quot;,
+              &quot;lte&quot;: &quot;2022-09-30&quot;
+            }
+          }
+        },{
+          &quot;terms&quot;: {
+            &quot;publicationDeptId&quot;: [
+              &quot;4&quot;,
+              &quot;5&quot;
+            ]
+          }
+        }
+      ]
+    } 
+  }
+}
+
+</code></pre>
+<ol start="13">
+<li>elasticsearch 事务</li>
+</ol>
+<pre><code>Elasticsearch 支持单个文档级别的原子创建、更新和删除操作，但没有内置对多文档事务的支持。
+
+</code></pre>
+<p>可以使用乐观锁, 带上version字段, 或者可以通过外置的关系型数据库进行处理</p>
+<ol start="14">
+<li>什么是elasticSearch 的子字段</li>
+</ol>
+<p><a class="link" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/multi-fields.html"  target="_blank" rel="noopener"
+    >https://www.elastic.co/guide/en/elasticsearch/reference/current/multi-fields.html</a></p>
+<ol start="15">
+<li></li>
+</ol>
+<h1 id="5-精确搜索方案">5. 精确搜索方案
+</h1><p>问题描述</p>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20220928180343431.png"
+	width="621"
+	height="212"
+	
+	loading="lazy"
+	
+		alt="image-20220928180343431"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="292"
+		data-flex-basis="703px"
+	
+></p>
+<h2 id="1-multi_field">1. multi_field
+</h2><pre><code>默认情况下使用标准分析器分析字段。如果您想检查完全匹配，您可以存储未分析的字段
+
+&quot;dog&quot;:{
+            &quot;type&quot;:&quot;multi_field&quot;,
+            &quot;fields&quot;:{
+                &quot;dog&quot;:{
+                    &quot;include_in_all&quot;:false,
+                    &quot;type&quot;:&quot;string&quot;,
+                    &quot;index&quot;:&quot;not_analyzed&quot;,
+                    &quot;store&quot;:&quot;no&quot;
+                },
+                &quot;_tokenized&quot;:{
+                    &quot;include_in_all&quot;:false,
+                    &quot;type&quot;:&quot;string&quot;,
+                    &quot;index&quot;:&quot;analyzed&quot;,
+                    &quot;store&quot;:&quot;no&quot;
+                }
+            }
+        }
+
+
+</code></pre>
+<p>然后您可以查询 dog-field 以获得精确匹配，并查询 dog._tokenized 用于分析查询（如全文）</p>
+<h2 id="2-standard-分词">2. Standard 分词
+</h2><p>结合 bool 查询  should + match_pharse</p>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20220928180207678.png"
+	width="462"
+	height="433"
+	
+	loading="lazy"
+	
+		alt="image-20220928180207678"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="106"
+		data-flex-basis="256px"
+	
+></p>
+<pre><code>查询  --&gt; 飞科剃须刀
+bool: {
+	should: {
+		&quot;科剃须&quot;
+	}
+	match_pharse: {
+		&quot;科剃须&quot;
+	}
+}
+
+</code></pre>
+<h1 id="6-function_score">6. function_score
+</h1><blockquote>
+<h6 id="参考资料-httpsjuejincnpost6844904022948724744">参考资料: <a class="link" href="https://juejin.cn/post/6844904022948724744"  target="_blank" rel="noopener"
+    >https://juejin.cn/post/6844904022948724744</a>
+</h6></blockquote>
+<p>Elasticsearch进行全文搜索的时候，==默认是使用BM25计算的_score字段进行降序排序的==。当我们需要用==其他字段进行降序或者升序排序的时候，可以使用sort字段==，传入我们想要的排序字段和方式。 当简单的使用几个字段升降序排列组合无法满足我们的需求的时候，我们就需要==自定义排序的特性==，Elasticsearch提供了function_score的DSL来自定义打分，这样就可以根据自定义的_score来进行排序。</p>
+<p>可以再查询结束后对每一个匹配的文档进行重新算分, 根据新生成的分数进行排序</p>
+<p>算法函数</p>
+<ul>
+<li>weight : 为每一个文档设置一个简单而不被规范化的权重</li>
+<li>field value factor: 使用该数字来修改_score, 例如将 &ldquo;热度&rdquo; 和&quot;点赞数&quot; 作为算分的参考因素</li>
+<li>random score: 为每一个用户使用一个不同的, 随机算分结果</li>
+<li>衰减函数: 以某个字段的值为标准, 距离某个值越近, 得分越高</li>
+<li>script scores: 自定义脚本完全控制</li>
+</ul>
+<p>一致性随机文档</p>
+<pre><code>GET article/_search
+{
+  &quot;from&quot;: 0, 
+  &quot;size&quot;: 2,
+  &quot;query&quot;: {
+    &quot;function_score&quot;: {
+      &quot;random_score&quot;: {
+        &quot;seed&quot;: 314124
+      }
+    }
+  }
+}
+
+</code></pre>
+<p>脚本排序</p>
+<pre><code class="language-json">&quot;sort&quot;: [
+    {
+      &quot;publicationDate&quot;: {
+        &quot;order&quot;: &quot;asc&quot;
+      }
+    },
+    {
+      &quot;_script&quot;: {
+        &quot;script&quot;: {
+          &quot;source&quot;: &quot;def type = doc['book_type'].value; def time = doc['publish_time'].value;if(type==1) return time; else return -time&quot;,
+          &quot;lang&quot;: &quot;painless&quot;
+        },
+        &quot;type&quot;: &quot;number&quot;,
+        &quot;order&quot;: &quot;asc&quot;
+      }
+    }
+  ]
+
+</code></pre>
+<h1 id="7-constant_score--filter">7. constant_score + filter
+</h1><p>TF &ndash; 词频 (检索词频率)</p>
+<p>IDF &ndash; 词在文档中出现的概率 (反向文档频率)</p>
+<pre><code>检索词频率
+检索词在该字段出现的频率？出现频率越高，相关性也越高。 字段中出现过 5 次要比只出现过 1 次的相关性高。
+
+反向文档频率
+每个检索词在索引中出现的频率？频率越高，相关性越低。检索词出现在多数文档中会比出现在少数文档中的权重更低。
+
+字段长度准则
+字段的长度是多少？长度越长，相关性越低。 检索词出现在一个短的 title 要比同样的词出现在一个长的 content 字段权重更大。
+
+</code></pre>
+<p>可以跳过算分步骤提高系统性能</p>
+<h1 id="8-bool">8. bool
+</h1><h2 id="1-概述-1">1. 概述
+</h2><ul>
+<li>子查询可以任意顺序出现</li>
+<li>可以嵌套多个查询</li>
+<li>如果bool查询中, 没有must条件, should 中必须至少满足一条查询才会有返回</li>
+</ul>
+<h2 id="2-多值精确匹配">2. 多值精确匹配
+</h2><p>对多值字段进行精确匹配的话  例如: List<String></p>
+<p>可以通过增加一个 genre count 字段进行计数</p>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221012104355848.png"
+	width="587"
+	height="260"
+	
+	loading="lazy"
+	
+		alt="image-20221012104355848"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="225"
+		data-flex-basis="541px"
+	
+></p>
+<h2 id="2--算分">2.  算分
+</h2><p>算分过程</p>
+<ul>
+<li>查询should 语句中的两个查询</li>
+<li>加和两个查询的评分</li>
+<li>乘以匹配语句的总数</li>
+<li>除以所有语句的总数</li>
+</ul>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>must</th>
+          <th>必须匹配, 贡献算分</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>should</td>
+          <td>选择性匹配, 贡献算分</td>
+      </tr>
+      <tr>
+          <td>must_not</td>
+          <td>filter_context  不贡献算分</td>
+      </tr>
+      <tr>
+          <td>filter</td>
+          <td>filter_context  不贡献算分</td>
+      </tr>
+  </tbody>
+</table></div>
+<ol start="2">
+<li>bool 查询的结构也会对算分产生影响</li>
+</ol>
+<ul>
+<li>
+<p>同一级下的竞争字段会具有相同的权重</p>
+</li>
+<li>
+<p>通过嵌套bool查询, 可以改变对算分的影响</p>
+</li>
+</ul>
+<ol start="3">
+<li>Boosting 是控制相关度的一种手段
+<ul>
+<li>索引, 字段 或查询子条件</li>
+</ul>
+</li>
+</ol>
+<p>参数 boost 的含义</p>
+<ul>
+<li>bootst &gt; 1, 打分的相关度相对性提高</li>
+<li>0&lt; boost &lt;1 , 打分的权重相对性降低</li>
+<li>boost &lt; 0, 贡献负分</li>
+</ul>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221012105349279.png"
+	width="441"
+	height="475"
+	
+	loading="lazy"
+	
+		alt="image-20221012105349279"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="92"
+		data-flex-basis="222px"
+	
+></p>
+<h1 id="9-dix-max-query">9. dix max query
+</h1><p>单字符串多字段查询</p>
+<p>会将所有查询字段匹配度最高的 字段来算分</p>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221012110715127.png"
+	width="364"
+	height="173"
+	
+	loading="lazy"
+	
+		alt="image-20221012110715127"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="210"
+		data-flex-basis="504px"
+	
+></p>
+<p>tie_breaker 介于0-1 之间的浮点数, 0 代表最佳匹配, 1 代表所有语句同等重要</p>
+<ol>
+<li>获得最佳匹配语句的评分-score</li>
+<li>将其他匹配语句的评分与tie_breaker 相乘</li>
+<li>对以上评分求和并规范化</li>
+</ol>
+<h1 id="10-multi-match">10. multi match
+</h1><p>单字符串多字段查询</p>
+<p>三种type:</p>
+<pre><code>CROSS_FIELDS 希望这个词条的分词词汇是分配到不同字段中的, 支持 Operator
+MOST_FIELDS  越多字段匹配的文档分越高 ,⽆法使⽤ Operator
+BEST_FIELDS  完全匹配的文档占的评分比较高
+
+</code></pre>
+<h1 id="11-termpharse-suggester">11. term&amp;pharse suggester
+</h1><p>suggester 就是一种特殊类型的搜索,</p>
+<ul>
+<li>搜索引擎中类似的功能，在 Elasticsearch 中是通过 Suggester API 实现的</li>
+<li>原理：将输⼊的⽂本分解为 Token，然后在索引的字典⾥查找相似的 Term 并返回</li>
+<li>Elasticsearch 设计了 4 种类别的 Suggesters
+<ul>
+<li>Term &amp; Phrase Suggester</li>
+<li>Complete &amp; Context Suggester 自动补全和上下文提示, 不是使用倒排索引的, 只能基于前缀</li>
+</ul>
+</li>
+</ul>
+<h1 id="12-聚合分析">12. 聚合分析
+</h1><h2 id="1-bucket--metric-aggregation">1. bucket &amp; metric aggregation
+</h2><pre><code class="language-sql">select count(brand) from cars group by brand;
+
+</code></pre>
+<ul>
+<li>metric 相当于 count , 一些统计方法</li>
+<li>bucket 相当与group by , 一组满足条件的文档</li>
+</ul>
+<p>​	ES对聚合索引的桶数有限制，默认是10000, 可以进行配置</p>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221013094517157.png"
+	width="682"
+	height="357"
+	
+	loading="lazy"
+	
+		alt="image-20221013094517157"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="191"
+		data-flex-basis="458px"
+	
+></p>
+<h3 id="1-metric-aggregation">1. metric aggregation
+</h3><p>● 单值分析：只输出⼀个分析结果</p>
+<p>○ min, max, avg, sum</p>
+<p>○ Cardinality （类似 distinct Count）</p>
+<p>● 多值分析：输出多个分析结果</p>
+<p>○ stats, extended stats</p>
+<p>○ percentile, percentile rank</p>
+<p>○ top hits （排在前⾯的示例）</p>
+<h3 id="2-terms-aggregation">2. terms aggregation
+</h3><p>==对于Text 类型的数据默认是关闭的, 需要配置mapping 开启, 但是聚合的时候会对text 类型进行分词的==</p>
+<p>terms 不准的问题:</p>
+<p>原因是, 数据分散在多个分片上, Coordinating node 无法获取数据的全貌</p>
+<p>提升shard_size 的参数, 每次从分片上获取额外多的数据, 提升准确率</p>
+<p>● 按照⼀定的规则，将⽂档分配到不同的</p>
+<p>桶中，从⽽达到分类的⽬的。ES 提供的</p>
+<p>⼀些常⻅的 Bucket Aggregation</p>
+<blockquote>
+<ol>
+<li>
+<p>==Terms==</p>
+</li>
+<li>
+<p>==数字类型==</p>
+</li>
+</ol>
+<p>​	● Range / Data Range</p>
+<p>​	● Histogram / Date Histogram</p>
+<ol start="3">
+<li>==⽀持嵌套==：也就在桶⾥再做分桶</li>
+</ol>
+</blockquote>
+<p>优化terms 聚合的性能, 把以下配置打开, 每当加入新数据的时候会自动加入cache(预加载)</p>
+<p>场景</p>
+<ul>
+<li>在当聚合查询比较频繁, 而且会有新文档不断写入的情况下可以打开这个配置</li>
+</ul>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221013100243416.png"
+	width="395"
+	height="168"
+	
+	loading="lazy"
+	
+		alt="image-20221013100243416"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="235"
+		data-flex-basis="564px"
+	
+></p>
+<p><a class="link" href="https://www.elastic.co/guide/en/elasticsearch/reference/7.1/tune-for-search-speed.html"  target="_blank" rel="noopener"
+    >https://www.elastic.co/guide/en/elasticsearch/reference/7.1/tune-for-search-speed.html</a></p>
+<h3 id="3-range--histogram-aggregation">3. range &amp; histogram aggregation
+</h3><p>按照数字的范围，进⾏分桶</p>
+<p>● 在 Range Aggregation 中，可以⾃定义 Key</p>
+<blockquote>
+<p>​	Demo：</p>
+<p>​	● 按照⼯资的 Range 分桶</p>
+<p>​	● 按照⼯资的间隔（Histogram）分桶</p>
+</blockquote>
+<h3 id="4-bucket--metrix-aggregation">4. bucket + metrix aggregation
+</h3><p>Bucket 聚合分析允许通过添加**⼦聚合**分析来进⼀步分析，⼦聚合分析可以是</p>
+<ul>
+<li>bucket</li>
+<li>metric</li>
+</ul>
+<blockquote>
+<p>Demo</p>
+<p>● 按照⼯作类型进⾏分桶，并统计⼯资信息</p>
+<p>● 先按照⼯作类型分桶，然后按性别分桶，并统计⼯资信</p>
+</blockquote>
+<h2 id="2-pipeline-聚合">2. Pipeline 聚合
+</h2><p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221013103451402.png"
+	width="633"
+	height="327"
+	
+	loading="lazy"
+	
+		alt="image-20221013103451402"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="193"
+		data-flex-basis="464px"
+	
+></p>
+<p>管道的概念: 支持对聚合分析的结果, 再次进行聚合</p>
+<p>Pipeline 的 分析结果会输出到原结果中, 根据位置的不同, 分为两类</p>
+<ul>
+<li>
+<p>Sibling - 结果和现有分析结果同级</p>
+<ul>
+<li>Max, min, Avg &amp; Sum bucket</li>
+<li>Stats, Extended status Bucket</li>
+<li>Percentiles Bucket</li>
+</ul>
+</li>
+<li>
+<p>Parent - 结果内嵌到现有的聚合分析结果之中</p>
+<ul>
+<li>
+<p>Derivative （求导）</p>
+</li>
+<li>
+<p>Cumultive Sum （累计求和）</p>
+</li>
+<li>
+<p>Moving Function (滑动窗⼝)</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="3-聚合作用范围">3. 聚合作用范围
+</h2><ol>
+<li>
+<p>ES 聚合分析的默认作⽤范围是 query 的查询结果集</p>
+</li>
+<li>
+<p>同时 ES 还⽀持以下⽅式改变聚合的作⽤范围</p>
+<ul>
+<li>
+<p>Filter 只对当前的子聚合语句生效</p>
+</li>
+<li>
+<p>Post_Filter</p>
+<ul>
+<li>是对聚合分析后的⽂档进⾏再次过滤</li>
+<li>size 无需设置为0</li>
+<li>使用场景
+<ul>
+<li>一条语句, 获取聚合信息 + 获取符合条件的文档</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Global, 无视query, 对全部文档进行统计</p>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="4-聚合分析">4. 聚合分析
+</h2><p>在 Terms Aggregation 的返回中有两个特殊的数值</p>
+<ul>
+<li>
+<p>doc_count_error_upper_bound ： 被遗漏的term 分桶，包含的⽂档，有可能的最⼤值</p>
+</li>
+<li>
+<p>sum_other_doc_count: 除了返回结果 bucket 的 terms 以外，其他 terms 的⽂档总数（总数-返回的总数）</p>
+</li>
+</ul>
+<h1 id="13-数据建模">13. 数据建模
+</h1><p>==问题: 什么是子字段==</p>
+<h2 id="1-字段">1. 字段
+</h2><p>字段建模过程</p>
+<ol>
+<li>字段类型</li>
+<li>是否要搜索及分词</li>
+<li>是否需要聚合排序</li>
+<li>是否需要额外的存储</li>
+</ol>
+<p>Text 和keyword 如何选择</p>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221014113224618.png"
+	width="716"
+	height="338"
+	
+	loading="lazy"
+	
+		alt="image-20221014113224618"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="211"
+		data-flex-basis="508px"
+	
+></p>
+<p>结构数据</p>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221014113346380.png"
+	width="621"
+	height="275"
+	
+	loading="lazy"
+	
+		alt="image-20221014113346380"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="225"
+		data-flex-basis="541px"
+	
+></p>
+<p>==对字段的index 设置为false , 则该字段不可被搜索了, 但是还是可以进行聚合查询==</p>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221014114729839.png"
+	width="464"
+	height="346"
+	
+	loading="lazy"
+	
+		alt="image-20221014114729839"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="134"
+		data-flex-basis="321px"
+	
+></p>
+<p>==关闭_source, 可以解决数据在网络中传输过大的问题==</p>
+<ul>
+<li>对于需要显示的信息, 可以再查询中指定stored_fields</li>
+<li>禁止_source 后还是 可以使用hignlights API</li>
+</ul>
+<h2 id="2-关联数据概述">2. 关联数据概述
+</h2><p>反范式设计, 扁平数据结构</p>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221013115739991.png"
+	width="715"
+	height="366"
+	
+	loading="lazy"
+	
+		alt="image-20221013115739991"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="195"
+		data-flex-basis="468px"
+	
+></p>
+<p>==Elasticsearch 处理关联关系的方法==</p>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221013115818379.png"
+	width="628"
+	height="246"
+	
+	loading="lazy"
+	
+		alt="image-20221013115818379"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="255"
+		data-flex-basis="612px"
+	
+></p>
+<p>当存储的数据是对象的时候, 使用bool + must搜索可能会搜索到不需要的结果</p>
+<p>● 存储时，内部对象的边界并没有考虑在内，JSON 格式被处理成扁平式键值对的结构</p>
+<p>● 当对多个字段进⾏查询时，导致了意外的搜索结果</p>
+<p>● 可以⽤ Nested Data Type 解决这个问题</p>
+<h2 id="3-nested-data-type">3. nested data type
+</h2><p>Nested 数据类型：允许对象数组中的对象被独⽴索引</p>
+<p>● 使⽤ nested 和 properties 关键字，将所有 actors 索引到多个分隔的⽂档</p>
+<p>● 在内部， Nested ⽂档会被保存在两个Lucene ⽂档中，在查询时做 Join 处理</p>
+<pre><code class="language-json"># 创建 Nested 对象 Mapping
+#PUT my_movies
+{
+      &quot;mappings&quot; : {
+      &quot;properties&quot; : {
+        &quot;actors&quot; : {
+          &quot;type&quot;: &quot;nested&quot;,
+          &quot;properties&quot; : {
+            &quot;first_name&quot; : {&quot;type&quot; : &quot;keyword&quot;},
+            &quot;last_name&quot; : {&quot;type&quot; : &quot;keyword&quot;}
+          }},
+        &quot;title&quot; : {
+          &quot;type&quot; : &quot;text&quot;,
+          &quot;fields&quot; : {&quot;keyword&quot;:{&quot;type&quot;:&quot;keyword&quot;,&quot;ignore_above&quot;:256}}
+        }
+      }
+    }
+}
+
+# Nested 查询
+#POST my_movies/_search
+{
+  &quot;query&quot;: {
+    &quot;bool&quot;: {
+      &quot;must&quot;: [
+        {&quot;match&quot;: {&quot;title&quot;: &quot;Speed&quot;}},
+        {
+        // 需要指定关键字
+          &quot;nested&quot;: {
+            // 嵌套对象  
+            &quot;path&quot;: &quot;actors&quot;,
+            &quot;query&quot;: {
+              &quot;bool&quot;: {
+                &quot;must&quot;: [
+                  {&quot;match&quot;: {
+                    &quot;actors.first_name&quot;: &quot;Keanu&quot;
+                  }},
+
+                  {&quot;match&quot;: {
+                    &quot;actors.last_name&quot;: &quot;Hopper&quot;
+                  }}
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+</code></pre>
+<h2 id="4-父子文档">4. 父子文档
+</h2><p>对象和nested 对象的局限性</p>
+<ul>
+<li>每次更新都需要重新索引整个对象 (根对象和嵌套对象)</li>
+</ul>
+<p>ES 提供了类似关系型数据库中的Join 的实现, 使用Join 数据类型, 可以通过维护Parent / Child 的关系, 从而分离两个对象</p>
+<ul>
+<li>父子文档是两个独立的文档</li>
+<li>更新父文档 无需重新索引子文档, 子文档不影响父文档和其他子文档</li>
+</ul>
+<p>==Spring Data Es , Field 使用哪种类型?==</p>
+<p>==定义步骤==</p>
+<ol>
+<li>
+<p>设置索引的 Mapping</p>
+</li>
+<li>
+<p>索引⽗⽂档</p>
+</li>
+<li>
+<p>索引⼦⽂档</p>
+</li>
+<li>
+<p>按需查询⽂档</p>
+</li>
+</ol>
+<p>==注意==</p>
+<p>● ⽗⽂档和⼦⽂档必须存在相同的分⽚上</p>
+<p>​	● 确保查询 join 的性能</p>
+<p>● 当指定⼦⽂档时候，必须指定它的⽗⽂档 Id</p>
+<p>​	● 使⽤ route 参数来保证，分配到相同的分⽚</p>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221013122559938.png"
+	width="655"
+	height="323"
+	
+	loading="lazy"
+	
+		alt="image-20221013122559938"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="202"
+		data-flex-basis="486px"
+	
+></p>
+<h1 id="14-query">14. query
+</h1><h2 id="1-query-string">1. query String
+</h2><p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221013153058993.png"
+	width="745"
+	height="240"
+	
+	loading="lazy"
+	
+		alt="image-20221013153058993"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="310"
+		data-flex-basis="745px"
+	
+></p>
+<h2 id="2-simple-query-string">2. simple query String
+</h2><p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221013153111400.png"
+	width="758"
+	height="289"
+	
+	loading="lazy"
+	
+		alt="image-20221013153111400"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="262"
+		data-flex-basis="629px"
+	
+></p>
+<h1 id="15-minimum_should_match">15. minimum_should_match
+</h1><p>参考资料: <a class="link" href="http://events.jianshu.io/p/84789dd89dcf"  target="_blank" rel="noopener"
+    >http://events.jianshu.io/p/84789dd89dcf</a></p>
+<p>minnum_should_match：当operator参数设置为or时，该参数用来控制匹配的分词的最少数量</p>
+<p>==bool 查询中==</p>
+<p><strong>当默认不传<code>minimum_should_match</code>的情况下，查询分为两个情况</strong></p>
+<ul>
+<li>当bool处在query上下文时，若must或者filter匹配了doc，那么should即使一条都不满足也可以召回doc（如图1.3.1）；</li>
+<li>当bool处于filter上下文时，或者bool处于query上下文，但没有must或者filter子句，should至少匹配一个才会召回doc（如图1.3.2）；</li>
+</ul>
+<p>参数说明</p>
+<ol>
+<li>
+<p>最低匹配的个数。也可以传入负数</p>
+</li>
+<li>
+<p>传入的参数为百分比, 默认向下取整</p>
+<ol>
+<li>负数表示最多不匹配的百分比50%，向下取整为<strong>最多不匹配的个数为1个</strong>。即最少匹配个数为2个。</li>
+</ol>
+</li>
+</ol>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221013194229885.png"
+	width="363"
+	height="165"
+	
+	loading="lazy"
+	
+		alt="image-20221013194229885"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="220"
+		data-flex-basis="528px"
+	
+></p>
+<h1 id="16-updatebyqueryreindex">16. updateByQuery&amp;reindex
+</h1><p>⼀般在以下⼏种情况时，我们需要重建索引</p>
+<ol>
+<li>
+<p>索引的 Mappings 发⽣变更：字段类型更改，分词器及字典更新</p>
+</li>
+<li>
+<p>索引的 Settings 发⽣变更：索引的主分⽚数发⽣改变</p>
+</li>
+<li>
+<p>集群内，集群间需要做数据迁移</p>
+</li>
+</ol>
+<p>Elasticsearch 的内置提供的 API</p>
+<ol>
+<li>
+<p>Update By Query：在现有索引上重建</p>
+<ol>
+<li>在索引更新之前的数据也能被搜索到</li>
+</ol>
+</li>
+<li>
+<p>Reindex：在其他索引上重建索引</p>
+<ol>
+<li>创建新的正确的索引</li>
+<li><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221014104113183.png"
+	width="272"
+	height="123"
+	
+	loading="lazy"
+	
+		alt="image-20221014104113183"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="221"
+		data-flex-basis="530px"
+	
+>重新导入</li>
+</ol>
+</li>
+</ol>
+<p>reindex aip 的其他使用场景</p>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221014104259765.png"
+	width="372"
+	height="167"
+	
+	loading="lazy"
+	
+		alt="image-20221014104259765"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="222"
+		data-flex-basis="534px"
+	
+></p>
+<ol>
+<li>如果目标索引已经存在数据的话, 需要指定额外配置, 实现对新增数据的写入</li>
+<li>支持异步的操作, wait_for_completion=false, 通过返回的taskId 查询是否完成</li>
+</ol>
+<h1 id="17-ingest-node-painless">17. ingest node&amp; painless
+</h1><h2 id="1-ingest-node">1. ingest node
+</h2><p>==概述==</p>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221014104814861.png"
+	width="739"
+	height="415"
+	
+	loading="lazy"
+	
+		alt="image-20221014104814861"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="178"
+		data-flex-basis="427px"
+	
+></p>
+<p>可以对文档进行预处理, Es 提供了一些内置的processor, 也可以通过开发插件实现自己的processor</p>
+<h2 id="2-painless">2. painless
+</h2><p>==简介==</p>
+<p>● Painless ⽀持所有 Java 的数据类型及 Java API ⼦集</p>
+<p>● Painless Script 具备以下特性</p>
+<p>○ ⾼性能 / 安全</p>
+<p>○ ⽀持显示类型或者动态定义类型</p>
+<p>==用途==</p>
+<ol>
+<li>
+<p>可以对⽂档字段进⾏加⼯处理</p>
+<ul>
+<li>
+<p>更新或删除字段，处理数据聚合操作</p>
+</li>
+<li>
+<p>Script Field：对返回的字段提前进⾏计算</p>
+</li>
+<li>
+<p>Function Score：对⽂档的算分进⾏处理</p>
+</li>
+</ul>
+</li>
+<li>
+<p>在 Ingest Pipeline 中执⾏脚本</p>
+</li>
+<li>
+<p>在 Reindex API，Update By Query 时，对数据进⾏处理</p>
+</li>
+</ol>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221014112721214.png"
+	width="664"
+	height="335"
+	
+	loading="lazy"
+	
+		alt="image-20221014112721214"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="198"
+		data-flex-basis="475px"
+	
+></p>
+<h1 id="18-深度分页">18. 深度分页
+</h1><p>参考资料 : <a class="link" href="https://mp.weixin.qq.com/s/Quoym4438irm4Uexb40asw"  target="_blank" rel="noopener"
+    >https://mp.weixin.qq.com/s/Quoym4438irm4Uexb40asw</a></p>
+<h2 id="1-基本分页">1. 基本分页
+</h2><blockquote>
+<p>from + size 分页方式是 ES 最基本的分页方式，类似于关系型数据库中的 limit 方式。from 参数表示：分页起始位置；size 参数表示：每页获取数据条数</p>
+</blockquote>
+<pre><code class="language-sql">GET /articles/_search
+{
+  &quot;query&quot;: {
+    &quot;match_all&quot;: {}
+  },
+  &quot;from&quot;: 10,
+  &quot;size&quot;: 20
+}
+
+</code></pre>
+<p><img src="/p/elasticsearch%E8%BF%9B%E9%98%B6%E4%B8%8E%E5%BC%80%E5%8F%91%E5%AE%9E%E5%BD%95/images/image-20221122110628443.png"
+	width="992"
+	height="381"
+	
+	loading="lazy"
+	
+		alt="image-20221122110628443"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="260"
+		data-flex-basis="624px"
+	
+></p>
+<h3 id="11-query-阶段">1.1 Query 阶段
+</h3><ul>
+<li>第一步：Client 发送查询请求到 Server 端，Node1 接收到请求然后创建一个大小为 from + size 的优先级队列用来存放结果，此时 Node1 被称为 coordinating node（协调节点）；</li>
+<li>第二步：Node1 将请求广播到涉及的 shard 上，每个 shard 内部执行搜索请求，然后将执行结果存到==自己内部的大小同样为 from+size 的优先级队列==里；</li>
+<li>第三步：每个 shard 将暂存的自身优先级队列里的结果==返给 Node1==，Node1 拿到所有 shard 返回的结果后，对==结果进行一次合并，产生一个全局的优先级队列==，存在 Node1 的优先级队列中。（如上图中，Node1 会拿到 (from + size) * 6 条数据，==这些数据只包含 doc 的唯一标识_id 和用于排序的_score==，然后 Node1 会对这些数据合并排序，选择前 from + size 条数据存到优先级队列）；</li>
+</ul>
+<h3 id="12-fetch-阶段">1.2 Fetch 阶段
+</h3><h2 id="方案">方案
+</h2><h4 id="1-使用-search_after">1. <strong>使用 <code>search_after</code></strong>
+</h4><ul>
+<li><strong>适用场景</strong>：需要严格的分页访问，且结果顺序固定（例如基于时间或 ID）。</li>
+<li><strong>原理</strong>：利用上一页的最后一条记录的 <code>sort</code> 值作为下一页查询的起点。</li>
+<li><strong>实现步骤</strong>：
+<ol>
+<li>在查询中设置 <code>sort</code> 字段（如时间戳或唯一 ID）。</li>
+<li>获取第一页数据时，同时记录最后一条记录的 <code>sort</code> 值。</li>
+<li>下一次查询时，将 <code>search_after</code> 设置为上一页的 <code>sort</code> 值。</li>
+</ol>
+</li>
+<li><strong>示例</strong>：</li>
+</ul>
+<pre><code class="language-json">GET /index/_search
+{
+  &quot;size&quot;: 10,
+  &quot;sort&quot;: [&quot;timestamp&quot;, &quot;id&quot;],
+  &quot;search_after&quot;: [1668740999999, 123]
+}
+
+</code></pre>
+<ul>
+<li><strong>优点</strong>：性能优于 <code>from+size</code>，内存占用小。</li>
+<li><strong>缺点</strong>：需要记录每次查询的 <code>search_after</code> 值，<strong>不支持直接跳页</strong>。</li>
+</ul>
+<hr>
+<h4 id="2-使用-scroll-api">2. <strong>使用 <code>scroll</code> API</strong>
+</h4><ul>
+<li><strong>适用场景</strong>：需要从大量数据中逐页读取，例如批量数据处理。</li>
+<li><strong>原理</strong>：<code>scroll</code> 会保留一个快照上下文，使得查询结果在多个请求中保持一致。</li>
+<li><strong>实现步骤</strong>：
+<ol>
+<li>初始化查询，设置 <code>scroll</code> 参数。</li>
+<li>使用返回的 <code>_scroll_id</code> 获取后续页面。</li>
+<li>数据处理完成后，清理上下文（<code>clear_scroll</code>）。</li>
+</ol>
+</li>
+<li><strong>示例</strong>：</li>
+</ul>
+<pre><code class="language-json">POST /index/_search?scroll=1m
+{
+  &quot;size&quot;: 100,
+  &quot;query&quot;: {
+    &quot;match_all&quot;: {}
+  }
+}
+
+POST /_search/scroll
+{
+  &quot;scroll&quot;: &quot;1m&quot;,
+  &quot;scroll_id&quot;: &quot;DXF1ZXJ5QWJvdXRDOjE2OTY3MA==&quot;
+}
+
+</code></pre>
+<ul>
+<li>优点
+<ul>
+<li>高效处理深度分页。</li>
+<li>保证查询结果一致性。</li>
+</ul>
+</li>
+<li>缺点
+<ul>
+<li>不适合实时数据查询。</li>
+<li>对资源（内存和磁盘）有一定占用。</li>
+</ul>
+</li>
+</ul>
+<h1 id="19-拼音中文搜索">19. 拼音中文搜索
+</h1><p>在Elasticsearch中实现输入拼音也能进行模糊匹配到中文的搜索结果，可以通过以下几个步骤来实现：</p>
+<ol>
+<li><strong>安装拼音分词器</strong>：使用<code>elasticsearch-analysis-pinyin</code>插件来实现拼音搜索。这个插件可以帮助Elasticsearch支持拼音搜索功能。</li>
+<li><strong>配置索引</strong>：在创建索引的时候，需要配置一个自定义的分词器（analyzer），这个分词器会使用拼音分词器来处理文本。例如，可以创建一个名为<code>pinyin_analyzer</code>的分词器，它使用<code>pinyin</code> tokenizer来将中文字符转换成拼音。</li>
+<li><strong>字段映射</strong>：在字段映射中，可以为需要进行拼音搜索的字段设置两个不同的分词器，一个用于索引时使用，一个用于搜索时使用。例如，可以为字段<code>content</code>设置<code>lc_index</code>作为索引分词器，<code>lc_search</code>作为搜索分词器。</li>
+<li><strong>构建查询</strong>：在执行搜索时，可以使用<code>multi_match</code>查询，它允许在多个字段上进行搜索，包括原始字段和拼音字段。这样，当用户输入拼音时，Elasticsearch会同时在原始字段和拼音字段上进行搜索。</li>
+<li><strong>示例配置</strong>：以下是一个配置示例，其中<code>title</code>字段既使用了正常的分词器，也使用了拼音分词器和单字分词器</li>
+<li><strong>执行搜索</strong>：在执行搜索时，可以指定查询关键词在<code>title</code>、<code>title.pinyin</code>和<code>title.word</code>字段上进行匹配：</li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/elasticsearch/">ElasticSearch</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/p/elasticsearch%E5%85%A5%E9%97%A8/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">ElasticSearch入门</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/elasticsearch_dsl%E8%AF%AD%E5%8F%A5%E7%A4%BA%E4%BE%8B%E4%B8%8E%E7%BB%83%E4%B9%A0/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">ElasticSearch_DSL语句示例与练习</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/p/elasticsearch_linux%E5%8D%95%E6%9C%BA%E9%83%A8%E7%BD%B2/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">ElasticSearch_Linux单机部署</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

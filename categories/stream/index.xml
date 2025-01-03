@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Stream on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/categories/stream/</link>
+        <description>Recent content in Stream on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Tue, 03 Mar 2020 12:21:43 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/categories/stream/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Stream</title>
+        <link>https://mikeLing-qx.github.io/p/stream/</link>
+        <pubDate>Tue, 03 Mar 2020 12:21:43 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/stream/</guid>
+        <description>&lt;h1 id=&#34;1-概述&#34;&gt;1. 概述
+&lt;/h1&gt;&lt;p&gt;Stream的操作符大体上分为两种：中间操作符和终止操作符&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/stream/images/image-20220705104939760.png&#34;
+	width=&#34;944&#34;
+	height=&#34;416&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220705104939760&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;226&#34;
+		data-flex-basis=&#34;544px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;11-中间操作符&#34;&gt;1.1 中间操作符
+&lt;/h2&gt;&lt;p&gt;对于数据流来说，中间操作符在执行制定处理程序后，数据流依然可以传递给下一级的操作符。&lt;/p&gt;
+&lt;p&gt;中间操作符包含8种(排除了parallel,sequential,这两个操作并不涉及到对数据流的加工操作)：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;map(mapToInt,mapToLong,mapToDouble) 转换操作符，把比如A-&amp;gt;B，这里默认提供了转int，long，double的操作符。&lt;/li&gt;
+&lt;li&gt;flatmap(flatmapToInt,flatmapToLong,flatmapToDouble) 拍平操作比如把 int[]{2,3,4} 拍平 变成 2，3，4 也就是从原来的一个数据变成了3个数据，这里默认提供了拍平成int,long,double的操作符。&lt;/li&gt;
+&lt;li&gt;limit 限流操作，比如数据流中有10个 我只要出前3个就可以使用。&lt;/li&gt;
+&lt;li&gt;distint 去重操作，对重复元素去重，底层使用了equals方法。&lt;/li&gt;
+&lt;li&gt;filter 过滤操作，把不想要的数据过滤。&lt;/li&gt;
+&lt;li&gt;peek 挑出操作，如果想对数据进行某些操作，如：读取、编辑修改等。&lt;/li&gt;
+&lt;li&gt;skip 跳过操作，跳过某些元素。&lt;/li&gt;
+&lt;li&gt;sorted(unordered) 排序操作，对元素排序，前提是实现Comparable接口，当然也可以自定义比较器。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;12--终止操作符&#34;&gt;1.2  终止操作符
+&lt;/h2&gt;&lt;p&gt;数据经过中间加工操作，就轮到终止操作符上场了；终止操作符就是用来对数据进行收集或者消费的，数据到了终止操作这里就不会向下流动了，终止操作符只能使用一次。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;collect 收集操作，将所有数据收集起来，这个操作非常重要，官方的提供的Collectors 提供了非常多收集器，可以说Stream 的核心在于Collectors。&lt;/li&gt;
+&lt;li&gt;count 统计操作，统计最终的数据个数。&lt;/li&gt;
+&lt;li&gt;findFirst、findAny 查找操作，查找第一个、查找任何一个 返回的类型为Optional。&lt;/li&gt;
+&lt;li&gt;noneMatch、allMatch、anyMatch 匹配操作，数据流中是否存在符合条件的元素 返回值为bool 值。&lt;/li&gt;
+&lt;li&gt;min、max 最值操作，需要自定义比较器，返回数据流中最大最小的值。&lt;/li&gt;
+&lt;li&gt;reduce 规约操作，将整个数据流的值规约为一个值，count、min、max底层就是使用reduce。&lt;/li&gt;
+&lt;li&gt;forEach、forEachOrdered 遍历操作，这里就是对最终的数据进行消费了。&lt;/li&gt;
+&lt;li&gt;toArray 数组操作，将数据流的元素转换成数组。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;这里只介绍了Stream，并没有涉及到IntStream、LongStream、DoubleStream，这三个流实现了一些特有的操作符，我将在后续文章中介绍到。&lt;/p&gt;
+&lt;p&gt;说了这么多，只介绍这些操作符还远远不够；俗话说，实践出真知。那么，Let‘s go。&lt;/p&gt;
+&lt;h1 id=&#34;2-代码演练&#34;&gt;2. 代码演练
+&lt;/h1&gt;&lt;h2 id=&#34;21-map&#34;&gt;2.1 map
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;Stream 的一系列操作必须要使用终止操作，否者整个数据流是不会流动起来的，即处理操作不会执行。&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;==map==，可以看到 map 操作符要求输入一个Function的函数是接口实例，功能是将T类型转换成R类型的&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;map操作将原来的单词 转换成了每个字符串的长度，利用了String自身的length()方法，该方法返回类型为int。这里我直接使用了lambda表达式，关于lambda表达式 还请读者们自行了解吧&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Main {
+
+    public static void main(String[] args) {
+        Stream.of(&amp;quot;apple&amp;quot;,&amp;quot;banana&amp;quot;,&amp;quot;orange&amp;quot;,&amp;quot;waltermaleon&amp;quot;,&amp;quot;grape&amp;quot;)
+                .map(e-&amp;gt;e.length()) //转成单词的长度 int
+                .forEach(e-&amp;gt;System.out.println(e)); //输出
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;当然也可以这样，这里使用了成员函数引用，为了便于读者们理解，后续的例子中将使用lambda表达式而非函数引用。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Main {
+
+    public static void main(String[] args) {
+         Stream.of(&amp;quot;apple&amp;quot;,&amp;quot;banana&amp;quot;,&amp;quot;orange&amp;quot;,&amp;quot;waltermaleon&amp;quot;,&amp;quot;grape&amp;quot;)
+                .map(String::length) //转成单词的长度 int
+                .forEach(System.out::println);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;结果&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;C:%5cUsers%5c86189%5cAppData%5cRoaming%5cTypora%5ctypora-user-images%5cimage-20201119141759716.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20201119141759716&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;mapToInt 将数据流中得元素转成Int，这限定了转换的类型Int，最终产生的流为IntStream，及结果只能转化成int。&lt;/p&gt;
+&lt;p&gt;mapTolong&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+         Stream.of(&amp;quot;apple&amp;quot;, &amp;quot;banana&amp;quot;, &amp;quot;orange&amp;quot;, &amp;quot;waltermaleon&amp;quot;, &amp;quot;grape&amp;quot;)
+                .mapToLong(e -&amp;gt; e.length()) //转成long ,本质上是int 但是存在类型自动转换
+                .forEach(e -&amp;gt; System.out.println(e));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;mapToDouble&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+         Stream.of(&amp;quot;apple&amp;quot;, &amp;quot;banana&amp;quot;, &amp;quot;orange&amp;quot;, &amp;quot;waltermaleon&amp;quot;, &amp;quot;grape&amp;quot;)
+                .mapToDouble(e -&amp;gt; e.length()) //转成Double ，自动类型转换成Double
+                .forEach(e -&amp;gt; System.out.println(e));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;==flatmap== 作用就是将元素拍平拍扁 ，将拍扁的元素重新组成Stream，并将这些Stream 串行合并成一条Stream ;  flatmapToInt、flatmapToLong、flatmapToDouble 跟flatMap 都类似的，只是类型被限定了，这里就不在举例子了。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;
+public class Main {
+
+    public static void main(String[] args) {
+        Stream.of(&amp;quot;a-b-c-d&amp;quot;,&amp;quot;e-f-i-g-h&amp;quot;)
+                .flatMap(e-&amp;gt;Stream.of(e.split(&amp;quot;-&amp;quot;)))
+                .forEach(e-&amp;gt;System.out.println(e));
+
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;==limit==限制元素的个数，只需传入 long 类型 表示限制的最大数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+        Stream.of(1,2,3,4,5,6)
+                .limit(3) //限制三个
+                .forEach(e-&amp;gt;System.out.println(e)); //将输出 前三个 1，2，3
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;==distinct== 去重&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+
+        Stream.of(1,2,3,1,2,5,6,7,8,0,0,1,2,3,1)
+                .distinct() //去重
+                .forEach(e-&amp;gt;System.out.println(e));
+
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;==filter== 对某些元素进行过滤，不符合筛选条件的将无法进入流的下游&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+        Stream.of(1,2,3,1,2,5,6,7,8,0,0,1,2,3,1)
+                .filter(e-&amp;gt;e&amp;gt;=5) //过滤小于5的
+                .forEach(e-&amp;gt;System.out.println(e));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;==peek==挑选 ，将元素挑选出来，可以理解为提前消费&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+
+        User w = new User(&amp;quot;w&amp;quot;,10);
+        User x = new User(&amp;quot;x&amp;quot;,11);
+        User y = new User(&amp;quot;y&amp;quot;,12);
+
+        Stream.of(w,x,y)
+                .peek(e-&amp;gt;{e.setName(e.getAge()+e.getName());}) //重新设置名字 变成 年龄+名字
+                .forEach(e-&amp;gt;System.out.println(e.toString()));
+
+    }
+
+    static class User {
+
+        private String name;
+
+        private int age;
+
+        public User(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+        public void setAge(int age) {
+            this.age = age;
+        }
+
+        @Override
+        public String toString() {
+            return &amp;quot;User{&amp;quot; +
+                    &amp;quot;name=&#39;&amp;quot; + name + &#39;\&#39;&#39; +
+                    &amp;quot;, age=&amp;quot; + age +
+                    &#39;}&#39;;
+        }
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;==skip== 跳过 元素&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+        Stream.of(1,2,3,4,5,6,7,8,9)
+                .skip(4) //跳过前四个
+                .forEach(e-&amp;gt;System.out.println(e)); //输出的结果应该只有5，6，7，8，9
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;==sorted==排序 底层依赖Comparable 实现，也可以提供自定义比较器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;ublic class Main {
+
+    public static void main(String[] args) {
+
+        User x = new User(&amp;quot;x&amp;quot;,11);
+        User y = new User(&amp;quot;y&amp;quot;,12);
+        User w = new User(&amp;quot;w&amp;quot;,10);
+
+        Stream.of(w,x,y)
+                .sorted((e1,e2)-&amp;gt;e1.age&amp;gt;e2.age?1:e1.age==e2.age?0:-1)
+                .forEach(e-&amp;gt;System.out.println(e.toString()));
+
+    }
+
+    static class User {
+
+        private String name;
+
+        private int age;
+
+        public User(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+        public void setAge(int age) {
+            this.age = age;
+        }
+
+        @Override
+        public String toString() {
+            return &amp;quot;User{&amp;quot; +
+                    &amp;quot;name=&#39;&amp;quot; + name + &#39;\&#39;&#39; +
+                    &amp;quot;, age=&amp;quot; + age +
+                    &#39;}&#39;;
+        }
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;==collect== 收集，使用系统提供的收集器可以将最终的数据流收集到List，Set，Map等容器中。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;不是说终止操作符只能使用一次吗，为什么这里调用了forEach 呢？forEach不仅仅是是Stream 中得操作符还是各种集合中得一个语法糖&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+        Stream.of(&amp;quot;apple&amp;quot;, &amp;quot;banana&amp;quot;, &amp;quot;orange&amp;quot;, &amp;quot;waltermaleon&amp;quot;, &amp;quot;grape&amp;quot;)
+                .collect(Collectors.toSet()) //set 容器
+                .forEach(e -&amp;gt; System.out.println(e));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;==count== 统计数据流中的元素个数，返回的是long 类型&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;==noneMatch== 数据流中得没有一个元素与条件匹配的&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;allMatch和anyMatch 一个是全匹配，一个是任意匹配 和noneMatch 类似，这里就不在举例了。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;min 最小的一个，传入比较器，也可能没有(如果数据流为空)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;public class Main {
+
+    public static void main(String[] args) {
+
+        Optional&amp;lt;Integer&amp;gt; integerOptional = Stream.of(0,9,8,4,5,6,-1)
+                .min((e1,e2)-&amp;gt;e1.compareTo(e2));
+
+        integerOptional.ifPresent(e-&amp;gt;System.out.println(e));
+
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;max 元素中最大的，需要传入比较器，也可能没有（流为Empty时）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code&gt;
+public class Main {
+
+    public static void main(String[] args) {
+
+        Optional&amp;lt;Integer&amp;gt; integerOptional = Stream.of(0,9,8,4,5,6,-1)
+                .max((e1,e2)-&amp;gt;e1.compareTo(e2));
+
+        integerOptional.ifPresent(e-&amp;gt;System.out.println(e));
+
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;reduce 是一个规约操作，所有的元素归约成一个，比如对所有元素求和，乘啊等&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Main {
+    public static void main(String[] args) {
+
+        int sum = Stream.of(0,9,8,4,5,6,-1)
+              .reduce(0,(e1,e2)-&amp;gt;e1+e2);
+        System.out.println(sum);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;// filter 去重&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;List&amp;lt;BizList&amp;gt; distinctBizLists = bizList.stream().filter(distinctByKey(BizList::getItem)).collect(Collectors.toList());
+
+
+public static &amp;lt;T&amp;gt; Predicate&amp;lt;T&amp;gt; distinctByKey(Function&amp;lt;? super T, ?&amp;gt; keyExtractor) {
+        Set&amp;lt;Object&amp;gt; seen = ConcurrentHashMap.newKeySet();
+        return t -&amp;gt; seen.add(keyExtractor.apply(t));
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

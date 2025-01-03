@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content=" 参考资料:\nhttps://baijiahao.baidu.com/s?id=1683139600979891676&wfr=spider&for=pc https://juejin.cn/post/6844903655477346317 LoadBalance\n# https://github.com/Linyuzai/concept/wiki/Concept-WebSocket-LoadBalance &lt;dependency&gt; &lt;groupId&gt;com.github.linyuzai&lt;/groupId&gt; &lt;artifactId&gt;concept-websocket-loadbalance-spring-boot-starter&lt;/artifactId&gt; &lt;version&gt;1.0.4&lt;/version&gt; &lt;/dependency&gt; 1. WebSocket 的功能 1）通知功能：\n保持一个长连接，当服务端有新的消息，能够实时的推送到使用方。像知乎的点赞通知、评论等，都可以使用WebSocket通信。\n">
+<title>Websocket</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/websocket/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Websocket">
+<meta property='og:description' content=" 参考资料:\nhttps://baijiahao.baidu.com/s?id=1683139600979891676&wfr=spider&for=pc https://juejin.cn/post/6844903655477346317 LoadBalance\n# https://github.com/Linyuzai/concept/wiki/Concept-WebSocket-LoadBalance &lt;dependency&gt; &lt;groupId&gt;com.github.linyuzai&lt;/groupId&gt; &lt;artifactId&gt;concept-websocket-loadbalance-spring-boot-starter&lt;/artifactId&gt; &lt;version&gt;1.0.4&lt;/version&gt; &lt;/dependency&gt; 1. WebSocket 的功能 1）通知功能：\n保持一个长连接，当服务端有新的消息，能够实时的推送到使用方。像知乎的点赞通知、评论等，都可以使用WebSocket通信。\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/websocket/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2023-04-10T15:48:18&#43;08:00'/><meta property='article:modified_time' content='2023-04-10T15:48:18&#43;08:00'/>
+<meta name="twitter:title" content="Websocket">
+<meta name="twitter:description" content=" 参考资料:\nhttps://baijiahao.baidu.com/s?id=1683139600979891676&wfr=spider&for=pc https://juejin.cn/post/6844903655477346317 LoadBalance\n# https://github.com/Linyuzai/concept/wiki/Concept-WebSocket-LoadBalance &lt;dependency&gt; &lt;groupId&gt;com.github.linyuzai&lt;/groupId&gt; &lt;artifactId&gt;concept-websocket-loadbalance-spring-boot-starter&lt;/artifactId&gt; &lt;version&gt;1.0.4&lt;/version&gt; &lt;/dependency&gt; 1. WebSocket 的功能 1）通知功能：\n保持一个长连接，当服务端有新的消息，能够实时的推送到使用方。像知乎的点赞通知、评论等，都可以使用WebSocket通信。\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-websocket-的功能">1. WebSocket 的功能</a></li>
+    <li><a href="#2-websocket协议">2. WebSocket协议</a>
+      <ul>
+        <li><a href="#21-http">2.1 http</a></li>
+        <li><a href="#22-tcp三次握手四次挥手">2.2 TCP三次握手四次挥手</a></li>
+        <li><a href="#23-websocket-和http-的关系">2.3 WebSocket 和http 的关系</a></li>
+        <li><a href="#24-如何创建一个websocket-连接">2.4 如何创建一个webSocket 连接</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-stomp">3. stomp</a>
+      <ul>
+        <li><a href="#2-stomp-服务端">2. stomp 服务端</a></li>
+        <li><a href="#3-stomp-客户端">3. stomp 客户端</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-spring-websocket">4. spring websocket</a>
+      <ul>
+        <li><a href="#1-sendto">1. @SendTo</a></li>
+        <li><a href="#2-sendtouser">2. @SendToUser</a></li>
+        <li><a href="#3-simpmessagingtemplate">3. SimpMessagingTemplate</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/websocket/">Websocket</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Apr 10, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 12 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <blockquote>
+<p>参考资料:</p>
+<ul>
+<li><a class="link" href="https://baijiahao.baidu.com/s?id=1683139600979891676&amp;wfr=spider&amp;for=pc"  target="_blank" rel="noopener"
+    >https://baijiahao.baidu.com/s?id=1683139600979891676&wfr=spider&for=pc</a></li>
+<li><a class="link" href="https://juejin.cn/post/6844903655477346317"  target="_blank" rel="noopener"
+    >https://juejin.cn/post/6844903655477346317</a></li>
+</ul>
+</blockquote>
+<p>LoadBalance</p>
+<pre><code class="language-properties"># https://github.com/Linyuzai/concept/wiki/Concept-WebSocket-LoadBalance
+
+&lt;dependency&gt;
+  &lt;groupId&gt;com.github.linyuzai&lt;/groupId&gt;
+  &lt;artifactId&gt;concept-websocket-loadbalance-spring-boot-starter&lt;/artifactId&gt;
+  &lt;version&gt;1.0.4&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<h1 id="1-websocket-的功能">1. WebSocket 的功能
+</h1><p><strong>1）通知功能：</strong></p>
+<p>保持一个长连接，当服务端有新的消息，能够实时的推送到使用方。像知乎的点赞通知、评论等，都可以使用WebSocket通信。</p>
+<p>某些使用H5的客户端，为了简化开发，也会使用WebSocket进行消息的通知，由于它是实时推送的，会有更好的用户体验。</p>
+<p><strong>2）数据收集：</strong></p>
+<p>一些次优级别的数据，比如行为日志、trace、异常执栈收集等，都可以开辟专门的WebSocket通道进行传输。这能够增加信息的集中度，并能及时的针对用户的行为进行合适的配置推送。由于大多数浏览器内核都支持，它将使客户端APM编程模型变得简单。</p>
+<p><strong>3）加密 &amp;&amp; 认证：</strong></p>
+<p>虽然使用Fiddler、Charles等能够抓到很多WebSocket包。但如果同时开启SSL，传输加密后的二进制数据，会大幅增加破解的成本，会安全的多。</p>
+<p><strong>4）反向控制钩子：</strong></p>
+<p>这个&hellip;由于是双工长连接，==服务端完全可以推送一些钩子命令==，甚至直接是==代码，在客户端进行执行==。比如截个屏，录个音，种个小马。用户只要通过了授权申请，剩下的就随你发挥了。</p>
+<p>所以就一个梗：支付宝偷偷调用你的相机给你拍照</p>
+<h1 id="2-websocket协议">2. WebSocket协议
+</h1><h2 id="21-http">2.1 http
+</h2><pre><code class="language-properties">单工： 数据传输只允许在一个方向上的传输，只能一方来发送数据，另一方来接收数据并发送。例如：对讲机
+
+半双工：数据传输允许两个方向上的传输，但是同一时间内，只可以有一方发送或接受消息。例如：打电话
+
+全双工：同时可进行双向传输。例如：websocket
+</code></pre>
+<ol>
+<li><strong>HTTP是单工的还是双工的还是半双工的</strong></li>
+</ol>
+<blockquote>
+<p>1.http1.0：单工。因为是短连接，客户端发起请求之后，服务端处理完请求并收到客户端的响应后即断开连接。</p>
+<p>2.http1.1：半双工。默认开启长连接keep-alive，开启一个连接可发送多个请求。</p>
+<p>3.http2.0：全双工，允许服务端主动向客户端发送数据。</p>
+</blockquote>
+<h2 id="22-tcp三次握手四次挥手">2.2 TCP三次握手四次挥手
+</h2><p><img src="/p/websocket/images/image-20220511134951514.png"
+	width="517"
+	height="569"
+	
+	loading="lazy"
+	
+		alt="image-20220511134951514"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="90"
+		data-flex-basis="218px"
+	
+></p>
+<h2 id="23-websocket-和http-的关系">2.3 WebSocket 和http 的关系
+</h2><p>都是==应用层==</p>
+<ol>
+<li>
+<p>Tcp ==是传输层协议==; ==http协议是在Tcp协议之上建立的==，http在发起请求时通过tcp协议建立起连接服务器的，请求结束后，==立即断开tcp连接==</p>
+</li>
+<li>
+<p>Http是无状态的短连接，而TCP是有状态的长连接</p>
+</li>
+<li>
+<p>Socket本身并不是协议，而是一个调用接口(API)。Socket的出现只是使得程序员更方便地使用TCP/IP协议栈而已，是对TCP/IP协议的抽象，从而形成了我们知道的一些最基本的函数接口</p>
+<p>HTTP是轿车，提供了封装或者显示数据的具体形式;Socket是发动机，提供了网络通信的能力。</p>
+</li>
+</ol>
+<p><img src="/p/websocket/images/image-20220511135401274.png"
+	width="491"
+	height="189"
+	
+	loading="lazy"
+	
+		alt="image-20220511135401274"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="259"
+		data-flex-basis="623px"
+	
+></p>
+<p><strong>WebSocket借助http协议进行握手，三次握手成功后，就会变身为TCP通道，从此与http不再相见。</strong></p>
+<p>WebSocket是一种在==单个TCP==连接上进行==全双工通信的协议==。<strong>在WebSocket API中，浏览器和服务器只需要完成一次握手（不是指建立TCP连接的那个三次握手，==是指在建立TCP连接后传输一次握手数据==），两者之间就直接可以创建持久性的连接，并进行==双向数据传输==。</strong></p>
+<p><strong>WebSocket：WebSocket协议只能浏览器发起么？</strong></p>
+<p>不是。目前此协议的受众的也不仅仅是web开发者。</p>
+<p>WebSocket只是一种协议，它和http协议一样，使用类似==okhttp的组件==，可以在任何地方进行调用，甚至可以借助WebSocket实现RPC框架。</p>
+<p><strong>WebSocket：WebSocket和长轮询有什么区别？</strong></p>
+<p>​	长轮询就是客户端发送一个请求，服务端将一直在这个连接上等待（当然有一个超长的超时时间），直到有数据才返回，它依然是一个一问一答的模式。比如著名的comted。==WebSocket在握手成功后，就是全双工的TCP通道，数据可以主动从服务端发送到客户端，处于链接两端的应用没有任何区别==。WebSocket创建的连接和Http的长连接是不一样的。由于==Http长连接底层依然是Http议，所以它还是一问一答==，只是Hold住了一条命长点的连接而已。长轮询和Http长连接是阻塞的I/O，但WebSocket可以是==非阻塞的（具体是多路复用）==</p>
+<h2 id="24-如何创建一个websocket-连接">2.4 如何创建一个webSocket 连接
+</h2><p>WebSocket的连接创建是==借助Http协议进行的==。这样设计主要是考虑兼容性，在浏览器中就可以很方便的发起请求，看起来比较具有迷惑性。</p>
+<p>下图是一个典型的由浏览器发起的ws请求，可以看到和http请求长的是非常相似的。</p>
+<p><strong>但是，它只是请求阶段长得像而已</strong></p>
+<p><img src="/p/websocket/images/image-20220511140223876.png"
+	width="532"
+	height="564"
+	
+	loading="lazy"
+	
+		alt="image-20220511140223876"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="94"
+		data-flex-basis="226px"
+	
+></p>
+<p><strong>请求的地址: 一般是：ws://***，或者是使用了SSL/TLS加密的安全协议wss:，用来标识是WebSocket请求。</strong></p>
+<p>1）首先，通过Http头里面的Upgrade域，请求进行协议转换。如果服务端支持的话，就可以切换到WebSocket协议。简单点讲：连接已经在那了，通过握手切换成ws协议，就是切换了连接的一个状态而已。</p>
+<p>2）Connection域可以认为是与Upgrade域配对的头信息。像nginx等代理服务器，是要先处理Connection，然后再发起协议转换的。</p>
+<p>3）Sec-WebSocket-Key 是随机的字符串，服务器端会用这些数据来构造出一个 SHA-1 的信息摘要。如此操作，可以尽量避免普通 HTTP 请求被误认为 WebSocket 协议。</p>
+<p>其他的，像Sec-WebSocket*字样的头信息，表明了客户端支持的子协议以及其他信息。像loT中很流行的mqtt，就可以作为WebSocket的子协议。</p>
+<p><img src="/p/websocket/images/image-20220511142947235.png"
+	width="474"
+	height="311"
+	
+	loading="lazy"
+	
+		alt="image-20220511142947235"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="152"
+		data-flex-basis="365px"
+	
+></p>
+<h1 id="3-stomp">3. stomp
+</h1><p>​	STOMP是一个用于C/S之间进行异步消息传输的简单文本协议, 全称是Simple Text Oriented Messaging Protocol; 它其实是==消息队列的一种协议, 和AMQP,JMS是平级的==</p>
+<p>​	STOMP是一种基于帧的协议，一帧由一个命令，一组可选的Header和一个可选的Body组成。 STOMP是基于Text的，但也允许传输二进制数据。 它的默认编码是UTF-8，但它的消息体也支持其他编码方式，比如压缩编码。</p>
+<p>==stomp帧结构==</p>
+<blockquote>
+<p>COMMAND
+header1:value1
+header2:value2</p>
+<p>Body^@</p>
+</blockquote>
+<p>^@表示行结束符</p>
+<p>一个STOMP帧由三部分组成:命令，Header(头信息)，Body（消息体）</p>
+<ul>
+<li>命令使用UTF-8编码格式，命令有SEND、SUBSCRIBE、MESSAGE、CONNECT、CONNECTED等。</li>
+<li>Header也使用UTF-8编码格式，它类似HTTP的Header，有content-length,content-type等。</li>
+<li>Body可以是二进制也可以是文本。注意Body与Header间通过一个空行（EOL）来分隔。</li>
+</ul>
+<p>例子</p>
+<blockquote>
+<p>SEND
+destination:/broker/roomId/1
+content-length:57</p>
+<p>{“type&quot;:&ldquo;ENTER&rdquo;,&ldquo;content&rdquo;:&ldquo;o7jD64gNifq-wq-C13Q5CRisJx5E&rdquo;}</p>
+</blockquote>
+<ul>
+<li>第1行：表明此帧为SEND帧，是COMMAND字段。</li>
+<li>第2行：Header字段，消息要发送的目的地址，是相对地址。</li>
+<li>第3行：Header字段，消息体字符长度。</li>
+<li>第4行：空行，间隔Header与Body。</li>
+<li>第5行：消息体，为自定义的JSON结构</li>
+</ul>
+<h2 id="2-stomp-服务端">2. stomp 服务端
+</h2><p>​		STOMP服务端被设计为客户端可以向其发送消息的一组目标地址。STOMP协议并没有规定目标地址的格式，它由使用协议的应用自己来定义。 例如/topic/a，/queue/a，queue-a对于STOMP协议来说都是正确的。应用可以自己规定不同的格式以此来表明不同格式代表的含义。比如应用自己可以定义以/topic打头的为发布订阅模式，消息会被所有消费者客户端收到，以/user开头的为点对点模式，只会被一个消费者客户端收到。</p>
+<h2 id="3-stomp-客户端">3. stomp 客户端
+</h2><p>​</p>
+<p>对于STOMP协议来说, 客户端会扮演下列两种角色的任意一种：</p>
+<ul>
+<li>作为生产者，通过SEND帧发送消息到指定的地址</li>
+<li>作为消费者，通过发送SUBSCRIBE帧到已知地址来进行消息订阅，而当生产者发送消息到这个订阅地址后，订阅该地址的其他消费者会受到通过MESSAGE帧收到该消息</li>
+</ul>
+<p>实际上，WebSocket结合STOMP相当于构建了一个消息分发队列，客户端可以在上述两个角色间转换，订阅机制保证了一个客户端消息可以通过服务器广播到多个其他客户端，作为生产者，又可以通过服务器来发送点对点消息。</p>
+<h1 id="4-spring-websocket">4. spring websocket
+</h1><p>==架构图==</p>
+<p><img src="/p/websocket/images/image-20230406154015491.png"
+	width="820"
+	height="372"
+	
+	loading="lazy"
+	
+		alt="image-20230406154015491"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="220"
+		data-flex-basis="529px"
+	
+></p>
+<p>==各个组件介绍==：</p>
+<ul>
+<li><strong>生产者型客户端（左上组件）</strong>: 发送SEND命令到某个目的地址(destination)的客户端。</li>
+<li><strong>消费者型客户端（左下组件）</strong>: 订阅某个目的地址(destination), 并接收此目的地址所推送过来的消息的客户端。</li>
+<li><strong>request channel</strong>: 一组用来接收生产者型客户端所推送过来的消息的线程池。</li>
+<li><strong>response channel</strong>: 一组用来推送消息给消费者型客户端的线程池。</li>
+<li><strong>broker</strong>: 消息队列管理者，也可以成为消息代理。它有自己的地址（例如“/topic”），客户端可以向其发送订阅指令，它会记录哪些订阅了这个目的地址(destination)。</li>
+<li><strong>应用目的地址(图中的”/app”)</strong>: 发送到这类目的地址的消息在到达broker之前，会先路由到由应用写的某个方法。相当于对进入broker的消息进行一次拦截，目的是针对消息做一些业务处理。</li>
+<li><strong>非应用目的地址(图中的”/topic”</strong>，也是消息代理地址): 发送到这类目的地址的消息会直接转到broker。不会被应用拦截。</li>
+<li><strong>SimpAnnotatonMethod</strong>: 发送到应用目的地址的消息在到达broker之前, 先路由到的方法. 这部分代码是由应用控制的。</li>
+</ul>
+<p>==流转流程==</p>
+<ol>
+<li>生产者通过发送一条SEND命令消息到某个目的地址(destination)，</li>
+<li>服务端request channel接受到这条SEND命令消息，
+<ol>
+<li>如果目的地址是应用目的地址则转到相应的由应用自己写的业务方法做处理（对应图中的SimpAnnotationMethod），再转到broker(SimpleBroker)。</li>
+<li>如果目的地址是非应用目的地址则直接转到broker。</li>
+</ol>
+</li>
+<li>broker通过SEND命令消息来构建MESSAGE命令消息, 再通过response channel推送MESSAGE命令消息到所有订阅此目的地址的消费者</li>
+</ol>
+<h2 id="1-sendto">1. @SendTo
+</h2><p>==它可以是方法的返回值 推送到消息代理器中, 由消息代理器广播到订阅路径中去==</p>
+<pre><code class="language-java">@MessageMapping(&quot;/hello&quot;)   //使用MessageMapping注解来标识所有发送到“/hello”这个destination的消息，都会被路由到这个方法进行处理.
+    @SendTo(&quot;/topic/greetings&quot;) //使用SendTo注解来标识这个方法返回的结果，都会被发送到它指定的destination，“/topic/greetings”.
+    //传入的参数Message为客户端发送过来的消息，是自动绑定的。
+    public Greeting greeting(HelloMessage message) throws Exception {
+        Thread.sleep(1000); // 模拟处理延时
+        return new Greeting(&quot;Hello, &quot; + HtmlUtils.htmlEscape(message.getName()) + &quot;!&quot;); //根据传入的信息，返回一个欢迎消息.
+    }
+}
+</code></pre>
+<p>​	上面方法中的==返回值，会被广播到<code>/topic/greetings</code>这个订阅路径中==，只要客户端订阅了这个路径，都会接收到消息。Spring处理消息的主要类是==SimpleBrokerMessageHandler==, 当需要发送广播消息时，最终会调用其中的==sendMessageToSubscribers()==方法：方法内部会循环调用当前所有订阅此<code>Broker</code>的客户端<code>Session</code>，然后逐个发送消息。这里，入参<code>destination</code>就是<code>Broker</code>的地址，而<code>message</code>，就是我们返回信息的封装</p>
+<h2 id="2-sendtouser">2. @SendToUser
+</h2><pre><code class="language-java">  @MessageMapping(&quot;/hello&quot;) //使用MessageMapping注解来标识所有发送到“/hello”这个destination的消息，都会被路由到这个方法进行处理.
+    @SendToUser(&quot;/topic/greetings&quot;) //使用SendToUser注解来标识这个方法返回的结果，都会被发送到请求它的用户的destination.
+    //传入的参数Message为客户端发送过来的消息，是自动绑定的。
+    public Greeting greeting(HelloMessage message) throws Exception {
+        Thread.sleep(1000); // 模拟处理延时
+        return new Greeting(&quot;Hello, &quot; + HtmlUtils.htmlEscape(message.getName()) + &quot;!&quot;); //根据传入的信息，返回一个欢迎消息.
+    }
+}
+
+</code></pre>
+<p>上面这段代码, return 之后会走到 <code>AbstractMethodMessageHandler.java</code>中的<code>handleMatch</code>方法</p>
+<pre><code class="language-java">protected void handleMatch(T mapping, HandlerMethod handlerMethod, String lookupDestination, Message&lt;?&gt; message) {
+	....
+    Object returnValue = invocable.invoke(message, new Object[0]); // 这里调用MessageMapping匹配到的方法
+    .....
+    // 开始处理返回值
+    this.returnValueHandlers.handleReturnValue(returnValue, returnType, message);
+	.....
+
+}
+</code></pre>
+<p>==SendToMethodReturnValueHandler==</p>
+<blockquote>
+<p>专门处理<code>SendTo</code>相关注解的类。当用<code>SendTo</code>注解的方法返回后，即调用此类中的<code>handleReturnValue</code>方法来进行处理</p>
+</blockquote>
+<h2 id="3-simpmessagingtemplate">3. SimpMessagingTemplate
+</h2><pre><code class="language-java">public void convertAndSendToUser(String user, String destination, Object payload, @Nullable Map&lt;String, Object&gt; headers, @Nullable MessagePostProcessor postProcessor) throws MessagingException {
+    Assert.notNull(user, &quot;User must not be null&quot;);
+    user = StringUtils.replace(user, &quot;/&quot;, &quot;%2F&quot;);
+    destination = destination.startsWith(&quot;/&quot;) ? destination : &quot;/&quot; + destination;
+    super.convertAndSend(this.destinationPrefix + user + destination, payload, headers, postProcessor);
+}
+</code></pre>
+<blockquote>
+<p><strong><code>user</code></strong>:用户标识，这里就是客户端与服务端链接的sessionId
+<strong><code>destination</code></strong>: 这是SendToUser注解后括号内的参数值
+<strong><code>payload</code></strong>:<code>Object</code>类型，它标识<code>Controller</code>中定义的方法的返回值，这里就是<code>GreetingController</code>类中<code>greeting</code>方法的返回值
+<strong><code>headers</code></strong>:返回信息的消息头
+<strong><code>postProcessor</code></strong>:此处为<code>Null</code>\</p>
+</blockquote>
+<p><code>SimpMessagingTemplate</code> 是 Spring 框架中提供的一个用于在 WebSocket 中发送消息的工具类。它可以用于在服务器端向订阅了特定主题的客户端发送消息，实现了在 WebSocket 中进行消息的发布（Publish）操作。</p>
+<p><code>SimpMessagingTemplate</code> 提供了多种方法来发送消息，包括：</p>
+<ol>
+<li><code>convertAndSend(String destination, Object payload)</code>: 向指定的目的地发送消息。<code>destination</code> 参数表示消息的目的地，可以是一个主题（topic）或一个队列（queue），<code>payload</code> 参数表示要发送的消息体。</li>
+<li><code>convertAndSendToUser(String user, String destination, Object payload)</code>: 向指定用户发送消息。<code>user</code> 参数表示用户的唯一标识，<code>destination</code> 参数表示消息的目的地，<code>payload</code> 参数表示要发送的消息体。</li>
+<li><code>convertAndSendToUser(String user, String destination, Object payload, MessageHeaders headers)</code>: 向指定用户发送消息，并可以设置消息头（headers）。</li>
+<li><code>convertAndSendToUser(String user, String destination, Object payload, Map&lt;String, Object&gt; headers)</code>: 向指定用户发送消息，并可以设置消息头（headers）。</li>
+</ol>
+<p><code>SimpMessagingTemplate</code> 还支持一些其他的方法，例如发送带有自定义消息头（headers）的消息，发送带有消息头和消息体（payload）的消息等。</p>
+<p>使用 <code>SimpMessagingTemplate</code> 可以方便地在服务器端向 WebSocket 客户端发送消息，实现了在 WebSocket 中进行消息的发布操作。需要注意的是，使用 <code>SimpMessagingTemplate</code> 发送的消息只会发送给订阅了相应主题或用户的客户端，因此可以实现点对点或广播式的消息发送。在使用 <code>SimpMessagingTemplate</code> 时，需要确保已经正确配置了 WebSocket 相关的配置，并且已经设置了相应的消息代理（Message Broker）来实现消息的传递。</p>
+<pre><code>@RestController
+public class DemoController {
+@MessageMapping(&quot;/chat&quot;)
+    @SendTo(&quot;/topic/chat&quot;)
+    public String chat(String message) throws Exception {
+        Thread.sleep(1000); // simulated delay
+        return message + &quot;mike ling&quot;;
+    }
+}
+</code></pre>
+<pre><code>@Bean
+    public Executor websocketExecutor() {
+        ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
+                .setNameFormat(&quot;websocket-pool-%d&quot;).build();
+
+        return new ThreadPoolExecutor(5, 200,
+                0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue&lt;Runnable&gt;(1024), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
+    }
+
+    @Bean
+    public ExecutorSubscribableChannel messageChannel(Executor websocketExecutor) {
+        return new ExecutorSubscribableChannel(websocketExecutor);
+    }
+
+    @Bean
+    public SimpMessagingTemplate messagingTemplate(ExecutorSubscribableChannel messageChannel) {
+        return new SimpMessagingTemplate(messageChannel);
+    }
+</code></pre>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>

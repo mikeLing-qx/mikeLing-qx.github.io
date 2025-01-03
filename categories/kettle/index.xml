@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Kettle on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/categories/kettle/</link>
+        <description>Recent content in Kettle on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Thu, 03 Oct 2024 18:14:03 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/categories/kettle/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Kettle</title>
+        <link>https://mikeLing-qx.github.io/p/kettle/</link>
+        <pubDate>Thu, 03 Oct 2024 18:14:03 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/kettle/</guid>
+        <description>&lt;h1 id=&#34;1-介绍&#34;&gt;1. 介绍
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;ETL是数据抽取（Extract）、转换（Transform）、装载（Load）的过程。&lt;/li&gt;
+&lt;li&gt;Kettle是一款国外开源的ETL工具，有两种脚本文件transformation和job，transformation完成针对数据的基础转换，job则完成整个工作流的控制。&lt;/li&gt;
+&lt;li&gt;Job：一个作业，由不同逻辑功能的entry组件构成，数据从一个entry组件传递到另一个entry组件，并在entry组件中进行相应的处理。&lt;/li&gt;
+&lt;li&gt;Transformation：完成针对数据的基础转换，即一个数据转换过程。&lt;/li&gt;
+&lt;li&gt;Entry:实体，即job型组件。用来完成特定功能应用，是job的组成单元、执行单元。&lt;/li&gt;
+&lt;li&gt;Step:步骤，是Transformation的功能单元，用来完成整个转换过程的一个特定步骤。&lt;/li&gt;
+&lt;li&gt;Hop:工作流或转换过程的流向指示，从一个组件指向另一个组件，在kettle源工程中有三种hop，无条件流向、判断为真时流向、判断为假时流向。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;==其他ETL工具: Sqoop, DataX, Kettle, Talend 等==&lt;/p&gt;
+&lt;h1 id=&#34;2-体系结构&#34;&gt;2. 体系结构
+&lt;/h1&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kettle/images/image-20240418154411061.png&#34;
+	width=&#34;1537&#34;
+	height=&#34;786&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240418154411061&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;195&#34;
+		data-flex-basis=&#34;469px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;两种工作单元文件&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;ktr 文件, kettle transformation: 此文件定义一个转换任务, 包含多个步骤, 这些步骤可以并行或者按顺序执行, 转换的目的是从一个或者多个数据源读取数据, 然后进行一些处理 (比如 清洗, 验证, 转换, 合并), 并将这些数据输出到一个或者多个目标, 是xml 格式&lt;/li&gt;
+&lt;li&gt;kjb 文件 （Kettle Job）: 此文件表示一个作业，作业是一种更高级别的工作流控制，可以包含多个转换（ktr）、作业（kjb）、脚本、邮件发送或其他任务等。这些任务按照某种特定的顺序（可以是并行、串行执行，也可以依赖于任务之间的成功与否）进行执行&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;1-元数据管理引擎&#34;&gt;1. 元数据管理引擎
+&lt;/h2&gt;&lt;p&gt;元数据管理引擎管理ktr、kjb或者元数据库，插件通过该引擎获取基本信息，主要包括TransMeta、JobMeta和StepMeta三个类。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;TransMeta类，定义了一个转换（对应一个.ktr文件），提供了保存和加载该文件的方法；&lt;/li&gt;
+&lt;li&gt;JobMeta类，同样对应于一个工作(对应一个.kjb文件)，提供保存和加载方法；&lt;/li&gt;
+&lt;li&gt;StepMeta类，保存的是Step的一些公共信息的类，每个类的具体的元数据将保存在显示了StepMetaInterface的类里面。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;2-数据集成引擎&#34;&gt;2. 数据集成引擎
+&lt;/h2&gt;&lt;p&gt;数据集成引擎包括Step引擎、Job引擎和数据库访问引擎三大部分，主要负责调用插件，并返回相应信息。&lt;/p&gt;
+&lt;h2 id=&#34;3-功能模块&#34;&gt;3. 功能模块
+&lt;/h2&gt;&lt;p&gt;Kettle的主要包括四大功能模块：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Chef——工作(job)设计工具 (GUI方式)；&lt;/li&gt;
+&lt;li&gt;Kitchen——工作(job)执行器(命令行方式)；&lt;/li&gt;
+&lt;li&gt;Spoon——转换(transform)设计工具 (GUI方式)；&lt;/li&gt;
+&lt;li&gt;Span——转换(trasform)执行器(命令行方式)。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;3-transformation&#34;&gt;3. transformation
+&lt;/h1&gt;&lt;h2 id=&#34;1-步骤的特性&#34;&gt;1. 步骤的特性
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;步骤需要有名字, 同一个转换范围内唯一&lt;/li&gt;
+&lt;li&gt;每个步骤都会读, 写数据行 , 唯一的例外是 &amp;lsquo;生成记录&amp;rsquo; 步骤, 该步骤只写数据&lt;/li&gt;
+&lt;li&gt;步骤将数据==写到与之相连的一个或者多个输出跳 hop==,  再传送到 hop另一端的步骤&lt;/li&gt;
+&lt;li&gt;大多数的步骤 都可以有多个输出 hop, 一个步骤的数据发送可以被设置==为分发 和 复制==, 分发是轮流接受, 复制是发送到所有的目标步骤&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;跳实际上是两个步骤之间的 ==被称为行集的 数据行缓存,== ==行集的大小可以在转换的设置里定义==, 当行集满了, 向&lt;/p&gt;
+&lt;p&gt;所有步骤都是并行执行的&lt;/p&gt;
+&lt;p&gt;输出: 字段拆分之后, 原字段不会存在数据流里面&lt;/p&gt;
+&lt;p&gt;行扁平化: 需要规整的数据, 需要先进行排&lt;/p&gt;
+&lt;h2 id=&#34;2-转换控件&#34;&gt;2. 转换控件
+&lt;/h2&gt;&lt;h3 id=&#34;1-列转行&#34;&gt;1. ==列转行==
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kettle/images/image-20240423165918942.png&#34;
+	width=&#34;993&#34;
+	height=&#34;358&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240423165918942&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;277&#34;
+		data-flex-basis=&#34;665px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;需要注意的是: 列转行之前, 数据流必须按照==分组字段==进行排序, 否则数据会错乱&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kettle/images/image-20240423170513520.png&#34;
+	width=&#34;750&#34;
+	height=&#34;285&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240423170513520&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;263&#34;
+		data-flex-basis=&#34;631px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;2-行转列&#34;&gt;2. 行转列
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kettle/images/image-20240423173209885.png&#34;
+	width=&#34;1052&#34;
+	height=&#34;366&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240423173209885&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;287&#34;
+		data-flex-basis=&#34;689px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;3-流程控件&#34;&gt;3. 流程控件
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;switch&lt;/li&gt;
+&lt;li&gt;过滤控件&lt;/li&gt;
+&lt;li&gt;空操作&amp;ndash;一般作为数据流的终点&lt;/li&gt;
+&lt;li&gt;中止操作&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;4-查询控件&#34;&gt;4. 查询控件
+&lt;/h2&gt;&lt;h3 id=&#34;1-数据库查询&#34;&gt;1. 数据库查询
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kettle/images/image-20240424093725426.png&#34;
+	width=&#34;1116&#34;
+	height=&#34;198&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240424093725426&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;563&#34;
+		data-flex-basis=&#34;1352px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kettle/images/image-20240424094518704.png&#34;
+	width=&#34;941&#34;
+	height=&#34;848&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240424094518704&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;110&#34;
+		data-flex-basis=&#34;266px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;2-流查询控件&#34;&gt;2. 流查询控件
+&lt;/h3&gt;&lt;p&gt;可以把两个表输入, 根据指定条件进行连接&lt;/p&gt;
+&lt;p&gt;==lookup step &amp;ndash; 被连接的表 (次表)==&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kettle/images/image-20240424094945360.png&#34;
+	width=&#34;1240&#34;
+	height=&#34;693&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240424094945360&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;178&#34;
+		data-flex-basis=&#34;429px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;5-连接控件&#34;&gt;5. 连接控件
+&lt;/h2&gt;&lt;h3 id=&#34;1-合并记录&#34;&gt;1. 合并记录
+&lt;/h3&gt;&lt;p&gt;==用于 新 旧数据的比较==, 必须要相同的结构, 而且需要对数据先进行排序&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kettle/images/image-20240424095305909.png&#34;
+	width=&#34;1118&#34;
+	height=&#34;571&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240424095305909&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;195&#34;
+		data-flex-basis=&#34;469px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kettle/images/image-20240424095545080.png&#34;
+	width=&#34;1177&#34;
+	height=&#34;650&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240424095545080&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;181&#34;
+		data-flex-basis=&#34;434px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;2-记录集连接&#34;&gt;2. 记录集连接
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kettle/images/image-20240424100803698.png&#34;
+	width=&#34;1116&#34;
+	height=&#34;300&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240424100803698&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;372&#34;
+		data-flex-basis=&#34;892px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;6-统计控件&#34;&gt;6. 统计控件
+&lt;/h2&gt;&lt;h3 id=&#34;1-分组&#34;&gt;1. 分组
+&lt;/h3&gt;&lt;p&gt;就类似与group by, 但是在分组之前, 最好先进行排序&lt;/p&gt;
+&lt;h2 id=&#34;7-映射控件&#34;&gt;7. 映射控件
+&lt;/h2&gt;&lt;p&gt;类似于一个方法&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kettle/images/image-20240424104218527.png&#34;
+	width=&#34;700&#34;
+	height=&#34;259&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240424104218527&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;270&#34;
+		data-flex-basis=&#34;648px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;8-从结果获取记录&#34;&gt;8. 从结果获取记录
+&lt;/h2&gt;&lt;p&gt;这个步骤通常与「Execute SQL script」步骤配合使用，==用于执行 SQL 查询并从查询结果中获取记录==。&lt;/p&gt;
+&lt;h1 id=&#34;4-job&#34;&gt;4. job
+&lt;/h1&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kettle/images/image-20240424111001729.png&#34;
+	width=&#34;1133&#34;
+	height=&#34;576&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240424111001729&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;196&#34;
+		data-flex-basis=&#34;472px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;5-kettle传递参数&#34;&gt;5. kettle传递参数
+&lt;/h1&gt;&lt;p&gt;可分为全局参数和局部参数&lt;/p&gt;
+&lt;p&gt;一般全局参数只在临时调试中使用, 存储在 kettle.properties 文件中&lt;/p&gt;
+&lt;h2 id=&#34;1-全局变量&#34;&gt;1. 全局变量
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;全局参数定义是通过当前用户下.kettle文件夹中的kettle.properties文件来定义。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;定义方式是采用键=值对方式来定，如：start_date=20130101&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;注：在配置全局变量时需要重启Kettle才会生效。&lt;/p&gt;
+&lt;h2 id=&#34;2-局部变量&#34;&gt;2. 局部变量
+&lt;/h2&gt;&lt;p&gt;局部参数 在kettle 流程的开发中使用较多, 主要的传递方式 为 ==“设置变量/获取变量”，“转换命名参数”，“常量引用”三种==,  &lt;strong&gt;参数（变量）在transformation 之间传递，参数（变量）传递时，每次只能传递一个变量。&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;在ktr转换中设置变量&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;在转换中通过设置变量组件实现变量的设置，变量在当前转换中设置，不能在当前转换中使用，必须在下一转换中使用，在下一转换中通过获取变量组件实现上一转换中变量的获取使用。&lt;/p&gt;
+&lt;p&gt;使用方式：使用获取变量组件获取后直接使用&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;在job作业中设置变量&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;在job作业中也可以设置变量，在作业中通过==设置变量设置完成后，在下一转换中可以使用获取变量组件获取或直接在使用时通过${变量名}使用==（不需要使用获取变量组件）。&lt;/p&gt;
+&lt;p&gt;使用方式：使用获取==变量组件获取后直接使用 或者直接在需要使用时使用${变量名}==&lt;/p&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;常量传递&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;在任意组件都可以定义，定义后使用？获取使用。&lt;/p&gt;
+&lt;p&gt;常量定义的顺序即？对应的顺序&lt;/p&gt;
+&lt;h1 id=&#34;6-疑问&#34;&gt;6. 疑问
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;kettle 中的日志打印, 在使用 代码调用的时候可以单独进行配置吗?
+&lt;ul&gt;
+&lt;li&gt;不需要, 有日志组件可以使用&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;如何配置本地kettle 模板, 并使用etl工程完成数据装载?&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

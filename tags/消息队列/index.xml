@@ -1,0 +1,4117 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>消息队列 on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/</link>
+        <description>Recent content in 消息队列 on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Sun, 14 Jul 2024 16:23:18 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>RocketMq</title>
+        <link>https://mikeLing-qx.github.io/p/rocketmq/</link>
+        <pubDate>Sun, 14 Jul 2024 16:23:18 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/rocketmq/</guid>
+        <description>&lt;h1 id=&#34;1-rocketmq-简介&#34;&gt;1. RocketMq 简介
+&lt;/h1&gt;&lt;h2 id=&#34;1-特点&#34;&gt;1. 特点
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;支持发布/订阅（Pub/Sub）和点对点（P2P）消息模型&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;能够保证严格的消息顺序，在一个队列中可靠的先进先出（FIFO）和严格的顺序传递&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;提供丰富的消息拉取模式，支持拉（pull）和推（push）两种消息模式&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;推模式：在推模式下，==消息从服务器“推动”到消费者==。这意味着一旦有新的消息进入服务器，服务器都会将它们推送给消费者，消费者只需要接收和处理消息即可。这种模式下，消费者较为被动，主要关注点是如何处理推送过来的消息，适合消息处理速度较快，对实时性要求较高的场景。&lt;/p&gt;
+&lt;p&gt;拉模式：在拉模式下，==消费者从服务器“拉取”消息==。这样，消费者可以决定何时获取消息，并可根据自身需求和能力去主动获取消息，因此可以更好地控制消息处理的速度和节奏。它适合处理的消息并不那么紧急，允许有一定延迟的场景，或者处理能力有限需要自我控制拉取速度的场景。&lt;/p&gt;
+&lt;p&gt;值得注意的是，RocketMQ==默认采用的是推模式进行消息的消费==，但==实质上其内部对于消息的获取其实是拉模式==，区别在于RocketMQ的==客户端封装了详尽的拉取调用，使得对于终端使用者来说展示出的是推送模式==。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;单一队列百万消息的堆积能力，亿级消息堆积能力&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;支持多种消息协议，如 JMS、MQTT 等&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;分布式高可用的部署架构,满足至少一次消息传递语义&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;原理:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.jianshu.com/p/2838890f3284&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.jianshu.com/p/2838890f3284&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;主要优势&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;支持==事务型消息==（消息发送和 DB 操作保持两方的最终一致性，RabbitMQ 和 Kafka 不支持）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;支持结合 RocketMQ 的多个系统之间==数据最终一致性==（==多方事务==，二方事务是前提）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;支持 18 个级别的==延迟消息==（RabbitMQ 和 Kafka 不支持）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;支持==指定次数和时间间隔的失败消息重发==（Kafka 不支持，RabbitMQ 需要手动确认）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;支持 ==Consumer 端 Tag 过滤==，减少不必要的网络传输（RabbitMQ 和 Kafka 不支持）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;==支持重复消费==（RabbitMQ 不支持，Kafka 支持）&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&#34;2-运行架构&#34;&gt;2. 运行架构
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;一个正常工作的RocketMQ包括四个部分。&lt;/p&gt;
+&lt;p&gt;NameServer ：基于高可用设计产生的，用于服务发现和路由。正式应用时通常采用集群部署。==就相当于与祖册中心==,  ==NameServer之间没有通信==,   ==broker 需要到 所有的nameServer上去注册==&lt;/p&gt;
+&lt;p&gt;Broker：实现==队列机制==，负责消息存储和转发。正式应用时也采用集群部署. 也就是==消息存储中心==, 它还==存储与消息相关的元数据==, Broker 有 Master 和 Slave 两种类型，Master 既可以写又可以读，Slave不可以写只可以读。&lt;/p&gt;
+&lt;p&gt;Producer：消息生产者，生成消息并发送到RocketMQ中，生产者通常是我们自己实现的应用程序。&lt;/p&gt;
+&lt;p&gt;Consumer：消息消费者，从RocketMQ中接收消息并进行业务处理。这部分也通常是我们自己实现的。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/image-20210604094345170.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20210604094345170&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;运转流程&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rocketmq/images/image-20211211104734307.png&#34;
+	width=&#34;737&#34;
+	height=&#34;443&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20211211104734307&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;166&#34;
+		data-flex-basis=&#34;399px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;1. NameServer启动
+2. Broker启动向NameServer注册
+3. 生产者再发送某个主题的消息前 先从 NameServer 获取Broker服务器地址列表(可能回是集群), 然后根据负载均衡算法, 从列表汇总选择一台Broker 进行消息发送
+4. NameServer 与每台broker 服务器保持长链接, 每隔30s 监测是否存活, 如果检测到
+Broker 宕机（使用心跳机制， 如果检测超过120S），则从路由注册表中将其移除。
+5. 消费者在订阅某个主题的消息之前从 NamerServer 获取 Broker 服务器地址列表（有可能是集群），但是消费者选择从 Broker 中 订阅消息，订阅规则由 Broker 配置决定
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Message -&amp;gt; 要传输的信息&lt;/p&gt;
+&lt;p&gt;Topic -&amp;gt; 一条消息必须要有一个Topic, ==可以看做是你的信件要邮寄的地址==&lt;/p&gt;
+&lt;p&gt;Tag -&amp;gt; 一条消息也可以拥有一个==可选的标签（Tag）和额外的键值对==，它们可以用于设置&lt;/p&gt;
+&lt;p&gt;==一个业务 key 并在 Broker 上查找此消息==以便在开发期间查找问题。&lt;/p&gt;
+&lt;h2 id=&#34;3-基础概念&#34;&gt;3. 基础概念
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Producer Group:  只是一个概念性的, 配不配都没有什么影响&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;生产者组：是一类生产者的集合，通常发送同一类消息并且发送逻辑一致&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Producer:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;三种消息发送方式&lt;/p&gt;
+&lt;p&gt;1: 同步&lt;/p&gt;
+&lt;p&gt;2: 异步&lt;/p&gt;
+&lt;p&gt;3: 单向发送&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Consumer Group&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;消费者组：是一类消费者的集合，通常消费同一类消息并且消费逻辑一致&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Consumer&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;两种消费模式:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;拉取型&lt;/li&gt;
+&lt;li&gt;推送型: 实际上也是拉取消息, 但是对拉取逻辑进行了封装, 将消息达到时执行的回调接口留给用户来实现&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Broker (存储消息);&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;每个Broker与Name Server集群中的所有节点建立长连接，定时(每隔30s)==注册Topic信息到所有Name Server==。Name Server定时(每隔10s)扫描所有存活broker的连接，如果Name Server超过2分钟没有收到心跳，则Name Server断开与Broker的连接。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rocketmq/images/image-20240509173328871.png&#34;
+	width=&#34;1383&#34;
+	height=&#34;794&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240509173328871&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;174&#34;
+		data-flex-basis=&#34;418px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;NameServer&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;作用和zookeeper类似, 用来保存broker相关元素, 并给producer 和comsumer 查找broker 消息, ==Producer 在发送消息前会根据 Topic 到 NameServer 获取到 Broker 的路由信息，Consumer 也会定时获取 Topic 的路由信息==。&lt;/p&gt;
+&lt;p&gt;name-server充当==路由消息的提供者==。生产者或消费者能够通过name-server查找各主题相应的 Broker IP 列表。多个 Namesrv 实例组成集群，但相互独立，没有信息交换&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;topic 消息主题 (==理解为rebbit 的 exchange==); 可以看做消息的规类&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;tag  消费标签;  (==理解为 rabbit 的 routing key==)&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;标签, Topic的二级分类, 可以理解为==消息队列==, ==一个Topic 可以设置多个Tag==, 发送消息时执行该消息的Topic, RockerMq ==会轮询该Topic 下所有的队列将消息发出去==&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;message queue 消息队列&amp;ndash;&amp;gt; 主题被划分为一个或多个子主题. 就是消息队列&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Topic 和 Tags 使用示例&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;以天猫交易平台为例，订单消息，支付消息属于不同业务类型的消息，分别创建 Topic_Order 和 Topic_Pay，其中订单消息根据商品品类以不同的 Tag 再进行细分，如电器类、男装类、女装类、化妆品类，最后他们都被各个不同的系统所接收。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/topic-tags.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;topic-tags&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;4-windows-开发搭建&#34;&gt;4. windows 开发搭建
+&lt;/h2&gt;&lt;h3 id=&#34;1-rocketmq&#34;&gt;1. rocketMq
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;参考资料 &lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/zxl646801924/article/details/105637278&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://blog.csdn.net/zxl646801924/article/details/105637278&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;注意: ==java环境为1.8==&lt;/p&gt;
+&lt;p&gt;nameserver 启动&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start mqnamesrv.cmd
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;broker启动&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;start mqbroker.cmd -n 127.0.0.1:9876 autoCreateTopicEnable=true
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;发送消息失败, 空间不足, 修改启动脚本&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;参考资料 &lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/muriyue6/article/details/130607492&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://blog.csdn.net/muriyue6/article/details/130607492&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;runbroker.sh文件添加
+set &amp;quot;JAVA_OPT=%JAVA_OPT% -server -Xms512m -Xmx512m -Xmn128m -Drocketmq.broker.diskSpaceWarningLevelRatio=0.99&amp;quot;，使磁盘使用超过99%再报错，根本的解决办法是保证磁盘空间永远不超过90%
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;验证Mq服务&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;启动consumer&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;set NAMESRV_ADDR=127.0.0.1:9876
+tools.cmd org.apache.rocketmq.example.quickstart.Consumer
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;启动producer&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;set NAMESRV_ADDR=127.0.0.1:9876
+tools.cmd org.apache.rocketmq.example.quickstart.Producer
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;2-rocketmq-dashboard&#34;&gt;2. rocketmq-dashboard
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/apache/rocketmq-dashboard&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/apache/rocketmq-dashboard&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;mvn clean package -Dmaven.test.skip=true
+java -jar target/rocketmq-dashboard-1.0.1-SNAPSHOT.jar
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;5-检测mq服务是否正常&#34;&gt;5. 检测mq服务是否正常
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;&amp;gt; export NAMESRV_ADDR=localhost:9876
+&amp;gt; sh bin/tools.sh org.apache.rocketmq.example.quickstart.Producer
+ SendResult [sendStatus=SEND_OK, msgId= ...
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;如下所示官方提供这个例子属于生产者，==用于发送消息，运行之后会发送大量的消息==，之后就会退出&lt;/p&gt;
+&lt;p&gt;接收消息&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt; sh bin/tools.sh org.apache.rocketmq.example.quickstart.Consumer
+ ConsumeMessageThread_%d Receive New Messages: [MessageExt...
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;上面的消息发送完毕之后就会退出，在同一窗口中可以使用消费者类来进行接收消息, 是多线程的消费&lt;/p&gt;
+&lt;h1 id=&#34;2-问题&#34;&gt;2. 问题
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; rocketMq 发送消息的时候, 默认的队列是什么? 不需要单独创建和指定吗?&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 默认是四个&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; rocketMq dashboard 要如何使用?&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; rocketMq 的==消费策略不可以随意更改, 可能会造成重复消费和 队列没有消费者消费==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; 为什么?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; rocketMq 的顺序消息是怎么实现的? 顺序消息有几种类型&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; rocketMq 有哪些消息投递策略&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;3-顺序消息&#34;&gt;3. 顺序消息
+&lt;/h1&gt;&lt;h2 id=&#34;1-概念总结&#34;&gt;1. 概念总结
+&lt;/h2&gt;&lt;p&gt;==rocketMq  里面的局部顺序, 依靠的是broker-queue 中的分段锁实现的, queue 中的消息一定是先入先出的==&lt;/p&gt;
+&lt;p&gt;局部顺序有一个很关键的点，在==一个消费者集群的情况下==&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;消费者1先去Queue拿消息，它拿到了北京订单1，它拿完后，&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;消费者2去queue拿到的是 北京订单2。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;拿的顺序是没毛病了，==但关键是先拿到不代表先消费完它==。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;会存在虽然你消费者1先拿到北京订单 但由于网络等原因，消费者2比你真正的先消费消息。这是不是很尴尬了。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;实际上&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;==Broker采用的是分段锁，它不是锁整个Broker而是锁里面的单个Queue==，因为只要锁单个 Queue就可以保证局部顺序消费了。&lt;/p&gt;
+&lt;p&gt;所以最终的消费者这边的逻辑就是&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;消费者1去Queue拿 北京订单1，==它就锁住了整个Queue，只有它消费完成并返回成功后，这个锁才会释放==。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;然后下一个消费者去拿到 北京订单2 同样锁住当前Queue,这样的一个过程来真正保证对同一个 Queue能够真正意义上的顺序消费，而不仅仅是顺序取出&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;注意事项&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;顺序消息暂不支持广播模式。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;顺序消息不支持异步发送方式，否则将无法严格保证顺序。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;==建议同一个 Group ID 只对应一种类型的 Topic，即不同时用于顺序消息和无序消息的收发==。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;对于全局顺序消息，建议创建broker个数 &amp;gt;=2。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;2-使用&#34;&gt;2. 使用
+&lt;/h2&gt;&lt;h3 id=&#34;1-队列选择器&#34;&gt;1. 队列选择器
+&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class SelectorFactory {
+    /**
+    * 工厂模式获取MessageQueueSelector
+    *
+    * @param value
+    * @return
+    */
+	public static MessageQueueSelector getMessageQueueSelector(String value) {
+        //如果value不为空使用hash选择器
+        if (StringUtils.isNotEmpty(value)) {
+        return new SelectMessageQueueByHash();
+        }
+        //如果value为空使用随机选择器
+        return new SelectMessageQueueByRandom();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;2-消息生产者&#34;&gt;2. 消息生产者
+&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Component
+public class MQProducer {
+
+    @Autowired
+    DefaultMQProducer defaultMQProducer;
+
+    /**
+     * 同步发送消息
+     *
+     * @param taxiBO
+     */
+    public void send(TaxiBO taxiBO) {
+        if (null == taxiBO) {
+            return;
+        }
+        SendResult sendResult = null;
+        try {
+//获取消息对象
+            Message message =
+                    RocketMQHelper.buildMessage(DispatchConstant.SEQ_TOPIC, taxiBO);
+//根据区域编码获取队列选择器
+            MessageQueueSelector selector =
+                    SelectorFactory.getMessageQueueSelector(taxiBO.getAreaCode());
+//发送同步消息
+            sendResult = defaultMQProducer.send(message, selector,
+                    taxiBO.getAreaCode(), 10000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (null != sendResult) {
+            System.out.println(sendResult.toString());
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;4-消息投递策略&#34;&gt;4. 消息投递策略
+&lt;/h1&gt;&lt;p&gt;==一个队列只能被一个消费者订阅 (可以保证不被重复消费), 一个消费者可以订阅多个队列==&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;集群消费 clustering (默认); 就是分组&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;模式下一个消费者集群共同消费一个主题的多个队列，一个队列只会被
+一个消费者消费，如果某个消费者挂掉，分组内其它消费者会接替挂掉的消费者继续消费
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;广播消费 broadcasting&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;发给消费者组中的每一个消费者进行消费
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;==commitlog 有文件过期时间, 默认是72小时, 当超过这个时间文件没有任何没有更新的话, 文件会被删除, 无法找回==&lt;/p&gt;
+&lt;p&gt;==超过超时时间, 消息发送失败的, 是不会进行重试的==&lt;/p&gt;
+&lt;p&gt;==集群部署需要禁止自动创建主题==&lt;/p&gt;
+&lt;p&gt;消息重试&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;rabbitMq 是会回到队列的头部, 重新发送&lt;/li&gt;
+&lt;li&gt;rocketMq 则是会新开一个新的队列, 已当前消费组为单位, 与具体的主题无关, 不会立马重试, 大概5小时内,默认会重试16次,  如果全部失败的话就会到死信队列里面&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;1-生产者投递策略&#34;&gt;1. 生产者投递策略
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;轮询投递&lt;/li&gt;
+&lt;li&gt;顺序投递&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;RockeMQ 采用了这种实现方案：&lt;strong&gt;对于相同订单号的消息，通过一定的策略，将其&lt;/strong&gt; 放置在一个queue队列中 &lt;strong&gt;，然后&lt;/strong&gt; 消费者 再采用一定的策略(一个线程独立处理一个queue ,保证处理消息的顺序性)，能够保证消费的顺序性&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;package org.apache.rocketmq.client.producer;
+
+import java.util.List;
+import org.apache.rocketmq.common.message.Message;
+import org.apache.rocketmq.common.message.MessageQueue;
+
+public interface MessageQueueSelector {
+    MessageQueue select(List&amp;lt;MessageQueue&amp;gt; var1, Message var2, Object var3);
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;&lt;strong&gt;投递策略&lt;/strong&gt;&lt;/th&gt;
+          &lt;th&gt;&lt;strong&gt;策略实现类&lt;/strong&gt;&lt;/th&gt;
+          &lt;th&gt;&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;随机分配策略&lt;/td&gt;
+          &lt;td&gt;SelectMessageQueueByRandom&lt;/td&gt;
+          &lt;td&gt;使用了简单的随机数选择算法&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;基于Hash分配&lt;/td&gt;
+          &lt;td&gt;SelectMessageQueueByHash&lt;/td&gt;
+          &lt;td&gt;根据附加参数的Hash值，按照消&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;2-消费者分配队列&#34;&gt;2. 消费者分配队列
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;BROADCASTING :广播式消费，这种模式下，一个消息会被通知到每一个 消费者&lt;/li&gt;
+&lt;li&gt;CLUSTERING : 集群式消费，这种模式下，一个消息最多只会被投递到一个 消费者 上进行消费&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;平局分配算法, 并不是指的严格意义上的完全平均，如上面的例子中，==10个queue，而 消费者只有4个==，无法是整除关系，除了整除之外的==多出来的queue,将依次根据消费者的顺序均摊==。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;一致性hash分配算法, 会将 consumer消费者 作为Node节点构造成一个hash环，然后 queue队列 通过这个&lt;/p&gt;
+&lt;p&gt;hash环来决定被分配给哪个 consumer消费者 。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;默认消费者使用使用了 AllocateMessageQueueAveragely 平均分配策略&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;//创建一个消息消费者，并设置一个消息消费者组，并指定使用一致性hash算法的分配策略
+DefaultMQPushConsumer consumer = new
+DefaultMQPushConsumer(null,&amp;quot;rocket_test_consumer_group&amp;quot;,null,new
+AllocateMessageQueueConsistentHash());
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;5--rocketmq-消息存储&#34;&gt;5.  rocketMq 消息存储
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;CommitLog：这是消息存储的核心文件，所有的消息都先写入 CommitLog。它是一个顺序写的日志文件，写入性能高。&lt;/li&gt;
+&lt;li&gt;ConsumeQueue：这是消息的逻辑队列，存储了消息在 CommitLog 中的物理偏移量、消息大小和消息的 Tag 哈希值。每个 Topic 下的每个队列都有一个对应的 ConsumeQueue。&lt;/li&gt;
+&lt;li&gt;IndexFile：这是消息的索引文件，存储了消息的索引信息，可以通过消息的 Key 快速查找消息。
+这些文件都存储在磁盘上，&lt;/li&gt;
+&lt;li&gt;Broker 会定期进行刷盘操作，将内存中的数据写入磁盘，保证消息的持久性。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;6-消息保障&#34;&gt;6. 消息保障
+&lt;/h1&gt;&lt;h2 id=&#34;1-生产端保障&#34;&gt;1. 生产端保障
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;使用可靠的消息发送方式,    同步发送比异步发送可靠,  ==两者都可以对消息的响应结果做处理==, 只有one-way(单向模式) 的时候才会不需要处理, 而且==只有同步发送才有重试==, ==并且超时是不会进行重试的==&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;注意生产端重试&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;生产禁止自动创建topic&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;发送重试源码&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;/**
+     * 说明 抽取部分代码
+     */
+    private SendResult sendDefaultImpl(Message msg, final CommunicationMode
+            communicationMode, final SendCallback sendCallback, final long timeout) {
+//1、获取当前时间
+        long beginTimestampFirst = System.currentTimeMillis();
+        long beginTimestampPrev ;
+//2、去服务器看下有没有主题消息
+        TopicPublishInfo topicPublishInfo =
+                this.tryToFindTopicPublishInfo(msg.getTopic());
+        if (topicPublishInfo != null &amp;amp;&amp;amp; topicPublishInfo.ok()) {
+            boolean callTimeout = false;
+//3、通过这里可以很明显看出 如果不是同步发送消息 那么消息重试只有1次
+            int timesTotal = communicationMode == CommunicationMode.SYNC ? 1 +
+                    this.defaultMQProducer.getRetryTimesWhenSendFailed() : 1;
+//4、根据设置的重试次数，循环再去获取服务器主题消息
+            for (times = 0; times &amp;lt; timesTotal; times++) {
+                MessageQueue mqSelected =
+                        this.selectOneMessageQueue(topicPublishInfo, lastBrokerName);
+                beginTimestampPrev = System.currentTimeMillis();
+                long costTime = beginTimestampPrev - beginTimestampFirst;
+//5、前后时间对比 如果前后时间差 大于 设置的等待时间 那么直接跳出for循环了 这就
+                说明连接超时是不进行多次连接重试的
+                if (timeout &amp;lt; costTime) {
+                    callTimeout = true;
+                    break
+                }
+//6、如果超时直接报错
+                if (callTimeout) {
+                    throw new RemotingTooMuchRequestException(&amp;quot;sendDefaultImpl call
+                            timeout&amp;quot;);
+                }
+            }
+        }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;==自动创建topic==&lt;/p&gt;
+&lt;p&gt;autoCreateTopicEnable 设置为true 标识开启自动创建topic&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;消息发送时如果根据topic没有获取到 路由信息，则会根据默认的topic去获取，获取到路由信息后&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;选择一个队列进行发送，发送时报文会带上默认的topic以及默认的队列数量。&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;消息到达broker后，broker检测没有topic的路由信息，则查找默认topic的路由信息，查到表示开&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;启了自动创建topic，则会根据消息内容中的默认的队列数量在本broker上创建topic，然后进行消&lt;/p&gt;
+&lt;p&gt;息存储。&lt;/p&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;&lt;strong&gt;broker创建topic后并不会马上同步给namesrv&lt;/strong&gt;，而是每30进行汇报一次，更新namesrv上的 topic路由信息，producer会每30s进行拉取一次topic的路由信息，更新完成后就可以正常发送消 息。更新之前一直都是按照默认的topic查找路由信息。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;2-消费端保障&#34;&gt;2. 消费端保障
+&lt;/h2&gt;&lt;h3 id=&#34;1-消息确认&#34;&gt;1. 消息确认
+&lt;/h3&gt;&lt;p&gt;业务实现消费回调的时候，当且仅当此回调函数返回 ==ConsumeConcurrentlyStatus.CONSUME_SUCCESS== ，RocketMQ才会认为这批消息（默认是1 条）是消费完成的。&lt;/p&gt;
+&lt;h3 id=&#34;2-消费异常&#34;&gt;2. &lt;strong&gt;消费异常&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;数据库异常，余额不足扣款失败等一切业务认为消息需要重试的场 景，只要返回 ==ConsumeConcurrentlyStatus.RECONSUME_LATER== ，RocketMQ就会认为这批消息 消费失败了。&lt;/p&gt;
+&lt;p&gt;为了保证消息是肯定被至少消费成功一次，RocketMQ会把这批消息重发回Broker（==topic不是原 topic而是这个消费租的RETRY topic==），在延迟的某个时间点（默认是10秒，业务可设置）后，==再次投 递到这个ConsumerGroup==。而如果一直这样重复消费都持续失败到一定次数（默认16次），就会==投递 到DLQ死信队列==。应用可以监控死信队列来做人工干预。&lt;/p&gt;
+&lt;h2 id=&#34;3-死信队列&#34;&gt;3. 死信队列
+&lt;/h2&gt;&lt;p&gt;当一条消息初次消费失败，消息队列 RocketMQ 会自动进行消息重试；&lt;/p&gt;
+&lt;p&gt;达到最大重试次 数后，若 消费依然失败，则表明消费者在正常情况下无法正确地消费该消息，&lt;/p&gt;
+&lt;p&gt;此时，消息队列 RocketMQ 不会立 刻将消息丢弃，而是将其发送到该消费者对应的特殊队列中。 在消息队列 RocketMQ 中，这种正常情况 下无法被消费的消息称为死信消息，存储死信消息的特殊队列称为死信队列&lt;/p&gt;
+&lt;p&gt;==不会再被消费者正常消费==&lt;/p&gt;
+&lt;p&gt;有效期与正常消息相同，均为 3 天，3 天后会被自动删除。故死信消息应在产生的 3 天内及时处理&lt;/p&gt;
+&lt;p&gt;==一个死信队列对应一个消费者组，而不是对应单个消费者实例==&lt;/p&gt;
+&lt;p&gt;一个死信队列包含了对应的 ==Group ID所产生的所有死信消息，不论该消息属于哪个Topic若一个 Group ID 没有产生过死信消息，则 RocketMQ 不会为其创建相应的死信队列==&lt;/p&gt;
+&lt;h1 id=&#34;7-应用&#34;&gt;7. 应用
+&lt;/h1&gt;&lt;h2 id=&#34;1-spring-cloud-stream-整合&#34;&gt;1. spring cloud stream 整合
+&lt;/h2&gt;&lt;p&gt;以统一的一套API来进行消息的发送和消费, 底层消息中间件的实现细节由各消息中间件的 binder 完成&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.jianshu.com/p/7f8fd90564ca?utm_campaign=hugo&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.jianshu.com/p/7f8fd90564ca?utm_campaign=hugo&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;gitee: &lt;a class=&#34;link&#34; href=&#34;https://gitee.com/jbcode/GitRepository.git&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://gitee.com/jbcode/GitRepository.git&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;1-依赖&#34;&gt;1. 依赖
+&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;
+&amp;lt;project xmlns=&amp;quot;http://maven.apache.org/POM/4.0.0&amp;quot;
+         xmlns:xsi=&amp;quot;http://www.w3.org/2001/XMLSchema-instance&amp;quot;
+         xsi:schemaLocation=&amp;quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&amp;quot;&amp;gt;
+
+    &amp;lt;modelVersion&amp;gt;4.0.0&amp;lt;/modelVersion&amp;gt;
+    &amp;lt;groupId&amp;gt;com.erbadagang.springcloud.stream&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;sc-stream-rocketmq-producer&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;0.0.1&amp;lt;/version&amp;gt;
+
+    &amp;lt;properties&amp;gt;
+        &amp;lt;maven.compiler.target&amp;gt;1.8&amp;lt;/maven.compiler.target&amp;gt;
+        &amp;lt;maven.compiler.source&amp;gt;1.8&amp;lt;/maven.compiler.source&amp;gt;
+        &amp;lt;spring.boot.version&amp;gt;2.2.4.RELEASE&amp;lt;/spring.boot.version&amp;gt;
+        &amp;lt;spring.cloud.version&amp;gt;Hoxton.SR1&amp;lt;/spring.cloud.version&amp;gt;
+        &amp;lt;spring.cloud.alibaba.version&amp;gt;2.2.0.RELEASE&amp;lt;/spring.cloud.alibaba.version&amp;gt;
+    &amp;lt;/properties&amp;gt;
+
+    &amp;lt;!--
+        引入 Spring Boot、Spring Cloud、Spring Cloud Alibaba 三者 BOM 文件，进行依赖版本的管理，防止不兼容。
+        在 https://dwz.cn/mcLIfNKt 文章中，Spring Cloud Alibaba 开发团队推荐了三者的依赖关系
+     --&amp;gt;
+    &amp;lt;dependencyManagement&amp;gt;
+        &amp;lt;dependencies&amp;gt;
+            &amp;lt;dependency&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-boot-starter-parent&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;${spring.boot.version}&amp;lt;/version&amp;gt;
+                &amp;lt;type&amp;gt;pom&amp;lt;/type&amp;gt;
+                &amp;lt;scope&amp;gt;import&amp;lt;/scope&amp;gt;
+            &amp;lt;/dependency&amp;gt;
+            &amp;lt;dependency&amp;gt;
+                &amp;lt;groupId&amp;gt;org.springframework.cloud&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-cloud-dependencies&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;${spring.cloud.version}&amp;lt;/version&amp;gt;
+                &amp;lt;type&amp;gt;pom&amp;lt;/type&amp;gt;
+                &amp;lt;scope&amp;gt;import&amp;lt;/scope&amp;gt;
+            &amp;lt;/dependency&amp;gt;
+            &amp;lt;dependency&amp;gt;
+                &amp;lt;groupId&amp;gt;com.alibaba.cloud&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;spring-cloud-alibaba-dependencies&amp;lt;/artifactId&amp;gt;
+                &amp;lt;version&amp;gt;${spring.cloud.alibaba.version}&amp;lt;/version&amp;gt;
+                &amp;lt;type&amp;gt;pom&amp;lt;/type&amp;gt;
+                &amp;lt;scope&amp;gt;import&amp;lt;/scope&amp;gt;
+            &amp;lt;/dependency&amp;gt;
+        &amp;lt;/dependencies&amp;gt;
+    &amp;lt;/dependencyManagement&amp;gt;
+
+    &amp;lt;dependencies&amp;gt;
+        &amp;lt;!-- 引入 SpringMVC 相关依赖，并实现对其的自动配置 --&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-boot-starter-web&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+
+        &amp;lt;!-- 引入 Spring Cloud Alibaba Stream RocketMQ 相关依赖，将 RocketMQ 作为消息队列，并实现对其的自动配置 --&amp;gt;
+        &amp;lt;dependency&amp;gt;
+            &amp;lt;groupId&amp;gt;com.alibaba.cloud&amp;lt;/groupId&amp;gt;
+            &amp;lt;artifactId&amp;gt;spring-cloud-starter-stream-rocketmq&amp;lt;/artifactId&amp;gt;
+        &amp;lt;/dependency&amp;gt;
+    &amp;lt;/dependencies&amp;gt;
+
+&amp;lt;/project&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;2-生产端配置文件&#34;&gt;2. 生产端配置文件
+&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;spring:
+  application:
+    name: stream-rocketmq-producer-application
+  cloud:
+    # Spring Cloud Stream 配置项，对应 BindingServiceProperties 类
+    stream:
+      # Binding 配置项，对应 BindingProperties Map
+      bindings:
+        erbadagang-output:
+          destination: ERBADAGANG-TOPIC-01 # 目的地。这里使用 RocketMQ Topic
+          content-type: application/json # 内容格式。这里使用 JSON
+
+        trek-output:
+          destination: TREK-TOPIC-01 # 目的地。这里使用 RocketMQ Topic
+          content-type: application/json # 内容格式。这里使用 JSON
+      # Spring Cloud Stream RocketMQ 配置项
+      rocketmq:
+        # RocketMQ Binder 配置项，对应 RocketMQBinderConfigurationProperties 类
+        binder:
+          name-server: 101.133.227.13:9876 # RocketMQ Namesrv 地址
+        # RocketMQ 自定义 Binding 配置项，对应 RocketMQBindingProperties Map
+        bindings:
+          erbadagang-output:
+            # RocketMQ Producer 配置项，对应 RocketMQProducerProperties 类
+            producer:
+              group: test # 生产者分组
+              sync: true # 是否同步发送消息，默认为 false 异步。
+
+server:
+  port: 18080
+
+# 同时我们设置了2个binding，模拟2个topic情形。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;3--消费端配置文件&#34;&gt;3.  消费端配置文件
+&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;spring:
+  application:
+    name: erbadagang-consumer-application
+  cloud:
+    # Spring Cloud Stream 配置项，对应 BindingServiceProperties 类
+    stream:
+      # Binding 配置项，对应 BindingProperties Map
+      bindings:
+        erbadagang-input:
+          destination: ERBADAGANG-TOPIC-01 # 目的地。这里使用 RocketMQ Topic
+          content-type: application/json # 内容格式。这里使用 JSON
+          group: erbadagang-consumer-group-ERBADAGANG-TOPIC-01 # 消费者分组,命名规则：组名+topic名
+
+        trek-input:
+          destination: TREK-TOPIC-01 # 目的地。这里使用 RocketMQ Topic
+          content-type: application/json # 内容格式。这里使用 JSON
+          group: trek-consumer-group-TREK-TOPIC-01 # 消费者分组,命名规则：组名+topic名
+      # Spring Cloud Stream RocketMQ 配置项
+      rocketmq:
+        # RocketMQ Binder 配置项，对应 RocketMQBinderConfigurationProperties 类
+        binder:
+          name-server: 101.133.227.13:9876 # RocketMQ Namesrv 地址
+        # RocketMQ 自定义 Binding 配置项，对应 RocketMQBindingProperties Map
+        bindings:
+          erbadagang-input:
+            # RocketMQ Consumer 配置项，对应 RocketMQConsumerProperties 类
+            consumer:
+              enabled: true # 是否开启消费，默认为 true
+              broadcasting: false # 是否使用广播消费，默认为 false 使用集群消费，如果要使用广播消费值设成true。
+
+server:
+  port: ${random.int[10000,19999]} # 随机端口，方便启动多个消费者
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol&gt;
+&lt;li&gt;发送消息 @OutPut&lt;/li&gt;
+&lt;li&gt;接受消息 @ Input&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;2-springboot-集成-rocketmq&#34;&gt;2. springboot 集成 rocketMq
+&lt;/h2&gt;&lt;h3 id=&#34;1-知识点-泛型方法&#34;&gt;1. 知识点: 泛型方法
+&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;private static &amp;lt;T&amp;gt; void getConsumer() {
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/zxl646801924/article/details/105659481&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://blog.csdn.net/zxl646801924/article/details/105659481&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;2-rocketmq-spring-boot-starter&#34;&gt;2. rocketmq-spring-boot-starter
+&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/m0_37968982/article/details/109066088&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://blog.csdn.net/m0_37968982/article/details/109066088&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4 id=&#34;1-引入依赖&#34;&gt;1. 引入依赖
+&lt;/h4&gt;&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;&amp;lt;dependency&amp;gt;
+    &amp;lt;groupId&amp;gt;org.apache.rocketmq&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;rocketmq-spring-boot-starter&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;2.1.0&amp;lt;/version&amp;gt;
+&amp;lt;/dependency&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;2-配置rocketmq&#34;&gt;2. 配置rocketMq
+&lt;/h4&gt;&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;rocketmq:
+  name-server: 127.0.0.1:9876
+  producer:
+    group: my-producer-group
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;3-构建生产者&#34;&gt;3. 构建生产者
+&lt;/h4&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@RestController
+public class Producer {
+
+    @Autowired
+    private RocketMQTemplate rocketMQTemplate;
+
+    @GetMapping(&amp;quot;send&amp;quot;)
+    public void send(){
+
+        rocketMQTemplate.convertAndSend(&amp;quot;first-topic&amp;quot;,&amp;quot;你好,Java旅途&amp;quot;);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;4-消费者&#34;&gt;4. 消费者
+&lt;/h4&gt;&lt;pre&gt;&lt;code&gt;@Component
+@RocketMQMessageListener(topic = &amp;quot;first-topic&amp;quot;,consumerGroup = &amp;quot;my-consumer-group&amp;quot;)
+@Slf4j
+public class Consumer implements RocketMQListener&amp;lt;String&amp;gt; {
+
+    @Override
+    public void onMessage(String message) {
+        log.info(&amp;quot;我收到消息了！消息内容为：&amp;quot;+message);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;3-打车服务&#34;&gt;3. 打车服务
+&lt;/h2&gt;&lt;h3 id=&#34;1-车辆调度&#34;&gt;1. 车辆调度
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rocketmq/images/image-20240612163426938.png&#34;
+	width=&#34;1187&#34;
+	height=&#34;748&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240612163426938&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;158&#34;
+		data-flex-basis=&#34;380px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;2-司机自动接单&#34;&gt;2. 司机自动接单
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rocketmq/images/image-20240612163538833.png&#34;
+	width=&#34;1220&#34;
+	height=&#34;493&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240612163538833&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;247&#34;
+		data-flex-basis=&#34;593px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;3-用户下车&#34;&gt;3. 用户下车
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rocketmq/images/image-20240612163602860.png&#34;
+	width=&#34;1168&#34;
+	height=&#34;763&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240612163602860&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;153&#34;
+		data-flex-basis=&#34;367px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;4-总体流程&#34;&gt;4. 总体流程
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rocketmq/images/image-20240612163932221.png&#34;
+	width=&#34;1212&#34;
+	height=&#34;730&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240612163932221&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;166&#34;
+		data-flex-basis=&#34;398px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;4--rocketmqpushconsumerlifecyclelistener-接口&#34;&gt;4.  RocketMQPushConsumerLifecycleListener 接口
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;RocketMQPushConsumerLifecycleListener&lt;/code&gt; 是一个用于管理 RocketMQ 推送消费者生命周期的接口。实现这个接口的类可以在==消费者启动前和启动后执行一些自定义逻辑==。&lt;/p&gt;
+&lt;p&gt;示例&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class MyConsumerLifecycleListener implements RocketMQPushConsumerLifecycleListener {
+
+    @Override
+    public void prepareStart(DefaultMQPushConsumer consumer) {
+        // 在消费者启动前执行一些初始化操作
+        consumer.setConsumeThreadMax(10); // 设置最大消费线程数
+        System.out.println(&amp;quot;Consumer is about to start.&amp;quot;);
+    }
+
+    @Override
+    public void prepareShutdown(DefaultMQPushConsumer consumer) {
+        // 在消费者关闭前执行一些清理操作
+        System.out.println(&amp;quot;Consumer is about to shut down.&amp;quot;);
+    }
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;8--任务&#34;&gt;8.  任务
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;&lt;del&gt;复习文档&lt;/del&gt;&lt;/li&gt;
+&lt;li&gt;整理面试题&lt;/li&gt;
+&lt;li&gt;查看代码使用&lt;/li&gt;
+&lt;li&gt;&lt;del&gt;复述 rocket 打车&lt;/del&gt;&lt;/li&gt;
+&lt;li&gt;&lt;del&gt;搭建一个本机的 rocketMq&lt;/del&gt;&lt;/li&gt;
+&lt;li&gt;kafka 进行学习&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;9-rocketmq-的事务消息&#34;&gt;9. RocketMq 的事务消息
+&lt;/h1&gt;&lt;p&gt;面试官：什么是RocketMQ的事务消息&lt;/p&gt;
+&lt;p&gt;事务消息就是MQ提供的类似XA的分布式事务能力，通过事务消息可以达到分布式事务的最终一致性。&lt;/p&gt;
+&lt;p&gt;半事务消息就是MQ收到了生产者的消息，但是没有收到二次确认，不能投递的消息。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;4.1&lt;/strong&gt; &lt;strong&gt;实现原理&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;生产者先发送一条半事务消息到MQ&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;MQ收到消息后返回ack确认&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;生产者开始执行本地事务&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果事务执行成功发送commit到MQ，失败发送rollback&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果MQ长时间未收到生产者的二次确认commit或者rollback，MQ对生产者发起消息回查&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;生产者查询事务执行最终状态&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;根据查询事务状态再次提交二次确认&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;最终，如果MQ收到二次确认commit，就可以把消息投递给消费者，反之如果是rollback，消息会保存下来并且在==3天后被删除==。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rocketmq/images/image-20220217104845523.png&#34;
+	width=&#34;713&#34;
+	height=&#34;289&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220217104845523&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;246&#34;
+		data-flex-basis=&#34;592px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;10-消费者闲置&#34;&gt;10. 消费者闲置
+&lt;/h1&gt;&lt;p&gt;在使用 RocketMQ 时，如果存在多个消费者，但某些消费者闲置不接收消息&lt;/p&gt;
+&lt;p&gt;消费者分组在 RocketMQ 中起着重要作用。一个消费者分组中的所有消费者共同消费主题中的消息。消息队列（queue）会在同一个分组的消费者之间均匀分配：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;消费者分组内部的消费者不均衡&lt;/strong&gt;：==如果消费者数量大于消息队列的数量==，则多出的消费者会闲置。例如，如果一个主题有4个消息队列，但有5个消费者在同一个分组内，那么多出的一个消费者将不会分配到任何队列，从而闲置。&lt;/li&gt;
+&lt;li&gt;==类似于kafka 中的分区数量少于 消费者数量==&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
+        <title>Kafka</title>
+        <link>https://mikeLing-qx.github.io/p/kafka/</link>
+        <pubDate>Wed, 15 May 2024 16:13:29 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/kafka/</guid>
+        <description>&lt;h1 id=&#34;1-基础组件&#34;&gt;1. 基础组件
+&lt;/h1&gt;&lt;h2 id=&#34;1-角色&#34;&gt;1. 角色
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kafka/images/image-20240618162759039.png&#34;
+	width=&#34;1277&#34;
+	height=&#34;744&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240618162759039&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;171&#34;
+		data-flex-basis=&#34;411px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;broker：节点，就是你看到的机器&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;provider：生产者，发消息的&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;consumer：消费者，读消息的&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;zookeeper：信息中心，记录kafka的各种信息的地方&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;==controller==：其中的一个broker，作为leader身份来负责管理整个集群。如果挂掉，借助zk重新选&lt;/p&gt;
+&lt;p&gt;主&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;controller_epoch:   leader身份变更的次数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;​&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;2-副本集合&#34;&gt;2. 副本集合
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;topic：主题，一个消息的通道，收发总得知道消息往哪投&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;partition：分区，==每个主题可以有多个分区分担数据的传递==，多条路并行，吞吐量大&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Replicas：副本，==每个分区可以设置多个副本==，副本之间数据一致。相当于备份，有备胎更可靠&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;leader &amp;amp; follower：主从，上面的这些副本里有1个身份为leader，其他的为follower。leader处理&lt;/p&gt;
+&lt;p&gt;partition的所有读写请求&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kafka/images/image-20240618151317793.png&#34;
+	width=&#34;1362&#34;
+	height=&#34;700&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240618151317793&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;194&#34;
+		data-flex-basis=&#34;466px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;AR（Assigned Repllicas）：所有副本的统称，AR=ISR+OSR&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ISR（In-Sync Replicas）：同步中的副本，可以参与leader选主。一旦落后太多（数量滞后和时间&lt;/p&gt;
+&lt;p&gt;滞后两个维度）会被踢到OSR。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;OSR（Out-Sync Relipcas）：踢出同步的副本，一直追赶leader，追上后会进入ISR&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;3-消息标记&#34;&gt;3. 消息标记
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kafka/images/image-20240617191541864.png&#34;
+	width=&#34;1026&#34;
+	height=&#34;475&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240617191541864&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;216&#34;
+		data-flex-basis=&#34;518px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kafka/images/image-20240617191603504.png&#34;
+	width=&#34;1047&#34;
+	height=&#34;510&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240617191603504&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;205&#34;
+		data-flex-basis=&#34;492px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;==offset==  每条消息在Kafka==分区中都有一个唯一的offset==，它被用来==标记消息在分区（Partition）中的位置==。这是一个递增的==长整数值==。消费者使用这个offset来跟踪他们在每个分区已经读到的位置。当消费者消费了一条消息之后，它需要更新保存的offset值。下次消费时，它会从保存的offset值开始消费。&lt;/p&gt;
+&lt;p&gt;这是Kafka中消费者消费消息的核心机制，因为Kafka本身并不追踪哪些消息已经被消费，这个工作是由消费者自己完成的。&lt;/p&gt;
+&lt;p&gt;==需要注意的是==，Kafka允许消费者提交他们已经处理到的offset。这样，如果消费者崩溃了并再次启动，它可以从上次提交的offset开始消费，避免重复处理相同的消息。然而，这也意味着如果你的==消费者崩溃在提交offset和处理消息之间的时间窗口，你可能会重复消费一些消息==。这就需要你的处理逻辑具备幂等性，即重复处理相同的消息不会导致问题。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;High Watermark）和 LEO（最后日志偏移量，Log End Offset）是两个非常重要的概念，它们主要用于消息的处理和数据的同步。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;==HW（High Watermark）==： 高水位是代表了==消费者能够消费到的最大的 offset==。也就是说，高于这个标记的消息对消费者是不可见的。当 follower 副本将 leader 副本中的消息复制到本地之后，它就会把自己的 HW 更新到和 leader 副本的 HW 一致。只有当所有的 follower 副本的 HW 都已经达到消息的 offset 时，这条消息才认为是 &amp;ldquo;已提交&amp;rdquo;（committed），也只有 &amp;ldquo;已提交&amp;rdquo; 的消息才可以被消费者消费。&lt;/li&gt;
+&lt;li&gt;==LEO（Log End Offset）==：LEO 是每个副本（包括 leader 副本和 follower 副本）最新消息的 offset + 1。换句话说，LEO 代表了下一条消息将要写入的位置。在正常情况下，leader 副本的 LEO 是大于等于 follower 副本的 LEO 的，当 follower 成功从 leader 复制消息之后，它的 LEO 会增大。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;2-kafka-搭建&#34;&gt;2. kafka 搭建
+&lt;/h1&gt;&lt;p&gt;使用wsl&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;启动命令
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-yml&#34;&gt;#docker-compose.yml
+#注意hostname问题，ip地址：192.168.10.30，换成你自己服务器的
+#docker-compose up -d 启动
+version: &#39;3&#39;
+services:
+    zookeeper:
+        image: zookeeper:3.4.13
+
+    kafka-1:
+        container_name: kafka-1
+        image: wurstmeister/kafka:2.12-2.2.2
+        ports:
+            - 10903:9092
+        environment:
+            KAFKA_BROKER_ID: 1 
+            HOST_IP: kafka-1
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            #docker部署必须设置外部可访问ip和端口，否则注册进zk的地址将不可达造成外部无法连接
+            KAFKA_ADVERTISED_HOST_NAME: kafka-1
+            KAFKA_ADVERTISED_PORT: 9092
+        volumes:
+            - /etc/localtime:/etc/localtime
+        depends_on:
+            - zookeeper           
+    kafka-2:
+        container_name: kafka-2
+        image: wurstmeister/kafka:2.12-2.2.2
+        ports:
+            - 10904:9092
+        environment:
+            KAFKA_BROKER_ID: 2 
+            HOST_IP: kafka-2
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            KAFKA_ADVERTISED_HOST_NAME: kafka-2
+            KAFKA_ADVERTISED_PORT: 9092 
+        volumes:
+            - /etc/localtime:/etc/localtime
+        depends_on:
+            - zookeeper 
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;2024-06-19 17:09:01 [2024-06-19 09:09:01,482] WARN [Controller id=2, targetBrokerId=2] Connection to node 2 (/127.0.0.1:10904) could not be established. Broker may not be available. (org.apache.kafka.clients.NetworkClient)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;3-kafka命令行工具&#34;&gt;3. Kafka命令行工具
+&lt;/h1&gt;&lt;p&gt;消费者数量如果大于分区数量可能会出现, 有消费者为闲置的情况&lt;/p&gt;
+&lt;h2 id=&#34;1-主题创建&#34;&gt;1. 主题创建
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;#进入容器
+docker exec -it kafka-1 bash
+#进入bin目录
+cd /opt/kafka/bin
+#创建
+kafka-topics.sh --zookeeper zookeeper:2181 --create --topic test --partitions 2 --replication-factor 1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-查看主题&#34;&gt;2. 查看主题
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;kafka-topics.sh --zookeeper zookeeper:2181 --list
+
+kafka-topics.sh --zookeeper zookeeper:2181 --describe --topic test
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kafka/images/image-20240619150039410.png&#34;
+	width=&#34;717&#34;
+	height=&#34;110&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240619150039410&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;651&#34;
+		data-flex-basis=&#34;1564px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;3-消息收发&#34;&gt;3. 消息收发
+&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;#使用docker连接任意集群中的一个容器
+docker exec -it kafka-1 sh
+
+#进入kafka的容器内目录
+cd /opt/kafka/bin
+
+#客户端监听
+kafka-console-consumer.sh --bootstrap-server kafka-1:9092,kafka-2:9092 --topic test
+
+#另起一个终端，验证发送
+kafka-console-producer.sh --broker-list kafka-1:9092,kafka-2:9092 --topic test
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;4-分组消费&#34;&gt;4. 分组消费
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;5-消息同步&#34;&gt;5. 消息同步
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kafka/images/image-20240717115213050.png&#34;
+	width=&#34;1441&#34;
+	height=&#34;905&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240717115213050&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;159&#34;
+		data-flex-basis=&#34;382px&#34;
+	
+&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>RabbitMq_2</title>
+        <link>https://mikeLing-qx.github.io/p/rabbitmq_2/</link>
+        <pubDate>Thu, 10 Aug 2023 16:15:39 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/rabbitmq_2/</guid>
+        <description>&lt;h1 id=&#34;rabbitmq高级特性二&#34;&gt;RabbitMQ高级特性（二）
+&lt;/h1&gt;&lt;p&gt;课程回顾：消息队列MQ&lt;/p&gt;
+&lt;p&gt;1、MQ的介绍&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;概念：消息队列，在消息传输过程中用来&lt;strong&gt;保存消息的容器&lt;/strong&gt;。 目的：完成应用间的相互通信。&lt;/li&gt;
+&lt;li&gt;使用场景：
+&lt;ul&gt;
+&lt;li&gt;业务的解耦&lt;/li&gt;
+&lt;li&gt;异步通信&lt;/li&gt;
+&lt;li&gt;流量削峰&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;产品：ActiveMQ、RabbitMQ、RocketMQ、Kafka&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;2、RabbitMQ介绍以及安装&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;介绍：略（erlang语言开发的）&lt;/li&gt;
+&lt;li&gt;安装：先安装erlang开发环境   +    再RabbitMQ【计算机名称不能为中文的】&lt;/li&gt;
+&lt;li&gt;配置：用户名  、 虚拟主机&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;3、RabbitMQ入门程序：使用的是MQ的简单模式&lt;/p&gt;
+&lt;p&gt;4、RabbitMQ的通信方式：五种&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;简单模式&lt;/li&gt;
+&lt;li&gt;工作模式&lt;/li&gt;
+&lt;li&gt;P/S模式：fanout，广播&lt;/li&gt;
+&lt;li&gt;路由模式：Direct，定向      将消息进行分类，将消息发送到各个满足条件的队列中&lt;/li&gt;
+&lt;li&gt;主题模式：Topic，主题        将消息进行分类，路由器是进行匹配规则    *：0个1个  #：0个1个多个&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;5、SpringBoot集成RabbitMQ【目的：减少代码开发】&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;编写生产者：略&lt;/li&gt;
+&lt;li&gt;编写消费者：编写监听器     @RabbitListener&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;课程计划：&lt;/p&gt;
+&lt;p&gt;1、消息的可靠性投递&lt;/p&gt;
+&lt;p&gt;2、消费端ack【确认】机制&lt;/p&gt;
+&lt;p&gt;3、消费端限流&lt;/p&gt;
+&lt;p&gt;4、延时队列【TTL、DLX】&lt;/p&gt;
+&lt;p&gt;5、RabbitMQ相关应用问题【了解】&lt;/p&gt;
+&lt;p&gt;6、RabbitMQ集群【了解】   运维人员&lt;/p&gt;
+&lt;h1 id=&#34;1-消息的可靠性投递&#34;&gt;1 消息的可靠性投递
+&lt;/h1&gt;&lt;h2 id=&#34;11-什么是可靠性投递&#34;&gt;1.1 什么是可靠性投递
+&lt;/h2&gt;&lt;p&gt;在使用RabbitMQ的时候，作为消息的发送方希望杜绝任何&lt;strong&gt;消息丢失或者投递失败&lt;/strong&gt;的场景。如果消息投递失败，RabbitMQ为我们提供了两种模式用来控制消息的可靠投递。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;confirm：确认模式&lt;/li&gt;
+&lt;li&gt;return：退回模式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;-&lt;/p&gt;
+&lt;p&gt;我们都知道MQ消息投递的流程，producer&amp;mdash;&amp;gt;exchange&amp;mdash;&amp;gt;routingKey&amp;mdash;&amp;gt;queue&amp;mdash;&amp;gt;consumer。如图所示：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589253589529.png&#34;
+	width=&#34;919&#34;
+	height=&#34;203&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589253589529&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;452&#34;
+		data-flex-basis=&#34;1086px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;那么这两种模式又是如何工作的呢？&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;confirm模式：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;首先需要开启confirm模式&lt;/li&gt;
+&lt;li&gt;消息&lt;strong&gt;从producer到达exchange&lt;/strong&gt;后，会执行一个confirmCallback回调函数&lt;/li&gt;
+&lt;li&gt;该回调函数的方法中有个ack参数
+&lt;ul&gt;
+&lt;li&gt;ack = true，则发送成功&lt;/li&gt;
+&lt;li&gt;ack = false，则发送失败&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;return模式：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;首先需要开启return模式&lt;/li&gt;
+&lt;li&gt;消息从exchange路由到queue后
+&lt;ul&gt;
+&lt;li&gt;如果投递成功，不会执行一个returnCallback回调函数&lt;/li&gt;
+&lt;li&gt;如果投递失败，则会执行一个returnCallback回调函数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;12-confirm模式&#34;&gt;1.2 confirm模式
+&lt;/h2&gt;&lt;h3 id=&#34;121-创建工程&#34;&gt;1.2.1 创建工程
+&lt;/h3&gt;&lt;p&gt;创建&lt;code&gt;&amp;lt;rabbitmq-day02-demo1-reliable&amp;gt;&lt;/code&gt;工程并且添加依赖&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589255639549.png&#34;
+	width=&#34;1129&#34;
+	height=&#34;228&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589255639549&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;495&#34;
+		data-flex-basis=&#34;1188px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;pom文件：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;!--起步依赖--&amp;gt;
+&amp;lt;parent&amp;gt;
+    &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;spring-boot-starter-parent&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;2.1.4.RELEASE&amp;lt;/version&amp;gt;
+&amp;lt;/parent&amp;gt;
+&amp;lt;dependencies&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-amqp&amp;lt;/artifactId&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+&amp;lt;/dependencies&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;122-编写启动类&#34;&gt;1.2.2 编写启动类
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;&amp;lt;com.itheima.ReliableApplication&amp;gt;&lt;/code&gt;编写启动类:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589982295928.png&#34;
+	width=&#34;1401&#34;
+	height=&#34;364&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589982295928&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;384&#34;
+		data-flex-basis=&#34;923px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@SpringBootApplication
+public class ReliableApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ReliableApplication.class, args);
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;123-编写创建队列的配置类&#34;&gt;1.2.3 编写创建队列的配置类
+&lt;/h3&gt;&lt;p&gt;创建配置类&lt;code&gt;&amp;lt;com.itheima.config.ConfirmQueueConfig&amp;gt;&lt;/code&gt;   或者 我们也可以在启动类中创建队列。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589982627103.png&#34;
+	width=&#34;1368&#34;
+	height=&#34;667&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589982627103&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;205&#34;
+		data-flex-basis=&#34;492px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Configuration
+public class ConfirmQueueConfig {
+
+    // 创建队列
+    @Bean
+    public Queue confirmQueue(){
+        return new Queue(&amp;quot;confirm-queue&amp;quot;, true);
+    }
+
+    // 创建交换机
+    @Bean
+    public Exchange confirmExchange(){
+        return new DirectExchange(&amp;quot;confirm-exchange&amp;quot;, true, false);
+    }
+
+    // 队列绑定到交换机
+    @Bean
+    public Binding queueBindToExchange(Queue confirmQueue, Exchange confirmExchange){
+        return BindingBuilder.bind(confirmQueue).to(confirmExchange).with(&amp;quot;confirm-routing-key&amp;quot;).noargs();
+    }
+}
+	
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;124-添加yml文件&#34;&gt;1.2.4 添加yml文件
+&lt;/h3&gt;&lt;p&gt;在resources目录下添加application.yml文件：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    # 开启confirm模式
+    publisher-confirms: true
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589260159231.png&#34;
+	width=&#34;788&#34;
+	height=&#34;255&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589260159231&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;309&#34;
+		data-flex-basis=&#34;741px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;125-编写单元测试&#34;&gt;1.2.5 编写单元测试
+&lt;/h3&gt;&lt;p&gt;在test包下编写单元测试类：&lt;code&gt;&amp;lt;com.itheima.ReliableTest&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@SpringBootTest
+@RunWith(SpringRunner.class)
+public class ReliableTest {
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    /**
+     * @author 栗子
+     * @Description confirm模式测试
+     * @Date 13:15 2020/5/12
+     * @param
+     * @return void
+     **/
+    @Test
+    public void testConfirm(){
+        // 1、设置回调函数
+        rabbitTemplate.setConfirmCallback(new RabbitTemplate.ConfirmCallback() {
+            /**
+             * @author 栗子
+             * @Description
+             * @Date 13:15 2020/5/12
+             * @param correlationData   其他相关属性
+             * @param ack               应答，成功或失败
+             * @param cause             失败原因
+             * @return void
+             **/
+            @Override
+            public void confirm(CorrelationData correlationData, boolean ack, String cause) {
+                if (ack){
+                    System.out.println(&amp;quot;我成功接收到消息了。。。&amp;quot;);
+                }else {
+                    System.out.println(&amp;quot;我没有接收得到消息，原因是：&amp;quot; + cause);
+                }
+            }
+        });
+        // 2-1、正确发送消息
+        rabbitTemplate.convertAndSend(&amp;quot;confirm-exchange&amp;quot;, &amp;quot;confirm-routing-key&amp;quot;, &amp;quot;confirm确认模式。。。&amp;quot;);
+        // 2-2、错误发送消息，我们可以指定一个不存在的交换机
+        // rabbitTemplate.convertAndSend(&amp;quot;confirm-exchange-001&amp;quot;, &amp;quot;confirm-routing-key&amp;quot;, &amp;quot;confirm确认模式。。。&amp;quot;);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;126-测试结果&#34;&gt;1.2.6 测试结果
+&lt;/h3&gt;&lt;p&gt;发送消息成功：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589261244520.png&#34;
+	width=&#34;1394&#34;
+	height=&#34;545&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589261244520&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;255&#34;
+		data-flex-basis=&#34;613px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;发送消息失败：&lt;strong&gt;【温馨提示：confirm模式只针对交换机，因此在测试过程中指定错误路由则callback回调函数中的ack依然为true。】&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589261285720.png&#34;
+	width=&#34;1403&#34;
+	height=&#34;546&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589261285720&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;256&#34;
+		data-flex-basis=&#34;616px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;13-return模式&#34;&gt;1.3 return模式
+&lt;/h2&gt;&lt;h3 id=&#34;131-创建队列&#34;&gt;1.3.1 创建队列
+&lt;/h3&gt;&lt;p&gt;编写创建队列的配置类&lt;code&gt;&amp;lt;com.itheima.config.ReturnQueueConfig&amp;gt;&lt;/code&gt;。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Configuration
+public class ReturnQueueConfig {
+
+    // 创建队列
+    @Bean
+    public Queue returnQueue(){
+        return new Queue(&amp;quot;return-queue&amp;quot;, true);
+    }
+
+    // 创建交换机
+    @Bean
+    public Exchange returnExchange(){
+        return new DirectExchange(&amp;quot;return-exchange&amp;quot;, true, false);
+    }
+
+    // 队列绑定到交换机
+    @Bean
+    public Binding queueBindToExchangeByReturn(Queue returnQueue, Exchange returnExchange){
+        return BindingBuilder.bind(returnQueue).to(returnExchange).with(&amp;quot;return-routing-key&amp;quot;).noargs();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;132-编写yml文件&#34;&gt;1.3.2 编写yml文件
+&lt;/h3&gt;&lt;p&gt;开启return模式。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    # 开启confirm模式
+    publisher-confirms: true
+    # 开启return模式
+    publisher-returns: true
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589266554102.png&#34;
+	width=&#34;528&#34;
+	height=&#34;245&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589266554102&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;215&#34;
+		data-flex-basis=&#34;517px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;133-编写单元测试&#34;&gt;1.3.3 编写单元测试
+&lt;/h3&gt;&lt;p&gt;在&lt;code&gt;&amp;lt;ReliableTest&amp;gt;&lt;/code&gt;测试类中添加方法：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test
+public void testReturn(){
+    // 1、消息处理方式 true：消息通过交换机无法匹配到队列时会返回给生产者  false：匹配不到直接丢弃消息
+    //        rabbitTemplate.setMandatory(true); // 默认则为true，如果设置为false就算发送失败也不会执行callback方法，因为消息被丢弃
+    // 2、设置回调函数
+    rabbitTemplate.setReturnCallback(new RabbitTemplate.ReturnCallback() {
+        /**
+             * @author 栗子
+             * @Description
+             * @Date 15:08 2020/5/12
+             * @param message    消息体
+             * @param replyCode  响应码
+             * @param replyText  响应信息
+             * @param exchange
+             * @param routingKey
+             * @return void
+             **/
+        @Override
+        public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {
+            System.out.println(&amp;quot;消息路由失败会执行该方法。。。&amp;quot;);
+            System.out.println(&amp;quot;发送的消息体：&amp;quot; + new String(message.getBody()));
+            System.out.println(&amp;quot;响应码：&amp;quot; + replyCode);
+            System.out.println(&amp;quot;响应信息：&amp;quot; + replyText);
+        }
+    });
+    // 3-1、正确发送消息
+    //         rabbitTemplate.convertAndSend(&amp;quot;test-return-exchange&amp;quot;, &amp;quot;test-return-routing-key&amp;quot;, &amp;quot;return退回模式。。。&amp;quot;);
+    // 3-2、错误发送消息，我们可以指定一个不存在的路由
+    rabbitTemplate.convertAndSend(&amp;quot;test-return-exchange&amp;quot;, &amp;quot;test-return-routing-key-001&amp;quot;, &amp;quot;return退回模式。。。&amp;quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;134-测试结果&#34;&gt;1.3.4 测试结果
+&lt;/h3&gt;&lt;p&gt;PS：当程序中指定一个不存在的routingKey的时候，发送失败则会触发returnCallback回调方法。（温馨提示：指定错误的exchange无效。）&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589267616853.png&#34;
+	width=&#34;1693&#34;
+	height=&#34;561&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589267616853&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;301&#34;
+		data-flex-basis=&#34;724px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;14-总结&#34;&gt;1.4 总结
+&lt;/h2&gt;&lt;p&gt;1、confirm确认模式：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;开启confirm模式（application.yml   &lt;strong&gt;spring.publisher-confirms=true&lt;/strong&gt;）&lt;/li&gt;
+&lt;li&gt;设置回调函数：rabbitTemplate.setConfirmCallback
+&lt;ul&gt;
+&lt;li&gt;若ack=true，消息投递成功&lt;/li&gt;
+&lt;li&gt;若ack=false，消息投递失败&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;2、return退回模式：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;开启return模式（application.yml   &lt;strong&gt;spring.publisher-returns=true&lt;/strong&gt;）&lt;/li&gt;
+&lt;li&gt;设置消息处理方式：rabbitTemplate.setMandatory(true) 【可以省略，默认为true。】&lt;/li&gt;
+&lt;li&gt;设置回调函数：rabbitTemplate.setReturnCallback
+&lt;ul&gt;
+&lt;li&gt;投递失败，则会执行该方法。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;2-消费端ack机制&#34;&gt;2 消费端ack机制
+&lt;/h1&gt;&lt;h2 id=&#34;21-什么是ack&#34;&gt;2.1 什么是ack
+&lt;/h2&gt;&lt;p&gt;在第一章节中我们就生产者发送消息如何保证消息可靠性投递进行了处理，也就是说需要保证消息能够成功发送到broker中，但是如果消费者消费消息失败那又该如何处理呢？&lt;/p&gt;
+&lt;p&gt;如果在处理消息的过程中，消费者的服务在处理消息的时候出现异常，那么可能这条正在处理的消息就没有完成消息消费，数据就会丢失。为了确保数据不会丢失，RabbitMQ支持&lt;strong&gt;确认机制&lt;/strong&gt;ACK （Acknowledge）。&lt;/p&gt;
+&lt;p&gt;消费端接收到消息后有三种ack方式：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;自动确认：ack = &amp;ldquo;none&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;手动确认：ack = &amp;ldquo;manual&amp;rdquo;&lt;/li&gt;
+&lt;li&gt;根据异常确认（少，不考虑）：ack = &amp;ldquo;auto&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;自动确认是指，消息一旦被consumer接收到则自动确认收到，并将相应的message从RabbitMQ的消息缓存中移除。但是在实际的业务处理中，很可能是消息被接收到了，但是业务处理出现了异常，那么消息从缓存中移除即该消息就被丢弃了。如果设置了手动确认，则需要在业务处理成功后，调用&lt;strong&gt;channel.basicAck()方法手动签收&lt;/strong&gt;，如果出现了异常，则调用&lt;strong&gt;channel.basicNack()方法，让其自动重发消息&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;总结：ack机制，确认机制（消费者对mq中的消息进行确认）&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;手动确认，获取到消息&amp;mdash;&amp;gt;消费消息【处理业务】&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;消费成功：签收   &lt;strong&gt;channel.basicAck(id, true)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;消费失败：将消息重回队列中  &lt;strong&gt;channel.basicNack()&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;22-ack代码实现&#34;&gt;2.2 ack代码实现
+&lt;/h2&gt;&lt;h3 id=&#34;221-创建工程&#34;&gt;2.2.1 创建工程
+&lt;/h3&gt;&lt;p&gt;创建工程&lt;code&gt;&amp;lt;rabbitmq-day02-demo2-ack&amp;gt;&lt;/code&gt;并且添加依赖。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589272481648.png&#34;
+	width=&#34;1106&#34;
+	height=&#34;189&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589272481648&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;585&#34;
+		data-flex-basis=&#34;1404px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;pom.xml文件：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;!--起步依赖--&amp;gt;
+&amp;lt;parent&amp;gt;
+    &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;spring-boot-starter-parent&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;2.1.4.RELEASE&amp;lt;/version&amp;gt;
+&amp;lt;/parent&amp;gt;
+&amp;lt;dependencies&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-amqp&amp;lt;/artifactId&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-web&amp;lt;/artifactId&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+&amp;lt;/dependencies&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;222-编写启动类&#34;&gt;2.2.2 编写启动类
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589272614817.png&#34;
+	width=&#34;1190&#34;
+	height=&#34;353&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589272614817&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;337&#34;
+		data-flex-basis=&#34;809px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@SpringBootApplication
+public class AckApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(AckApplication.class, args);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;223-添加applicationyml文件&#34;&gt;2.2.3 添加application.yml文件
+&lt;/h3&gt;&lt;p&gt;在resources目录下添加yml文件：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    # 消息确认方式
+    listener:
+      simple:
+        acknowledge-mode: manual  # 手动确认
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;224-编写监听器&#34;&gt;2.2.4 编写监听器
+&lt;/h3&gt;&lt;p&gt;在&lt;code&gt;&amp;lt;com.itheima.listener&amp;gt;包下创建AckListener监听器&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Component
+@RabbitListener(queues = {&amp;quot;confirm-queue&amp;quot;})
+public class AckListener {
+
+    @RabbitHandler
+    public void readMsg(String msg, Message message, Channel channel){
+        System.out.println(&amp;quot;获取到的消息体：&amp;quot; + new String(message.getBody()));
+        long id = message.getMessageProperties().getDeliveryTag();
+        try {
+            System.out.println(&amp;quot;业务处理成功...&amp;quot;);
+            // 业务处理成功：手动签收
+            channel.basicAck(id, true);
+        } catc h (Exception e) {
+            System.out.println(&amp;quot;业务处理失败...&amp;quot;);
+            try {
+                Thread.sleep(2000); // 消息每隔2s发送一次
+                // 业务处理失败：拒收，并且让消息重回队列
+                channel.basicNack(id, true, true);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;225-测试&#34;&gt;2.2.5 测试
+&lt;/h3&gt;&lt;p&gt;我们可以模拟一个业务处理失败的场景。例如：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589986335087.png&#34;
+	width=&#34;953&#34;
+	height=&#34;596&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589986335087&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;159&#34;
+		data-flex-basis=&#34;383px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;23-总结&#34;&gt;2.3 总结
+&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;MQ消息的可靠性：
+1、持久化：exchange、queue、message都需要持久化
+2、生产者确保消息被成功发送，confirm
+3、消费者保证消息被消费，ack
+4、搭建Broker(mq服务)的高可用性
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;3-消费端限流&#34;&gt;3 消费端限流
+&lt;/h1&gt;&lt;h2 id=&#34;31-限流介绍&#34;&gt;3.1 限流介绍
+&lt;/h2&gt;&lt;p&gt;如果并发访问量大的情况下，生产方不停的发送消息，消费端可能处理不了那么多消息，此时消息在队列中堆积很多，当消费端启动，瞬间就会涌入很多消息，消费端有可能瞬间垮掉，这时我们可以在消费端进行限流操作，每秒钟拉取多少个消息。这样就可以进行并发量的控制，减轻系统的负载，提供系统的可用性，这种效果往往可以在秒杀和抢购中进行使用。rabbitmq中有限流的配置。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589288254017.png&#34;
+	width=&#34;770&#34;
+	height=&#34;372&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589288254017&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;206&#34;
+		data-flex-basis=&#34;496px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;32-代码实现&#34;&gt;3.2 代码实现
+&lt;/h2&gt;&lt;h3 id=&#34;321-开启限流&#34;&gt;3.2.1 开启限流
+&lt;/h3&gt;&lt;p&gt;这里我们就不在单独的去创建工程了，我们在&lt;code&gt;&amp;lt;rabbitmq-day02-demo2-ack&amp;gt;&lt;/code&gt;工程中application.yml中添加限流配置。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    # 确认方式
+    listener:
+      simple:
+        acknowledge-mode: manual
+        # 每次最多处理消息的个数
+        prefetch: 5
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589986639903.png&#34;
+	width=&#34;713&#34;
+	height=&#34;293&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589986639903&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;243&#34;
+		data-flex-basis=&#34;584px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;322-单元测试&#34;&gt;3.2.2 单元测试
+&lt;/h3&gt;&lt;h4 id=&#34;3221-发送n条消息&#34;&gt;3.2.2.1 发送n条消息
+&lt;/h4&gt;&lt;p&gt;在&lt;code&gt;&amp;lt;rabbitmq-day02-demo1-reliable&amp;gt;工程的测试类ReliableTest中添加测试方法&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// 发送10条消息
+@Test
+public void testSendMsg(){
+    for (int i = 1; i &amp;lt;= 10; i++) {
+        rabbitTemplate.convertAndSend(&amp;quot;confirm-exchange&amp;quot;, &amp;quot;confirm-routing-key&amp;quot;, &amp;quot;发送消息：&amp;quot; + i);
+    }
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;3222-修改监听器代码&#34;&gt;3.2.2.2 修改监听器代码
+&lt;/h4&gt;&lt;p&gt;修改&lt;code&gt;&amp;lt;rabbitmq-day02-demo2-ack&amp;gt;&lt;/code&gt;工程中监听器代码&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;删除异常代码&lt;code&gt;&amp;lt;System.out.println(9/0)&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;并且在try代码块让程序进行休眠，例如：休眠5s&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Component
+@RabbitListener(queues = {&amp;quot;confirm-queue&amp;quot;})
+public class AckListener {
+
+    @RabbitHandler
+    public void readMsg(String msg, Message message, Channel channel){
+        System.out.println(&amp;quot;获取到的消息体：&amp;quot; + new String(message.getBody()));
+        long id = message.getMessageProperties().getDeliveryTag();
+        try {
+            Thread.sleep(5000);
+            System.out.println(&amp;quot;业务处理成功...&amp;quot;);
+            // 业务处理成功：手动签收签收
+            channel.basicAck(id, true);
+        } catch (Exception e) {
+
+            System.out.println(&amp;quot;业务处理失败...&amp;quot;);
+            try {
+                Thread.sleep(2000); // 消息每隔2s发送一次
+                // 业务处理失败：拒收，并且让消息重回队列
+                channel.basicNack(id, true, true);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;3223-结果说明&#34;&gt;3.2.2.3 结果说明
+&lt;/h4&gt;&lt;p&gt;生产者发送消息（没有启动消费者）：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589290150555.png&#34;
+	width=&#34;906&#34;
+	height=&#34;124&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589290150555&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;730&#34;
+		data-flex-basis=&#34;1753px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Ready：待消费的消息总数，10条&lt;/li&gt;
+&lt;li&gt;Unacked：待应答的消息总数，0条&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;启动消费端后：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589290236123.png&#34;
+	width=&#34;907&#34;
+	height=&#34;94&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589290236123&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;964&#34;
+		data-flex-basis=&#34;2315px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Ready：待消费的消息总数，5条&lt;/li&gt;
+&lt;li&gt;Unacked：待应答的消息总数，5条&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;4-延时队列&#34;&gt;4 延时队列
+&lt;/h1&gt;&lt;p&gt;&lt;strong&gt;环境搭建：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;创建&lt;code&gt;&amp;lt;rabbitmq-day02-demo3-delay&amp;gt;&lt;/code&gt;工程并且添加依赖。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;!--起步依赖--&amp;gt;
+&amp;lt;parent&amp;gt;
+    &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;spring-boot-starter-parent&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;2.1.4.RELEASE&amp;lt;/version&amp;gt;
+&amp;lt;/parent&amp;gt;
+&amp;lt;dependencies&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-amqp&amp;lt;/artifactId&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-web&amp;lt;/artifactId&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+&amp;lt;/dependencies&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;编写启动类&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@SpringBootApplication
+public class DelayApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DelayApplication.class, args);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;编写application.yml文件&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;41-ttl&#34;&gt;4.1 TTL
+&lt;/h2&gt;&lt;h3 id=&#34;411-概念&#34;&gt;4.1.1 概念
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;TTL：Time To Live（存活时间/过期时间）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;当消息到达存活时间后，该消息还没有被消费，会自动被清除&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;RabbitMQ可以对消息设置过期时间也可以对整个队列设置过期时间&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果都设置了，哪个时间先到则生效&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;举个最常见了栗子：当我们在某个平台购买商品或者火车票、机票等，如果半个小时内没有支付，则该订单失效。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589291916403.png&#34;
+	width=&#34;662&#34;
+	height=&#34;232&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589291916403&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;285&#34;
+		data-flex-basis=&#34;684px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;412-代码实现&#34;&gt;4.1.2 代码实现
+&lt;/h3&gt;&lt;h4 id=&#34;4121-创建队列&#34;&gt;4.1.2.1 创建队列
+&lt;/h4&gt;&lt;p&gt;在工程中创建队列的配置类&lt;code&gt;&amp;lt;com.itheima.config.TTLConfig&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Configuration
+public class TTLConfig {
+
+    // 创建队列
+    @Bean
+    public Queue ttlQueue(){
+        // 创建队列，并且指定队列的过期时间
+        return QueueBuilder.durable(&amp;quot;ttl-queue&amp;quot;).withArgument(&amp;quot;x-message-ttl&amp;quot;, 10000).build();
+    }
+
+    @Bean
+    public Exchange ttlExchange(){
+        // 注意，由于routingkey我们使用了匹配，因此我们要创建topic类型的交换机
+        return new TopicExchange(&amp;quot;ttl-exchange&amp;quot;, true, false);
+    }
+
+    // 队列绑定到交换机
+    @Bean
+    public Binding queueBindToExchangeByTTL(Queue ttlQueue, Exchange ttlExchange){
+        return BindingBuilder.bind(ttlQueue).to(ttlExchange).with(&amp;quot;ttl.#&amp;quot;).noargs();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;4122-编写单元测试&#34;&gt;4.1.2.2 编写单元测试
+&lt;/h4&gt;&lt;p&gt;在工程的test包下创建测试类&lt;code&gt;&amp;lt;com.itheima.DelayTest&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test
+public void testTTL(){
+    // 可以设置消息的属性消息
+    MessagePostProcessor messagePostProcessor = new MessagePostProcessor() {
+        @Override
+        public Message postProcessMessage(Message message) throws AmqpException {
+            // 设置消息的过期时间 5s
+            message.getMessageProperties().setExpiration(&amp;quot;5000&amp;quot;);
+            return message;
+        }
+    };
+    rabbitTemplate.convertAndSend(&amp;quot;test-ttl-exchange&amp;quot;,&amp;quot;ttl.hehe&amp;quot;, &amp;quot;ttl消息&amp;quot;, messagePostProcessor);
+}
+
+PS：温馨提示，如果同时设置了队列过期时间和消息的过期时间，那么时间越短的先生效。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;413-客户端创建队列了解&#34;&gt;4.1.3 客户端创建队列【了解】
+&lt;/h3&gt;&lt;p&gt;1、创建队列&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589294819246.png&#34;
+	width=&#34;1059&#34;
+	height=&#34;359&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589294819246&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;294&#34;
+		data-flex-basis=&#34;707px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;2、创建交换机&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589294871233.png&#34;
+	width=&#34;839&#34;
+	height=&#34;337&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589294871233&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;248&#34;
+		data-flex-basis=&#34;597px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;3、队列绑定交换机&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589294973845.png&#34;
+	width=&#34;916&#34;
+	height=&#34;414&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589294973845&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;221&#34;
+		data-flex-basis=&#34;531px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;4、发送消息【PS：&lt;strong&gt;Delivery mode ：2 - Persistent，指定为消息持久化&lt;/strong&gt;】&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589989186990.png&#34;
+	width=&#34;917&#34;
+	height=&#34;490&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589989186990&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;187&#34;
+		data-flex-basis=&#34;449px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;42-dlx&#34;&gt;4.2 DLX
+&lt;/h2&gt;&lt;h3 id=&#34;421-概念&#34;&gt;4.2.1 概念
+&lt;/h3&gt;&lt;p&gt;DLX：Dead-Letter-Exchange，死信交换机。当消息成为Dead Message后，可以被重新发送到另一个交换机，这个交换机就称为死信交换机。&lt;/p&gt;
+&lt;p&gt;DLX其始就是一个Exchange，和一般的Exchange没有区别，仅仅只是设置某个队列的属性而已。当这个队列中有死信时，RabbitMQ就会自动的将这个消息重新发布到设置的Exchange上去，进而被路由到另一个队列。消费端可以监听这个队列中的消息做相应的处理。&lt;/p&gt;
+&lt;h3 id=&#34;422-处理过程&#34;&gt;4.2.2 处理过程
+&lt;/h3&gt;&lt;p&gt;1、生成者将消息发送到交换机后，由交换机路由到指定的队列&lt;/p&gt;
+&lt;p&gt;2、当该消息成为了死信后并且将该消息发送给DLX。PS：成为死信的三种情况&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;队列消息长度达到限制&lt;/li&gt;
+&lt;li&gt;消费者拒签消息&lt;/li&gt;
+&lt;li&gt;原队列中存在消息过期设置，消息到达超时时间未被消费&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;3、DLX再将这个消息路由给死信队列，并且由对应的消费者消费&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1590042255594.png&#34;
+	width=&#34;878&#34;
+	height=&#34;409&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1590042255594&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;214&#34;
+		data-flex-basis=&#34;515px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589341135991.png&#34;
+	width=&#34;876&#34;
+	height=&#34;300&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589341135991&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;292&#34;
+		data-flex-basis=&#34;700px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;423-代码实现&#34;&gt;4.2.3 代码实现
+&lt;/h3&gt;&lt;p&gt;创建配置类：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Configuration
+public class DLXConfig {
+
+    // 创建交换机
+    @Bean
+    public Exchange delayExchange(){
+        return new DirectExchange(&amp;quot;delay-exchange&amp;quot;);
+    }
+    // 创建队列
+    @Bean
+    public Queue delayQueue(){
+        Map&amp;lt;String, Object&amp;gt; args = new HashMap&amp;lt;&amp;gt;();
+        args.put(&amp;quot;x-message-ttl&amp;quot;, 20000);           // 队列过期时间
+        args.put(&amp;quot;x-max-length&amp;quot;, 10000000);         // 队列中消息数量
+        args.put(&amp;quot;x-dead-letter-exchange&amp;quot;, &amp;quot;dlx-exchange&amp;quot;);       // 绑定死信交换机
+        args.put(&amp;quot;x-dead-letter-routing-key&amp;quot;, &amp;quot;dlx-routing-key&amp;quot;);    // 绑定死信路由器
+        return QueueBuilder.durable(&amp;quot;delay-queue&amp;quot;).withArguments(args).build();
+    }
+
+    // 将队列绑定到交换机
+    @Bean
+    public Binding delayBinding(Queue delayQueue, Exchange delayExchange){
+        return BindingBuilder.bind(delayQueue).to(delayExchange).with(&amp;quot;delay-routing-key&amp;quot;).noargs();
+    }
+
+    // 创建死信交换机
+    @Bean
+    public Exchange dlxExhange(){
+        return new DirectExchange(&amp;quot;dlx-exchange&amp;quot;);
+    }
+
+    // 创建死信队列
+    @Bean
+    public Queue dlxQueue(){
+        return new Queue(&amp;quot;dlx-queue&amp;quot;);
+    }
+
+    // 将死信队列绑定到死信交换机上
+    @Bean
+    public Binding dlxBinding(Queue dlxQueue, Exchange dlxExhange){
+        return BindingBuilder.bind(dlxQueue).to(dlxExhange).with(&amp;quot;dlx-routing-key&amp;quot;).noargs();
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;单元测试：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test
+public void testDLX(){
+    // 发送消息
+    rabbitTemplate.convertAndSend(&amp;quot;delay-exchange&amp;quot;,&amp;quot;delay-routing-key&amp;quot;, &amp;quot;死信消息&amp;quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;发送消息：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589992130599.png&#34;
+	width=&#34;1061&#34;
+	height=&#34;160&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589992130599&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;663&#34;
+		data-flex-basis=&#34;1591px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;20S后，我们再看：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589992207176.png&#34;
+	width=&#34;1023&#34;
+	height=&#34;161&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589992207176&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;635&#34;
+		data-flex-basis=&#34;1524px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;43-延时队列&#34;&gt;4.3 延时队列
+&lt;/h2&gt;&lt;h3 id=&#34;431-什么是延时队列&#34;&gt;4.3.1 什么是延时队列
+&lt;/h3&gt;&lt;p&gt;延时队列，即消息进入队列后不会被立即消费，只有到达指定的时间后才会被消费。比较遗憾的是，RabbitMQ本身没有直接支持延迟队列的功能，但是可以通过TTL + DLX组合来实现延时队列的效果。&lt;/p&gt;
+&lt;h3 id=&#34;432-需求&#34;&gt;4.3.2 需求
+&lt;/h3&gt;&lt;p&gt;例如：用户下单后，30分钟内未完成支付，取消订单回滚库存。&lt;/p&gt;
+&lt;p&gt;解决方案：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;定时器&lt;/li&gt;
+&lt;li&gt;延时队列&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1590044162041.png&#34;
+	width=&#34;1156&#34;
+	height=&#34;298&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1590044162041&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;387&#34;
+		data-flex-basis=&#34;931px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;433-代码实现&#34;&gt;4.3.3 代码实现
+&lt;/h3&gt;&lt;p&gt;在【4.2章节中】我们其始已实现了延时队列了。我们只需要去监听死信队列去消费消息即可。创建监听器，如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Component
+@RabbitListener(queues = {&amp;quot;dlx-queue&amp;quot;})
+public class DelayListener {
+
+    @RabbitHandler
+    public void readMsg(String msg){
+        SimpleDateFormat sdf = new SimpleDateFormat(&amp;quot;yyyy-MM-dd hh:mm:ss&amp;quot;);
+        System.out.println(&amp;quot;消费消息时间：&amp;quot; + sdf.format(new Date()));
+        System.out.println(&amp;quot;获取到的消息为：&amp;quot; + msg);
+    }
+}
+
+
+// 单元测试
+@Test
+public void testDLX(){
+    // 发送消息
+    rabbitTemplate.convertAndSend(&amp;quot;delay-exchange&amp;quot;,&amp;quot;delay-routing-key&amp;quot;, &amp;quot;死信消息&amp;quot;);
+    SimpleDateFormat sdf = new SimpleDateFormat(&amp;quot;yyyy-MM-dd hh:mm:ss&amp;quot;);
+    System.out.println(&amp;quot;发送消息时间：&amp;quot; + sdf.format(new Date()));
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;5-rabbitmq应用&#34;&gt;5 RabbitMQ应用
+&lt;/h1&gt;&lt;h2 id=&#34;51-日志与监控&#34;&gt;5.1 日志与监控
+&lt;/h2&gt;&lt;h3 id=&#34;511-日志&#34;&gt;5.1.1 日志
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Linux OS下：&lt;/p&gt;
+&lt;p&gt;RabbitMQ默认存放日志的路径：/var/log/rabbitmq/rabbit@xxx.log&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Windows OS下，例如：&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589518752061.png&#34;
+	width=&#34;855&#34;
+	height=&#34;184&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589518752061&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;464&#34;
+		data-flex-basis=&#34;1115px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;512-管控台监控&#34;&gt;5.1.2 管控台监控
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589518528251.png&#34;
+	width=&#34;1524&#34;
+	height=&#34;683&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589518528251&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;223&#34;
+		data-flex-basis=&#34;535px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;52-消息补偿-面试&#34;&gt;5.2 消息补偿-面试
+&lt;/h2&gt;&lt;p&gt;需求：100%保证消息发送成功&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589518181167.png&#34;
+	width=&#34;1009&#34;
+	height=&#34;413&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589518181167&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;244&#34;
+		data-flex-basis=&#34;586px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;53-消息幂等性保障-面试&#34;&gt;5.3 消息幂等性保障-面试
+&lt;/h2&gt;&lt;p&gt;思想一样。&lt;/p&gt;
+&lt;p&gt;MySql的数据库引擎：InnoDB（默认）   +   MYISAM      建表：engines=MYISAM&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;数据结构：InnoDB   B+T   B+T+链表&lt;/li&gt;
+&lt;li&gt;不会进行全表扫描&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1590045582913.png&#34;
+	width=&#34;1210&#34;
+	height=&#34;311&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1590045582913&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;389&#34;
+		data-flex-basis=&#34;933px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;需求：数据 库存只有1件了。    显示10个人买。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;悲观锁：for update&lt;/li&gt;
+&lt;li&gt;**乐视锁：**需要在表设计的时候添加一个额外的字段  version（1 -2）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;幂等性：指一次或多次请求某一个资源，对于资源本身应该具有同样的结果。也就是说，任意多次请求对资源本身所产生的影响均与一次请求所产生的影响相同。在MQ中，消费多条相同的消息，得到与消费该消息一次相同的结果。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/assets/1589518408986.png&#34;
+	width=&#34;1043&#34;
+	height=&#34;467&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589518408986&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;223&#34;
+		data-flex-basis=&#34;536px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;6-rabbitmq集群-了解&#34;&gt;6 RabbitMQ集群-了解
+&lt;/h1&gt;&lt;p&gt;没有意义：docker&amp;mdash;部署集群的mq&lt;/p&gt;
+&lt;p&gt;注意：在学习docker的时候我们在给大家演示如何搭建集群。&lt;/p&gt;
+&lt;h1 id=&#34;总结mq的高级特性&#34;&gt;总结：MQ的高级特性
+&lt;/h1&gt;&lt;p&gt;1、消息的可靠性投递&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;confirm：确认模式【交换机】&lt;/li&gt;
+&lt;li&gt;return：退回模式【路由器】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;2、消息的确认机制【ack】  消费方&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;自动确认：略&lt;/li&gt;
+&lt;li&gt;手动确认：快递送到咱手中，本人需要签字。（买了华为P30     送了MP3：拒收，消息重回队列）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;3、消费端限流：配置限流【每次处理消息的最大个数】&lt;/p&gt;
+&lt;p&gt;4、延时队列：TTL  + DLX&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TTL：过期&lt;/li&gt;
+&lt;li&gt;DLX：死信交换机   死信队列&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;5、RabbitMQ的应用&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;日志和监控&lt;/li&gt;
+&lt;li&gt;消息补偿：要求消息100%发送到队列中&lt;/li&gt;
+&lt;li&gt;消息幂等性; 保障：乐视锁&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;7-rabbit-避免重复消费&#34;&gt;7. Rabbit 避免重复消费;
+&lt;/h1&gt;&lt;h1 id=&#34;8-保证消息的顺序&#34;&gt;8. 保证消息的顺序
+&lt;/h1&gt;&lt;p&gt;大体来说主流的解决方案有两种：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;一种是使用单线程消费来保证消息的顺序性&lt;/li&gt;
+&lt;li&gt;对消息进行编号，消费者处理时根据编号来判断顺序&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;乍一看，觉得两种方案没有什么问题，但是深入了解下，觉得这两种解决方案并不能完全接保证消息的消费的顺序性问题。&lt;/p&gt;
+&lt;p&gt;首先我们来分析下，是什么导致RabbitMQ消息的顺序性问题的，常见的有以下几种情形：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;消息生产者启用了发送确认机制，在发生超时、中断等，需要RabbitMQ补偿发送时，那么此时消息在源头就已经出现顺序混乱了，导致消息被消费时也是乱序的&lt;/li&gt;
+&lt;li&gt;另一种情况，如果消息发送时，设置了超时时间，并且采用了死信队列，模拟了延时队列的效果，那么此时消息的顺序也时不能保证的&lt;/li&gt;
+&lt;li&gt;还有一种情况，如果消息设置了优先级，那么在高并发的情况下，消息的顺序也是得不到保证的，消息的消费顺序也就不能保证了&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;刚才我们分析了出现消息乱序的几种情况，这里我们首先排除了实用单线程来消费，原因很简单，发送的消息的顺序（源头数据的顺序出现了异常）出现了异常，单线程消费的顺序肯定也是异常的&lt;/p&gt;
+&lt;p&gt;其次对消息进行编号，这个可以解决消息顺序的问题，但是对加大了对业务处理的复杂性&lt;/p&gt;
+&lt;p&gt;messageId&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_2/images/image-20220104141506541.png&#34;
+	width=&#34;521&#34;
+	height=&#34;368&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220104141506541&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;141&#34;
+		data-flex-basis=&#34;339px&#34;
+	
+&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>RabbitMq_1</title>
+        <link>https://mikeLing-qx.github.io/p/rabbitmq_1/</link>
+        <pubDate>Tue, 08 Aug 2023 16:15:32 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/rabbitmq_1/</guid>
+        <description>&lt;h1 id=&#34;rabbitmq一&#34;&gt;RabbitMQ（一）
+&lt;/h1&gt;&lt;p&gt;课程回顾：&lt;/p&gt;
+&lt;p&gt;1、OpenFeign进行远程调用&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;介绍
+&lt;ul&gt;
+&lt;li&gt;对RestTemplate进行了封装&lt;/li&gt;
+&lt;li&gt;通过更加优雅的方式【客户端    编写Feign相当于编写Service】进行调用&lt;/li&gt;
+&lt;li&gt;集成了负载均衡、集成了熔断器、支持日志、支持请求与响应压缩&lt;/li&gt;
+&lt;li&gt;代码实现：略&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;2、SpringCloudGateway网关&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;场景：鉴权操作、认证操作、记录日志、限流等等&lt;/li&gt;
+&lt;li&gt;网关介绍：
+&lt;ul&gt;
+&lt;li&gt;路由：转发到哪个服务上&lt;/li&gt;
+&lt;li&gt;断言：匹配具体的url地址&lt;/li&gt;
+&lt;li&gt;过滤器：在本次的请求中，通过过滤器完成一些限制（业务需求）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;过滤器&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;局部过滤器&lt;/li&gt;
+&lt;li&gt;全局过滤器&lt;/li&gt;
+&lt;li&gt;官方自带的过滤器&lt;/li&gt;
+&lt;li&gt;自定义过滤器：
+&lt;ul&gt;
+&lt;li&gt;全局过滤器：实现GlobalFilter接口，还可以实现Ordered接口，指定过滤器的执行顺序的【代替该接口：@Order注解】&lt;/li&gt;
+&lt;li&gt;局部过滤器：
+&lt;ul&gt;
+&lt;li&gt;继承AbstractGatewayFilterFactory&lt;/li&gt;
+&lt;li&gt;自定义过滤器的名称规范：XxxGatewayFilterFactory&lt;/li&gt;
+&lt;li&gt;需要在yml文件中配置&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;3、SpringCloudConfig：配置中心&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;配置中心：管理服务中的配置文件的&lt;/li&gt;
+&lt;li&gt;执行流程：托管平台（码云/GitHub）&amp;mdash;&amp;gt;配置中心&amp;mdash;&amp;gt;分发到具体的服务中&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;学习目标：MQ：Message Queue（消息队列）&lt;/p&gt;
+&lt;p&gt;1、消息队列介绍【了解】&lt;/p&gt;
+&lt;p&gt;2、RabbitMQ介绍以及安装【应用】&lt;/p&gt;
+&lt;p&gt;3、编写RabbitMQ的入门程序【掌握】&lt;/p&gt;
+&lt;p&gt;4、RabbitMQ的通信方式【重点】&lt;/p&gt;
+&lt;p&gt;5、SpringBoot集成RabbitMQ【掌握】&lt;/p&gt;
+&lt;h1 id=&#34;1-消息队列概述&#34;&gt;1. 消息队列概述
+&lt;/h1&gt;&lt;p&gt;学习过Redis：5种数据结构     List可以作为消息队列。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1589938458020.png&#34;
+	width=&#34;1119&#34;
+	height=&#34;330&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589938458020&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;339&#34;
+		data-flex-basis=&#34;813px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;11-什么是mq&#34;&gt;1.1. 什么是MQ
+&lt;/h2&gt;&lt;p&gt;消息队列（MQ）是一种应用程序对应用程序的通信方法。应用程序通过写和检索出入列队的针对应用程序的数据（消息）来通信，而无需专用连接来链接它们。消息传递指的是程序之间通过在消息中发送数据进行通信，而不是通过直接调用彼此来通信，直接调用通常是用于诸如远程过程调用的技术。排队指的是应用程序通过队列来通信。队列的使用除去了接收和发送应用程序同时执行的要求。&lt;/p&gt;
+&lt;p&gt;MQ全称为Message Queue，消息队列作用在（一个）应用程序和（一个或多个）&lt;strong&gt;应用程序之间进行通信过程中保存消息的容器&lt;/strong&gt;。【是在消息的传输过程中保存消息的容器 】&lt;/p&gt;
+&lt;h2 id=&#34;12-常见产品&#34;&gt;1.2 常见产品
+&lt;/h2&gt;&lt;p&gt;场景的消息中间件（MOM）产品有：RabbitMQ  ActiveMQ  RocketMQ  kafka&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564382934252.png&#34;
+	width=&#34;1292&#34;
+	height=&#34;454&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564382934252&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;284&#34;
+		data-flex-basis=&#34;682px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;kafka&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;Apache下的一个子项目，使用scala实现的一个高性能分布式Publish/Subscribe消息队列系统。
+	1.快速持久化：通过磁盘顺序读写与零拷贝机制，可以在O(1)的系统开销下进行消息持久化；
+	2.高吞吐：在一台普通的服务器上既可以达到10W/s的吞吐速率；
+	3.高堆积：支持topic下消费者较长时间离线，消息堆积量大；
+	4.完全的分布式系统：Broker、Producer、Consumer都原生自动支持分布式，依赖zookeeper自动实现负载均衡；
+	5.支持Hadoop数据并行加载：对于像Hadoop的一样的日志数据和离线分析系统，但又要求实时处理的限制，这是一个可行的解决方案。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;13-mq的常见应用场景&#34;&gt;1.3 MQ的常见应用场景
+&lt;/h2&gt;&lt;h3 id=&#34;131-应用解耦&#34;&gt;1.3.1 应用解耦
+&lt;/h3&gt;&lt;p&gt;双11是购物狂节,用户下单后,订单系统需要通知库存系统,传统的做法就是订单系统调用库存系统的接口.这种做法有一个缺点:当库存系统出现故障时,订单就会失败。(这样某云、某东将少赚好多好多钱)订单系统和库存系统高耦合.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;用户提交订单：同步处理，需要执行的时间：50ms * n&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564383470643.png&#34;
+	width=&#34;994&#34;
+	height=&#34;123&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564383470643&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;808&#34;
+		data-flex-basis=&#34;1939px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;思考：在上述业务逻辑中，其实用户只需要关心自己的订单提交是否成功即可，至于其他的服务（业务）处理与用户是没有任何关系的，因此针对这个场景，我们是否可以这样去做呢？&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564383948529.png&#34;
+	width=&#34;954&#34;
+	height=&#34;302&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564383948529&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;315&#34;
+		data-flex-basis=&#34;758px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;由此可以看出,引入消息队列后，用户的响应时间就等于写入数据库的时间+写入消息队列的时间(可以忽略不计),引入消息队列后处理后,响应时间提高3倍。&lt;/p&gt;
+&lt;p&gt;订单系统:用户下单后,订单系统完成持久化处理,将消息写入消息队列,返回用户订单下单成功。库存系统:订阅下单的消息,获取下单消息,进行库操作。就算库存系统出现故障,消息队列也能保证消息的可靠投递,不会导致消息丢失。&lt;/p&gt;
+&lt;h3 id=&#34;132-异步处理&#34;&gt;1.3.2 异步处理
+&lt;/h3&gt;&lt;p&gt;例如：用户注册。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;用户注册，将数据写入数据库，然后等待系统发送短信，收到短信后继续等待系统发送邮件。这个过程中短信业务与邮件业务与用户也是无关的，因此也可以通过MQ去解决&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564384216328.png&#34;
+	width=&#34;763&#34;
+	height=&#34;99&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564384216328&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;770&#34;
+		data-flex-basis=&#34;1849px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;MQ：用户注册过程中，只需要将手机号和email发送到MQ中即可，然后由其他服务监听MQ然后获取消息并且处理相关业务。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564385009047.png&#34;
+	width=&#34;933&#34;
+	height=&#34;296&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564385009047&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;315&#34;
+		data-flex-basis=&#34;756px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;133-流量削峰&#34;&gt;1.3.3 流量削峰
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564385121615.png&#34;
+	width=&#34;591&#34;
+	height=&#34;167&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564385121615&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;353&#34;
+		data-flex-basis=&#34;849px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;流量削峰一般在秒杀活动中应用广泛。场景:秒杀活动，一般会因为流量过大，导致应用挂掉,为了解决这个问题，一般在应用前端加入消息队列。 作用:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;可以控制活动人数，超过此一定阀值的订单直接丢弃(这就是为什么秒杀一次都没有成功过:cry:)&lt;/li&gt;
+&lt;li&gt;可以缓解短时间的高流量压垮应用(应用程序按自己的最大处理能力获取订单)&lt;/li&gt;
+&lt;li&gt;用户的请求,服务器收到之后,首先写入消息队列,加入消息队列长度超过最大值,则直接抛弃用户请求或跳转到错误页面&lt;/li&gt;
+&lt;li&gt;秒杀业务根据消息队列中的请求信息，再做后续业务处理&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;14-思考&#34;&gt;1.4 思考
+&lt;/h2&gt;&lt;p&gt;所有服务间调用是否都可以使用MQ？&lt;strong&gt;不是&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;记住一个原则：调用方实时依赖执行结果的业务场景，使用直接调用，而不是MQ 。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564382839184.png&#34;
+	width=&#34;989&#34;
+	height=&#34;363&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564382839184&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;272&#34;
+		data-flex-basis=&#34;653px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;15-amqp-和-jms&#34;&gt;1.5 AMQP 和 JMS
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564385585125.png&#34;
+	width=&#34;801&#34;
+	height=&#34;438&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564385585125&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;182&#34;
+		data-flex-basis=&#34;438px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;AMQP高级消息队列协议，是一个进程间传递异步消息的网络协议，更准确的说是一种binary wire-level protocol（链接协议）。这是其和JMS的本质差别，AMQP不从API层进行限定，而是直接定义网络交换的数据格式。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;JMS即Java消息服务（JavaMessage Service）应用程序接口，是一个Java平台中关于面向消息中间件（MOM）的API，用于在两个应用程序之间，或分布式系统中发送消息，进行异步通信。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;JMS和AMQP区别&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;JMS是定义了统一的接口，来对消息操作进行统一；AMQP是通过规定协议来统一数据交互的格式&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;JMS限定了必须使用Java语言；AMQP只是协议，不规定实现方式，因此是跨语言的。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;JMS规定了两种消息模式（P2P、P/S）；而AMQP的消息模式更加丰富&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;JMS：应用层接口    AMQP：消息传输的协议。&lt;/p&gt;
+&lt;h1 id=&#34;2-rabbitmq介绍以及安装&#34;&gt;2. RabbitMQ介绍以及安装
+&lt;/h1&gt;&lt;h2 id=&#34;21-rabbitmq介绍&#34;&gt;2.1 RabbitMQ介绍
+&lt;/h2&gt;&lt;p&gt;RabbitMQ是由erlang语言开发，基于AMQP（Advanced Message Queue 高级消息队列协议）协议实现的消息队列，它是一种应用程序之间的通信方法，消息队列在分布式系统开发中应用非常广泛。&lt;/p&gt;
+&lt;p&gt;RabbitMQ官方地址：http://www.rabbitmq.com/&lt;/p&gt;
+&lt;p&gt;RabbitMQ提供了5种通信模式：简单模式，work模式，Publish/Subscribe发布与订阅模式，Routing路由模式，Topics主题模式；&lt;/p&gt;
+&lt;p&gt;官网对应模式介绍：https://www.rabbitmq.com/getstarted.html&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1555988678324.png&#34;
+	width=&#34;1014&#34;
+	height=&#34;551&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1555988678324&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;184&#34;
+		data-flex-basis=&#34;441px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;22-安装说明&#34;&gt;2.2. 安装说明
+&lt;/h2&gt;&lt;p&gt;略：详细查看 &lt;code&gt;资料/软件/安装Windows RabbitMQ.pdf&lt;/code&gt; 文档。&lt;/p&gt;
+&lt;p&gt;1、先安装erlang&lt;/p&gt;
+&lt;p&gt;2、再安装mq服务&lt;/p&gt;
+&lt;h2 id=&#34;23-用户以及virtual-hosts配置&#34;&gt;2.3 用户以及Virtual Hosts配置
+&lt;/h2&gt;&lt;h3 id=&#34;231-配置账号&#34;&gt;2.3.1 配置账号
+&lt;/h3&gt;&lt;p&gt;RabbitMQ在安装好后，可以访问http://localhost:15672 ；其&lt;strong&gt;自带了guest/guest的用户名和密码&lt;/strong&gt;；如果需要创建自定义用户；那么也可以登录管理界面后，如下操作：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564386195991.png&#34;
+	width=&#34;832&#34;
+	height=&#34;576&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564386195991&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;144&#34;
+		data-flex-basis=&#34;346px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;创建用户后效果如下：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564386635450.png&#34;
+	width=&#34;699&#34;
+	height=&#34;271&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564386635450&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;257&#34;
+		data-flex-basis=&#34;619px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;角色说明&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;超级管理员(administrator)：可登陆管理控制台，可查看所有的信息，并且可以对用户，策略(policy)进行操作。&lt;/li&gt;
+&lt;li&gt;监控者(monitoring)：可登陆管理控制台，同时可以查看rabbitmq节点的相关信息(进程数，内存使用情况，磁盘使用情况等)&lt;/li&gt;
+&lt;li&gt;策略制定者(policymaker)：可登陆管理控制台, 同时可以对policy进行管理。但无法查看节点的相关信息(上图红框标识的部分)。&lt;/li&gt;
+&lt;li&gt;普通管理者(management)：仅可登陆管理控制台，无法看到节点信息，也无法对策略进行管理。&lt;/li&gt;
+&lt;li&gt;其他：无法登陆管理控制台，通常就是普通的生产者和消费者。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;232-配置virtual-hosts&#34;&gt;2.3.2 配置Virtual Hosts
+&lt;/h3&gt;&lt;p&gt;像mysql拥有数据库的概念并且可以指定用户对库和表等操作的权限。RabbitMQ也有类似的权限管理；在RabbitMQ中可以虚拟消息服务器Virtual Host，每个Virtual Hosts相当于一个相对独立的RabbitMQ服务器，每个VirtualHost之间是相互隔离的。exchange、queue、message不能互通。 相当于mysql的db。&lt;strong&gt;Virtual Name一般以/开头&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;第一步：创建Virtual Hosts&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564386791029.png&#34;
+	width=&#34;1292&#34;
+	height=&#34;344&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564386791029&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;375&#34;
+		data-flex-basis=&#34;901px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;第二步：设置Virtual Hosts权限&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;首先：点击【名称】&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564386931079.png&#34;
+	width=&#34;1298&#34;
+	height=&#34;277&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564386931079&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;468&#34;
+		data-flex-basis=&#34;1124px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;权限设置：进入权限设置页面后，关联一个用户，然后确定【Set permission】。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564387033583.png&#34;
+	width=&#34;759&#34;
+	height=&#34;414&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564387033583&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;183&#34;
+		data-flex-basis=&#34;440px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;效果如下：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564387162595.png&#34;
+	width=&#34;633&#34;
+	height=&#34;225&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564387162595&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;281&#34;
+		data-flex-basis=&#34;675px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;参数说明：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;user：用户名
+configure ：一个正则表达式，用户对符合该正则表达式的所有资源拥有 configure 操作的权限
+write：一个正则表达式，用户对符合该正则表达式的所有资源拥有 write 操作的权限
+read：一个正则表达式，用户对符合该正则表达式的所有资源拥有 read 操作的权限
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;3-rabbitmq入门程序&#34;&gt;3 RabbitMQ入门程序
+&lt;/h1&gt;&lt;p&gt;入门案例将使用RabbitMQ的简单模式实现。&lt;/p&gt;
+&lt;h2 id=&#34;31-创建工程&#34;&gt;3.1 创建工程
+&lt;/h2&gt;&lt;p&gt;创建工程：&lt;code&gt;rabbitmq-day01-demo1-quickstart&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564389013218.png&#34;
+	width=&#34;792&#34;
+	height=&#34;303&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564389013218&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;261&#34;
+		data-flex-basis=&#34;627px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;添加依赖：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;!--添加mq依赖--&amp;gt;
+&amp;lt;dependencies&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;com.rabbitmq&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;amqp-client&amp;lt;/artifactId&amp;gt;
+        &amp;lt;version&amp;gt;5.6.0&amp;lt;/version&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+&amp;lt;/dependencies&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;32-创建生产者&#34;&gt;3.2 创建生产者
+&lt;/h2&gt;&lt;h3 id=&#34;321-实现步骤&#34;&gt;3.2.1 实现步骤
+&lt;/h3&gt;&lt;p&gt;创建生产者具体步骤：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;// 1.创建链接工厂对象
+// 2.设置RabbitMQ服务主机地址,默认localhost
+// 3.设置RabbitMQ服务端口,默认5672
+// 4.设置虚拟主机名字，默认/
+// 5.设置用户连接名，默认guest
+// 6.设置链接密码，默认guest
+// 7.创建一个新链接
+// 8.创建消息通道
+// 9.创建队列
+// 10.创建消息
+// 11.消息发送
+// 12.关闭资源
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;创建com.itheima.quickstart.Producer类，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Producer {
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        // 1.创建链接工厂对象
+        ConnectionFactory connectionFactory = new ConnectionFactory();
+        // 2.设置RabbitMQ服务主机地址,默认localhost
+        connectionFactory.setHost(&amp;quot;localhost&amp;quot;);
+        // 3.设置RabbitMQ服务端口,默认5672
+        connectionFactory.setPort(5672);
+        // 4.设置虚拟主机名字，默认/
+        connectionFactory.setVirtualHost(&amp;quot;/sz_itcast&amp;quot;);
+        // 5.设置用户连接名，默认guest
+        connectionFactory.setUsername(&amp;quot;admin&amp;quot;);
+        // 6.设置链接密码，默认guest
+        connectionFactory.setPassword(&amp;quot;123456&amp;quot;);
+        // 7.创建链接
+        Connection connection = connectionFactory.newConnection();
+        // 8.创建消息通道
+        Channel channel = connection.createChannel();
+        // 9.创建队列
+        // arg0：队列名称 arg1：是否持久化 arg2：是否排外 arg3：关闭连接时队列是否自动删除 arg4：队列其他参数
+        channel.queueDeclare(&amp;quot;simple_queue&amp;quot;, true, false, false, null);
+        // 10.创建消息
+        String message = &amp;quot;你好，欢迎来到程序员。&amp;quot;;
+        // 11.消息发送
+        // arg0：交换机名称，没有指定使用默认的Default Exchange
+        // arg1：路由key，点对点模式可以使用队列名称 arg2：指定消息其他属性 arg3：消息的字节码
+        channel.basicPublish(&amp;quot;&amp;quot;, &amp;quot;simple_queue&amp;quot;, null, message.getBytes());
+        // 12.关闭资源
+        channel.close();
+        connection.close();
+    }
+}
+
+PS：参数详细说明
+arg2 boolean exclusive 是否排外
+如果不是排外的，可以使用两个消费者都访问同一个队列，没有任何问题，如果是排外的，会对当前队列加锁，其他通道channel是不能访问的，如果强制访问会报异常。
+
+arg4:队列其他参数设置
+- Message TTL 设置消息生命周期
+- Auto Expire 当队列在指定的时间没有被访问就会被删除
+- Max Length 限定队列的消息的最大值长度，超过指定长度将会把最早的几条删除掉
+- Max Length Bytes 限定队列最大占用的空间大小
+- DLX 当队列消息长度大于最大长度、或者过期的等，将从队列中删除的消息推送到指定的交换机中去而不是丢弃掉
+- DLK 将删除的消息推送到指定交换机的指定路由键的队列中去
+- Maximum priority 声明优先级队列
+- Lazy mode 先将消息保存到磁盘上，不放在内存中，当消费者开始消费的时候才加载到内存中
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;322-效果&#34;&gt;3.2.2 效果
+&lt;/h3&gt;&lt;p&gt;在执行上述的消息发送之后；可以登录rabbitMQ的管理控制台：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564390252163.png&#34;
+	width=&#34;822&#34;
+	height=&#34;359&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564390252163&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;228&#34;
+		data-flex-basis=&#34;549px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;如果想查看消息，可以点击&lt;code&gt;队列名称-&amp;gt;Get Messages&lt;/code&gt;,如下图：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564390303556.png&#34;
+	width=&#34;501&#34;
+	height=&#34;418&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564390303556&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;119&#34;
+		data-flex-basis=&#34;287px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;3--自己实现代码&#34;&gt;3  自己实现代码
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;package com.itheima.simple;
+
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
+
+/**
+ * @description: 简单模式 生产者  没有交换机 , 队列名称 = 路由器名称
+ * @author: QIXIANG LING
+ * @date: 2020/5/23 19:25
+ */
+public class SimpleProducer {
+    public static void main(String[] args) throws Exception {
+        // 1. 创建连接工厂
+        ConnectionFactory connectionFactory = new ConnectionFactory();
+
+        // 2. 设置RabbitMq服务主机地址
+        connectionFactory.setHost(&amp;quot;localhost&amp;quot;);
+
+        // 3, 设置RabbitMq 服务端口, 默认5672 (通信端口 TCP)    (15672 是应用层的端口 http 访问rabbitMQ客户端的端口)
+
+        connectionFactory.setPort(5672);
+
+        // 4.设置虚拟主机名字, 默认/
+        connectionFactory.setVirtualHost(&amp;quot;/sz_itheima88&amp;quot;);
+
+        // 5. 设置用户连接名和 密码
+        connectionFactory.setUsername(&amp;quot;Rina&amp;quot;);
+        connectionFactory.setPassword(&amp;quot;123456&amp;quot;);
+
+        // 7. 创建新连接
+        Connection connection = connectionFactory.newConnection();
+
+        // 8. 创建消息通道
+        Channel channel = connection.createChannel();
+
+        // 9. 创建队列
+        //  需要参数 String queue, boolean durable, boolean exclusive, boolean autoDelete,Map&amp;lt;String, Object&amp;gt; arguments
+
+        // queue 队列的名称 ; durable 是否持久化 ; exclusive 是否排外 (操作这个队列的时候是否允许别人也操作)
+        // autoDelete : 是否自动删除 ;  arguments (指定队列的一些额外属性 ) 队列的过期时间 , 长度
+
+        channel.queueDeclare(&amp;quot;simple-queue&amp;quot;,true,false,false,null);
+
+        // 10 . 创建消息
+        String message  = &amp;quot;望月理奈,夏海里伽子,花鸟玲爱&amp;quot;;
+
+
+        // 11 .消息发送
+        // String exchange (指定交换机的名称) , String routingKey (路由器的名称) , BasicProperties props (指定消息的属性 :可指定过期时间), byte[] body
+        channel.basicPublish(&amp;quot;&amp;quot;,&amp;quot;simple-exchange&amp;quot;,null,message.getBytes(&amp;quot;UTF-8&amp;quot;));
+    }
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;323-queues列表说明&#34;&gt;3.2.3 Queues列表说明
+&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;PS：列表说明
+- Features消息特征：
+  - D：持久化
+- State：当前的状态
+  - running：运行中
+  - idle：空闲。 
+- Ready：待消费的消息总数 
+- Unacked：待应答的消息总数 
+- total：消息总数 = Ready+Unacked 
+- incoming：消息进入的速率
+- deliver/get：消息获取的速率
+- ack：消息应答的速率
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;33-创建消费者&#34;&gt;3.3 创建消费者
+&lt;/h2&gt;&lt;p&gt;消费者创建可以按照如下步骤实现：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;// 1.创建链接工厂对象
+// 2.设置RabbitMQ服务主机地址,默认localhost
+// 3.设置RabbitMQ服务端口,默认5672
+// 4.设置虚拟主机名字，默认/
+// 5.设置用户连接名，默认guest
+// 6.设置链接密码，默认guest
+// 7.创建一个新链接
+// 8.创建消息通道
+// 9.创建队列
+// 10.创建消费者，并设置消息处理
+// 11.消息监听
+// 12.关闭资源(不建议关闭，建议一直监听消息)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;按照上面的步骤创建消息消费者com.itheima.rabbitmq.simple.Consumer代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class Consumer {
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        // 1.创建链接工厂对象
+        ConnectionFactory connectionFactory = new ConnectionFactory();
+        // 2.设置RabbitMQ服务主机地址,默认localhost
+        connectionFactory.setHost(&amp;quot;localhost&amp;quot;);
+        // 3.设置RabbitMQ服务端口,默认5672
+        connectionFactory.setPort(5672);
+        // 4.设置虚拟主机名字，默认/
+        connectionFactory.setVirtualHost(&amp;quot;/sz_itcast&amp;quot;);
+        // 5.设置用户连接名，默认guest
+        connectionFactory.setUsername(&amp;quot;admin&amp;quot;);
+        // 6.设置链接密码，默认guest
+        connectionFactory.setPassword(&amp;quot;123456&amp;quot;);
+        // 7.创建一个新链接
+        Connection connection = connectionFactory.newConnection();
+        // 8.创建消息通道
+        Channel channel = connection.createChannel();
+        // 9.创建队列
+        channel.queueDeclare(&amp;quot;simple_queue&amp;quot;, true, false, false, null);
+        // 10.创建消费者，并消费消息
+        DefaultConsumer consumer = new DefaultConsumer(channel){
+            /**
+             * @param consumerTag 消费者标签，在channel.basicConsume时候可以指定
+             * @param envelope 消息包的内容，可从中获取消息id，消息routing key，交换机，消息和重发标志(收到消息失败后是否需要重新发送)
+             * @param properties 消息属性信息
+             * @param body 消息体
+             **/
+            @Override
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                // 路由
+                String routingKey = envelope.getRoutingKey();
+                // 交换机
+                String exchange = envelope.getExchange();
+                // 消息id
+                long deliveryTag = envelope.getDeliveryTag();
+                // 消息体
+                String message = new String(body, &amp;quot;UTF-8&amp;quot;);
+                System.out.println(&amp;quot;路由：&amp;quot; + routingKey + &amp;quot;,交换机：&amp;quot; + exchange + &amp;quot;,消息id：&amp;quot; + deliveryTag + &amp;quot;,消息体：&amp;quot; + message);
+            }
+        };
+        // 11.消息监听 arg0：监听的队列名称
+        // arg1：是否自动应答，设置为true为表示消息接收到自动向mq回复接收到了，mq接收到回复会删除消息，设置为false则需要手动确认
+        // arg2：消费者接收消息到后回调（消费消息）
+        channel.basicConsume(&amp;quot;simple_queue&amp;quot;, true, consumer);
+        // 12.关闭资源(不建议关闭，建议一直监听消息)
+    }
+}
+
+PS：同一个会话， consumerTag 是固定的 可以做此会话的名字， deliveryTag 每次接收消息+1，可以做此消息处理通道的名字
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;332-console控制台&#34;&gt;3.3.2 console控制台
+&lt;/h3&gt;&lt;p&gt;执行后，控制台输入如下：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564391734810.png&#34;
+	width=&#34;918&#34;
+	height=&#34;391&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564391734810&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;234&#34;
+		data-flex-basis=&#34;563px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;333-rabbitmq控制台&#34;&gt;3.3.3 RabbitMQ控制台
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564391840497.png&#34;
+	width=&#34;805&#34;
+	height=&#34;307&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564391840497&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;262&#34;
+		data-flex-basis=&#34;629px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;34-代码抽取&#34;&gt;3.4 代码抽取
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;重复代码：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564394914493.png&#34;
+	width=&#34;829&#34;
+	height=&#34;295&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564394914493&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;281&#34;
+		data-flex-basis=&#34;674px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;无论是消费者，还是生产者，都需要创建连接，因此我们可以将这段公共的代码抽取到工具类中。创建com.itheima.rabbitmq.util.ConnectionUtil工具类对象，用于创建Connection，代码如下：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564395167481.png&#34;
+	width=&#34;1072&#34;
+	height=&#34;491&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564395167481&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;218&#34;
+		data-flex-basis=&#34;523px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class ConnectionUtils {
+
+    // 提供一个公共的静态的访问方法
+    public static Connection getConnection() throws Exception {
+        // 1.创建链接工厂对象
+        ConnectionFactory connectionFactory = new ConnectionFactory();
+        // 2.设置RabbitMQ服务主机地址,默认localhost
+        connectionFactory.setHost(&amp;quot;localhost&amp;quot;);
+        // 3.设置RabbitMQ服务端口,默认5672
+        connectionFactory.setPort(5672);
+        // 4.设置虚拟主机名字，默认/
+        connectionFactory.setVirtualHost(&amp;quot;/sz_itcast&amp;quot;);
+        // 5.设置用户连接名，默认guest
+        connectionFactory.setUsername(&amp;quot;admin&amp;quot;);
+        // 6.设置链接密码，默认guest
+        connectionFactory.setPassword(&amp;quot;123456&amp;quot;);
+        // 7.创建链接
+        Connection connection = connectionFactory.newConnection();
+        return connection;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;生产者优化&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;修改Producer，链接对象使用上面的ConnectionUtil工具类创建，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;//创建链接
+Connection connection = ConnectionUtil.getConnection();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;消费者优化&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;修改Consumer，链接对象使用上面的ConnectionUtil工具类创建，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;//创建链接
+Connection connection = ConnectionUtil.getConnection();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;34-小结&#34;&gt;3.4 小结
+&lt;/h2&gt;&lt;p&gt;上述的入门案例中使用的是如下的AMQP最简单的P2P通信方式：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1555991074575.png&#34;
+	width=&#34;902&#34;
+	height=&#34;151&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1555991074575&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;597&#34;
+		data-flex-basis=&#34;1433px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;在上图的模型中，有以下概念：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;P：生产者，也就是要发送消息的程序
+C：消费者：消息的接受者，会一直等待消息到来。
+queue：消息队列，图中红色部分。类似一个邮箱，可以缓存消息；生产者向其中投递消息，消费者从其中取出消息。
+
+在rabbitMQ中的消费者是一定要监听某个消息队列才能获取消息。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;4-rabbitmq工作模式&#34;&gt;4. RabbitMQ工作模式
+&lt;/h1&gt;&lt;p&gt;RabbitMQ提供了6种模式：简单模式，work模式，Publish/Subscribe发布与订阅模式，Routing路由模式，Topics主题模式。&lt;/p&gt;
+&lt;h2 id=&#34;41-work-queues工作队列模式&#34;&gt;4.1 Work queues工作队列模式
+&lt;/h2&gt;&lt;h3 id=&#34;411-模式说明&#34;&gt;4.1.1 模式说明
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1562516450360.png&#34;
+	width=&#34;935&#34;
+	height=&#34;189&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1562516450360&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;494&#34;
+		data-flex-basis=&#34;1187px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Work Queues&lt;/code&gt;与入门程序的&lt;code&gt;简单模式&lt;/code&gt;相比，多了一个或多个消费端，多个消费端共同消费同一个队列中的消息。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;应用场景&lt;/strong&gt;：对于任务过重或任务较多情况使用工作队列可以提高任务处理的速度（也就是多人处理）。&lt;/p&gt;
+&lt;h3 id=&#34;412-代码实现&#34;&gt;4.1.2 代码实现
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;Work Queues&lt;/code&gt;与入门程序的&lt;code&gt;简单模式&lt;/code&gt;的代码是几乎一样的；可以完全复制，并复制多一个消费者进行多个消费者同时消费消息的测试。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564396531411.png&#34;
+	width=&#34;524&#34;
+	height=&#34;273&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564396531411&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;191&#34;
+		data-flex-basis=&#34;460px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;4121-创建生产者&#34;&gt;4.1.2.1 创建生产者
+&lt;/h4&gt;&lt;p&gt;创建WorkProducer消息生产者对象，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class WorkProducer {
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        // 获取连接
+        Connection connection = ConnectionUtils.getConnection();
+        // 创建消息通道
+        Channel channel = connection.createChannel();
+        channel.queueDeclare(&amp;quot;work_queue&amp;quot;, true, false, false, null);
+        for (int i = 0; i &amp;lt; 10; i++){
+            // 创建消息
+            String message = &amp;quot;你好，欢迎来到黑马程序员，学号：&amp;quot; + i;
+            // 消息发送
+            channel.basicPublish(&amp;quot;&amp;quot;, &amp;quot;work_queue&amp;quot;, null, message.getBytes());
+        }
+        // 关闭资源
+        channel.close();
+        connection.close();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;4122-创建消费者1&#34;&gt;4.1.2.2 创建消费者1
+&lt;/h4&gt;&lt;p&gt;WorkConsumer1,代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class WorkConsumer1 {
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        // 获取连接
+        Connection connection = ConnectionUtils.getConnection();
+        // 创建消息通道
+        Channel channel = connection.createChannel();
+        // 创建队列
+        channel.queueDeclare(&amp;quot;work_queue&amp;quot;, true, false, false, null);
+        // 创建消费者，并消费消息
+        DefaultConsumer consumer = new DefaultConsumer(channel){
+            @Override
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                // 路由
+                String routingKey = envelope.getRoutingKey();
+                // 交换机
+                String exchange = envelope.getExchange();
+                // 消息id
+                long deliveryTag = envelope.getDeliveryTag();
+                // 消息体
+                String message = new String(body, &amp;quot;UTF-8&amp;quot;);
+                System.out.println(&amp;quot;消费者1获取的数据：&amp;quot; + &amp;quot;路由：&amp;quot; + routingKey + &amp;quot;,交换机：&amp;quot; + exchange + &amp;quot;,消息id：&amp;quot; + deliveryTag + &amp;quot;,消息体：&amp;quot; + message);
+            }
+        };
+        // 11.消息监听 arg0：监听的队列名称
+        channel.basicConsume(&amp;quot;work_queue&amp;quot;, true, consumer);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;4123-创建消费者2&#34;&gt;4.1.2.3 创建消费者2
+&lt;/h4&gt;&lt;p&gt;创建WorkConsumer2，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class WorkConsumer2 {
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        // 获取连接
+        Connection connection = ConnectionUtils.getConnection();
+        // 创建消息通道
+        Channel channel = connection.createChannel();
+        // 创建队列
+        channel.queueDeclare(&amp;quot;work_queue&amp;quot;, true, false, false, null);
+        // 创建消费者，并消费消息
+        DefaultConsumer consumer = new DefaultConsumer(channel){
+            @Override
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                // 路由
+                String routingKey = envelope.getRoutingKey();
+                // 交换机
+                String exchange = envelope.getExchange();
+                // 消息id
+                long deliveryTag = envelope.getDeliveryTag();
+                // 消息体
+                String message = new String(body, &amp;quot;UTF-8&amp;quot;);
+                System.out.println(&amp;quot;消费者2获取的数据：&amp;quot; + &amp;quot;路由：&amp;quot; + routingKey + &amp;quot;,交换机：&amp;quot; + exchange + &amp;quot;,消息id：&amp;quot; + deliveryTag + &amp;quot;,消息体：&amp;quot; + message);
+            }
+        };
+        // 11.消息监听 arg0：监听的队列名称
+        channel.basicConsume(&amp;quot;work_queue&amp;quot;, true, consumer);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;413-测试&#34;&gt;4.1.3 测试
+&lt;/h3&gt;&lt;p&gt;启动两个消费者，然后再启动生产者发送消息；到IDEA的两个消费者对应的控制台查看是否竞争性的接收到消息。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;消费者1：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564397871582.png&#34;
+	width=&#34;860&#34;
+	height=&#34;125&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564397871582&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;688&#34;
+		data-flex-basis=&#34;1651px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;消费者2：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564397884743.png&#34;
+	width=&#34;836&#34;
+	height=&#34;129&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564397884743&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;648&#34;
+		data-flex-basis=&#34;1555px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;414-小结&#34;&gt;4.1.4 小结
+&lt;/h3&gt;&lt;p&gt;在一个队列中如果有多个消费者，那么消费者之间对于同一个消息的关系是&lt;strong&gt;竞争&lt;/strong&gt;的关系。&lt;/p&gt;
+&lt;p&gt;默认，RabbitMQ会一个一个的发送信息给下一个消费者(consumer)，而不考虑每个任务的时长且&lt;strong&gt;是一次性分配，并非一个一个分配&lt;/strong&gt;。平均的每个消费者将会获得相等数量的消息。这种发送消息得方式叫做——轮询（round-robin）。&lt;/p&gt;
+&lt;p&gt;P/S：消息的发布与订阅者&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Fanout：广播模式&lt;/li&gt;
+&lt;li&gt;RoutingKey：路由模式&lt;/li&gt;
+&lt;li&gt;Topic：主题模式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;42-fanout广播模式&#34;&gt;4.2 Fanout广播模式
+&lt;/h2&gt;&lt;h3 id=&#34;421-模式说明&#34;&gt;4.2.1 模式说明
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1562518625240.png&#34;
+	width=&#34;956&#34;
+	height=&#34;193&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1562518625240&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;495&#34;
+		data-flex-basis=&#34;1188px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;发布订阅模式：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;1.每个消费者监听自己的队列。
+2.生产者将消息发给broker，由交换机将消息转发到绑定此交换机的每个队列，每个绑定交换机的队列都将接收
+到消息
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;而在订阅模型中，多了一个exchange角色，而且过程略有变化：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;P：生产者，也就是要发送消息的程序，但是不再发送到队列中，而是发给X（交换机）
+C：消费者，消息的接受者，会一直等待消息到来。
+Queue：消息队列，接收消息、缓存消息。
+Exchange：交换机，图中的X。一方面，接收生产者发送的消息。另一方面，知道如何处理消息，例如递交给某个特别队列、递交给所有队列、或是将消息丢弃。到底如何操作，取决于Exchange的类型。Exchange有常见以下3种类型：
+	Fanout：广播，将消息交给所有绑定到交换机的队列
+	Direct：定向，把消息交给符合指定routing key 的队列
+	Topic：通配符，把消息交给符合routing pattern（路由模式） 的队列
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;Exchange（交换机）只负责转发消息，不具备存储消息的能力&lt;/strong&gt;，因此如果没有任何队列与Exchange绑定，或者没有符合路由规则的队列，那么消息会丢失！&lt;/p&gt;
+&lt;h3 id=&#34;422-代码&#34;&gt;4.2.2 代码
+&lt;/h3&gt;&lt;h4 id=&#34;4221-创建生产者&#34;&gt;4.2.2.1 创建生产者
+&lt;/h4&gt;&lt;p&gt;生产者需要注意如下3点：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;1.声明交换机
+2.声明队列
+3.队列需要绑定指定的交换机
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;创建FanoutProducer消息生产者，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class FanoutProducer {
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        // 获取连接
+        Connection connection = ConnectionUtils.getConnection();
+        // 创建消息通道
+        Channel channel = connection.createChannel();
+        // 创建队列
+        channel.queueDeclare(&amp;quot;fanout_queue1&amp;quot;, true, false, false, null);
+        channel.queueDeclare(&amp;quot;fanout_queue2&amp;quot;, true, false, false, null);
+        // 创建交换机：arg0,交换机名称  arg1,交换机类型（广播）
+        channel.exchangeDeclare(&amp;quot;fanout_exchange&amp;quot;, BuiltinExchangeType.FANOUT);
+        // 将队列绑定到交换机
+        channel.queueBind(&amp;quot;fanout_queue1&amp;quot;, &amp;quot;fanout_exchange&amp;quot;, &amp;quot;&amp;quot;);
+        channel.queueBind(&amp;quot;fanout_queue2&amp;quot;, &amp;quot;fanout_exchange&amp;quot;, &amp;quot;&amp;quot;);
+        for (int i = 0; i &amp;lt; 10; i++){
+            // 创建消息
+            String message = &amp;quot;你好，欢迎来到程序员，fanout：&amp;quot; + i;
+            // 消息发送
+            channel.basicPublish(&amp;quot;fanout_exchange&amp;quot;, &amp;quot;&amp;quot;, null, message.getBytes());
+        }
+        // 关闭资源
+        channel.close();
+        connection.close();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;4222-创建消费者1&#34;&gt;4.2.2.2 创建消费者1
+&lt;/h4&gt;&lt;p&gt;创建FanoutConsumer1消费者，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class FanoutConsumer1 {
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        // 获取连接
+        Connection connection = ConnectionUtils.getConnection();
+        // 创建消息通道
+        Channel channel = connection.createChannel();
+        // 创建队列
+        channel.queueDeclare(&amp;quot;fanout_queue1&amp;quot;, true, false, false, null);
+        // 创建消费者，并消费消息
+        DefaultConsumer consumer = new DefaultConsumer(channel){
+            @Override
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                // 路由
+                String routingKey = envelope.getRoutingKey();
+                // 交换机
+                String exchange = envelope.getExchange();
+                // 消息id
+                long deliveryTag = envelope.getDeliveryTag();
+                // 消息体
+                String message = new String(body, &amp;quot;UTF-8&amp;quot;);
+                System.out.println(&amp;quot;消费者1获取的数据：&amp;quot; + &amp;quot;路由：&amp;quot; + routingKey + &amp;quot;,交换机：&amp;quot; + exchange + &amp;quot;,消息id：&amp;quot; + deliveryTag + &amp;quot;,消息体：&amp;quot; + message);
+            }
+        };
+        // 11.消息监听 arg0：监听的队列名称
+        channel.basicConsume(&amp;quot;fanout_queue1&amp;quot;, true, consumer);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;4223-创建消费者2&#34;&gt;4.2.2.3 创建消费者2
+&lt;/h4&gt;&lt;p&gt;创建FanoutConsumer2消费者，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class FanoutConsumer2 {
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        // 获取连接
+        Connection connection = ConnectionUtils.getConnection();
+        // 创建消息通道
+        Channel channel = connection.createChannel();
+        // 创建队列
+        channel.queueDeclare(&amp;quot;fanout_queue2&amp;quot;, true, false, false, null);
+        // 创建消费者，并消费消息
+        DefaultConsumer consumer = new DefaultConsumer(channel){
+            @Override
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                // 路由
+                String routingKey = envelope.getRoutingKey();
+                // 交换机
+                String exchange = envelope.getExchange();
+                // 消息id
+                long deliveryTag = envelope.getDeliveryTag();
+                // 消息体
+                String message = new String(body, &amp;quot;UTF-8&amp;quot;);
+                System.out.println(&amp;quot;消费者2获取的数据：&amp;quot; + &amp;quot;路由：&amp;quot; + routingKey + &amp;quot;,交换机：&amp;quot; + exchange + &amp;quot;,消息id：&amp;quot; + deliveryTag + &amp;quot;,消息体：&amp;quot; + message);
+            }
+        };
+        // 11.消息监听 arg0：监听的队列名称
+        channel.basicConsume(&amp;quot;fanout_queue2&amp;quot;, true, consumer);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;423-测试&#34;&gt;4.2.3 测试
+&lt;/h3&gt;&lt;p&gt;启动所有消费者，然后使用生产者发送消息；在每个消费者对应的控制台可以查看到生产者发送的所有消息；到达&lt;strong&gt;广播&lt;/strong&gt;的效果。&lt;/p&gt;
+&lt;p&gt;消费者1：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564497091180.png&#34;
+	width=&#34;934&#34;
+	height=&#34;293&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564497091180&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;318&#34;
+		data-flex-basis=&#34;765px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;消费者2：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564497107892.png&#34;
+	width=&#34;942&#34;
+	height=&#34;303&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564497107892&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;310&#34;
+		data-flex-basis=&#34;746px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;在执行完测试代码后，其实到RabbitMQ的管理后台找到&lt;code&gt;Exchanges&lt;/code&gt;选项卡，点击 &lt;code&gt;fanout_exchange&lt;/code&gt; 的交换机，可以查看到如下的绑定：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564497143772.png&#34;
+	width=&#34;742&#34;
+	height=&#34;483&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564497143772&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;153&#34;
+		data-flex-basis=&#34;368px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;424-小结&#34;&gt;4.2.4 小结
+&lt;/h3&gt;&lt;p&gt;交换机需要与队列进行绑定，绑定之后；一个消息可以被多个消费者都收到。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;发布订阅模式与work队列模式的区别&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;1、work队列模式不用定义交换机，而发布/订阅模式需要定义交换机。 
+2、发布/订阅模式的生产方是面向交换机发送消息，work队列模式的生产方是面向队列发送消息(底层使用默认交换机)。
+3、发布/订阅模式需要设置队列和交换机的绑定，work队列模式不需要设置，实际上work队列模式会将队列绑 定到默认的交换机 。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;43-routing路由模式&#34;&gt;4.3 Routing路由模式
+&lt;/h2&gt;&lt;h3 id=&#34;431-模式说明&#34;&gt;4.3.1. 模式说明
+&lt;/h3&gt;&lt;p&gt;路由模式特点：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;1.队列与交换机的绑定，不能是任意绑定了，而是要指定一个RoutingKey（路由key）
+2.消息的发送方在 向 Exchange发送消息时，也必须指定消息的 RoutingKey。
+3.Exchange不再把消息交给每一个绑定的队列，而是根据消息的Routing Key进行判断，只有队列的Routingkey与消息的 Routing key完全一致，才会接收到消息
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1562522054280.png&#34;
+	width=&#34;1269&#34;
+	height=&#34;330&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1562522054280&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;384&#34;
+		data-flex-basis=&#34;922px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;图解：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;P：生产者，向Exchange发送消息，发送消息时，会指定一个routing key。
+X：Exchange（交换机），接收生产者的消息，然后把消息递交给 与routing key完全匹配的队列
+C1：消费者，其所在队列指定了需要routing key 为 error 的消息
+C2：消费者，其所在队列指定了需要routing key 为 info、error、warning 的消息
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;432-代码&#34;&gt;4.3.2 代码
+&lt;/h3&gt;&lt;p&gt;在编码上与 &lt;code&gt;Publish/Subscribe发布与订阅模式&lt;/code&gt; 的区别是交换机的类型为：Direct，还有队列绑定交换机的时候需要指定routing key。&lt;/p&gt;
+&lt;h4 id=&#34;4321-创建生产者&#34;&gt;4.3.2.1 创建生产者
+&lt;/h4&gt;&lt;p&gt;创建RoutingKeyProducer消息生产者，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class RoutingKeyProducer {
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        // 获取连接
+        Connection connection = ConnectionUtils.getConnection();
+        // 创建消息通道
+        Channel channel = connection.createChannel();
+        // 创建队列
+        channel.queueDeclare(&amp;quot;routing_key_queue1&amp;quot;, true, false, false, null);
+        channel.queueDeclare(&amp;quot;routing_key_queue2&amp;quot;, true, false, false, null);
+        // 创建交换机：arg0,交换机名称  arg1,交换机类型（广播）
+        channel.exchangeDeclare(&amp;quot;routing_key_exchange&amp;quot;, BuiltinExchangeType.DIRECT);
+        // 将队列绑定到交换机
+        // routing_key_queue1：error
+        // routing_key_queue2：error、info、warning
+        channel.queueBind(&amp;quot;routing_key_queue1&amp;quot;, &amp;quot;routing_key_exchange&amp;quot;, &amp;quot;error&amp;quot;);
+        channel.queueBind(&amp;quot;routing_key_queue2&amp;quot;, &amp;quot;routing_key_exchange&amp;quot;, &amp;quot;error&amp;quot;);
+        channel.queueBind(&amp;quot;routing_key_queue2&amp;quot;, &amp;quot;routing_key_exchange&amp;quot;, &amp;quot;info&amp;quot;);
+        channel.queueBind(&amp;quot;routing_key_queue2&amp;quot;, &amp;quot;routing_key_exchange&amp;quot;, &amp;quot;warning&amp;quot;);
+        for (int i = 0; i &amp;lt; 10; i++){
+            // 创建消息
+            String message = &amp;quot;你好，欢迎来到黑马程序员，routing_key：&amp;quot; + i;
+            String routingKey = &amp;quot;&amp;quot;;
+            if (i%2 == 0){ // routing_key_queue1、routing_key_queue2 0、2、4、6、8
+                routingKey = &amp;quot;error&amp;quot;;
+            }else if (i%5 == 0){    // routing_key_queue2：5
+                routingKey = &amp;quot;info&amp;quot;;
+            }else { // 0、1、5
+                routingKey = &amp;quot;warning&amp;quot;;
+            }
+            message += &amp;quot;---&amp;gt;&amp;quot; + routingKey;
+
+            // 消息发送
+            channel.basicPublish(&amp;quot;routing_key_exchange&amp;quot;, routingKey, null, message.getBytes());
+        }
+        // 关闭资源
+        channel.close();
+        connection.close();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;4322-创建消费者1&#34;&gt;4.3.2.2 创建消费者1
+&lt;/h4&gt;&lt;p&gt;创建RoutingKeyConsumer1，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class RoutingKeyConsumer1 {
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        // 获取连接
+        Connection connection = ConnectionUtils.getConnection();
+        // 创建消息通道
+        Channel channel = connection.createChannel();
+        // 创建队列
+        channel.queueDeclare(&amp;quot;routing_key_queue1&amp;quot;, true, false, false, null);
+        // 创建消费者，并消费消息
+        DefaultConsumer consumer = new DefaultConsumer(channel){
+            @Override
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                // 路由
+                String routingKey = envelope.getRoutingKey();
+                // 交换机
+                String exchange = envelope.getExchange();
+                // 消息id
+                long deliveryTag = envelope.getDeliveryTag();
+                // 消息体
+                String message = new String(body, &amp;quot;UTF-8&amp;quot;);
+                System.out.println(&amp;quot;消费者1获取的数据：&amp;quot; + &amp;quot;路由：&amp;quot; + routingKey + &amp;quot;,交换机：&amp;quot; + exchange + &amp;quot;,消息id：&amp;quot; + deliveryTag + &amp;quot;,消息体：&amp;quot; + message);
+            }
+        };
+        // 11.消息监听 arg0：监听的队列名称
+        channel.basicConsume(&amp;quot;routing_key_queue1&amp;quot;, true, consumer);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;4323-创建消费者2&#34;&gt;4.3.2.3 创建消费者2
+&lt;/h4&gt;&lt;p&gt;创建RoutingKeyConsumer2，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class RoutingKeyConsumer2 {
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        // 获取连接
+        Connection connection = ConnectionUtils.getConnection();
+        // 创建消息通道
+        Channel channel = connection.createChannel();
+        // 创建队列
+        channel.queueDeclare(&amp;quot;routing_key_queue2&amp;quot;, true, false, false, null);
+        // 创建消费者，并消费消息
+        DefaultConsumer consumer = new DefaultConsumer(channel){
+            @Override
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                // 路由
+                String routingKey = envelope.getRoutingKey();
+                // 交换机
+                String exchange = envelope.getExchange();
+                // 消息id
+                long deliveryTag = envelope.getDeliveryTag();
+                // 消息体
+                String message = new String(body, &amp;quot;UTF-8&amp;quot;);
+                System.out.println(&amp;quot;消费者2获取的数据：&amp;quot; + &amp;quot;路由：&amp;quot; + routingKey + &amp;quot;,交换机：&amp;quot; + exchange + &amp;quot;,消息id：&amp;quot; + deliveryTag + &amp;quot;,消息体：&amp;quot; + message);
+            }
+        };
+        // 11.消息监听 arg0：监听的队列名称
+        channel.basicConsume(&amp;quot;routing_key_queue2&amp;quot;, true, consumer);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;433-测试&#34;&gt;4.3.3 测试
+&lt;/h3&gt;&lt;p&gt;启动所有消费者，然后使用生产者发送消息；在消费者对应的控制台可以查看到生产者发送对应routing key对应队列的消息；到达&lt;strong&gt;按照需要接收&lt;/strong&gt;的效果。&lt;/p&gt;
+&lt;p&gt;消费者1：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564500966364.png&#34;
+	width=&#34;1167&#34;
+	height=&#34;125&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564500966364&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;933&#34;
+		data-flex-basis=&#34;2240px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;消费者2：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564501008020.png&#34;
+	width=&#34;1215&#34;
+	height=&#34;229&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564501008020&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;530&#34;
+		data-flex-basis=&#34;1273px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;在执行完测试代码后，其实到RabbitMQ的管理后台找到&lt;code&gt;Exchanges&lt;/code&gt;选项卡，点击 &lt;code&gt;direct_exchange&lt;/code&gt; 的交换机，可以查看到如下的绑定：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564501086365.png&#34;
+	width=&#34;680&#34;
+	height=&#34;412&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564501086365&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;165&#34;
+		data-flex-basis=&#34;396px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;434-小结&#34;&gt;4.3.4 小结
+&lt;/h3&gt;&lt;p&gt;Routing模式要求队列在绑定交换机时要指定routing key，消息会转发到符合routing key的队列。&lt;/p&gt;
+&lt;h2 id=&#34;44-topics通配符模式&#34;&gt;4.4 Topics通配符模式
+&lt;/h2&gt;&lt;h3 id=&#34;441-模式说明&#34;&gt;4.4.1 模式说明
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1562524697140.png&#34;
+	width=&#34;1286&#34;
+	height=&#34;346&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1562524697140&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;371&#34;
+		data-flex-basis=&#34;892px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Topic&lt;/code&gt;类型与&lt;code&gt;Direct&lt;/code&gt;相比，都是可以根据&lt;code&gt;RoutingKey&lt;/code&gt;把消息路由到不同的队列。只不过&lt;code&gt;Topic&lt;/code&gt;类型&lt;code&gt;Exchange&lt;/code&gt;可以让队列在绑定&lt;code&gt;Routing key&lt;/code&gt; 的时候&lt;strong&gt;使用通配符&lt;/strong&gt;！&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Routingkey&lt;/code&gt; 一般都是有一个或多个单词组成，多个单词之间以”.”分割，例如： &lt;code&gt;item.insert&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;通配符规则：&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;#&lt;/code&gt;：匹配一个或多个词&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;*&lt;/code&gt;：匹配不多&lt;/p&gt;
+&lt;p&gt;举例：&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;item.#&lt;/code&gt;：能够匹配&lt;code&gt;item.insert.abc&lt;/code&gt; 或者 &lt;code&gt;item.insert&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;item.*&lt;/code&gt;：只能匹配&lt;code&gt;item.insert&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1562524972321.png&#34;
+	width=&#34;880&#34;
+	height=&#34;311&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1562524972321&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;282&#34;
+		data-flex-basis=&#34;679px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;图解：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;红色Queue：绑定的是&lt;code&gt;usa.#&lt;/code&gt; ，因此凡是以 &lt;code&gt;usa.&lt;/code&gt;开头的&lt;code&gt;routing key&lt;/code&gt; 都会被匹配到&lt;/li&gt;
+&lt;li&gt;黄色Queue：绑定的是&lt;code&gt;#.news&lt;/code&gt; ，因此凡是以 &lt;code&gt;.news&lt;/code&gt;结尾的 &lt;code&gt;routing key&lt;/code&gt; 都会被匹配&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;442-代码&#34;&gt;4.4.2 代码
+&lt;/h3&gt;&lt;h4 id=&#34;4421-创建生产者&#34;&gt;4.4.2.1 创建生产者
+&lt;/h4&gt;&lt;p&gt;创建TopicProducer实现消息生产者，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class TopicProducer {
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        // 获取连接
+        Connection connection = ConnectionUtils.getConnection();
+        // 创建消息通道
+        Channel channel = connection.createChannel();
+        // 创建队列
+        channel.queueDeclare(&amp;quot;topic_queue1&amp;quot;, true, false, false, null);
+        channel.queueDeclare(&amp;quot;topic_queue2&amp;quot;, true, false, false, null);
+        // 创建交换机：arg0,交换机名称  arg1,交换机类型（广播）
+        channel.exchangeDeclare(&amp;quot;topic_exchange&amp;quot;, BuiltinExchangeType.TOPIC);
+        // 将队列绑定到交换机
+        channel.queueBind(&amp;quot;topic_queue1&amp;quot;, &amp;quot;topic_exchange&amp;quot;, &amp;quot;*.orange.*&amp;quot;);
+        channel.queueBind(&amp;quot;topic_queue2&amp;quot;, &amp;quot;topic_exchange&amp;quot;, &amp;quot;*.*.rabbit&amp;quot;);
+        channel.queueBind(&amp;quot;topic_queue2&amp;quot;, &amp;quot;topic_exchange&amp;quot;, &amp;quot;lazy.#&amp;quot;);
+        // 发送消息
+        String msg = &amp;quot;欢迎来到黑马学习quick.orange.rabbit&amp;quot;;
+        byte[] body = msg.getBytes(&amp;quot;UTF-8&amp;quot;);
+        channel.basicPublish(&amp;quot;topic_exchange&amp;quot;, &amp;quot;quick.orange.rabbit&amp;quot;, null, body);  // 1/2
+
+        String msg2 = &amp;quot;欢迎来到黑马学习lazy.pink.rabbit&amp;quot;;
+        byte[] body2 = msg2.getBytes(&amp;quot;UTF-8&amp;quot;);
+        channel.basicPublish(&amp;quot;topic_exchange&amp;quot;, &amp;quot;lazy.pink.rabbit&amp;quot;, null, body2);     // 1
+        // 关闭资源
+        channel.close();
+        connection.close();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;4422-创建消费者1&#34;&gt;4.4.2.2 创建消费者1
+&lt;/h4&gt;&lt;p&gt;创建TopicConsumer1，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class TopicConsumer1 {
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        // 获取连接
+        Connection connection = ConnectionUtils.getConnection();
+        // 创建消息通道
+        Channel channel = connection.createChannel();
+        // 创建队列
+        channel.queueDeclare(&amp;quot;topic_queue1&amp;quot;, true, false, false, null);
+        // 创建消费者，并消费消息
+        DefaultConsumer consumer = new DefaultConsumer(channel){
+            @Override
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                // 路由
+                String routingKey = envelope.getRoutingKey();
+                // 交换机
+                String exchange = envelope.getExchange();
+                // 消息id
+                long deliveryTag = envelope.getDeliveryTag();
+                // 消息体
+                String message = new String(body, &amp;quot;UTF-8&amp;quot;);
+                System.out.println(&amp;quot;消费者1获取的数据：&amp;quot; + &amp;quot;路由：&amp;quot; + routingKey + &amp;quot;,交换机：&amp;quot; + exchange + &amp;quot;,消息id：&amp;quot; + deliveryTag + &amp;quot;,消息体：&amp;quot; + message);
+            }
+        };
+        // 11.消息监听 arg0：监听的队列名称
+        channel.basicConsume(&amp;quot;topic_queue1&amp;quot;, true, consumer);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h4 id=&#34;4423-创建消费者2&#34;&gt;4.4.2.3 创建消费者2
+&lt;/h4&gt;&lt;p&gt;创建TopicConsumer2，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class TopicConsumer2 {
+
+    public static void main(String[] args) throws IOException, TimeoutException {
+        // 获取连接
+        Connection connection = ConnectionUtils.getConnection();
+        // 创建消息通道
+        Channel channel = connection.createChannel();
+        // 创建队列
+        channel.queueDeclare(&amp;quot;topic_queue2&amp;quot;, true, false, false, null);
+        // 创建消费者，并消费消息
+        DefaultConsumer consumer = new DefaultConsumer(channel){
+            @Override
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                // 路由
+                String routingKey = envelope.getRoutingKey();
+                // 交换机
+                String exchange = envelope.getExchange();
+                // 消息id
+                long deliveryTag = envelope.getDeliveryTag();
+                // 消息体
+                String message = new String(body, &amp;quot;UTF-8&amp;quot;);
+                System.out.println(&amp;quot;消费者2获取的数据：&amp;quot; + &amp;quot;路由：&amp;quot; + routingKey + &amp;quot;,交换机：&amp;quot; + exchange + &amp;quot;,消息id：&amp;quot; + deliveryTag + &amp;quot;,消息体：&amp;quot; + message);
+            }
+        };
+        // 11.消息监听 arg0：监听的队列名称
+        channel.basicConsume(&amp;quot;topic_queue2&amp;quot;, true, consumer);
+    }
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;443-测试&#34;&gt;4.4.3 测试
+&lt;/h3&gt;&lt;p&gt;启动所有消费者，然后使用生产者发送消息；在消费者对应的控制台可以查看到生产者发送对应routing key对应队列的消息；到达&lt;strong&gt;按照需要接收&lt;/strong&gt;的效果；并且这些routing key可以使用通配符。&lt;/p&gt;
+&lt;p&gt;消费者1：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1576679250472.png&#34;
+	width=&#34;1145&#34;
+	height=&#34;136&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1576679250472&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;841&#34;
+		data-flex-basis=&#34;2020px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;消费者2：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1576679268274.png&#34;
+	width=&#34;1126&#34;
+	height=&#34;149&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1576679268274&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;755&#34;
+		data-flex-basis=&#34;1813px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;在执行完测试代码后，其实到RabbitMQ的管理后台找到&lt;code&gt;Exchanges&lt;/code&gt;选项卡，点击 &lt;code&gt;topic_exchange&lt;/code&gt; 的交换机，可以查看到如下的绑定：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564502526555.png&#34;
+	width=&#34;714&#34;
+	height=&#34;382&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564502526555&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;186&#34;
+		data-flex-basis=&#34;448px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;444-小结&#34;&gt;4.4.4 小结
+&lt;/h3&gt;&lt;p&gt;Topic主题模式可以实现 &lt;code&gt;Publish/Subscribe发布与订阅模式&lt;/code&gt; 和 &lt;code&gt; Routing路由模式&lt;/code&gt; 的功能；只是Topic在配置routing key 的时候可以使用通配符，显得更加灵活。&lt;/p&gt;
+&lt;h2 id=&#34;45-rabbitmq工作模式总结&#34;&gt;4.5 RabbitMQ工作模式总结
+&lt;/h2&gt;&lt;p&gt;RabbitMQ工作模式：
+&lt;strong&gt;1、简单模式 HelloWorld&lt;/strong&gt;
+一个生产者、一个消费者，不需要设置交换机（使用默认的交换机）&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2、工作队列模式 Work Queue&lt;/strong&gt;
+一个生产者、多个消费者（竞争关系），不需要设置交换机（使用默认的交换机）&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3、发布订阅模式 Publish/subscribe&lt;/strong&gt;
+需要设置类型为fanout的交换机，并且交换机和队列进行绑定，当发送消息到交换机后，交换机会将消息发送到绑定的队列&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;4、路由模式 Routing&lt;/strong&gt;
+需要设置类型为direct的交换机，交换机和队列进行绑定，并且指定routing key，当发送消息到交换机后，交换机会根据routing key将消息发送到对应的队列&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;5、通配符模式 Topic&lt;/strong&gt;
+需要设置类型为topic的交换机，交换机和队列进行绑定，并且指定通配符方式的routing key，当发送消息到交换机后，交换机会根据routing key将消息发送到对应的队列&lt;/p&gt;
+&lt;h1 id=&#34;5-spring-boot集成rabbitmq&#34;&gt;5 Spring Boot集成RabbitMQ
+&lt;/h1&gt;&lt;h2 id=&#34;51-简介&#34;&gt;5.1 简介
+&lt;/h2&gt;&lt;p&gt;在Spring项目中，可以使用Spring-Rabbit去操作RabbitMQ
+&lt;a class=&#34;link&#34; href=&#34;https://github.com/spring-projects/spring-amqp&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/spring-projects/spring-amqp&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;尤其是在spring boot项目中只需要引入对应的amqp启动器依赖即可，方便的使用RabbitTemplate发送消息，使用注解接收消息。&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;一般在开发过程中&lt;/em&gt;：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;生产者工程：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;application.yml文件配置RabbitMQ相关信息；&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在生产者工程中编写配置类，用于创建交换机和队列，并进行绑定&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;注入RabbitTemplate对象，通过RabbitTemplate对象发送消息到交换机&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;消费者工程：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;application.yml文件配置RabbitMQ相关信息&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;创建消息处理类，用于接收队列中的消息并进行处理&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;52-搭建生产者工程&#34;&gt;5.2 搭建生产者工程
+&lt;/h2&gt;&lt;h3 id=&#34;521-创建工程&#34;&gt;5.2.1 创建工程
+&lt;/h3&gt;&lt;p&gt;创建生产者工程springboot-rabbitmq-producer：略。&lt;/p&gt;
+&lt;h3 id=&#34;522-添加依赖&#34;&gt;5.2.2 添加依赖
+&lt;/h3&gt;&lt;p&gt;修改pom.xml文件内容为如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;parent&amp;gt;
+    &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;spring-boot-starter-parent&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;2.1.4.RELEASE&amp;lt;/version&amp;gt;
+    &amp;lt;relativePath/&amp;gt;
+&amp;lt;/parent&amp;gt;
+
+&amp;lt;dependencies&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-amqp&amp;lt;/artifactId&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt;
+        &amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+&amp;lt;/dependencies&amp;gt;
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;523-启动类&#34;&gt;5.2.3 启动类
+&lt;/h3&gt;&lt;p&gt;创建启动类com.itheima.ProducerApplication，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@SpringBootApplication
+public class RabbitMqProviderApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(RabbitMqProviderApplication.class, args);
+	}
+
+	// 创建队列
+	@Bean
+	public Queue topicQueue(){
+		return new Queue(&amp;quot;topic_queue_spring_boot&amp;quot;);
+	}
+
+	// 创建交换机
+	@Bean
+	public Exchange topicExchange(){
+		return new TopicExchange(&amp;quot;topic_exchange_spring_boot&amp;quot;);
+	}
+
+	// 将队列绑定到交换机
+	@Bean
+	public Binding topicQueueBind(Queue topicQueue, Exchange topicExchange){
+		return BindingBuilder.bind(topicQueue).to(topicExchange).with(&amp;quot;item.#&amp;quot;).noargs();
+	}
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;524-配置rabbitmq&#34;&gt;5.2.4 配置RabbitMQ
+&lt;/h3&gt;&lt;p&gt;application.yml配置文件&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    virtual-host: /sz_itcast
+    username: admin
+    password: 123456
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;53-搭建消费者工程&#34;&gt;5.3 搭建消费者工程
+&lt;/h2&gt;&lt;h3 id=&#34;531-创建工程&#34;&gt;5.3.1 创建工程
+&lt;/h3&gt;&lt;p&gt;创建消费者工程springboot-rabbitmq-consumer,工程坐标如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;groupId&amp;gt;com.itheima&amp;lt;/groupId&amp;gt;
+&amp;lt;artifactId&amp;gt;springboot-rabbitmq-consumer&amp;lt;/artifactId&amp;gt;
+&amp;lt;version&amp;gt;1.0-SNAPSHOT&amp;lt;/version&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;532-添加依赖&#34;&gt;5.3.2 添加依赖
+&lt;/h3&gt;&lt;p&gt;修改pom.xml文件内容为如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;parent&amp;gt;
+    &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;spring-boot-starter-parent&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;2.1.4.RELEASE&amp;lt;/version&amp;gt;
+    &amp;lt;relativePath/&amp;gt;
+&amp;lt;/parent&amp;gt;
+
+&amp;lt;dependencies&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-amqp&amp;lt;/artifactId&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt;
+        &amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+&amp;lt;/dependencies&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;533-启动类&#34;&gt;5.3.3 启动类
+&lt;/h3&gt;&lt;p&gt;创建启动类com.itheima.ConsumerApplication，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@SpringBootApplication
+public class ConsumerApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ConsumerApplication.class);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;534-配置rabbitmq&#34;&gt;5.3.4 配置RabbitMQ
+&lt;/h3&gt;&lt;p&gt;创建application.yml，内容如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-properties&#34;&gt;spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    virtual-host: /sz_itcast
+    username: admin
+    password: 123456
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;535-消息监听处理类&#34;&gt;5.3.5 消息监听处理类
+&lt;/h3&gt;&lt;p&gt;编写消息监听器com.itheima.listener.MessageListener，代码如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Component
+public class MessageListener {
+
+    /**
+     * 监听某个队列的消息
+     * @param message 接收到的消息
+     */
+    @RabbitListener(queues = &amp;quot;topic_queue_spring_boot&amp;quot;)
+    public void myListener1(String message){
+        System.out.println(&amp;quot;消费者接收到的消息为：&amp;quot; + message);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;54-测试&#34;&gt;5.4 测试
+&lt;/h2&gt;&lt;p&gt;在生产者工程rabbitmq-producer中创建测试类com.itheima.test.RabbitMQTest，发送消息：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@RunWith(SpringRunner.class)
+@SpringBootTest
+public class RabbitMqProviderApplicationTests {
+
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
+
+	@Test
+	public void contextLoads() {
+		rabbitTemplate.convertAndSend(&amp;quot;topic_exchange_spring_boot&amp;quot;,&amp;quot;item.update&amp;quot;, &amp;quot;更新&amp;quot;);
+		rabbitTemplate.convertAndSend(&amp;quot;topic_exchange_spring_boot&amp;quot;,&amp;quot;item.brand.insert&amp;quot;, &amp;quot;插入&amp;quot;);
+	}
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;先运行上述测试程序（交换机和队列才能先被声明和绑定），然后启动消费者；在消费者工程springboot-rabbitmq-consumer中控制台查看是否接收到对应消息。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564504900674.png&#34;
+	width=&#34;866&#34;
+	height=&#34;383&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564504900674&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;226&#34;
+		data-flex-basis=&#34;542px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;另外；也可以在RabbitMQ的管理控制台中查看到交换机与队列的绑定：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1564504920414.png&#34;
+	width=&#34;746&#34;
+	height=&#34;325&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1564504920414&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;229&#34;
+		data-flex-basis=&#34;550px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;6-安装问题&#34;&gt;6 安装问题
+&lt;/h1&gt;&lt;p&gt;计算机名称是中文无法启动RabbitMQ解决方案：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;1、管理员运行cmd然后打开RabbitMQ安装目录
+2、rabbitmq-service.bat remove
+3、set RABBITMQ_BASE=D:\rabbitmq_server\data
+4、rabbitmq-service.bat install
+5、rabbitmq-plugins enable rabbitmq_management
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1589959806808.png&#34;
+	width=&#34;787&#34;
+	height=&#34;553&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589959806808&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;142&#34;
+		data-flex-basis=&#34;341px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/rabbitmq_1/assets/1589959826016.png&#34;
+	width=&#34;630&#34;
+	height=&#34;91&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;1589959826016&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;692&#34;
+		data-flex-basis=&#34;1661px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;总结&#34;&gt;总结
+&lt;/h1&gt;&lt;p&gt;1、对MQ介绍以及使用场景&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;MQ：在消息传输过程中用来保存消息的容器   Message Queue&lt;/li&gt;
+&lt;li&gt;使用场景：
+&lt;ul&gt;
+&lt;li&gt;业务解耦&lt;/li&gt;
+&lt;li&gt;异步通信&lt;/li&gt;
+&lt;li&gt;流量削峰&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;MQ的产品有很多：略&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;2、RabbitMQ&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;介绍：略&lt;/li&gt;
+&lt;li&gt;安装：略&lt;/li&gt;
+&lt;li&gt;客户端工具：配置用户  +  配置虚拟主机【数据库】&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;3、编写RabbitMQ程序：5种通信方式【&lt;strong&gt;重点&lt;/strong&gt;】&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;简单模式&lt;/li&gt;
+&lt;li&gt;工作模式&lt;/li&gt;
+&lt;li&gt;广播模式&lt;/li&gt;
+&lt;li&gt;路由模式&lt;/li&gt;
+&lt;li&gt;主题模式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;4、SpringBoot集成RabbitMQ：代码简化了。&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

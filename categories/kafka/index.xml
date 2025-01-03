@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Kafka on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/categories/kafka/</link>
+        <description>Recent content in Kafka on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Wed, 15 May 2024 16:13:29 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/categories/kafka/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Kafka</title>
+        <link>https://mikeLing-qx.github.io/p/kafka/</link>
+        <pubDate>Wed, 15 May 2024 16:13:29 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/kafka/</guid>
+        <description>&lt;h1 id=&#34;1-基础组件&#34;&gt;1. 基础组件
+&lt;/h1&gt;&lt;h2 id=&#34;1-角色&#34;&gt;1. 角色
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kafka/images/image-20240618162759039.png&#34;
+	width=&#34;1277&#34;
+	height=&#34;744&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240618162759039&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;171&#34;
+		data-flex-basis=&#34;411px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;broker：节点，就是你看到的机器&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;provider：生产者，发消息的&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;consumer：消费者，读消息的&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;zookeeper：信息中心，记录kafka的各种信息的地方&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;==controller==：其中的一个broker，作为leader身份来负责管理整个集群。如果挂掉，借助zk重新选&lt;/p&gt;
+&lt;p&gt;主&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;controller_epoch:   leader身份变更的次数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;​&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;2-副本集合&#34;&gt;2. 副本集合
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;topic：主题，一个消息的通道，收发总得知道消息往哪投&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;partition：分区，==每个主题可以有多个分区分担数据的传递==，多条路并行，吞吐量大&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Replicas：副本，==每个分区可以设置多个副本==，副本之间数据一致。相当于备份，有备胎更可靠&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;leader &amp;amp; follower：主从，上面的这些副本里有1个身份为leader，其他的为follower。leader处理&lt;/p&gt;
+&lt;p&gt;partition的所有读写请求&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kafka/images/image-20240618151317793.png&#34;
+	width=&#34;1362&#34;
+	height=&#34;700&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240618151317793&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;194&#34;
+		data-flex-basis=&#34;466px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;AR（Assigned Repllicas）：所有副本的统称，AR=ISR+OSR&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ISR（In-Sync Replicas）：同步中的副本，可以参与leader选主。一旦落后太多（数量滞后和时间&lt;/p&gt;
+&lt;p&gt;滞后两个维度）会被踢到OSR。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;OSR（Out-Sync Relipcas）：踢出同步的副本，一直追赶leader，追上后会进入ISR&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;3-消息标记&#34;&gt;3. 消息标记
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kafka/images/image-20240617191541864.png&#34;
+	width=&#34;1026&#34;
+	height=&#34;475&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240617191541864&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;216&#34;
+		data-flex-basis=&#34;518px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kafka/images/image-20240617191603504.png&#34;
+	width=&#34;1047&#34;
+	height=&#34;510&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240617191603504&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;205&#34;
+		data-flex-basis=&#34;492px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;==offset==  每条消息在Kafka==分区中都有一个唯一的offset==，它被用来==标记消息在分区（Partition）中的位置==。这是一个递增的==长整数值==。消费者使用这个offset来跟踪他们在每个分区已经读到的位置。当消费者消费了一条消息之后，它需要更新保存的offset值。下次消费时，它会从保存的offset值开始消费。&lt;/p&gt;
+&lt;p&gt;这是Kafka中消费者消费消息的核心机制，因为Kafka本身并不追踪哪些消息已经被消费，这个工作是由消费者自己完成的。&lt;/p&gt;
+&lt;p&gt;==需要注意的是==，Kafka允许消费者提交他们已经处理到的offset。这样，如果消费者崩溃了并再次启动，它可以从上次提交的offset开始消费，避免重复处理相同的消息。然而，这也意味着如果你的==消费者崩溃在提交offset和处理消息之间的时间窗口，你可能会重复消费一些消息==。这就需要你的处理逻辑具备幂等性，即重复处理相同的消息不会导致问题。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;High Watermark）和 LEO（最后日志偏移量，Log End Offset）是两个非常重要的概念，它们主要用于消息的处理和数据的同步。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;==HW（High Watermark）==： 高水位是代表了==消费者能够消费到的最大的 offset==。也就是说，高于这个标记的消息对消费者是不可见的。当 follower 副本将 leader 副本中的消息复制到本地之后，它就会把自己的 HW 更新到和 leader 副本的 HW 一致。只有当所有的 follower 副本的 HW 都已经达到消息的 offset 时，这条消息才认为是 &amp;ldquo;已提交&amp;rdquo;（committed），也只有 &amp;ldquo;已提交&amp;rdquo; 的消息才可以被消费者消费。&lt;/li&gt;
+&lt;li&gt;==LEO（Log End Offset）==：LEO 是每个副本（包括 leader 副本和 follower 副本）最新消息的 offset + 1。换句话说，LEO 代表了下一条消息将要写入的位置。在正常情况下，leader 副本的 LEO 是大于等于 follower 副本的 LEO 的，当 follower 成功从 leader 复制消息之后，它的 LEO 会增大。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;2-kafka-搭建&#34;&gt;2. kafka 搭建
+&lt;/h1&gt;&lt;p&gt;使用wsl&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;启动命令
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-yml&#34;&gt;#docker-compose.yml
+#注意hostname问题，ip地址：192.168.10.30，换成你自己服务器的
+#docker-compose up -d 启动
+version: &#39;3&#39;
+services:
+    zookeeper:
+        image: zookeeper:3.4.13
+
+    kafka-1:
+        container_name: kafka-1
+        image: wurstmeister/kafka:2.12-2.2.2
+        ports:
+            - 10903:9092
+        environment:
+            KAFKA_BROKER_ID: 1 
+            HOST_IP: kafka-1
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            #docker部署必须设置外部可访问ip和端口，否则注册进zk的地址将不可达造成外部无法连接
+            KAFKA_ADVERTISED_HOST_NAME: kafka-1
+            KAFKA_ADVERTISED_PORT: 9092
+        volumes:
+            - /etc/localtime:/etc/localtime
+        depends_on:
+            - zookeeper           
+    kafka-2:
+        container_name: kafka-2
+        image: wurstmeister/kafka:2.12-2.2.2
+        ports:
+            - 10904:9092
+        environment:
+            KAFKA_BROKER_ID: 2 
+            HOST_IP: kafka-2
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            KAFKA_ADVERTISED_HOST_NAME: kafka-2
+            KAFKA_ADVERTISED_PORT: 9092 
+        volumes:
+            - /etc/localtime:/etc/localtime
+        depends_on:
+            - zookeeper 
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;2024-06-19 17:09:01 [2024-06-19 09:09:01,482] WARN [Controller id=2, targetBrokerId=2] Connection to node 2 (/127.0.0.1:10904) could not be established. Broker may not be available. (org.apache.kafka.clients.NetworkClient)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;3-kafka命令行工具&#34;&gt;3. Kafka命令行工具
+&lt;/h1&gt;&lt;p&gt;消费者数量如果大于分区数量可能会出现, 有消费者为闲置的情况&lt;/p&gt;
+&lt;h2 id=&#34;1-主题创建&#34;&gt;1. 主题创建
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;#进入容器
+docker exec -it kafka-1 bash
+#进入bin目录
+cd /opt/kafka/bin
+#创建
+kafka-topics.sh --zookeeper zookeeper:2181 --create --topic test --partitions 2 --replication-factor 1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-查看主题&#34;&gt;2. 查看主题
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;kafka-topics.sh --zookeeper zookeeper:2181 --list
+
+kafka-topics.sh --zookeeper zookeeper:2181 --describe --topic test
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kafka/images/image-20240619150039410.png&#34;
+	width=&#34;717&#34;
+	height=&#34;110&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240619150039410&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;651&#34;
+		data-flex-basis=&#34;1564px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;3-消息收发&#34;&gt;3. 消息收发
+&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;#使用docker连接任意集群中的一个容器
+docker exec -it kafka-1 sh
+
+#进入kafka的容器内目录
+cd /opt/kafka/bin
+
+#客户端监听
+kafka-console-consumer.sh --bootstrap-server kafka-1:9092,kafka-2:9092 --topic test
+
+#另起一个终端，验证发送
+kafka-console-producer.sh --broker-list kafka-1:9092,kafka-2:9092 --topic test
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;4-分组消费&#34;&gt;4. 分组消费
+&lt;/h2&gt;&lt;pre&gt;&lt;code&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;5-消息同步&#34;&gt;5. 消息同步
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/kafka/images/image-20240717115213050.png&#34;
+	width=&#34;1441&#34;
+	height=&#34;905&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20240717115213050&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;159&#34;
+		data-flex-basis=&#34;382px&#34;
+	
+&gt;&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

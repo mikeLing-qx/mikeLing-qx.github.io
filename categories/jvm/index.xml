@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>JVM on lexqinMike</title>
+        <link>https://mikeLing-qx.github.io/categories/jvm/</link>
+        <description>Recent content in JVM on lexqinMike</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>LexqinMike</copyright>
+        <lastBuildDate>Fri, 03 Jan 2025 19:21:43 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/categories/jvm/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Jvm</title>
+        <link>https://mikeLing-qx.github.io/p/jvm/</link>
+        <pubDate>Fri, 03 Jan 2025 19:21:43 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/jvm/</guid>
+        <description>&lt;h1 id=&#34;1-运行时数据区&#34;&gt;1. 运行时数据区
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;简述一下 运行时数据区的结构和各部分的作用&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;结构图&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/images/image-20220215101317324.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220215101317324&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;虚拟机栈&#34;&gt;虚拟机栈
+&lt;/h2&gt;&lt;p&gt;是一个栈结构, 线程每执行一个方法都会有一个栈帧入栈, 方法执行结束后栈帧出栈, 栈帧中存储的是方法所需要的数据 (局部变量表, 操作数栈, 动态连接, 方法出口)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;==虚拟机栈是基于线程的==: 只有一个main()方法, 也是以线程的方式运行的, 在线程的生命周期中, 参与执行的方法栈帧会频繁地入栈和出栈, 虚拟机栈的生命周期和线程一样&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;栈大小: 每个虚拟机栈==大小1M==&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;堆栈溢出: 栈帧深度压栈但并不出栈, 导致栈空间不足, 抛出StackOverFlowError, ==典型的就是递归调用==&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;栈帧的组成:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;局部变量表：存放我们的局部变量的（方法内的变量）。首先它是一个32 位的长度，主要存放我们的 Java 的八大基础数据类型，一般 32 位就可以存放下，如果是 64 位的就使用高低位占用两个也可以存放下，如果是局部变量是一个对象，存放的一个引用地址即可。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;操作数栈：存放 java 方法执行的操作数的，它也是一个栈，操作的元素可以是任意的 java 数据类型，一个方法刚刚开始的时候操作数栈为空，操作数栈本质上是JVM执行引擎的一个工作区，方法在执行，才会对操作数栈进行操作。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;动态链接：Java 语言特性多态&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;完成出口：正常返回（调用程序计数器中的地址作为返回）、异常的话（通过异常处理器表&amp;lt;非栈帧中的&amp;gt;来确定）&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/images/image-20220215095617369.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220215095617369&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;本地方法栈&#34;&gt;本地方法栈
+&lt;/h2&gt;&lt;p&gt;本地方法栈和虚拟机栈类似，具备线程隔离的特性，不同的是，==本地方法栈服务的对象是JVM执行的native方法==，而虚拟机栈服务的是JVM执行的java方法，虚拟机规范里对这块所用的语言、数据结构、没有强制规定，虚拟机可以自由实现它，==hotspot把它和虚拟机栈合并成了1个==&lt;/p&gt;
+&lt;h2 id=&#34;程序计数器&#34;&gt;程序计数器
+&lt;/h2&gt;&lt;p&gt;较小的内存空间，存储当前线程执行的字节码的偏移量；各线程之间独立存储，互不影响&lt;/p&gt;
+&lt;h2 id=&#34;方法区&#34;&gt;方法区
+&lt;/h2&gt;&lt;p&gt;方法区（Method Area）是==可供各线程共享的运行时内存区域==，主要用来存储==已被虚拟机加载的类信息、常量、静态变量、JIT编译器编译后的代码缓存等等==，它有个别名叫做：非堆（non-heap），主要是为了和堆区分开。&lt;/p&gt;
+&lt;p&gt;方法区中存储的信息大致可分以下两类：&lt;/p&gt;
+&lt;p&gt;1、类信息：主要指类相关的版本、字段、方法、接口描述、引用等&lt;/p&gt;
+&lt;p&gt;2、运行时常量池：编译阶段生成的常量与符号引用、运行时加入的动态变量&lt;/p&gt;
+&lt;h3 id=&#34;运行时常量池&#34;&gt;&lt;strong&gt;运行时常量池&lt;/strong&gt;
+&lt;/h3&gt;&lt;p&gt;在jvm规范中，方法区除了存储类信息之外，还包含了运行时常量池。这里首先要来讲一下常量池的分类&lt;/p&gt;
+&lt;p&gt;常量池可分两类：&lt;/p&gt;
+&lt;p&gt;1、Class常量池（静态常量池）&lt;/p&gt;
+&lt;p&gt;2、运行时常量池&lt;/p&gt;
+&lt;p&gt;3、字符串常量池（没有明确的官方定义，其目的是为了更好的使用&lt;/p&gt;
+&lt;p&gt;String ，真实的存储位置在堆）&lt;/p&gt;
+&lt;h2 id=&#34;堆&#34;&gt;&lt;strong&gt;堆&lt;/strong&gt;
+&lt;/h2&gt;&lt;p&gt;1、堆被划分为新生代和老年代（ Tenured ），&lt;/p&gt;
+&lt;p&gt;2、新生代与老年代的比例的值为 1:2 ，该值可以通过参数&lt;/p&gt;
+&lt;p&gt;–XX:NewRatio 来指定&lt;/p&gt;
+&lt;p&gt;3、新生代又被进一步划分为 Eden 和 Survivor 区， Survivor 由 From Survivor 和 To Survivor 组成，eden，from，to的大小比例为：8：1：1；可通过参数 **-**XX:SurvivorRatio 来指定&lt;/p&gt;
+&lt;h1 id=&#34;2-对象&#34;&gt;2. 对象
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;JVM 对象内存布局, new 一个对象有多大&lt;/li&gt;
+&lt;li&gt;阐述对象的分配策略&lt;/li&gt;
+&lt;li&gt;new 一个对象都有哪些步骤 User user01 = new User()&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;对象内存布局&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/images/image-20220215113501440.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220215113501440&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;对象头: 8 字节&lt;/p&gt;
+&lt;p&gt;对象头-类型指针: 4字节&lt;/p&gt;
+&lt;p&gt;数组多一个数组长度: 4字节&lt;/p&gt;
+&lt;p&gt;对象创建过程&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/images/image-20220215114002022.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220215114002022&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h1 id=&#34;3-字节码&#34;&gt;3. 字节码
+&lt;/h1&gt;&lt;h1 id=&#34;4-类加载&#34;&gt;4. 类加载
+&lt;/h1&gt;&lt;p&gt;JVM 类加载机制说一下&lt;/p&gt;
+&lt;p&gt;一个java 类在整个运行时会经过的阶段&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/images/image-20220215120641279.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220215120641279&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;加载&#34;&gt;加载
+&lt;/h2&gt;&lt;p&gt;加载 loading”是整个类加载（class loading）过程的一个阶段，&lt;strong&gt;加载阶段&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;虚拟机需要完成以下&lt;/strong&gt; &lt;strong&gt;3&lt;/strong&gt; &lt;strong&gt;件事情：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;1）通过==一个类的全限定名来获取定义此类的二进制字节流==。&lt;/p&gt;
+&lt;p&gt;2）将这个字节流所代表的==静态存储结构转化==为方法区的运行时数据结构。&lt;/p&gt;
+&lt;p&gt;3）在内存中生成一个代表这个类的 java.lang.Class 对象，作为方法区这个类的各种数据的访问入口。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/images/image-20220215120958934.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220215120958934&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;注意：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;加载的字节码来源，不一定非得是class文件，可以是符合字节码规范的任意地方，甚至二进制流等&lt;/li&gt;
+&lt;li&gt;从字节码到内存，是由加载器（ClassLoader）完成的，下面我们详细看一下加载器相关内容&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;验证&#34;&gt;&lt;strong&gt;验证&lt;/strong&gt;
+&lt;/h2&gt;&lt;p&gt;例如：&lt;/p&gt;
+&lt;p&gt;1、文件格式验证（版本号，是不是CAFEBABYE开头，&amp;hellip;&amp;hellip;&amp;hellip;.）&lt;/p&gt;
+&lt;p&gt;2、元数据验证（验证属性、字段、类关系、方法等是否合规）&lt;/p&gt;
+&lt;p&gt;3、字节码验证&lt;/p&gt;
+&lt;p&gt;4、符号引用验证&lt;/p&gt;
+&lt;h2 id=&#34;准备&#34;&gt;准备
+&lt;/h2&gt;&lt;p&gt;为class中定义的各种类变量（&lt;strong&gt;静态变量&lt;/strong&gt;）==分配内存，并赋初始值==，注意是对应类型的初始值，赋具体值在后面的初始化阶段。注意！即便是static变量，它在这个阶段初始化进内存的依然是该类型的初始值！而不是用户代码里的初始值。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;//类变量：在准备阶段为它开辟内存空间，但是它是int的初始值，也就是 0，而真正123的赋值，是在下面的初始化阶段 
+public static int a = 123; 
+
+//类成员变量(实例变量)的赋值是在类对象被构造时才会赋值 
+public String address = &amp;quot;北京&amp;quot;; 
+
+//final修饰的类变量，编译成字节码后，是一个ConstantValue类型,在准 备阶段，直接给定值123，后期也没有二次初始化一说 
+public static final int b = 123;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;解析&#34;&gt;解析
+&lt;/h2&gt;&lt;p&gt;将常量池内的符号引用替换为直接引用的过程&lt;/p&gt;
+&lt;h2 id=&#34;初始化&#34;&gt;初始化
+&lt;/h2&gt;&lt;p&gt;类加载的最后一个步骤，经过这个步骤后，类信息完全进入了jvm内存，直到它被垃圾回收器回收&lt;/p&gt;
+&lt;p&gt;1、前面几个阶段都是虚拟机来搞定的。我们也干涉不了，从代码上只能遵从它的语法要求。而这个阶段，是初始化赋值，java虚拟机才真正开始执行类中编写的java程序代码，将主导权移交给应用程序。&lt;/p&gt;
+&lt;p&gt;2、在准备阶段，静态变量已经赋过一次系统要求的初始值了，而在初始化阶段要执行初始化函数 &lt;clinit&gt; 函数，注意 &lt;clinit&gt; 并不是程序员在代码中编写的，而是由 javac 编译器自动生成的，&lt;/p&gt;
+&lt;p&gt;3、 &lt;clinit&gt; 函数是由编译器自动收集类中的所有静态变量的赋值动作和静态语句块（ static 代码块）中的语句合并产生的。&lt;/p&gt;
+&lt;p&gt;4、 &lt;clinit&gt; 函数与类的构造函数（虚拟机视角的 &lt;init&gt; 函数）是不同的， &lt;init&gt; 函数是在运行期创建对象时才执行，而 &lt;clinit&gt; 在类加载的时候就执行了。&lt;/p&gt;
+&lt;p&gt;5、虚拟机能保障父类的 &lt;clinit&gt; 函数优先于子类 &lt;clinit&gt; 函数的执行。&lt;/p&gt;
+&lt;p&gt;6、在 &lt;clinit&gt; 函数中会对类变量赋具体的值，也就是我们说的：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;public static int a = 123; 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;这行代码的123才真正赋值完成&lt;/p&gt;
+&lt;h2 id=&#34;双亲委派模型&#34;&gt;双亲委派模型
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/images/image-20220215140254599.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220215140254599&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;类加载器加载某个类的时候，因为有多个加载器，甚至可以有各种自定义的，他们呈父子关系。这给人一种印象，子类的加载会覆盖父类，其实恰恰相反！&lt;/p&gt;
+&lt;p&gt;与普通类继承属性不同，==类加载器会优先调父类的 loadClass 方法，如果父类能加载，直接用父类的==，否则最后一步才是自己尝试加载，从源代码上可以验证&lt;/p&gt;
+&lt;p&gt;采用双亲委派模式的是好处是Java类随着它的类加载器一起具备了一种带有优先级的层次关系，通过这种层级关可以==避免类的重复加载==，当父加载器已经加载了该类时，就没有必要子加载器再加载一次。&lt;/p&gt;
+&lt;p&gt;其次是考虑到==安全因素==，java核心api中定义类型不会被随意替换，假设通过网络传递一个名为 java.lang.Integer 的类，通过双亲委派模型传递到启动类加载器，而启动类加载器发现这个名字的类，发现该类已被加载，就不会重新加载网络传递过来的 java.lang.Integer ，而直接返回已加载过的Integer.class ，这样便可以==防止核心API库被随意篡改==&lt;/p&gt;
+&lt;p&gt;双亲委派是可以被打破的&lt;/p&gt;
+&lt;p&gt;tomcat 类加载的层次结构&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/images/image-20220215141605296.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220215141605296&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;为什么要打破该模型&lt;/p&gt;
+&lt;p&gt;tomcat 启动后会启一个jvm进程的, 它支持多个web应用部署到同一个tomcat里&lt;/p&gt;
+&lt;p&gt;1、对于不同的web应用中的class和外部jar包，需要相互隔离，不能因为不同的web应用引用了相同的jar或者有相同的class导致一个加载成功了另一个加载不了。&lt;/p&gt;
+&lt;p&gt;2、web容器支持jsp文件修改后不用重启，jsp文件也是要编译成.class文件的，每一个jsp文件对应一个JspClassLoader，它的加载范围仅仅是这个jsp文件所编译出来的那一个.class文件，当Web容器检测到jsp文件被修改时，会替换掉目前JasperLoader的实例，并通过再建立一个新的Jsp类加载器来实现JSP文件的热部署功能。&lt;/p&gt;
+&lt;h1 id=&#34;5-gc&#34;&gt;5. GC
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;JVM怎么判断一个类是不是垃圾？  引用计数 (弱引用); 可达性分析 GC ROOTS&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;说到GC ROOTS，你知道Java中哪些对象可作为GC ROOTS吗？&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;对象不可达是不是立即被回收死亡？&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CMS垃圾回收器的回收过程&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如何解决跨代引用？&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CMS收集器的流程，缺点；G1收集器的流程，相对于CMS收集器的优点&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;G1了解不，说说G1&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;并发标记的过程是怎么样的？&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;可达性分析&#34;&gt;可达性分析
+&lt;/h2&gt;&lt;p&gt;来判定对象是否存活的。这个算法的基本思路就是通过一系列的称为==“GC Roots”的对象作为起始点，从这些节点开始向下搜索，搜索所走过的路径称为引用链（ Reference Chain ），当一个对象到 GC Roots 没有任何引用链相连时，则证明此对象是不可用的==。&lt;/p&gt;
+&lt;p&gt;作为 GC Roots 的对象包括下面几种（重点是前面 4 种）：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;虚拟机栈（栈帧中的本地变量表）中引用的对象；各个线程调用方法堆栈中使用到的参数、局部变量、临时变量等。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;方法区中类静态属性引用的对象；java 类的引用类型静态变量。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;方法区中常量引用的对象；比如：字符串常量池里的引用。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;本地方法栈中 JNI（即一般说的 Native 方法）引用的对象。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;JVM 的内部引用（ class 对象、异常对象 NullPointException 、 OutofMemoryError ，系统类加载器）。（非重点）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;所有被同步锁( synchronized )持有的对象。（非重点）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;JVM 内部的 JMXBean 、 JVMTI 中注册的回调、本地代码缓存等（非重点）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;JVM 实现中的“临时性”对象，跨代引用的对象（在使用分代模型回收时只回收部分代的对象）（非重点）&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;除了这些固定的 GC Roots 集合以外，跟进用户选用的垃圾回收器以及当前回收的内存区域不同，还可能会有其他对象&amp;quot;临时&amp;quot;加入成为 GC Roots 。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/images/image-20220216142940342.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220216142940342&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;被标记为finalize 之后并不是非死不可,  真正的死亡需要经过两次标记过程,&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;没有找到GC ROOTS 的引用链, 它将第一次标记&lt;/li&gt;
+&lt;li&gt;随后进行一次筛选, 如果对象覆盖了finalize, 可以再finalize 中拯救 , 俗称对象的自我救赎&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;注意:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;finalize 只会执行一次, 不会执行多次&lt;/li&gt;
+&lt;li&gt;不建议使用finalize, 因为不太可靠&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;常见的回收算法&#34;&gt;常见的回收算法
+&lt;/h2&gt;&lt;h3 id=&#34;复制算法&#34;&gt;复制算法
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;将内存按容量划分为大小相等的两块, 每次只使用其中的一块&lt;/li&gt;
+&lt;li&gt;当其中一块内存用完了, 就将还存活的对象复制到另一块, 原来的内存空间清理&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;带来的&lt;strong&gt;好处&lt;/strong&gt;是：&lt;/p&gt;
+&lt;p&gt;1、实现简单，运行高效，&lt;/p&gt;
+&lt;p&gt;2、每次都是对整个半区进行内存回收，内存分配时也就不用考虑内存碎片等复杂情况，只要按顺序分配内存即可，&lt;/p&gt;
+&lt;p&gt;存在的&lt;strong&gt;弊端&lt;/strong&gt;是：&lt;/p&gt;
+&lt;p&gt;1、内存的使用率缩小为原来的一半。&lt;/p&gt;
+&lt;p&gt;2、内存移动是必须实打实的移动（复制），所以对应的引用（直接指针）&lt;/p&gt;
+&lt;p&gt;==适用于新生代==&lt;/p&gt;
+&lt;h3 id=&#34;标记清除算法&#34;&gt;标记清除算法
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/images/image-20220216155353396.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220216155353396&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;1、回收效率略低，如果大部分对象是朝生夕死，那么回收效率降低，因为==需要大量标记对象和回收对象==，对比复制回收效率要低，所以该算法不适合新生代。&lt;/p&gt;
+&lt;p&gt;2、它的主要问题是在标记清除之后会==产生大量不连续的内存碎片==，空间碎片太多可能会导致以后在程序运行过程中需要==分配较大对象时==，无法找到足够的连续内存而不得不提前触发另一次垃圾回收动作。&lt;/p&gt;
+&lt;p&gt;3、标记清除算法适用于老年代&lt;/p&gt;
+&lt;h3 id=&#34;标记整理法&#34;&gt;标记整理法
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;标记处所有需要回收的对象&lt;/li&gt;
+&lt;li&gt;标记成功后, 后续步骤不是直接对对象进行清理, 而是让所有存活的对象都向一端移动&lt;/li&gt;
+&lt;li&gt;然后直接清理掉端边界以外的内存&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/images/image-20220216162113407.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220216162113407&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;1、标记整理需要扫描两遍&lt;/p&gt;
+&lt;p&gt;2、标记整理与标记清除算法的区别主要在于对象的移动。对象移动不单单会加重系统负担，同时需要全程暂停户线程才能进行，同时所有引用对象的地方都需要更新（直接指针需要调整）。&lt;/p&gt;
+&lt;p&gt;3、标记整理算法不会产生内存碎片，但是效率偏低。&lt;/p&gt;
+&lt;p&gt;4、标记整理算法适用于老年代。&lt;/p&gt;
+&lt;h2 id=&#34;回收器&#34;&gt;回收器
+&lt;/h2&gt;</description>
+        </item>
+        
+    </channel>
+</rss>

@@ -1,0 +1,2694 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="0. 前言 设计模式是一套被反复使用的、多数人知晓的、经过分类编目的、代码设计经验的总结\n1. 创建型模式 工厂模式（Factory Pattern） 抽象工厂模式（Abstract Factory Pattern） 单例模式（Singleton Pattern） 建造者模式（Builder Pattern） 原型模式（Prototype Pattern） 2. 结构型模式 适配器模式（Adapter Pattern） 桥接模式（Bridge Pattern） 过滤器模式（Filter、Criteria Pattern） 组合模式（Composite Pattern） 装饰器模式（Decorator Pattern） 外观模式（Facade Pattern） 享元模式（Flyweight Pattern） 代理模式（Proxy Pattern） 3. 行为型模式 责任链模式（Chain of Responsibility Pattern） 命令模式（Command Pattern） 解释器模式（Interpreter Pattern） 迭代器模式（Iterator Pattern） 中介者模式（Mediator Pattern） 备忘录模式（Memento Pattern） 观察者模式（Observer Pattern） 状态模式（State Pattern） 空对象模式（Null Object Pattern） 策略模式（Strategy Pattern） 模板模式（Template Pattern） 访问者模式（Visitor Pattern） 两个问题:\n">
+<title>设计模式</title>
+
+<link rel='canonical' href='https://mikeLing-qx.github.io/p/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="设计模式">
+<meta property='og:description' content="0. 前言 设计模式是一套被反复使用的、多数人知晓的、经过分类编目的、代码设计经验的总结\n1. 创建型模式 工厂模式（Factory Pattern） 抽象工厂模式（Abstract Factory Pattern） 单例模式（Singleton Pattern） 建造者模式（Builder Pattern） 原型模式（Prototype Pattern） 2. 结构型模式 适配器模式（Adapter Pattern） 桥接模式（Bridge Pattern） 过滤器模式（Filter、Criteria Pattern） 组合模式（Composite Pattern） 装饰器模式（Decorator Pattern） 外观模式（Facade Pattern） 享元模式（Flyweight Pattern） 代理模式（Proxy Pattern） 3. 行为型模式 责任链模式（Chain of Responsibility Pattern） 命令模式（Command Pattern） 解释器模式（Interpreter Pattern） 迭代器模式（Iterator Pattern） 中介者模式（Mediator Pattern） 备忘录模式（Memento Pattern） 观察者模式（Observer Pattern） 状态模式（State Pattern） 空对象模式（Null Object Pattern） 策略模式（Strategy Pattern） 模板模式（Template Pattern） 访问者模式（Visitor Pattern） 两个问题:\n">
+<meta property='og:url' content='https://mikeLing-qx.github.io/p/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/'>
+<meta property='og:site_name' content='lexqinMike'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-01-03T15:25:43&#43;08:00'/><meta property='article:modified_time' content='2025-01-03T15:25:43&#43;08:00'/>
+<meta name="twitter:title" content="设计模式">
+<meta name="twitter:description" content="0. 前言 设计模式是一套被反复使用的、多数人知晓的、经过分类编目的、代码设计经验的总结\n1. 创建型模式 工厂模式（Factory Pattern） 抽象工厂模式（Abstract Factory Pattern） 单例模式（Singleton Pattern） 建造者模式（Builder Pattern） 原型模式（Prototype Pattern） 2. 结构型模式 适配器模式（Adapter Pattern） 桥接模式（Bridge Pattern） 过滤器模式（Filter、Criteria Pattern） 组合模式（Composite Pattern） 装饰器模式（Decorator Pattern） 外观模式（Facade Pattern） 享元模式（Flyweight Pattern） 代理模式（Proxy Pattern） 3. 行为型模式 责任链模式（Chain of Responsibility Pattern） 命令模式（Command Pattern） 解释器模式（Interpreter Pattern） 迭代器模式（Iterator Pattern） 中介者模式（Mediator Pattern） 备忘录模式（Memento Pattern） 观察者模式（Observer Pattern） 状态模式（State Pattern） 空对象模式（Null Object Pattern） 策略模式（Strategy Pattern） 模板模式（Template Pattern） 访问者模式（Visitor Pattern） 两个问题:\n">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avator_hu1060881492573662444.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">lexqinMike</a></h1>
+            <h2 class="site-description">welcome to my blog, 代码无 bug，咖啡无限续。</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/CaiJimmy/hugo-theme-stack'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://twitter.com'
+                        target="_blank"
+                        title="Twitter"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#0-前言">0. 前言</a>
+      <ul>
+        <li><a href="#1-创建型模式">1. 创建型模式</a></li>
+        <li><a href="#2-结构型模式">2. 结构型模式</a></li>
+        <li><a href="#3-行为型模式">3. 行为型模式</a></li>
+      </ul>
+    </li>
+    <li><a href="#1-工厂模式-factory">1. 工厂模式 Factory</a>
+      <ul>
+        <li><a href="#10-概述">1.0 概述</a></li>
+        <li><a href="#11-实现方式">1.1 实现方式</a>
+          <ul>
+            <li><a href="#11-1-简单工厂">1.1. 1 简单工厂</a></li>
+            <li><a href="#112--抽象工厂">1.1.2  抽象工厂</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#2-单例模式-singleton">2. 单例模式 SingleTon</a>
+      <ul>
+        <li><a href="#21-概述">2.1 概述</a></li>
+        <li><a href="#22-实现方式">2.2 实现方式</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-构造模式-builder">3. 构造模式 Builder</a>
+      <ul>
+        <li><a href="#31-概述">3.1 概述</a></li>
+        <li><a href="#32-实现">3.2 实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-原型模式-prototype">4. 原型模式 Prototype</a>
+      <ul>
+        <li><a href="#41-概述">4.1 概述</a>
+          <ul>
+            <li><a href="#411-深拷贝和浅拷贝">4.1.1 深拷贝和浅拷贝</a></li>
+          </ul>
+        </li>
+        <li><a href="#42-实现">4.2 实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-适配器模式-adapterwrapper">5. 适配器模式 Adapter(Wrapper)</a>
+      <ul>
+        <li><a href="#51-概述">5.1 概述</a></li>
+        <li><a href="#52-实现">5.2 实现</a>
+          <ul>
+            <li><a href="#520-实现步骤">5.2.0 实现步骤</a></li>
+            <li><a href="#521-类的适配器模式">5.2.1 类的适配器模式</a></li>
+            <li><a href="#522-对象的适配器模式">5.2.2 对象的适配器模式</a></li>
+            <li><a href="#523-接口的适配器模式">5.2.3 接口的适配器模式</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#6-装饰模式-decorator">6. 装饰模式 Decorator</a>
+      <ul>
+        <li><a href="#61-概述">6.1 概述</a></li>
+        <li><a href="#62-实现">6.2 实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-代理模式-proxy">7 .代理模式 Proxy</a>
+      <ul>
+        <li><a href="#71--概述">7.1  概述</a></li>
+        <li><a href="#72-实现-静态代理">7.2 实现 (静态代理)</a></li>
+        <li><a href="#73-实现-动态代理">7.3 实现 (动态代理)</a>
+          <ul>
+            <li><a href="#1-引入依赖">1. 引入依赖</a></li>
+            <li><a href="#aspectj">AspectJ</a></li>
+            <li><a href="#2-创建接口-和-实现类">2. 创建接口 和 实现类</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#8-外观模式-facade-门面">8. 外观模式 Facade (门面)</a>
+      <ul>
+        <li><a href="#81-概述">8.1 概述</a></li>
+        <li><a href="#82-实现">8.2 实现</a>
+          <ul>
+            <li><a href="#1-数据库连接">1. 数据库连接</a></li>
+            <li><a href="#2-组装电脑">2. 组装电脑</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#9-桥接模式">9. 桥接模式</a>
+      <ul>
+        <li><a href="#91-概述">9.1 概述</a>
+          <ul>
+            <li><a href="#910-jdbc-连接数据库">9.1.0 JDBC 连接数据库</a></li>
+            <li><a href="#911-使用场景">9.1.1 使用场景</a></li>
+          </ul>
+        </li>
+        <li><a href="#92-实现">9.2 实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#10--组合模式-composite">10.  组合模式 Composite</a></li>
+    <li><a href="#11-享元模式-flyweight">11. 享元模式 Flyweight</a>
+      <ul>
+        <li><a href="#1111-概述">11.1.1 概述</a></li>
+        <li><a href="#1112-包装类">11.1.2 包装类</a></li>
+        <li><a href="#112--实现">11.2  实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#12-策略模式-category">12. 策略模式 Category</a>
+      <ul>
+        <li><a href="#121-概述">12.1 概述</a></li>
+        <li><a href="#122-实现">12.2 实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#13-模板方法-template-method">13. 模板方法 Template Method</a>
+      <ul>
+        <li><a href="#131-概述">13.1 概述</a></li>
+        <li><a href="#132-实现">13.2 实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#14-观察者模式-observer">14. 观察者模式 Observer</a>
+      <ul>
+        <li><a href="#141-概述">14.1 概述</a></li>
+        <li><a href="#142-实现">14.2 实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#15-迭代器模式-iterator">15. 迭代器模式 <strong>Iterator</strong></a>
+      <ul>
+        <li><a href="#151-概述">15.1 概述</a></li>
+        <li><a href="#152-实现">15.2 实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#16-责任链模式-chain-of-responsibility">16. 责任链模式 Chain of Responsibility</a>
+      <ul>
+        <li><a href="#161-概述">16.1 概述</a></li>
+        <li><a href="#162-实现">16.2 实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#18-命令模式-command">18. 命令模式 Command</a>
+      <ul>
+        <li><a href="#181-概述">18.1 概述</a></li>
+        <li><a href="#182-实现">18.2 实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#19-备忘录模式-memento">19. 备忘录模式 Memento</a>
+      <ul>
+        <li><a href="#191-概述">19.1 概述</a></li>
+        <li><a href="#192-实现">19.2 实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#20-状态模式-state">20. 状态模式 State</a>
+      <ul>
+        <li><a href="#201-概述">20.1 概述</a></li>
+        <li><a href="#202--实现">20.2  实现</a></li>
+      </ul>
+    </li>
+    <li><a href="#21-访问者模式-visitor">21. 访问者模式 Visitor</a>
+      <ul>
+        <li><a href="#211-概述">21.1 概述</a></li>
+        <li><a href="#212-实现">21.2 实现</a></li>
+        <li><a href="#213--实现-递归改造">21.3  实现 (递归改造)</a></li>
+      </ul>
+    </li>
+    <li><a href="#22-中介模式-mediator">22. 中介模式 Mediator</a>
+      <ul>
+        <li><a href="#221--概述">22.1  概述</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">设计模式</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jan 03, 2025</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 20 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="0-前言">0. 前言
+</h1><p>设计模式是一套被反复使用的、多数人知晓的、经过分类编目的、代码设计经验的总结</p>
+<h2 id="1-创建型模式">1. 创建型模式
+</h2><ul>
+<li>工厂模式（Factory Pattern）</li>
+<li>抽象工厂模式（Abstract Factory Pattern）</li>
+<li>单例模式（Singleton Pattern）</li>
+<li>建造者模式（Builder Pattern）</li>
+<li>原型模式（Prototype Pattern）</li>
+</ul>
+<h2 id="2-结构型模式">2. 结构型模式
+</h2><ul>
+<li>适配器模式（Adapter Pattern）</li>
+<li>桥接模式（Bridge Pattern）</li>
+<li>过滤器模式（Filter、Criteria Pattern）</li>
+<li>组合模式（Composite Pattern）</li>
+<li>装饰器模式（Decorator Pattern）</li>
+<li>外观模式（Facade Pattern）</li>
+<li>享元模式（Flyweight Pattern）</li>
+<li>代理模式（Proxy Pattern）</li>
+</ul>
+<h2 id="3-行为型模式">3. 行为型模式
+</h2><ul>
+<li>责任链模式（Chain of Responsibility Pattern）</li>
+<li>命令模式（Command Pattern）</li>
+<li>解释器模式（Interpreter Pattern）</li>
+<li>迭代器模式（Iterator Pattern）</li>
+<li>中介者模式（Mediator Pattern）</li>
+<li>备忘录模式（Memento Pattern）</li>
+<li>观察者模式（Observer Pattern）</li>
+<li>状态模式（State Pattern）</li>
+<li>空对象模式（Null Object Pattern）</li>
+<li>策略模式（Strategy Pattern）</li>
+<li>模板模式（Template Pattern）</li>
+<li>访问者模式（Visitor Pattern）</li>
+</ul>
+<p>两个问题:</p>
+<ol>
+<li>使用场景, 好处</li>
+<li>怎么用的</li>
+</ol>
+<h1 id="1-工厂模式-factory">1. 工厂模式 Factory
+</h1><h2 id="10-概述">1.0 概述
+</h2><p>就是建立一个工厂类, 对实现了同一接口的一些类进行实例的创建</p>
+<blockquote>
+<ol>
+<li>普通工厂</li>
+<li>多工厂方法</li>
+<li>静态工厂方法</li>
+</ol>
+</blockquote>
+<p>使用场景</p>
+<blockquote>
+<p>出现了大量的产品需要创建, 并且具有共同的接口时, 可以通过工厂方法模式进行创建, 建议使用静态工厂方法模式</p>
+</blockquote>
+<h2 id="11-实现方式">1.1 实现方式
+</h2><h3 id="11-1-简单工厂">1.1. 1 简单工厂
+</h3><p>首先, 创建二者共同接口</p>
+<pre><code class="language-java">public interface Sender (){
+	public void Send();
+}
+</code></pre>
+<p>创建实现类</p>
+<pre><code class="language-java">public class MailSender implements Sender {  
+    @Override  
+    public void Send() {  
+        System.out.println(&quot;this is mailsender!&quot;);  
+    }  
+} 
+</code></pre>
+<pre><code class="language-java">public class SmsSender implements Sender {    
+    @Override  
+    public void Send() {  
+        System.out.println(&quot;this is sms sender!&quot;);  
+    }  
+}
+</code></pre>
+<p>建工厂类</p>
+<pre><code>public class SendFactory {  
+   public Sender produce(String type) {
+           if (&quot;mail&quot;.equals(type)) {
+                   return new MailSender();
+           } else if (&quot;sms&quot;.equals(type)) {
+                   return new SmsSender();
+           } else {
+                   System.out.println(&quot;请输入正确的类型!&quot;);
+                    return null;
+           }
+    }  
+}
+</code></pre>
+<h3 id="112--抽象工厂">1.1.2  抽象工厂
+</h3><p>==<strong>概述</strong>==</p>
+<blockquote>
+<p>类的创建依赖于工厂, 如果想要拓展程序就必须要对工厂类进行修改, 这违背了闭包原则 (对拓展开放, 对修改关闭); ==当程序修改的时候不需要去修改原来的代码,  实现一个热插拔的效果 (使用接口和抽象类)==</p>
+</blockquote>
+<p>实现方式</p>
+<pre><code>1. Cpu接口
+2. 再有两个实现类 Kirin990 和 888 
+3. 屏幕Screen接口
+4. 两个屏幕实现类 三星 和 京东方
+5. phone工厂接口 
+6. 手机工厂实现类 
+小米工厂 (三星屏幕 + 888Cpu) 华为工厂 (Kirin990 + 京东方)
+
+7. 
+
+</code></pre>
+<pre><code class="language-java">public class AbstractFactory {
+
+    // 手机cpu
+    public interface Cpu {
+
+        void run();
+
+
+        class Cpu660 implements Cpu {
+            @Override
+            public void run() {
+                System.out.println(&quot;660&quot;);
+            }
+        }
+
+        class Cpu845 implements Cpu {
+            @Override
+            public void run() {
+                System.out.println(&quot;845&quot;);
+            }
+        }
+
+        class CpuKirin9000 implements Cpu {
+            @Override
+            public void run() {
+                System.out.println(&quot;Kirin9000&quot;);
+            }
+        }
+
+    }
+
+    // 手机屏幕
+    public interface Screen {
+
+        void Size();
+
+        class Screen5 implements Screen {
+            @Override
+            public void Size() {
+                System.out.println(&quot;5&quot;);
+            }
+        }
+
+        class Screen6 implements Screen {
+            @Override
+            public void Size() {
+                System.out.println(&quot;6&quot;);
+            }
+        }
+
+    }
+
+
+    // 工厂接口
+    public interface PhoneFactory {
+
+        Cpu getCpu();
+
+        Screen getScreen();
+    }
+
+    public class XiaoMiFactory implements PhoneFactory {
+        @Override
+        public Cpu getCpu() {
+            return new Cpu.Cpu845();
+        }
+
+        @Override
+        public Screen getScreen() {
+            return new Screen.Screen6();
+        }
+    }
+
+    public class HongMiFactory implements PhoneFactory {
+        @Override
+        public Cpu getCpu() {
+            return new Cpu.Cpu660();
+        }
+
+        @Override
+        public Screen getScreen() {
+            return new Screen.Screen5();
+        }
+    }
+
+    public class HuaweiFactory implements PhoneFactory {
+
+        @Override
+        public Cpu getCpu() {
+            return new Cpu.CpuKirin9000();
+        }
+
+        @Override
+        public Screen getScreen() {
+            return new Screen.Screen6();
+        }
+    }
+
+
+    @Test
+    public void test01() {
+
+        HongMiFactory hongMiFactory = new HongMiFactory();
+
+        Cpu cpu = hongMiFactory.getCpu();
+        Screen screen = hongMiFactory.getScreen();
+
+        cpu.run();
+        screen.Size();
+    }
+
+}
+</code></pre>
+<h1 id="2-单例模式-singleton">2. 单例模式 SingleTon
+</h1><h2 id="21-概述">2.1 概述
+</h2><p>参考资料</p>
+<blockquote>
+<p><a class="link" href="https://www.liaoxuefeng.com/wiki/1252599548343744/1281319214514210#0"  target="_blank" rel="noopener"
+    >https://www.liaoxuefeng.com/wiki/1252599548343744/1281319214514210#0</a></p>
+</blockquote>
+<p>实现方式</p>
+<blockquote>
+<ol>
+<li>
+<p>只用private 构造方法, 确保外部无法实例化</p>
+</li>
+<li>
+<p>通过 private static 变量持有唯一治理, 保证全局唯一性</p>
+</li>
+<li>
+<p>通过public static 方法返回唯一实例, 使外部调用方能获取</p>
+</li>
+</ol>
+</blockquote>
+<p>==Singleton模式一般以“约定”为主 让框架（例如Spring）来实例化这些类，保证只有一个实例，不会刻意实现它==</p>
+<blockquote>
+<p>双重检查</p>
+<p>真正实现延迟加载，只能通过Java的ClassLoader机制完成。如果没有特殊的需求，使用Singleton模式的时候，最好不要延迟加载，这样会使代码更简单。</p>
+</blockquote>
+<h2 id="22-实现方式">2.2 实现方式
+</h2><ol>
+<li>普通实现</li>
+</ol>
+<pre><code class="language-java">public class Singleton {
+    // 静态字段引用唯一实例:
+    public static final Singleton INSTANCE = null;
+
+    // private构造方法保证外部无法实例化:
+    private Singleton() {
+    }
+    
+    public synchronized static Singleton getInstance() {
+    	if (INSTANCE == null) {
+        	INSTANCE = new Singleton();
+    	}
+	    return INSTANCE;
+	}
+}
+</code></pre>
+<ol start="2">
+<li>enum 实现</li>
+</ol>
+<pre><code>public enum World {
+    // 唯一枚举:
+	INSTANCE;
+
+	private String name = &quot;world&quot;;
+
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+}
+</code></pre>
+<h1 id="3-构造模式-builder">3. 构造模式 Builder
+</h1><h2 id="31-概述">3.1 概述
+</h2><blockquote>
+<p>使用Builder模式是, 适用于创建比较复杂的对象, 一步一步的创建出零件, 最后在装配起来</p>
+</blockquote>
+<pre><code class="language-java">String url = URLBuilder.builder() // 创建Builder
+            .setDomain(&quot;www.liaoxuefeng.com&quot;) // 设置domain
+            .setScheme(&quot;https&quot;) // 设置scheme
+            .setPath(&quot;/&quot;) // 设置路径
+            .setQuery(Map.of(&quot;a&quot;, &quot;123&quot;, &quot;q&quot;, &quot;K&amp;R&quot;)) // 设置query
+            .build(); // 完成build
+
+</code></pre>
+<h2 id="32-实现">3.2 实现
+</h2><h1 id="4-原型模式-prototype">4. 原型模式 Prototype
+</h1><h2 id="41-概述">4.1 概述
+</h2><blockquote>
+<p>创建新对象的时候, 根据现有的一个原型来创建,</p>
+</blockquote>
+<h3 id="411-深拷贝和浅拷贝">4.1.1 深拷贝和浅拷贝
+</h3><blockquote>
+<p>浅: 将一个对象复制后, 基本数据类型的变量都会重新创建, 而 引用类型, 指向的还是 原对象所指向的</p>
+<p>深: 将一个对象复制后, 不论是基本数据类型还是引用类型, 都是重新创建的, , 就是深复制是彻底的复制</p>
+</blockquote>
+<pre><code class="language-java">public class Prototype implements Cloneable, Serializable {
+    private static final long serialVersionUID = 1L;
+    private String string;
+    private SerializableObject obj;
+
+    /* 浅复制 */
+    public Object clone() throws CloneNotSupportedException {
+        Prototype proto = (Prototype) super.clone();
+        return proto;
+    }
+
+    /* 深复制 */
+    public Object deepClone() throws IOException, ClassNotFoundException {
+
+        /* 写入当前对象的二进制流 */
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject(this);
+
+        /* 读出二进制流产生的新对象 */
+        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        return ois.readObject();
+    }
+
+    public String getString() {
+        return string;
+    }
+
+    public void setString(String string) {
+        this.string = string;
+    }
+
+    public SerializableObject getObj() {
+        return obj;
+    }
+
+    public void setObj(SerializableObject obj) {
+        this.obj = obj;
+    }
+
+}
+
+class SerializableObject implements Serializable {
+    private static final long serialVersionUID = 1L;
+}
+
+</code></pre>
+<h2 id="42-实现">4.2 实现
+</h2><p>Q: 如果我们已经有了一个<code>String[]</code>数组，想再创建一个一模一样的<code>String[]</code>数组，怎么写？</p>
+<p>==这个创建过程封装一下，就成了原型模式==</p>
+<pre><code class="language-java">// 原型:
+String[] original = { &quot;Apple&quot;, &quot;Pear&quot;, &quot;Banana&quot; };
+// 新对象:
+String[] copy = Arrays.copyOf(original, original.length);
+
+</code></pre>
+<h1 id="5-适配器模式-adapterwrapper">5. 适配器模式 Adapter(Wrapper)
+</h1><p>相当一个转换器, 输入为 接口A , 输出为 接口B</p>
+<h2 id="51-概述">5.1 概述
+</h2><blockquote>
+<ol>
+<li>类的适配器模式：当希望将<strong>一个类</strong>转换成满足<strong>另一个新接口</strong>的类时，可以使用类的适配器模式，创建一个新类，继承原有的类，实现新的接口即可。</li>
+<li>对象的适配器模式：当希望将一个对象转换成满足另一个新接口的对象时，可以创建一个Wrapper类，持有原类的一个实例，在Wrapper类的方法中，调用实例的方法就行。</li>
+<li>接口的适配器模式：当不希望实现一个接口中所有的方法时，可以创建一个抽象类Wrapper，实现所有方法，我们写别的类的时候，继承抽象类即可。</li>
+</ol>
+</blockquote>
+<p>类</p>
+<p><img src="/p/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/images/%E7%B1%BB%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F.png"
+	width="605"
+	height="285"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="212"
+		data-flex-basis="509px"
+	
+></p>
+<p>==使用场景==</p>
+<blockquote>
+<p>将一个类的接口转换成客户希望的另外一个接口, 是的原本由于接口不兼容而不能一起工作的那些类可以一起工作</p>
+</blockquote>
+<p>适配器模式在Java标准库中有广泛应用</p>
+<pre><code class="language-java">String[] exist = new String[] {&quot;Good&quot;, &quot;morning&quot;, &quot;Bob&quot;, &quot;and&quot;, &quot;Alice&quot;};
+Set&lt;String&gt; set = new HashSet&lt;&gt;(Arrays.asList(exist));
+
+</code></pre>
+<h2 id="52-实现">5.2 实现
+</h2><h3 id="520-实现步骤">5.2.0 实现步骤
+</h3><blockquote>
+<ol>
+<li>实现目标接口</li>
+<li>内部持有一个待转换接口的引用, 可通过字段</li>
+<li>在目标接口的实现方法内部, 调用待转换接口的方法</li>
+</ol>
+</blockquote>
+<h3 id="521-类的适配器模式">5.2.1 类的适配器模式
+</h3><p>==sum==</p>
+<blockquote>
+</blockquote>
+<ol>
+<li>原本Source类只用method1 方法</li>
+</ol>
+<pre><code class="language-java">public class Source {
+
+    public void method1() {
+        System.out.println(&quot;this is original method!&quot;);
+    }
+
+}
+
+</code></pre>
+<ol start="2">
+<li>TargetTable 接口</li>
+</ol>
+<pre><code class="language-java">public interface TargetTable {
+
+    void method1();
+
+    void method2();
+}
+
+</code></pre>
+<ol start="3">
+<li>==Adapter类，将Source的功能扩展到Targetable里==</li>
+</ol>
+<pre><code class="language-java">public class Adapter extends Source implements TargetTable {
+
+    @Override
+    public void method2() {
+
+    }
+
+    public static void main(String[] args) {
+        Adapter adapter = new Adapter();
+        adapter.method1();
+        adapter.method2();
+    }
+
+}
+
+</code></pre>
+<ol start="4">
+<li>test</li>
+</ol>
+<pre><code class="language-java">public static void main(String[] args) {
+        Adapter adapter = new Adapter();
+        adapter.method1();
+        adapter.method2();
+}
+
+</code></pre>
+<h3 id="522-对象的适配器模式">5.2.2 对象的适配器模式
+</h3><p>不继承Source类，==而是持有Source类的实例==，以达到解决兼容性的问题</p>
+<p><img src="/p/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/images/%E5%AF%B9%E8%B1%A1%E9%80%82%E9%85%8D%E5%99%A8.png"
+	width="587"
+	height="293"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="200"
+		data-flex-basis="480px"
+	
+></p>
+<pre><code class="language-java">public class Wrapper implements Targetable {  
+
+           private Source source;  
+
+           public Wrapper(Source source){
+                   super();
+                   this.source = source;
+            }  
+           @Override  
+            public void method2() {
+                System.out.println(&quot;this is the targetable method!&quot;);
+            }  
+
+            @Override
+            public void method1() {
+                source.method1();
+            }  
+    }
+
+</code></pre>
+<h3 id="523-接口的适配器模式">5.2.3 接口的适配器模式
+</h3><p>​	接口定义了太多方法, 但是并不是都需要</p>
+<blockquote>
+<p>实现方式</p>
+<ol>
+<li>抽象类实现原接口</li>
+<li>新的类继承抽象类, 重写我们需要的方法就可以了</li>
+</ol>
+</blockquote>
+<h1 id="6-装饰模式-decorator">6. 装饰模式 Decorator
+</h1><h2 id="61-概述">6.1 概述
+</h2><p>给对象动态的添加一些新功能, 要求装饰对象和 被装饰对象实现同一接口, 装饰对象持有被装饰对象的实例</p>
+<p>==应用场景==</p>
+<blockquote>
+<ol>
+<li>需要拓展一个类的功能</li>
+<li>动态的为一个对象新增功能, 而且还能动态的撤销 (继承无法做到, 继承是静态的, 不能动态增删)</li>
+</ol>
+</blockquote>
+<p>==缺点==:  产生过多相似的对象, 不易排错</p>
+<h2 id="62-实现">6.2 实现
+</h2><p>接口</p>
+<pre><code class="language-java">public interface Sourceable {
+	public void method();
+}
+
+</code></pre>
+<p>被装饰类</p>
+<pre><code class="language-java">public class Source implents Sourceable{
+	
+	@Override
+	public void method(){
+		sout(&quot;the original mehtod&quot;);
+	}
+}
+
+</code></pre>
+<p>装饰类</p>
+<pre><code class="language-java">public class Decorator implement Sourceable{
+	
+	private Sourceable source;
+	
+	public Decorator(Sourceable source){
+		super();
+		this.source = source;
+	}
+
+	@Override
+	public void method(){
+		sout('before decorator');
+		source.method();
+		sout(&quot;after decorator&quot;);
+	}
+
+}
+
+</code></pre>
+<p>test</p>
+<pre><code class="language-java"> psvm{
+ 	Sourceable source = new Source();
+	Sourceable obj = new Decoratoe(source);
+	obj.method();
+ }
+
+</code></pre>
+<h1 id="7-代理模式-proxy">7 .代理模式 Proxy
+</h1><h2 id="71--概述">7.1  概述
+</h2><p>为其他对象提供一种代理以控制对这个对象的访问</p>
+<p>==应用场景==</p>
+<blockquote>
+<p>如果已有的方法在使用的时候需要对原有的方法进行改进, 就可以采用代理模式, 对产生的结果进行控制</p>
+</blockquote>
+<p>==装饰模式和代理模式的区别==</p>
+<blockquote>
+<p>对装饰器模式来说，装饰者（decorator）和被装饰者（decoratee）都实现同一个 接口。对代理模式来说，代理类（proxy class）和真实处理的类（real class）都实现同一个接口。他们之间的边界确实比较模糊，两者都是对类的方法进行扩展，具体区别如下：</p>
+<p>1、装饰器模式强调的是增强自身，在被装饰之后你能够在被增强的类上使用增强后的功能。增强后你还是你，只不过能力更强了而已；代理模式强调要让别人帮你去做一些本身与你业务没有太多关系的职责（记录日志、设置缓存）。代理模式是为了实现对象的控制，因为被代理的对象往往难以直接获得或者是其内部不想暴露出来。</p>
+<p>2、装饰模式是以对客户端透明的方式扩展对象的功能，是继承方案的一个替代方案；代理模式则是给一个对象提供一个代理对象，并由代理对象来控制对原有对象的引用；</p>
+<p>3、装饰模式是为装饰的对象增强功能；而代理模式对代理的对象施加控制，但不对对象本身的功能进行增强；</p>
+</blockquote>
+<h2 id="72-实现-静态代理">7.2 实现 (静态代理)
+</h2><p>代理模式通过封装一个已有的接口, 并向调用放返回相同的接口类型, 能在调用放不改变代码的前提下 增强功能(鉴权, 延迟加载, 连接池复用)</p>
+<p>==要求调用方持有接口, 作为 Proxy的类 也必须实现相同的接口==</p>
+<p>步骤</p>
+<ol>
+<li>代理类和目标类实现同一个接口</li>
+<li>代理类中除了要调用目标类的方法实现业务逻辑, 还要实现额外的功能</li>
+</ol>
+<p>接口</p>
+<pre><code class="language-java">public interface Sourceable{
+	void method;
+}
+
+</code></pre>
+<p>被代理方法</p>
+<pre><code class="language-java">public class Source implements Sourceable{
+	@Override
+	public void method(){
+  		sout(&quot;111&quot;)';
+	}
+}
+
+</code></pre>
+<p>代理</p>
+<pre><code class="language-java">public class Proxy implemts Sourcealble {
+	private Source source;
+	
+	public Proxy(){
+		super();
+		this.source = new source();
+	}
+
+	@Override
+	public void method(){
+		sout(&quot;befor&quot;);
+		source.method();
+	}
+
+}
+
+</code></pre>
+<h2 id="73-实现-动态代理">7.3 实现 (动态代理)
+</h2><p>动态代理: 动态的为目标类创建代理类</p>
+<h3 id="1-引入依赖">1. 引入依赖
+</h3><pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-context&lt;/artifactId&gt;
+    &lt;version&gt;5.2.16.RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.aspectj&lt;/groupId&gt;
+    &lt;artifactId&gt;aspectjrt&lt;/artifactId&gt;
+    &lt;version&gt;1.9.5&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.aspectj&lt;/groupId&gt;
+    &lt;artifactId&gt;aspectjweaver&lt;/artifactId&gt;
+    &lt;version&gt;1.9.5&lt;/version&gt;
+&lt;/dependency
+
+</code></pre>
+<blockquote>
+<h3 id="aspectj">AspectJ
+</h3><p>AspectJ 是一个基于 Java 语言的 AOP 框架，提供了强大的 AOP 功能，其他很多 AOP 框架都借鉴或采纳其中的一些思想。</p>
+<p>AspectJ 是 Java 语言的一个 AOP 实现，其主要包括两个部分：第一个部分定义了如何表达、定义 AOP 编程中的语法规范，通过这套语言规范，我们可以方便地用 AOP 来解决 Java 语言中存在的交叉关注点问题；另一个部分是工具部分，包括编译器、调试工具等。</p>
+<p>AspectJ 是最早、功能比较强大的 AOP 实现之一，对整套 AOP 机制都有较好的实现，很多其他语言的 AOP 实现，也借鉴或采纳了 AspectJ 中很多设计。在 Java 领域，AspectJ 中的很多语法结构基本上已成为 AOP 领域的标准。</p>
+</blockquote>
+<h3 id="2-创建接口-和-实现类">2. 创建接口 和 实现类
+</h3><p>接口</p>
+<pre><code class="language-java">public interface CalculateService {
+    // 加法
+    int add(int a,int b);
+    // 减法
+    int sub(int a,int b);
+}
+
+</code></pre>
+<p>实现类(目标类)</p>
+<pre><code class="language-java">@Service
+public class CalculateServiceImpl implements CalculateService {
+     @Override
+    public int add(int a, int b) {
+        int result = a + b;
+        System.out.println(&quot;加法操作。。。&quot;);
+        return result;
+    }
+
+    @Override
+    public int sub(int a, int b) {
+        int result = a - b;
+        System.out.println(&quot;减法操作。。。&quot;);
+        return result;
+    }
+}
+
+</code></pre>
+<h1 id="8-外观模式-facade-门面">8. 外观模式 Facade (门面)
+</h1><h2 id="81-概述">8.1 概述
+</h2><p>为了解决类与类之间的依赖关系, 外观模式就是把他们的关系放在一个Facede类中, 降低类类之间的耦合度, 该模式没有涉及到接口</p>
+<h2 id="82-实现">8.2 实现
+</h2><h3 id="1-数据库连接">1. 数据库连接
+</h3><blockquote>
+<p>Facade模式的一个典型应用就是进行数据库连接。一般我们在每一次对数据库进行访问，都要进行以下操作：先得到connect实例，然后打开connect获得连接，得到一个statement,.执行sql语句进行查询，得到查询结果集。</p>
+<p>我们可以将这些步骤提取出来，封装在一个类里面。这样，每次执行数据库访问只需要
+将必要的参数传递到这个类中就可以了。</p>
+</blockquote>
+<h3 id="2-组装电脑">2. 组装电脑
+</h3><ol>
+<li>cpu 类</li>
+</ol>
+<pre><code class="language-java">public void Cpu {
+	
+ public void startup() {
+ 	sout(&quot;&quot;)
+ };
+	
+ public void shutdown() {
+ 	sout(&quot;&quot;);
+ }
+	
+}
+
+</code></pre>
+<ol start="2">
+<li>
+<p>memory 类</p>
+</li>
+<li>
+<p>disk 类</p>
+</li>
+<li>
+<p>computer 进行统一管理</p>
+</li>
+</ol>
+<pre><code class="language-java">public void Computer {
+	private Cpu cpu;
+	pirvate Memory memory;
+	private Disk disk;
+	
+	public Computer (){
+		cpu = new Cpu();
+		memory = new Memory();
+		disk = new Disk();
+	}
+	
+	public void startup (){
+		sout();
+		cpu.startup();
+		memory.startup();
+		disk.startup();
+	}
+	
+	public void shutdown() {
+		sout();
+		cpu.shutdown();
+		memory.shutdown();
+		disk.shutdown();
+	}
+}
+
+</code></pre>
+<h1 id="9-桥接模式">9. 桥接模式
+</h1><h2 id="91-概述">9.1 概述
+</h2><blockquote>
+<p>桥接模式就是把事物和其具体实现分开，使他们可以各自独立的变化。桥接的用意是：<strong>将抽象化与实现化解耦，使得二者可以独立变化</strong>，像我们常用的JDBC桥DriverManager一样，JDBC进行连接数据库的时候，在各个数据库之间进行切换，基本不需要动太多的代码，甚至丝毫不用动，原因就是JDBC提供统一接口，每个数据库提供各自的实现，用一个叫做数据库驱动的程序来桥接就行了</p>
+</blockquote>
+<p>将抽象部分和它的实现部分分离, 使它们都可以独立的变化;</p>
+<p>三个品牌的汽车, 都生产可以燃油, 混动, 纯电 汽车, 此时新增了第四种品牌之后, 都会导致子类的数量快速增长</p>
+<h3 id="910-jdbc-连接数据库">9.1.0 JDBC 连接数据库
+</h3><p><img src="/p/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/images/JDBC%E8%BF%9E%E6%8E%A5%E6%95%B0%E6%8D%AE%E5%BA%93%28%E6%A1%A5%E6%8E%A5%29.png"
+	width="607"
+	height="191"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="317"
+		data-flex-basis="762px"
+	
+></p>
+<h3 id="911-使用场景">9.1.1 使用场景
+</h3><blockquote>
+<p>桥接模式实现比较复杂，实际应用也非常少，==但它提供的设计思想值得借鉴==，即不要过度使用继承，而是==优先拆分某些部件==，使用==组合的方式==来扩展功能。</p>
+</blockquote>
+<p><img src="/p/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/images/%E6%A1%A5%E6%8E%A5%E6%A8%A1%E5%BC%8F.png"
+	width="492"
+	height="315"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="156"
+		data-flex-basis="374px"
+	
+></p>
+<h2 id="92-实现">9.2 实现
+</h2><ol>
+<li>Car 抽象类, 拥有基础的属性和方法; 引用引擎engine</li>
+</ol>
+<pre><code class="language-java">public abstract class Car {
+    // 引用Engine:
+    protected Engine engine;
+
+    public Car(Engine engine) {
+        this.engine = engine;
+    }
+
+    public abstract void drive();
+}
+
+</code></pre>
+<ol start="2">
+<li>engine 是一个接口;</li>
+</ol>
+<pre><code class="language-java">public interface Engine {
+    void start();
+}
+
+</code></pre>
+<ol start="3">
+<li>不同的引擎实现 engine</li>
+</ol>
+<pre><code class="language-java">public class HybridEngine implements Engine {
+    public void start() {
+        System.out.println(&quot;Start Hybrid Engine...&quot;);
+    }
+}
+
+</code></pre>
+<ol start="4">
+<li>一个修正的抽象类 RefinedCar , 定义额外的方法, 汽车品牌</li>
+</ol>
+<pre><code class="language-java">public abstract class RefinedCar extends Car {
+    public RefinedCar(Engine engine) {
+        super(engine);
+    }
+
+    public void drive() {
+        this.engine.start();
+        System.out.println(&quot;Drive &quot; + getBrand() + &quot; car...&quot;);
+    }
+
+    public abstract String getBrand();
+}
+
+</code></pre>
+<ol start="5">
+<li>不同的品牌汽车继承自 修正类</li>
+</ol>
+<pre><code class="language-java">public class BossCar extends RefinedCar {
+    public BossCar(Engine engine) {
+        super(engine);
+    }
+
+    public String getBrand() {
+        return &quot;Boss&quot;;
+    }
+}
+
+</code></pre>
+<ol start="6">
+<li>选择品牌, 和引擎 得到Car  ==即一辆汽车的两个维度：品牌和引擎都可以独立地变化。==</li>
+</ol>
+<pre><code class="language-java">RefinedCar car = new BossCar(new HybridEngine());
+car.drive();
+
+</code></pre>
+<h1 id="10--组合模式-composite">10.  组合模式 Composite
+</h1><p><img src="/p/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/images/%E7%BB%84%E5%90%88%E6%A8%A1%E5%BC%8F.png"
+	width="416"
+	height="171"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="243"
+		data-flex-basis="583px"
+	
+></p>
+<p>==使用Composite模式时，需要先统一单个节点以及“容器”节点的接口==</p>
+<p>==作为容器节点的<code>ElementNode</code>又可以添加任意个<code>Node</code>，这样就可以构成层级结构==</p>
+<h1 id="11-享元模式-flyweight">11. 享元模式 Flyweight
+</h1><h2 id="1111-概述">11.1.1 概述
+</h2><p>主要目的是实现对象的共享 , 减少内存的开销, ==通常和工厂模式一起使用, 工厂内部返回的是缓存的实例==;</p>
+<p>思想是: 如果一个对象实例一经创建就不可变, 那么反复创建相同的实例就是 非必要的, 直接向调用方返回一个共享的实例</p>
+<blockquote>
+<p>你要先理解创建实例和实例变化的区别：</p>
+<pre><code>创建实例：var s = new StringBuilder();
+实例变化：s.append(&quot;changed&quot;);
+实例不能变化：String s = &quot;cannot-change&quot;;
+单例不是不变，是不允许创建新实例。
+
+</code></pre>
+<p>==享元要求实例不变，所以才能把“应该创建一个新实例”的操作给优化成“直接返回一个缓存的实例”==</p>
+</blockquote>
+<h2 id="1112-包装类">11.1.2 包装类
+</h2><blockquote>
+<p>包装类型如<code>Byte</code>、<code>Integer</code>都是不变类，因此，反复创建同一个值相同的包装类型是没有必要的。以<code>Integer</code>为例，如果我们通过<code>Integer.valueOf()</code>这个静态工厂方法创建<code>Integer</code>实例，当传入的<code>int</code>范围在<code>-128</code>~<code>+127</code>之间时，会直接返回缓存的<code>Integer</code>实例：</p>
+</blockquote>
+<h2 id="112--实现">11.2  实现
+</h2><p>==主要应用于缓存==</p>
+<pre><code>public class Student {
+    // 持有缓存:
+    private static final Map&lt;String, Student&gt; cache = new HashMap&lt;&gt;();
+
+    // 静态工厂方法:
+    public static Student create(int id, String name) {
+        String key = id + &quot;\n&quot; + name;
+        // 先查找缓存:
+        Student std = cache.get(key);
+        if (std == null) {
+            // 未找到,创建新对象:
+            System.out.println(String.format(&quot;create new Student(%s, %s)&quot;, id, name));
+            std = new Student(id, name);
+            // 放入缓存:
+            cache.put(key, std);
+        } else {
+            // 缓存中存在:
+            System.out.println(String.format(&quot;return cached Student(%s, %s)&quot;, std.id, std.name));
+        }
+        return std;
+    }
+
+    private final int id;
+    private final String name;
+
+    public Student(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+}
+
+</code></pre>
+<h1 id="12-策略模式-category">12. 策略模式 Category
+</h1><p>核心思想: 在一个计算方法中把统一变化的算法抽出来 作为<code>策略</code>参数传进去, 从而使得新增策略不必修改原有逻辑;</p>
+<h2 id="121-概述">12.1 概述
+</h2><p>在一个方法中，流程是确定的，但是，某些关键步骤的算法依赖调用方传入的策略，这样，传入不同的策略，即可获得不同的结果，大大增强了系统的灵活性。</p>
+<h2 id="122-实现">12.2 实现
+</h2><ol>
+<li>
+<p>一个折扣接口</p>
+<ul>
+<li>
+<pre><code class="language-java">public interface DiscountStrategy {
+    // 计算折扣额度:
+    BigDecimal getDiscount(BigDecimal total);
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>两个实现类</p>
+<ul>
+<li>
+<p>普通用户折扣</p>
+<ul>
+<li>
+<pre><code class="language-java">public class UserDiscountStrategy implements DiscountStrategy {
+    public BigDecimal getDiscount(BigDecimal total) {
+        // 普通会员打九折:
+        return total.multiply(new BigDecimal(&quot;0.1&quot;)).setScale(2, RoundingMode.DOWN);
+    }
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>满减</p>
+<ul>
+<li>
+<pre><code class="language-java">public class OverDiscountStrategy implements DiscountStrategy {
+    public BigDecimal getDiscount(BigDecimal total) {
+        // 满100减20优惠:
+        return total.compareTo(BigDecimal.valueOf(100)) &gt;= 0 ? BigDecimal.valueOf(20) : BigDecimal.ZERO;
+    }
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>折扣类 (应用策略) 本身持有默认的普通用户折扣策略</p>
+<ul>
+<li>
+<pre><code class="language-java">public class DiscountContext {
+    // 持有某个策略:
+    private DiscountStrategy strategy = new UserDiscountStrategy();
+
+    // 允许客户端设置新策略:
+    public void setStrategy(DiscountStrategy strategy) {
+        this.strategy = strategy;
+    }
+
+    public BigDecimal calculatePrice(BigDecimal total) {
+        return total.subtract(this.strategy.getDiscount(total)).setScale(2);
+    }
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>调用</p>
+<ul>
+<li>
+<pre><code class="language-java">DiscountContext ctx = new DiscountContext();
+
+// 默认使用普通会员折扣:
+BigDecimal pay1 = ctx.calculatePrice(BigDecimal.valueOf(105));
+System.out.println(pay1);
+
+// 使用满减折扣:
+ctx.setStrategy(new OverDiscountStrategy());
+BigDecimal pay2 = ctx.calculatePrice(BigDecimal.valueOf(105));
+System.out.println(pay2);
+
+// 使用Prime会员折扣:
+ctx.setStrategy(new PrimeDiscountStrategy());
+BigDecimal pay3 = ctx.calculatePrice(BigDecimal.valueOf(105));
+System.out.println(pay3);
+
+</code></pre>
+</li>
+</ul>
+</li>
+</ol>
+<h1 id="13-模板方法-template-method">13. 模板方法 Template Method
+</h1><blockquote>
+<p>定义一个操作中的算法的骨架, 而将一些步骤延迟到子类中去, 使得子类可以不改变一个算法的结构就可以重新定义改算法的某些特定步骤</p>
+</blockquote>
+<h2 id="131-概述">13.1 概述
+</h2><p>为了防止子类重写父类的骨架方法，可以在父类中对骨架方法使用==<code>final</code>==。对于需要子类实现的抽象方法，一般==声明为<code>protected</code>==，使得这些方法对外部客户端不可见。</p>
+<p>Java标准库也有很多模板方法的应用。在集合类中，<code>AbstractList</code>和<code>AbstractQueuedSynchronizer</code>都定义了很多通用操作，子类只需要实现某些必要方法。</p>
+<h2 id="132-实现">13.2 实现
+</h2><p>抽象父类,  用抽象方法让子类去实现</p>
+<ol>
+<li>
+<p>读取设置的类</p>
+<ul>
+<li>
+<pre><code class="language-java">public abstract class AbstractSetting {
+    public final String getSetting(String key) {
+        String value = lookupCache(key);
+        if (value == null) {
+            value = readFromDatabase(key);
+            putIntoCache(key, value);
+        }
+        return value;
+    }
+
+    protected abstract String lookupCache(String key);
+
+    protected abstract void putIntoCache(String key, String value);
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>可以选择使用不同的缓存</p>
+<ul>
+<li>
+<p>用Map缓存</p>
+<ul>
+<li>
+<pre><code class="language-java">public class LocalSetting extends AbstractSetting {
+    private Map&lt;String, String&gt; cache = new HashMap&lt;&gt;();
+
+    protected String lookupCache(String key) {
+        return cache.get(key);
+    }
+
+    protected void putIntoCache(String key, String value) {
+        cache.put(key, value);
+    }
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>用Redis缓存</p>
+<ul>
+<li>
+<pre><code class="language-java">public class RedisSetting extends AbstractSetting {
+    private RedisClient client = RedisClient.create(&quot;redis://localhost:6379&quot;);
+
+    protected String lookupCache(String key) {
+        try (StatefulRedisConnection&lt;String, String&gt; connection = client.connect()) {
+            RedisCommands&lt;String, String&gt; commands = connection.sync();
+            return commands.get(key);
+        }
+    }
+
+    protected void putIntoCache(String key, String value) {
+        try (StatefulRedisConnection&lt;String, String&gt; connection = client.connect()) {
+            RedisCommands&lt;String, String&gt; commands = connection.sync();
+            commands.set(key, value);
+        }
+    }
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>使用 (通过调用抽象类, 实现对子类的调用)</p>
+<ul>
+<li>
+<p>本地缓存</p>
+<pre><code class="language-java">AbstractSetting setting1 = new LocalSetting();
+System.out.println(&quot;test = &quot; + setting1.getSetting(&quot;test&quot;));
+System.out.println(&quot;test = &quot; + setting1.getSetting(&quot;test&quot;));
+
+</code></pre>
+</li>
+<li>
+<p>redis 缓存</p>
+<pre><code>AbstractSetting setting2 = new RedisSetting();
+System.out.println(&quot;autosave = &quot; + setting2.getSetting(&quot;autosave&quot;));
+System.out.println(&quot;autosave = &quot; + setting2.getSetting(&quot;autosave&quot;));
+
+</code></pre>
+</li>
+</ul>
+</li>
+</ol>
+<h1 id="14-观察者模式-observer">14. 观察者模式 Observer
+</h1><h2 id="141-概述">14.1 概述
+</h2><p>当一个对象变化是, 其他依赖该对象的对象都会收到通知,并且随之变化, 这是一种==一对多的方式==; 类似于发布订阅</p>
+<p>==定义了一对多的依赖关系, 让多个对象能够同时监听一个主题对象, 如果这个主题对象发生了变化, 会通知所有的观察者对象==</p>
+<p>好处: 主题对象和观察者之间降低耦合</p>
+<h2 id="142-实现">14.2 实现
+</h2><ol>
+<li>
+<p>观察接口</p>
+<pre><code class="language-java">public interface Observer {
+
+    void update();
+}
+
+</code></pre>
+</li>
+<li>
+<p>观察类</p>
+<ul>
+<li>
+<p>两个观察类</p>
+</li>
+<li>
+<pre><code>public class Observer1 implements Observer {
+    @Override
+    public void update() {
+        System.out.println(&quot;Observer1 update&quot;);
+    }
+}
+
+</code></pre>
+</li>
+<li>
+<pre><code>public class Observer2 implements Observer {
+
+    @Override
+    public void update() {
+        System.out.println(&quot;Observer2 update&quot;);
+    }
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>订阅管理接口</p>
+<ul>
+<li>
+<pre><code class="language-java">public interface Subject {
+
+    void add(Observer observer);
+
+    void remove(Observer observer);
+
+    void notifyObservers();
+
+    void operation();
+}
+
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>订阅抽象类 (==记录并管理订阅关系==, 当订阅对象放生变化时, 负责通知订阅类)</p>
+<ul>
+<li>
+<pre><code class="language-java">public abstract class AbstarctSubject implements Subject {
+
+	// 用数组管理
+    private Vector&lt;Observer&gt; vector = new Vector&lt;&gt;();
+
+    @Override
+    public void add(Observer observer) {
+        vector.add(observer);
+    }
+
+    @Override
+    public void remove(Observer observer) {
+        vector.remove(observer);
+    }
+
+	// 通知
+    @Override
+    public void notifyObservers() {
+        Enumeration&lt;Observer&gt; elements = vector.elements();
+        while (elements.hasMoreElements()) {
+            elements.nextElement().update();
+        }
+    }
+
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>实际订阅类</p>
+<ul>
+<li>
+<pre><code class="language-java">public class MySubject extends AbstarctSubject {
+    @Override
+    public void operation() {
+        System.out.println(&quot;observer update 11111&quot;);
+        notifyObservers();
+    }
+
+	// 测试
+    public static void main(String[] args) {
+        MySubject mySubject = new MySubject();
+        mySubject.add(new Observer1());
+        mySubject.add(new Observer2());
+
+        mySubject.operation();
+    }
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+</ol>
+<h1 id="15-迭代器模式-iterator">15. 迭代器模式 <strong>Iterator</strong>
+</h1><h2 id="151-概述">15.1 概述
+</h2><blockquote>
+<p>提供一个方法顺序访问一个聚合对象中的各个元素, 而又不需要暴露该对象的内部表示;</p>
+</blockquote>
+<p>在Java的集合类中广泛使用,  迭代模式 Java 允许任何支持Iterator 的集合对象用foreach 循环写出来;</p>
+<h2 id="152-实现">15.2 实现
+</h2><blockquote>
+<ol>
+<li>实现 Iterable 接口</li>
+<li>内部定义数据类型</li>
+<li>内部类(可以隐含的持有它所在对象的this引用, 即可以通过<code>ReverseArrayCollection.this</code>拿到它所在的集合), 返回一个Iterator 对象,(==迭代器模式的关键==)</li>
+</ol>
+</blockquote>
+<pre><code class="language-java">public class ReverseArrayCollection&lt;T&gt; implements Iterable&lt;T&gt; {
+
+    private T[] array;
+
+    @Override
+    public Iterator&lt;T&gt; iterator() {
+        return new ReverserIterator();
+    }
+
+
+    class ReverserIterator implements Iterator&lt;T&gt;{
+
+        int  index;
+
+        // 创建的时候, 索引在数组末尾
+        public ReverserIterator() {
+            this.index = ReverseArrayCollection.this.array.length;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return index &gt; 0;
+        }
+
+        @Override
+        public T next() {
+            // 将索引移动到下一个元素, 并返回
+            index --;
+            return array[index];
+        }
+    }
+}
+
+</code></pre>
+<h1 id="16-责任链模式-chain-of-responsibility">16. 责任链模式 Chain of Responsibility
+</h1><h2 id="161-概述">16.1 概述
+</h2><blockquote>
+<p>是一种处理请求的模式, 它会让多个处理器有机会处理该请求, 直到该请求被处理</p>
+<p>有多个对象, 每个对象都持有下一个对象的引用, 这样会形成一条链, 请求在这条链上传递, 直到某一个对象决定处理该请求, 所以可以实现在 在隐瞒客户端</p>
+<p>==链接上的请求可以是一条链，可以是一个树，还可以是一个环，模式本身不约束这个，需要我们自己去实现，同时，在一个时刻，命令只允许由一个对象传给另一个对象，而不允许传给多个对象。==</p>
+</blockquote>
+<p>==</p>
+<p>Servlet规范定义的<code>Filter</code>就是一种责任链模式, 它不但允许每个<code>Filter</code>都有机会处理请求，还允许每个<code>Filter</code>决定是否将请求“放行”给下一个<code>Filter</code>：</p>
+<pre><code class="language-java">public class AuditFilter implements Filter {
+    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
+        log(req);
+        if (check(req)) {
+            // 放行:
+            chain.doFilter(req, resp);
+        } else {
+            // 拒绝:
+            sendError(resp);
+        }
+    }
+}
+
+</code></pre>
+<h2 id="162-实现">16.2 实现
+</h2><blockquote>
+<p>需求; 财务审批责任链  ==顺序需正确添加==</p>
+<ul>
+<li>Manager：只能审核1000元以下的报销；</li>
+<li>Director：只能审核10000元以下的报销；</li>
+<li>CEO：可以审核任意额度</li>
+</ul>
+</blockquote>
+<ol>
+<li>
+<p>抽象出请求对象, 将它在责任链上传递</p>
+<ul>
+<li>
+<pre><code class="language-java">public class Request {
+    private String name;
+    private BigDecimal amount;
+
+    public Request(String name, BigDecimal amount) {
+        this.name = name;
+        this.amount = amount;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>抽象处理器</p>
+<ul>
+<li>
+<pre><code>public interface Handler {
+    // 返回Boolean.TRUE = 成功
+    // 返回Boolean.FALSE = 拒绝
+    // 返回null = 交下一个处理
+	Boolean process(Request request);
+}
+
+</code></pre>
+</li>
+<li>
+<p>依次编写处理类 ManagerHandler, DirectorHandler CEOHandler</p>
+<pre><code class="language-java">public class ManagerHandler implements Handler {
+    public Boolean process(Request request) {
+        // 如果超过1000元，处理不了，交下一个处理:
+        if (request.getAmount().compareTo(BigDecimal.valueOf(1000)) &gt; 0) {
+            return null;
+        }
+        // 对Bob有偏见:
+        return !request.getName().equalsIgnoreCase(&quot;bob&quot;);
+    }
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>链管理器, 把处理器串联起来, 组成一条链, 并提供一个统一入口进行处理</p>
+<ul>
+<li>
+<pre><code class="language-java">public class HandlerChain {
+    // 持有所有Handler:
+    private List&lt;Handler&gt; handlers = new ArrayList&lt;&gt;();
+
+    public void addHandler(Handler handler) {
+        this.handlers.add(handler);
+    }
+
+    public boolean process(Request request) {
+        // 依次调用每个Handler:
+        for (Handler handler : handlers) {
+            Boolean r = handler.process(request);
+            if (r != null) {
+                // 如果返回TRUE或FALSE，处理结束:
+                System.out.println(request + &quot; &quot; + (r ? &quot;Approved by &quot; : &quot;Denied by &quot;) + handler.getClass().getSimpleName());
+                return r;
+            }
+        }
+        throw new RuntimeException(&quot;Could not handle request: &quot; + request);
+    }
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>test</p>
+<ul>
+<li>
+<pre><code class="language-java">// 构造责任链:
+HandlerChain chain = new HandlerChain();
+chain.addHandler(new ManagerHandler());
+chain.addHandler(new DirectorHandler());
+chain.addHandler(new CEOHandler());
+// 处理请求:
+chain.process(new Request(&quot;Bob&quot;, new BigDecimal(&quot;123.45&quot;)));
+chain.process(new Request(&quot;Alice&quot;, new BigDecimal(&quot;1234.56&quot;)));
+chain.process(new Request(&quot;Bill&quot;, new BigDecimal(&quot;12345.67&quot;)));
+chain.process(new Request(&quot;John&quot;, new BigDecimal(&quot;123456.78&quot;)));
+
+</code></pre>
+</li>
+</ul>
+</li>
+</ol>
+<h1 id="18-命令模式-command">18. 命令模式 Command
+</h1><h2 id="181-概述">18.1 概述
+</h2><blockquote>
+<p>将一个请求封装为一个对象,从而使你可用不同的请求对客户进行参数化;</p>
+<p>目的就是达到命令的发出者和执行者之间解耦, 实现请求和执行分开</p>
+</blockquote>
+<p><img src="/p/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/images/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F.png"
+	width="603"
+	height="233"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="258"
+		data-flex-basis="621px"
+	
+></p>
+<h2 id="182-实现">18.2 实现
+</h2><ol>
+<li>
+<p>命令接口</p>
+<ul>
+<li>
+<pre><code class="language-java">public void Command {
+	void exe();
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>命令类</p>
+<ul>
+<li>
+<pre><code class="language-java">public class MyCommand implements Command {
+	private Receiver receiver;
+
+	public MyCommand(Receiver receiver) {
+		this.receiver = receiver;
+	}
+
+	@Override
+	public void exe() {
+		receiver.action();
+	}
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>被调用者</p>
+<ul>
+<li>
+<pre><code class="language-java">publicclass Receiver {
+	public void action(){
+		sout(&quot;command received&quot;);
+	}
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>调用方</p>
+<ul>
+<li>
+<pre><code class="language-java">public class Invoker {
+
+	private Command command;
+
+	public Invoker (Command command) {
+		this.command = command;
+	}
+
+	public void action (){
+		command.exe();
+	}
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>使用过程</p>
+<ul>
+<li>
+<pre><code class="language-java">public static void main(String[] args) {
+        Receiver receiver = new Receiver();
+        MyCommand cmd = new MyCommand(receiver);
+        Invoker invoker = new Invoker(cmd);
+        invoker.action();
+    }
+
+</code></pre>
+</li>
+</ul>
+</li>
+</ol>
+<h1 id="19-备忘录模式-memento">19. 备忘录模式 Memento
+</h1><h2 id="191-概述">19.1 概述
+</h2><blockquote>
+<p>目的是: 保存某个对象的某种状态, 以便在适当的时候恢复对象, 备份模式</p>
+</blockquote>
+<p><img src="/p/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/images/%E5%A4%87%E5%BF%98%E5%BD%95%E6%A8%A1%E5%BC%8F.png"
+	width="603"
+	height="236"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="255"
+		data-flex-basis="613px"
+	
+></p>
+<h2 id="192-实现">19.2 实现
+</h2><ol>
+<li>
+<p>原始类, 设置构造方法和 存储字段的get,set 方法, 以及设置存储备忘录和恢复备忘录的方法</p>
+<ul>
+<li>
+<pre><code class="language-java">public class Original {
+
+    private String value;
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public Original(String value) {
+        this.value = value;
+    }
+
+    // 创建备忘录
+    public Memento createMemento() {
+        return new Memento(value);
+    }
+
+    // 存储备忘录
+    public void storageMemento(Memento memento) {
+        this.value = memento.getValue();
+    }
+}
+
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>备忘录类</p>
+<ul>
+<li>
+<pre><code class="language-java">public class Memento {
+
+    private String value;
+
+    public Memento(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>备忘录存储类</p>
+<ul>
+<li>
+<pre><code>public class Storage {
+
+    private Memento memento;
+
+    public Storage(Memento memento) {
+        this.memento = memento;
+    }
+
+    public Memento getMemento (){
+        return memento;
+    }
+
+    public void setMemento(Memento memento) {
+        this.memento = memento;
+    }
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>使用测试</p>
+<ul>
+<li>
+<pre><code class="language-java">public static void main(String[] args) {
+
+        // 原始类
+        Original apple = new Original(&quot;apple&quot;);
+
+        // 创建备忘录
+        Storage storage = new Storage(apple.createMemento());
+
+        // 修改原始类的状态
+        System.out.println(&quot;初始类的原始状态: &quot; + apple.getValue());
+        apple.setValue(&quot;watermelon&quot;);
+        System.out.println(&quot;初始类的原始状态被修改成了: &quot; + apple.getValue());
+
+        // 恢复原始类的状态
+        apple.storageMemento(storage.getMemento());
+        System.out.println(&quot;状态回复后: &quot; + apple.getValue());
+
+    }
+
+</code></pre>
+</li>
+</ul>
+</li>
+</ol>
+<h1 id="20-状态模式-state">20. 状态模式 State
+</h1><h2 id="201-概述">20.1 概述
+</h2><blockquote>
+<p>核心思想: 当对象的状态改变, 同时改变它的行为</p>
+</blockquote>
+<p>状态模式在日常开发中用的挺多的，尤其是做网站的时候，我们有时希望根据对象的某一属性，区别开他们的一些功能，比如说简单的权限控制等。</p>
+<h2 id="202--实现">20.2  实现
+</h2><ol>
+<li>
+<p>状态类的核心类 (内包含了所有的方法)</p>
+<ul>
+<li>
+<pre><code class="language-java">public class State {
+
+    private String value;
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public void method1 (){
+        System.out.println(&quot;method1() 执行了&quot;);
+    }
+
+    public void method2 (){
+        System.out.println(&quot;method2() 执行了&quot;);
+    }
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>状态模式的切换类, 持有状态字段, 构造方法依赖状态, 同时提供状态核心类的</p>
+<ul>
+<li>
+<pre><code class="language-java">public class Context {
+
+    private State state;
+
+    public Context(State state) {
+        this.state = state;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    public void method() {
+        if (&quot;method1&quot;.equals(state.getValue())) {
+            state.method1();
+        } else if (&quot;method2&quot;.equals(state.getValue())){
+            state.method2();
+        }
+    }
+
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>测试: 使用的时候只需要用切换类就可以了</p>
+<ul>
+<li>
+<pre><code class="language-java">public static void main(String[] args) {
+       State state = new State();
+       Context context = new Context(state);
+
+       state.setValue(&quot;method1&quot;);
+       context.method();
+
+       state.setValue(&quot;method2&quot;);
+       context.method();
+}
+
+</code></pre>
+</li>
+</ul>
+</li>
+</ol>
+<h1 id="21-访问者模式-visitor">21. 访问者模式 Visitor
+</h1><h2 id="211-概述">21.1 概述
+</h2><blockquote>
+<p>访问者模式: 就是一种分离对象数据接口与行为的方法, 通过这种分离, 可达到为一个被访问这动态添加新的操作而无需做其他的修改; ==访问者模式的核心思想是为了访问比较复杂的数据结构==，==不去改变数据结构==，而是把==对数据的操作抽象==出来，在“访问”的过程中==以回调形式在访问者中处理操作逻辑==。如果要新增一组操作，那么只需要增加一个新的访问者。</p>
+</blockquote>
+<p><img src="/p/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/images/%E8%AE%BF%E9%97%AE%E8%80%85%E6%A8%A1%E5%BC%8F.png"
+	width="499"
+	height="255"
+	
+	loading="lazy"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="195"
+		data-flex-basis="469px"
+	
+></p>
+<blockquote>
+<p>如果想为现有的类添加新功能</p>
+</blockquote>
+<h2 id="212-实现">21.2 实现
+</h2><ol>
+<li>
+<p>访问者接口</p>
+<ul>
+<li>
+<p>设置访问对象</p>
+<pre><code class="language-java">public interface Vistor {
+    public void visit(Subject sub);
+}
+
+
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>访问者实现类</p>
+<ul>
+<li></li>
+</ul>
+</li>
+</ol>
+<pre><code> ```java
+ public class MyVistor implements Vistor {
+ 
+     @Override
+     public void visit(Subject sub) {
+         System.out.println(&quot;visit the subject：&quot;+ sub.getSubjet());
+     }
+ 
+ }
+ 
+ ```
+</code></pre>
+<ol start="3">
+<li>
+<p>访问接受者接口</p>
+<ol>
+<li>
+<p>接受访问者</p>
+</li>
+<li>
+<p>获取被访问属性</p>
+</li>
+<li></li>
+</ol>
+</li>
+</ol>
+<pre><code>  ```java
+  public interface Subject {
+  
+      void accept(Vistor vistor);
+  
+      String getSubjet();
+  }
+  
+  
+  ```
+</code></pre>
+<ol start="4">
+<li>
+<p>访问接受者实现类</p>
+<ul>
+<li></li>
+</ul>
+</li>
+</ol>
+<pre><code> ```java
+ public class MySubject implements Subject {
+ 
+     @Override
+     public void accept(Vistor vistor) {
+         vistor.visit(this);
+     }
+ 
+     @Override
+     public String getSubjet() {
+         return &quot;love&quot;;
+     }
+ }
+ 
+ ```
+</code></pre>
+<ol start="5">
+<li>
+<p>test</p>
+<ul>
+<li></li>
+</ul>
+</li>
+</ol>
+<pre><code> ```java
+ public class Test {  
+   
+     public static void main(String[] args) {  
+         
+         Visitor visitor = new MyVisitor();  
+         Subject sub = new MySubject();  
+         sub.accept(visitor);      
+     }  
+ } 
+ 
+ ```
+</code></pre>
+<h2 id="213--实现-递归改造">21.3  实现 (递归改造)
+</h2><blockquote>
+<p>访问者模式先把==数据结构（这里是文件夹和文件构成的树型结构）==和对其的==操作（查找文件）分离开==，以后==如果要新增操作==（例如清理<code>.class</code>文件），只需要==新增访问者==，不需要改变现有逻辑。</p>
+</blockquote>
+<p>场景描述, 假设我们要遍历某个文件夹的所有子文件夹 和文件, 然后找出java 文件</p>
+<p>写递归</p>
+<pre><code class="language-java">// 递归的问题是, 把数据扫描 和 对 数据的操作混在了一起
+    public void scan(File dir, List&lt;File&gt; fileList){
+        for (File file : dir.listFiles()) {
+            if (file.isFile() &amp;&amp; file.getName().endsWith(&quot;.java&quot;)) {
+                fileList.add(file);
+            } else if (file.isDirectory()){
+                scan(file, fileList);
+            }
+        }
+    }
+
+</code></pre>
+<ol>
+<li>访问者接口定义的访问者的行为</li>
+</ol>
+<pre><code class="language-java">public interface Vistor {
+
+    // 访问文件夹
+    void visitDir(File dir);
+
+    // 访问文件
+    void visitFile(File file);
+}
+
+</code></pre>
+<ol start="2">
+<li>定义能持有文件和文件夹的数据结构 <code>FileStructure</code></li>
+</ol>
+<pre><code class="language-java">public class FileStructure {
+
+    // 根目录
+    private File path;
+
+    public FileStructure(File path) {
+        this.path = path;
+    }
+
+
+    // handle 方法, 传入访问者; 这里把访问者的行为抽象出来了
+    public void handle(Vistor vistor) {
+        scan(this.path, vistor);
+    }
+
+    private void scan(File file, Vistor vistor) {
+        if (file.isDirectory()) {
+            // 让访问者处理文件夹:
+            vistor.visitDir(file);
+            for (File sub : file.listFiles()) {
+                // 递归处理子文件夹:
+                scan(sub, vistor);
+            }
+        } else if (file.isFile()) {
+            // 让访问者处理文件:
+            vistor.visitFile(file);
+        }
+    }
+
+}
+
+</code></pre>
+<ol start="3">
+<li>访问javal类的访问者</li>
+</ol>
+<pre><code class="language-java">public class JavaFileVistor implements Vistor {
+    @Override
+    public void visitDir(File dir) {
+        System.out.println(&quot;Visit dir: &quot; + dir);
+    }
+
+    @Override
+    public void visitFile(File file) {
+        System.out.println(&quot;Found java file: &quot; + file);
+    }
+}
+
+</code></pre>
+<ol start="4">
+<li>清除java 文件的</li>
+</ol>
+<pre><code class="language-java">public class ClassFileCleanerVistor implements Vistor {
+    @Override
+    public void visitDir(File dir) {
+
+    }
+
+    @Override
+    public void visitFile(File file) {
+        if (file.getName().endsWith(&quot;.class&quot;)) {
+            System.out.println(&quot;Will clean class file: &quot; + file);
+        }
+    }
+}
+
+</code></pre>
+<h1 id="22-中介模式-mediator">22. 中介模式 Mediator
+</h1><h2 id="221--概述">22.1  概述
+</h2><blockquote>
+<p><em>用一个中介对象来封装一系列的对象交互。中介者使各个对象不需要显式地相互引用，从而使其耦合松散，而且可以独立地改变它们之间的交互。</em></p>
+</blockquote>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2019 - 
+        
+        2025 LexqinMike
+    </section>
+    
+    <section class="powerby">
+        
+            你永远不知道，我的代码里藏了多少故事。 <br/>
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+<div id="particles-js"></div>
+
+<script src=https://mikeLing-qx.github.io/background/particles.min.js></script>
+<script>
+  particlesJS.load('particles-js', "https://mikeLing-qx.github.io/background/particlesjs-config.json", function() {
+    console.log('particles.js loaded - callback');
+  });
+</script>
+
+<style>
+  #particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+  }
+</style>
+
+<style>
+  body {
+    background: url(https://mikeLing-qx.github.io/background/background-01.png) no-repeat center top;
+    background-size: cover;
+    background-attachment: fixed;
+  }
+</style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+		<script>hljs.highlightAll();</script>
+    </body>
+</html>
