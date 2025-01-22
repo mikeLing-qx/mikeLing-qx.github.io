@@ -7,10 +7,10 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>LexqinMike</copyright>
-        <lastBuildDate>Fri, 03 Jan 2025 19:21:43 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/tags/jvm/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 13 Oct 2022 19:21:43 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/tags/jvm/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>Jvm</title>
         <link>https://mikeLing-qx.github.io/p/jvm/</link>
-        <pubDate>Fri, 03 Jan 2025 19:21:43 +0800</pubDate>
+        <pubDate>Thu, 13 Oct 2022 19:21:43 +0800</pubDate>
         
         <guid>https://mikeLing-qx.github.io/p/jvm/</guid>
         <description>&lt;h1 id=&#34;1-运行时数据区&#34;&gt;1. 运行时数据区

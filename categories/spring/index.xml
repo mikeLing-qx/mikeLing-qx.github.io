@@ -7,767 +7,7 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>LexqinMike</copyright>
-        <lastBuildDate>Fri, 03 Jan 2025 19:21:43 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/categories/spring/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>Spring基础</title>
-        <link>https://mikeLing-qx.github.io/p/spring%E5%9F%BA%E7%A1%80/</link>
-        <pubDate>Fri, 03 Jan 2025 19:21:43 +0800</pubDate>
-        
-        <guid>https://mikeLing-qx.github.io/p/spring%E5%9F%BA%E7%A1%80/</guid>
-        <description>&lt;h1 id=&#34;1-简介&#34;&gt;1. 简介
-&lt;/h1&gt;&lt;p&gt;Spring 是一个轻量级的 Java 开发框架。Spring 的核心是控制反转(IOC)和面向切面编程(AOP)。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Spring 主要有如下优点：&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;1.解耦&lt;/li&gt;
-&lt;li&gt;2.支持面向切面编程&lt;/li&gt;
-&lt;li&gt;3.便于集成其他框架&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h1 id=&#34;2-ioc-控制反转&#34;&gt;2. IOC 控制反转
-&lt;/h1&gt;&lt;p&gt;​	IOC，全称 Inversion of Control，意思是&lt;strong&gt;控制反转&lt;/strong&gt;。它是 Spring 框架中的一种思想。&lt;/p&gt;
-&lt;p&gt;​	&lt;strong&gt;控制反转就是将对象的控制权从程序中的代码转移到了 Spring 的工厂，通过 Spring 的工厂完成对象的创建以及赋值。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;​	之前是我们自己 new 对象、给对象中的成员变量赋值。现在是让 Spring 来帮助我们创建对象、给成员变量赋值。&lt;/p&gt;
-&lt;h1 id=&#34;3-spring核心内容描述&#34;&gt;3. Spring核心内容描述
-&lt;/h1&gt;&lt;ol&gt;
-&lt;li&gt;配置文件&lt;/li&gt;
-&lt;/ol&gt;
-&lt;blockquote&gt;
-&lt;p&gt;​	Spring 的配置文件可以放到项目中的任意一个地方，也可以随意命名，但是建	议使用：applicationContext.xml。&lt;/p&gt;
-&lt;p&gt;​	你可以将这个配置文件看成一个装有一堆 bean 标签的容器&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;ol start=&#34;2&#34;&gt;
-&lt;li&gt;bean 标签&lt;/li&gt;
-&lt;/ol&gt;
-&lt;blockquote&gt;
-&lt;p&gt;Spring 工厂创建的对象，叫做 bean，所以一个 bean 标签代表一个对象。&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;userService&amp;quot; class=&amp;quot;com.xxl.service.impl.UserServiceImpl&amp;quot;/&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;bean 标签中必须要有 class 属性，它的值是一个类的全限定名（包名+类名）除了 class 属性，bean 标签还可以设置 id 、name 、scope属性&lt;/p&gt;
-&lt;p&gt;name: 相当于这个 bean 的别名，可以配置多个&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; name=&amp;quot;aa,bb,cc&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot;/&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;scope: 可以控制简单对象的创建次数&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;singleton: 每次只会创建唯一⼀个简单对象，默认值&lt;/li&gt;
-&lt;li&gt;prototype 每⼀次都会创建新的对象&lt;/li&gt;
-&lt;/ol&gt;
-&lt;pre&gt;&lt;code&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot; scope=&amp;quot;singleton&amp;quot;/&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/blockquote&gt;
-&lt;ol start=&#34;3&#34;&gt;
-&lt;li&gt;ApplicationContext&lt;/li&gt;
-&lt;/ol&gt;
-&lt;blockquote&gt;
-&lt;p&gt;ApplicationContext 是 Spring 的工厂，主要用来创建对象&lt;/p&gt;
-&lt;p&gt;Spring 通过读取配置文件创建工厂。&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;ol start=&#34;4&#34;&gt;
-&lt;li&gt;
-&lt;p&gt;工厂常用的方法&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// 1、获取工厂
-ApplicationContext act = new ClassPathXmlApplicationContext(&amp;quot;/applicationContext.xml&amp;quot;);
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;blockquote&gt;
-&lt;p&gt;(1). 根据id 获取对象&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;UserService userService = (UserService)act.getBean(&amp;quot;userService&amp;quot;);
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;(2). 根据id 和类名获取对象&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;UserService userService = (UserService)act.getBean(&amp;quot;userService&amp;quot;,UserService.class);
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;(3). 只根据类名获取对象&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;UserService userService = (UserService)act.getBean(UserService.class);
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;(4). 获取配置文件中所有 bean 标签的 id 值&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;String[] beanDefinitionNames = act.getBeanDefinitionNames();
-for (String beanDefinitionName : beanDefinitionNames) {
-    System.out.println(beanDefinitionName);
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;(5). 判断是否存在指定id 或者name 的bean&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;act.containsBean(&amp;quot;userService&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;(6). 判断是否存在指定id 的bean&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;act.containsBeanDefinition(&amp;quot;userService&amp;quot;)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/blockquote&gt;
-&lt;ol start=&#34;5&#34;&gt;
-&lt;li&gt;Spring 是如何创建对象的?&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;​	工厂和反射&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;Spring 配置文件中 bean 标签的 id 和类的全限定名一一对应，所以 Spring 工厂的 getBean 方法其实就是先根据 bean 的 id ==获取该类的全限定名==，然后再利用==反射==根据类的全限定名创建对象并返回。&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;h1 id=&#34;4-di-依赖注入&#34;&gt;4. DI 依赖注入
-&lt;/h1&gt;&lt;p&gt;DI 全称 Dependency Injection，意思是&lt;strong&gt;依赖注入&lt;/strong&gt;，它是 IOC 的具体实现。&lt;/p&gt;
-&lt;p&gt;依赖就是说我需要你，比如 Service 层依赖 Dao 层，注入就是&lt;strong&gt;赋值&lt;/strong&gt;。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Spring 的依赖注入包含两种方式：&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;set 注入：Spring 调用 Set 方法通过配置文件为成员变量赋值。&lt;/strong&gt;&lt;/p&gt;
-&lt;h2 id=&#34;1-set-注入&#34;&gt;1. set 注入
-&lt;/h2&gt;&lt;p&gt;Set 注入就是在 property 标签中为属性赋值&lt;/p&gt;
-&lt;p&gt;(1) 创建对象&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class User {
-    private String name;
-    private int age;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;(2) 修改配置文件&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot;&amp;gt;
-  &amp;lt;property name=&amp;quot;name&amp;quot; value=&amp;quot;mike&amp;quot; /&amp;gt;
-  &amp;lt;property name=&amp;quot;age&amp;quot; value=&amp;quot;18&amp;quot; /&amp;gt;
-&amp;lt;/bean&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h2 id=&#34;2-构造注入&#34;&gt;2. 构造注入
-&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;Spring 调用构造方法通过配置文件为成员变量赋值。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;为类添加构造方法&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class User {
-    private String name;
-    private int age;
-
-    public User(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;bean 标签中使用 constructor-arg&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean class=&amp;quot;com.xxl.model.User&amp;quot;&amp;gt;
-    &amp;lt;constructor-arg value=&amp;quot;张三&amp;quot;/&amp;gt;
-    &amp;lt;constructor-arg value=&amp;quot;18&amp;quot;/&amp;gt;
-&amp;lt;/bean&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h1 id=&#34;5-bean-的生命周期&#34;&gt;5. Bean 的生命周期
-&lt;/h1&gt;&lt;h2 id=&#34;1-创建阶段&#34;&gt;1. 创建阶段
-&lt;/h2&gt;&lt;ol&gt;
-&lt;li&gt;singleton 模式, 创建 Spring 工厂的同时创建所有单例对象&lt;/li&gt;
-&lt;/ol&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class User {
-    String name;
-    int age;
-
-    public User() {
-        System.out.println(&amp;quot;调用User的构造方法&amp;quot;);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    @Override
-    public String toString() {
-        return &amp;quot;User{&amp;quot; +
-                &amp;quot;name=&#39;&amp;quot; + name + &#39;&#39;&#39; +
-                &amp;quot;, age=&amp;quot; + age +
-                &#39;}&#39;;
-    }
-}
-
-
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;spring 配置文件注册bean&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot;&amp;gt;
-    &amp;lt;property name=&amp;quot;name&amp;quot; value=&amp;quot;知否君&amp;quot;/&amp;gt;
-    &amp;lt;property name=&amp;quot;age&amp;quot; value=&amp;quot;23&amp;quot;/&amp;gt;
-&amp;lt;/bean&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;测试&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test
-  public void testSpring(){
-    ApplicationContext act = new ClassPathXmlApplicationContext(&amp;quot;/applicationContext.xml&amp;quot;);
-  }
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E5%9F%BA%E7%A1%80/images/image-20220920104640120.png&#34;
-	width=&#34;546&#34;
-	height=&#34;184&#34;
-	
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20220920104640120&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;296&#34;
-		data-flex-basis=&#34;712px&#34;
-	
-&gt;&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;获取的时候才创建&lt;/strong&gt;, 只需要在 bean 标签上面添加如下属性  &amp;mdash;&amp;gt; lazy-init=&amp;ldquo;true&amp;rdquo;&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot; lazy-init=&amp;quot;true&amp;quot;&amp;gt;
-    &amp;lt;property name=&amp;quot;name&amp;quot; value=&amp;quot;知否君&amp;quot;/&amp;gt;
-    &amp;lt;property name=&amp;quot;age&amp;quot; value=&amp;quot;23&amp;quot;/&amp;gt;
-&amp;lt;/bean&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h2 id=&#34;2-初始化阶段&#34;&gt;2. 初始化阶段
-&lt;/h2&gt;&lt;blockquote&gt;
-&lt;p&gt;==&lt;strong&gt;初始化方法修改了注入的值，所以初始化方法一定在注入之后执行&lt;/strong&gt;==&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;​	spring 中 bean 的初始化操作指的是在==创建对象的时候完成一些附加的功能==。bean 的初始化操作有两种实现方式：&lt;/p&gt;
-&lt;h3 id=&#34;1-实现-initializingbean-接口&#34;&gt;1. &lt;strong&gt;实现 InitializingBean 接口&lt;/strong&gt;
-&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;public class 类名 implements InitializingBean {
-    public void afterPropertiesSet(){
-       // 初始化方法操作
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;例如&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class User implements InitializingBean {
-    String name;
-    int age;
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    @Override
-    public String toString() {
-        return &amp;quot;User{&amp;quot; +
-                &amp;quot;name=&#39;&amp;quot; + name + &#39;&#39;&#39; +
-                &amp;quot;, age=&amp;quot; + age +
-                &#39;}&#39;;
-    }
-
-    // 初始化操作
-    @Override
-    public void afterPropertiesSet(){
-            this.name = &amp;quot;张无忌&amp;quot;;
-            this.age = 30;
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test
-    public void testSpring(){
-        ApplicationContext act = new ClassPathXmlApplicationContext(&amp;quot;/applicationContext.xml&amp;quot;);
-        Object user = act.getBean(&amp;quot;user&amp;quot;);
-        System.out.println(user);
-    }
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E5%9F%BA%E7%A1%80/images/image-20220920105214213.png&#34;
-	width=&#34;386&#34;
-	height=&#34;112&#34;
-	
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20220920105214213&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;344&#34;
-		data-flex-basis=&#34;827px&#34;
-	
-&gt;&lt;/p&gt;
-&lt;h3 id=&#34;2--通过创建普通方法完成初始化&#34;&gt;2.  通过创建普通方法完成初始化
-&lt;/h3&gt;&lt;p&gt;User 类中创建一个方法&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// 初始化方法
-  public void initMethod() {
-      this.name = &amp;quot;张无忌&amp;quot;;
-  }
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;在配置文件中配置 init-method 属性&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot; init-method=&amp;quot;initMethod&amp;quot; &amp;gt;
-    &amp;lt;property name=&amp;quot;name&amp;quot; value=&amp;quot;知否君&amp;quot;/&amp;gt;
-    &amp;lt;property name=&amp;quot;age&amp;quot; value=&amp;quot;23&amp;quot;/&amp;gt;
-&amp;lt;/bean&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;测试&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test
-    public void testSpring(){
-        ApplicationContext act = new ClassPathXmlApplicationContext(&amp;quot;/applicationContext.xml&amp;quot;);
-        Object user = act.getBean(&amp;quot;user&amp;quot;);
-        System.out.println(user);
-    }
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E5%9F%BA%E7%A1%80/images/image-20220920105411727.png&#34;
-	width=&#34;480&#34;
-	height=&#34;124&#34;
-	
-	loading=&#34;lazy&#34;
-	
-		alt=&#34;image-20220920105411727&#34;
-	
-	
-		class=&#34;gallery-image&#34; 
-		data-flex-grow=&#34;387&#34;
-		data-flex-basis=&#34;929px&#34;
-	
-&gt;&lt;/p&gt;
-&lt;h2 id=&#34;3-销毁阶段&#34;&gt;3. 销毁阶段
-&lt;/h2&gt;&lt;p&gt;Spring 销毁对象前，会调用对象的销毁方法，完成销毁操作。&lt;/p&gt;
-&lt;p&gt;Spring 什么时候销毁所创建的对象？当 Spring 工厂关闭时，Spring 工厂会调用我们自定义的销毁方法。&lt;/p&gt;
-&lt;p&gt;两种方式:&lt;/p&gt;
-&lt;h3 id=&#34;1-disposablebean接口&#34;&gt;1. DisposableBean接口
-&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class 类名 implements DisposableBean {
-    // 销毁操作
-    @Override
-    public void destroy(){
-        // 销毁操作业务
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h3 id=&#34;2-创建普通方法&#34;&gt;2. 创建普通方法
-&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;// 销毁方法
-  public void destroyMethod() {
-     // 销毁操作业务
-  }
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;配置文件中配置 destroy-method 属性&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot; destroy-method=&amp;quot;destroyMethod&amp;quot;&amp;gt;
-      &amp;lt;property name=&amp;quot;name&amp;quot; value=&amp;quot;知否君&amp;quot;/&amp;gt;
-      &amp;lt;property name=&amp;quot;age&amp;quot; value=&amp;quot;23&amp;quot;/&amp;gt;
-  &amp;lt;/bean&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h1 id=&#34;6-bean-的后置处理&#34;&gt;6. Bean 的后置处理
-&lt;/h1&gt;&lt;p&gt;后置处理的流程&lt;/p&gt;
-&lt;h2 id=&#34;1实现-beanpostprocessor-接口&#34;&gt;1.实现 BeanPostProcessor 接口
-&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class BeanProcessor implements BeanPostProcessor {
-
-    @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        System.out.println(&amp;quot;后置bean：before 方法&amp;quot;);
-        return bean;
-    }
-    
-    @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        System.out.println(&amp;quot;后置bean：after 方法&amp;quot;);
-        if (bean instanceof User) {
-            User user = (User) bean;
-            user.setName(&amp;quot;亚里士多德&amp;quot;);
-            return user;
-        }
-        return bean;
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h2 id=&#34;2-配置文件添加bean&#34;&gt;2. 配置文件添加bean
-&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;beanProcessor&amp;quot; class=&amp;quot;com.xxl.config.BeanProcessor&amp;quot;/&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h1 id=&#34;7-spring-aop&#34;&gt;7. Spring Aop
-&lt;/h1&gt;&lt;pre&gt;&lt;code&gt;Spring 的动态代理，通过代理类为原始类增加一些 额外功能
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;​	AOP思想的实现一般都是基于代理模式，在JAVA中一般采用JDK动态代理模式，但是我们都知道，JDK动态代理模式只能代理接口，如果要代理类那么就不行了。因此，Spring AOP 会这样子来进行切换，==因为Spring AOP 同时支持 CGLIB、ASPECTJ、JDK动态代理，当你的真实对象有实现接口时，Spring AOP会默认采用JDK动态代理，否则采用cglib代理==。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;如果目标对象的实现类实现了接口，Spring AOP 将会采用 JDK 动态代理来生成 AOP 代理类；&lt;/li&gt;
-&lt;li&gt;如果目标对象的实现类没有实现接口，Spring AOP 将会采用 CGLIB 来生成 AOP 代理类——不过这个选择过程对开发者完全透明、开发者也无需关心。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;1-aop基本概念&#34;&gt;1. Aop基本概念
-&lt;/h2&gt;&lt;h3 id=&#34;1-advice-通知&#34;&gt;1. advice 通知
-&lt;/h3&gt;&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;Before&lt;/code&gt; 在方法被调用之前调用&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;After&lt;/code&gt; 在方法完成后调用通知，无论方法是否执行成功&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;After-returning&lt;/code&gt; ==在方法成功执行之后调用通知==&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;After-throwing&lt;/code&gt; 在方法抛出异常后调用通知&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Around&lt;/code&gt; 方法调用之==前后调用之后执行自定义的行为==&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;2-切点-pointcut&#34;&gt;2. 切点 Pointcut
-&lt;/h3&gt;&lt;p&gt;​	切点在Spring AOP中确实是==对应系统中的方法==。但是这个方法是定义在切面中的方法，一般和通知一起使用，一起组成了切面。&lt;/p&gt;
-&lt;h3 id=&#34;3-连接点-joinpoint&#34;&gt;3. 连接点 JoinPoint
-&lt;/h3&gt;&lt;p&gt;比如: 方法调用、方法执行、字段设置/获取、异常处理执行、类初始化、甚至是 for 循环中的某个点&lt;/p&gt;
-&lt;p&gt;==程序执行过程中的任何时点都可以作为作为织入点, 而所有这些执行时点都是 Joint point==&lt;/p&gt;
-&lt;p&gt;Spring AOP 目前==仅支持方法执行 (method execution)==&lt;/p&gt;
-&lt;h3 id=&#34;4-切面-aspect&#34;&gt;4. 切面 Aspect
-&lt;/h3&gt;&lt;p&gt;切面就是切点和通知的集合, 一般单独作为一个类; 通知和切点共同定义了关于切面的全部内容，它是什么时候，在何时和何处完成功能。&lt;/p&gt;
-&lt;h3 id=&#34;5-引入-introduction&#34;&gt;5. 引入 introduction
-&lt;/h3&gt;&lt;p&gt;引用允许我们向现有的类添加新的方法或者属性&lt;/p&gt;
-&lt;h3 id=&#34;6-织入-weaving&#34;&gt;6. 织入 weaving
-&lt;/h3&gt;&lt;h2 id=&#34;2-使用&#34;&gt;2. 使用
-&lt;/h2&gt;&lt;p&gt;Spring 2.0 之后，Spring AOP有了两种配置方式。&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;&lt;strong&gt;schema-based&lt;/strong&gt;：Spring 2.0 以后使用 XML 的方式来配置，使用 命名空间 &lt;code&gt;&amp;lt;aop /&amp;gt;&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;@AspectJ 配置&lt;/strong&gt;：Spring 2.0 以后提供的注解方式。这里虽然叫做 @AspectJ，但是这个和 AspectJ 其实没啥关系。&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h3 id=&#34;1-enableaspectjautoproxy&#34;&gt;1. EnableAspectJAutoProxy
-&lt;/h3&gt;&lt;p&gt;开启配置之后，所有&lt;strong&gt;在容器中&lt;/strong&gt;，&lt;strong&gt;被&lt;code&gt;@AspectJ&lt;/code&gt;注解的 bean&lt;/strong&gt; 都会被 Spring 当做是 AOP 配置类，称为一个 Aspect。&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;注意: AspectJ 注解只能作用于Spring Bean 上面&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;h3 id=&#34;2-配置pointcut&#34;&gt;2. 配置Pointcut
-&lt;/h3&gt;&lt;p&gt;在Spring 中, Pointcut 是用来匹配Spring 容器中所有满足指定条件的bean的方法&lt;/p&gt;
-&lt;p&gt;例如&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;execution&lt;/strong&gt;：匹配方法名&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;    // 表示的是匹配名为testExecution的方法，*代表任意返回值，(..)表示零个或多个任意参数
-    @Pointcut(&amp;quot;execution(* testExecution(..))&amp;quot;)
-    public void anyTestMethod() {}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;within&lt;/strong&gt;&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// &amp;quot;..&amp;quot; 代表包及其子包
-	@Pointcut(&amp;quot;within(ric.study.demo.aop.svc..*)&amp;quot;)
-    public void inSvcLayer() {}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;&lt;strong&gt;annotation&lt;/strong&gt;：方法上具有特定的注解&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// 指定注解
-    @Pointcut(&amp;quot;@annotation(ric.study.demo.aop.HaveAop)&amp;quot;)
-    public void withAnnotation() {}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;bean(idOrNameOfBean)：匹配 bean 的名字&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// controller 层
-    @Pointcut(&amp;quot;bean(testController)&amp;quot;)
-    public void inControllerLayer() {}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;&lt;strong&gt;关于 Pointcut 的配置&lt;/strong&gt;, 开发企业级应用，Spring 建议你使用 &lt;code&gt;SystemArchitecture&lt;/code&gt;这种切面配置方式，即将一些公共的PointCut 配置全部写在这个一个类里面维护&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Aspect
-public class SystemArchitecture {
-
-  /**
-   * A join point is in the web layer if the method is defined
-   * in a type in the com.xyz.someapp.web package or any sub-package
-   * under that.
-   */
-  @Pointcut(&amp;quot;within(com.xyz.someapp.web..*)&amp;quot;)
-  public void inWebLayer() {}
-  
-  @Pointcut(&amp;quot;execution(* com.xyz.someapp.dao.*.*(..))&amp;quot;)
-  public void dataAccessOperation() {}
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h3 id=&#34;3-配置-advice&#34;&gt;3. 配置 Advice
-&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;实际开发过程当中，Aspect 类应该遵守单一职责原则，不要把所有的Advice配置全部写在一个Aspect类里面。&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Aspect
-@Component
-public class GlobalAopAdvice {
-
-    @Before(&amp;quot;ric.study.demo.aop.SystemArchitecture.dataAccessOperation()&amp;quot;)
-    public void doAccessCheck() {
-        // ... 实现代码
-    }
-
-    // 实际使用过程当中 可以像这样把Advice 和 Pointcut 合在一起，直接在Advice上面定义切入点
-    @Before(&amp;quot;execution(* ric.study.demo.dao.*.*(..))&amp;quot;)
-    public void doAccessCheck() {
-        // ... 实现代码
-    }
-
-    // 在方法
-    @AfterReturning(&amp;quot;ric.study.demo.aop.SystemArchitecture.dataAccessOperation()&amp;quot;)
-    public void doAccessCheck() {
-        // ... 实现代码
-    }
-
-    // returnVal 就是相应方法的返回值
-    @AfterReturning(
-        pointcut=&amp;quot;ric.study.demo.aop.SystemArchitecture.dataAccessOperation()&amp;quot;,
-        returning=&amp;quot;returnVal&amp;quot;)
-    public void doAccessCheck(Object returnVal) {
-        //  ... 实现代码
-    }
-
-    // 异常返回的时候
-    @AfterThrowing(&amp;quot;ric.study.demo.aop.SystemArchitecture.dataAccessOperation()&amp;quot;)
-    public void doRecoveryActions() {
-        // ... 实现代码
-    }
-
-    // 注意理解它和 @AfterReturning 之间的区别，这里会拦截正常返回和异常的情况
-    @After(&amp;quot;ric.study.demo.aop.SystemArchitecture.dataAccessOperation()&amp;quot;)
-    public void doReleaseLock() {
-        // 通常就像 finally 块一样使用，用来释放资源。
-        // 无论正常返回还是异常退出，都会被拦截到
-    }
-
-    // 这种最灵活，既能做 @Before 的事情，也可以做 @AfterReturning 的事情
-    @Around(&amp;quot;ric.study.demo.aop.SystemArchitecture.businessService()&amp;quot;)
-    public Object doBasicProfiling(ProceedingJoinPoint pjp) throws Throwable {
-       	//  target 方法执行前... 实现代码
-        Object retVal = pjp.proceed();
-        //  target 方法执行后... 实现代码
-        return retVal;
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;strong&gt;@Before的时候，去获取方法的入参，比如进行一些日志的记录&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;可以通过 &lt;code&gt;org.aspectj.lang.JoinPoint&lt;/code&gt;来实现。上文中的&lt;code&gt;ProceedingJoinPoint&lt;/code&gt;就是其子类&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Before(&amp;quot;...&amp;quot;)
-public void logArgs(JoinPoint joinPoint) {
-    System.out.println(&amp;quot;方法执行前，打印入参：&amp;quot; + Arrays.toString(joinPoint.getArgs()));
-}
-
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;方法返回参数打印&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@AfterReturning( pointcut=&amp;quot;...&amp;quot;, returning=&amp;quot;returnVal&amp;quot;)
-public void logReturnVal(Object returnVal) {
-    System.out.println(&amp;quot;方法执行后，打印返参：&amp;quot; + returnVal));
-}
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-        </item>
-        <item>
-        <title>Spring事务</title>
-        <link>https://mikeLing-qx.github.io/p/spring%E4%BA%8B%E5%8A%A1/</link>
-        <pubDate>Fri, 03 Jan 2025 19:21:43 +0800</pubDate>
-        
-        <guid>https://mikeLing-qx.github.io/p/spring%E4%BA%8B%E5%8A%A1/</guid>
-        <description>&lt;h1 id=&#34;1-spring事务的7种传播行为&#34;&gt;1. Spring事务的7种传播行为
-&lt;/h1&gt;&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;PROPAGATION_REQUIRED ，==默认==的spring事务传播级别，==如果上下文中已经存在事务，那么就加入到事务中执行，如果当前上下文中不存在事务，则新建事务执行==。所以这个级别通常能满足处理大多数的业务场景。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;PROPAGATION_SUPPORTS ，==如果上下文存在事务，则支持事务加入事务，如果没有事务，则使用非事务的方式执行==。所以说，并非所有的包在transactionTemplate.execute中的代码都会有事务支持。这个通常是用来处理那些并非原子性的非核心业务逻辑操作。应用场景较少。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;PROPAGATION_MANDATORY（强制） ， ==该级别的事务要求上下文中必须要存在事务，否则就会抛出异常！==配置该方式的传播级别是有效的控制上下文调用代码遗漏添加事务控制的保证手段。比如一段代码不能单独被调用执行，但是一旦被调用，就必须有事务包含的情况，就可以使用这个传播级别。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;PROPAGATION_REQUIRES_NEW ，==每次都会新建一个事务，并且同时将上下文中的事务挂起，执行当前新建事务完成以后，上下文事务恢复再执行==&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;这是一个很有用的传播级别，举一个应用场景：现在有一个发送100个红包的操作，在发送之前，要做一些系统的初始化、验证、数据记录操作，然后发送100封红包，然后再记录发送日志，发送日志要求100%的准确，如果日志不准确，那么整个父事务逻辑需要回滚。
-怎么处理整个业务需求呢？就是通过这个PROPAGATION_REQUIRES_NEW 级别的事务传播控制就可以完成。发送红包的子事务不会直接影响到父事务的提交和回滚。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;PROPAGATION_NOT_SUPPORTED ，当前级别的特点就是&lt;strong&gt;上下文中存在事务&lt;/strong&gt;，==则挂起事务，执行当前逻辑，结束后恢复上下文的事务==。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;PROPAGATION_NEVER ，该事务更严格，就抛出runtime异常，强制停止执行！&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;PROPAGATION_NESTED ，字面也可知道，nested，嵌套级别事务。该传播级别特征是，如果上下文中存在事务，则==嵌套事务==执行，如果不存在事务，则新建事务。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;还是子事务先提交，父事务再提交, 子事务是父事务的一部分，由父事务统一提交。&lt;/li&gt;
-&lt;li&gt;回滚特性
-&lt;ul&gt;
-&lt;li&gt;主事务和嵌套事务属于同一个事务&lt;/li&gt;
-&lt;li&gt;嵌套事务出错回滚不会影响到主事务&lt;/li&gt;
-&lt;li&gt;主事务回滚会将嵌套事务一起回滚了&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h1 id=&#34;2-多线程事务--二阶段提交&#34;&gt;2. 多线程事务&amp;ndash;二阶段提交
-&lt;/h1&gt;&lt;p&gt;这两个方法的两种写法, 第一种是可以正常的进行事务的提交和回滚的, 第二种执行的时候线程会一直阻塞, 不会退出, 分析原因&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;原因分析过程:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;第一种方式 是根据线程池大小来划分任务, 第二种方式是根据数据列表来划分任务,  第二种方式会出现一个线程需要处理多个事务的情况, 然而在updateStudentsTransaction 方法里面 ==事务的隔离级别  PROPAGATION_REQUIRES_NEW  会导致 线程新开任务==, ==这会导致 主线程等待子线程全部完成后再进行事务的提交或回滚==,  需要修改为 ==PROPAGATION_REQUIRES==&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/blockquote&gt;
-&lt;pre&gt;&lt;code&gt;第一种
-@Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
-    public void updateStudentWithThreadsAndTrans() throws InterruptedException {
-
-        //查询总数据
-        List&amp;lt;UserDemo&amp;gt; allUser = userMapper.selectAll();
-
-        // 线程数量
-        final int threadCount = 2;
-
-        //每个线程处理的数据量
-        final int dataPartionLength = (allUser.size() + threadCount - 1) / threadCount;
-
-        // 创建多线程处理任务
-        ExecutorService studentThreadPool = Executors.newFixedThreadPool(threadCount);
-        CountDownLatch threadLatchs = new CountDownLatch(threadCount);
-        AtomicBoolean isError = new AtomicBoolean(false);
-        try {
-            for (int i = 0; i &amp;lt; threadCount; i++) {
-                // 每个线程处理的数据
-                List&amp;lt;UserDemo&amp;gt; threadDatas = allUser.stream()
-                        .skip((long) i * dataPartionLength).limit(dataPartionLength).collect(Collectors.toList());
-                studentThreadPool.execute(() -&amp;gt; {
-                    try {
-                        try {
-                            userService.updateStudentsTransaction(transactionManager, transactionStatusList, threadDatas);
-                        } catch (Throwable e) {
-                            isError.set(true);
-                            throw e;
-                        }finally {
-                            threadLatchs.countDown();
-                        }
-                    } catch (Exception e) {
-                        isError.set(true);
-                        throw e;
-                    }
-                });
-            }
-
-            // 倒计时锁设置超时时间 30s
-            boolean await = threadLatchs.await(30, TimeUnit.SECONDS);
-            // 判断是否超时
-            if (!await) {
-                isError.set(true);
-            }
-        } catch (Throwable e) {
-            isError.set(true);
-            throw e;
-        }
-
-        if (!transactionStatuses.isEmpty()) {
-            if (isError.get()) {
-                transactionStatuses.forEach(transactionManager::rollback);
-            } else {
-                transactionStatuses.forEach(transactionManager::commit);
-            }
-        }
-
-        System.out.println(&amp;quot;主线程完成&amp;quot;);
-    }
-&lt;/code&gt;&lt;/pre&gt;
-&lt;pre&gt;&lt;code&gt;第二种
-@Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
-    public void updateStudentWithThreadsAndTrans() throws InterruptedException {
-
-        //查询总数据
-        List&amp;lt;UserDemo&amp;gt; allUser = userMapper.selectAll();
-
-        // 线程数量
-        final int threadCount = 5;
-
-        //每个线程处理的数据量
-        final int dataPartionLength = (allUser.size() + threadCount - 1) / threadCount;
-
-        ExecutorService studentThreadPool = Executors.newFixedThreadPool(threadCount);
-        CountDownLatch threadLatchs = new CountDownLatch(threadCount);
-        AtomicBoolean isError = new AtomicBoolean(false);
-
-        // 创建CompletableFuture列表
-        List&amp;lt;CompletableFuture&amp;lt;Void&amp;gt;&amp;gt; futures = new ArrayList&amp;lt;&amp;gt;();
-
-        int batchSize = 100;
-        int size = allUser.size();
-        int batchNum = size / batchSize;
-        if (size % batchSize != 0) {
-            batchNum++;
-        }
-
-        for (int i = 0; i &amp;lt; batchNum; i++) {
-            int start = i * batchSize;
-            int end = Math.min((i + 1) * batchSize, size);
-
-            // 使用CompletableFuture执行异步任务
-            CompletableFuture&amp;lt;Void&amp;gt; future = CompletableFuture.runAsync(() -&amp;gt; {
-                try {
-                    userService.updateStudentsTransaction(transactionManager, transactionStatusList, allUser.subList(start, end));
-                } catch (Throwable e) {
-                    throw new CompletionException(e);
-                } finally {
-                    threadLatchs.countDown();
-                }
-            }, studentThreadPool).exceptionally(e -&amp;gt; {
-                isError.set(true);
-                return null;
-            });
-
-            futures.add(future);
-        }
-
-        // 等待所有任务完成
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-
-        if (!transactionStatusList.isEmpty()) {
-            if (isError.get()) {
-                transactionStatusList.forEach(transactionManager::rollback);
-            } else {
-                transactionStatusList.forEach(transactionManager::commit);
-            }
-        }
-
-        System.out.println(&amp;quot;主线程完成&amp;quot;);
-    }
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;对于updateStudentsTransaction的调用里面是一样的代码&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;@Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
-    public void updateStudentsTransaction(PlatformTransactionManager transactionManager, List&amp;lt;TransactionStatus&amp;gt; transactionStatuses, List&amp;lt;UserDemo&amp;gt; userList) {
-        // 使用这种方式将事务状态都放在同一个事务里面
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW); // 事物隔离级别，开启新事务，这样会比较安全些。
-        TransactionStatus status = transactionManager.getTransaction(def); // 获得事务状态
-        transactionStatuses.add(status);
-
-        userList.forEach(s -&amp;gt; {
-//            if (&amp;quot;mike&amp;quot;.equals(s.getUserName())) {
-//                throw new RuntimeException(&amp;quot;故意抛出异常&amp;quot;);
-//            }
-            // 更新教师信息
-            // String teacher = s.getTeacher();
-            String newTeacher = &amp;quot;TNO_&amp;quot; + new Random().nextInt(100);
-            s.setUserName(newTeacher);
-            userMapper.updateByPrimaryKey(s);
-        });
-        System.out.println(&amp;quot;子线程：&amp;quot; + Thread.currentThread().getName());
-    }
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-        </item>
-        <item>
+        <lastBuildDate>Sat, 23 Nov 2024 18:07:34 +0800</lastBuildDate><atom:link href="https://mikeLing-qx.github.io/categories/spring/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>Spring_源码解析</title>
         <link>https://mikeLing-qx.github.io/p/spring_%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</link>
         <pubDate>Sat, 23 Nov 2024 18:07:34 +0800</pubDate>
@@ -2000,6 +1240,766 @@ public List&amp;lt;PatentTrademarkApplyCountEntity&amp;gt; listPatentTrademarkAp
 
 @Cacheable(cacheNames = {&amp;quot;zxipr:trademark&amp;quot;}, key = &amp;quot;#root.methodName&amp;quot;, cacheManager = &amp;quot;cacheManager&amp;quot;)
 public TrademarkCountEntity countTrademarks() {}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        <item>
+        <title>Spring事务</title>
+        <link>https://mikeLing-qx.github.io/p/spring%E4%BA%8B%E5%8A%A1/</link>
+        <pubDate>Thu, 09 Jul 2020 19:21:43 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/spring%E4%BA%8B%E5%8A%A1/</guid>
+        <description>&lt;h1 id=&#34;1-spring事务的7种传播行为&#34;&gt;1. Spring事务的7种传播行为
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_REQUIRED ，==默认==的spring事务传播级别，==如果上下文中已经存在事务，那么就加入到事务中执行，如果当前上下文中不存在事务，则新建事务执行==。所以这个级别通常能满足处理大多数的业务场景。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_SUPPORTS ，==如果上下文存在事务，则支持事务加入事务，如果没有事务，则使用非事务的方式执行==。所以说，并非所有的包在transactionTemplate.execute中的代码都会有事务支持。这个通常是用来处理那些并非原子性的非核心业务逻辑操作。应用场景较少。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_MANDATORY（强制） ， ==该级别的事务要求上下文中必须要存在事务，否则就会抛出异常！==配置该方式的传播级别是有效的控制上下文调用代码遗漏添加事务控制的保证手段。比如一段代码不能单独被调用执行，但是一旦被调用，就必须有事务包含的情况，就可以使用这个传播级别。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_REQUIRES_NEW ，==每次都会新建一个事务，并且同时将上下文中的事务挂起，执行当前新建事务完成以后，上下文事务恢复再执行==&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;这是一个很有用的传播级别，举一个应用场景：现在有一个发送100个红包的操作，在发送之前，要做一些系统的初始化、验证、数据记录操作，然后发送100封红包，然后再记录发送日志，发送日志要求100%的准确，如果日志不准确，那么整个父事务逻辑需要回滚。
+怎么处理整个业务需求呢？就是通过这个PROPAGATION_REQUIRES_NEW 级别的事务传播控制就可以完成。发送红包的子事务不会直接影响到父事务的提交和回滚。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_NOT_SUPPORTED ，当前级别的特点就是&lt;strong&gt;上下文中存在事务&lt;/strong&gt;，==则挂起事务，执行当前逻辑，结束后恢复上下文的事务==。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_NEVER ，该事务更严格，就抛出runtime异常，强制停止执行！&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;PROPAGATION_NESTED ，字面也可知道，nested，嵌套级别事务。该传播级别特征是，如果上下文中存在事务，则==嵌套事务==执行，如果不存在事务，则新建事务。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;还是子事务先提交，父事务再提交, 子事务是父事务的一部分，由父事务统一提交。&lt;/li&gt;
+&lt;li&gt;回滚特性
+&lt;ul&gt;
+&lt;li&gt;主事务和嵌套事务属于同一个事务&lt;/li&gt;
+&lt;li&gt;嵌套事务出错回滚不会影响到主事务&lt;/li&gt;
+&lt;li&gt;主事务回滚会将嵌套事务一起回滚了&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;2-多线程事务--二阶段提交&#34;&gt;2. 多线程事务&amp;ndash;二阶段提交
+&lt;/h1&gt;&lt;p&gt;这两个方法的两种写法, 第一种是可以正常的进行事务的提交和回滚的, 第二种执行的时候线程会一直阻塞, 不会退出, 分析原因&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;原因分析过程:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;第一种方式 是根据线程池大小来划分任务, 第二种方式是根据数据列表来划分任务,  第二种方式会出现一个线程需要处理多个事务的情况, 然而在updateStudentsTransaction 方法里面 ==事务的隔离级别  PROPAGATION_REQUIRES_NEW  会导致 线程新开任务==, ==这会导致 主线程等待子线程全部完成后再进行事务的提交或回滚==,  需要修改为 ==PROPAGATION_REQUIRES==&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;pre&gt;&lt;code&gt;第一种
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
+    public void updateStudentWithThreadsAndTrans() throws InterruptedException {
+
+        //查询总数据
+        List&amp;lt;UserDemo&amp;gt; allUser = userMapper.selectAll();
+
+        // 线程数量
+        final int threadCount = 2;
+
+        //每个线程处理的数据量
+        final int dataPartionLength = (allUser.size() + threadCount - 1) / threadCount;
+
+        // 创建多线程处理任务
+        ExecutorService studentThreadPool = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch threadLatchs = new CountDownLatch(threadCount);
+        AtomicBoolean isError = new AtomicBoolean(false);
+        try {
+            for (int i = 0; i &amp;lt; threadCount; i++) {
+                // 每个线程处理的数据
+                List&amp;lt;UserDemo&amp;gt; threadDatas = allUser.stream()
+                        .skip((long) i * dataPartionLength).limit(dataPartionLength).collect(Collectors.toList());
+                studentThreadPool.execute(() -&amp;gt; {
+                    try {
+                        try {
+                            userService.updateStudentsTransaction(transactionManager, transactionStatusList, threadDatas);
+                        } catch (Throwable e) {
+                            isError.set(true);
+                            throw e;
+                        }finally {
+                            threadLatchs.countDown();
+                        }
+                    } catch (Exception e) {
+                        isError.set(true);
+                        throw e;
+                    }
+                });
+            }
+
+            // 倒计时锁设置超时时间 30s
+            boolean await = threadLatchs.await(30, TimeUnit.SECONDS);
+            // 判断是否超时
+            if (!await) {
+                isError.set(true);
+            }
+        } catch (Throwable e) {
+            isError.set(true);
+            throw e;
+        }
+
+        if (!transactionStatuses.isEmpty()) {
+            if (isError.get()) {
+                transactionStatuses.forEach(transactionManager::rollback);
+            } else {
+                transactionStatuses.forEach(transactionManager::commit);
+            }
+        }
+
+        System.out.println(&amp;quot;主线程完成&amp;quot;);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;第二种
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
+    public void updateStudentWithThreadsAndTrans() throws InterruptedException {
+
+        //查询总数据
+        List&amp;lt;UserDemo&amp;gt; allUser = userMapper.selectAll();
+
+        // 线程数量
+        final int threadCount = 5;
+
+        //每个线程处理的数据量
+        final int dataPartionLength = (allUser.size() + threadCount - 1) / threadCount;
+
+        ExecutorService studentThreadPool = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch threadLatchs = new CountDownLatch(threadCount);
+        AtomicBoolean isError = new AtomicBoolean(false);
+
+        // 创建CompletableFuture列表
+        List&amp;lt;CompletableFuture&amp;lt;Void&amp;gt;&amp;gt; futures = new ArrayList&amp;lt;&amp;gt;();
+
+        int batchSize = 100;
+        int size = allUser.size();
+        int batchNum = size / batchSize;
+        if (size % batchSize != 0) {
+            batchNum++;
+        }
+
+        for (int i = 0; i &amp;lt; batchNum; i++) {
+            int start = i * batchSize;
+            int end = Math.min((i + 1) * batchSize, size);
+
+            // 使用CompletableFuture执行异步任务
+            CompletableFuture&amp;lt;Void&amp;gt; future = CompletableFuture.runAsync(() -&amp;gt; {
+                try {
+                    userService.updateStudentsTransaction(transactionManager, transactionStatusList, allUser.subList(start, end));
+                } catch (Throwable e) {
+                    throw new CompletionException(e);
+                } finally {
+                    threadLatchs.countDown();
+                }
+            }, studentThreadPool).exceptionally(e -&amp;gt; {
+                isError.set(true);
+                return null;
+            });
+
+            futures.add(future);
+        }
+
+        // 等待所有任务完成
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+        if (!transactionStatusList.isEmpty()) {
+            if (isError.get()) {
+                transactionStatusList.forEach(transactionManager::rollback);
+            } else {
+                transactionStatusList.forEach(transactionManager::commit);
+            }
+        }
+
+        System.out.println(&amp;quot;主线程完成&amp;quot;);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;对于updateStudentsTransaction的调用里面是一样的代码&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;@Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
+    public void updateStudentsTransaction(PlatformTransactionManager transactionManager, List&amp;lt;TransactionStatus&amp;gt; transactionStatuses, List&amp;lt;UserDemo&amp;gt; userList) {
+        // 使用这种方式将事务状态都放在同一个事务里面
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW); // 事物隔离级别，开启新事务，这样会比较安全些。
+        TransactionStatus status = transactionManager.getTransaction(def); // 获得事务状态
+        transactionStatuses.add(status);
+
+        userList.forEach(s -&amp;gt; {
+//            if (&amp;quot;mike&amp;quot;.equals(s.getUserName())) {
+//                throw new RuntimeException(&amp;quot;故意抛出异常&amp;quot;);
+//            }
+            // 更新教师信息
+            // String teacher = s.getTeacher();
+            String newTeacher = &amp;quot;TNO_&amp;quot; + new Random().nextInt(100);
+            s.setUserName(newTeacher);
+            userMapper.updateByPrimaryKey(s);
+        });
+        System.out.println(&amp;quot;子线程：&amp;quot; + Thread.currentThread().getName());
+    }
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        </item>
+        <item>
+        <title>Spring基础</title>
+        <link>https://mikeLing-qx.github.io/p/spring%E5%9F%BA%E7%A1%80/</link>
+        <pubDate>Tue, 16 Jun 2020 19:21:43 +0800</pubDate>
+        
+        <guid>https://mikeLing-qx.github.io/p/spring%E5%9F%BA%E7%A1%80/</guid>
+        <description>&lt;h1 id=&#34;1-简介&#34;&gt;1. 简介
+&lt;/h1&gt;&lt;p&gt;Spring 是一个轻量级的 Java 开发框架。Spring 的核心是控制反转(IOC)和面向切面编程(AOP)。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Spring 主要有如下优点：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;1.解耦&lt;/li&gt;
+&lt;li&gt;2.支持面向切面编程&lt;/li&gt;
+&lt;li&gt;3.便于集成其他框架&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1 id=&#34;2-ioc-控制反转&#34;&gt;2. IOC 控制反转
+&lt;/h1&gt;&lt;p&gt;​	IOC，全称 Inversion of Control，意思是&lt;strong&gt;控制反转&lt;/strong&gt;。它是 Spring 框架中的一种思想。&lt;/p&gt;
+&lt;p&gt;​	&lt;strong&gt;控制反转就是将对象的控制权从程序中的代码转移到了 Spring 的工厂，通过 Spring 的工厂完成对象的创建以及赋值。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;​	之前是我们自己 new 对象、给对象中的成员变量赋值。现在是让 Spring 来帮助我们创建对象、给成员变量赋值。&lt;/p&gt;
+&lt;h1 id=&#34;3-spring核心内容描述&#34;&gt;3. Spring核心内容描述
+&lt;/h1&gt;&lt;ol&gt;
+&lt;li&gt;配置文件&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;​	Spring 的配置文件可以放到项目中的任意一个地方，也可以随意命名，但是建	议使用：applicationContext.xml。&lt;/p&gt;
+&lt;p&gt;​	你可以将这个配置文件看成一个装有一堆 bean 标签的容器&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;bean 标签&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Spring 工厂创建的对象，叫做 bean，所以一个 bean 标签代表一个对象。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;userService&amp;quot; class=&amp;quot;com.xxl.service.impl.UserServiceImpl&amp;quot;/&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;bean 标签中必须要有 class 属性，它的值是一个类的全限定名（包名+类名）除了 class 属性，bean 标签还可以设置 id 、name 、scope属性&lt;/p&gt;
+&lt;p&gt;name: 相当于这个 bean 的别名，可以配置多个&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; name=&amp;quot;aa,bb,cc&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot;/&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;scope: 可以控制简单对象的创建次数&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;singleton: 每次只会创建唯一⼀个简单对象，默认值&lt;/li&gt;
+&lt;li&gt;prototype 每⼀次都会创建新的对象&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot; scope=&amp;quot;singleton&amp;quot;/&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;ApplicationContext&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ApplicationContext 是 Spring 的工厂，主要用来创建对象&lt;/p&gt;
+&lt;p&gt;Spring 通过读取配置文件创建工厂。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;
+&lt;p&gt;工厂常用的方法&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// 1、获取工厂
+ApplicationContext act = new ClassPathXmlApplicationContext(&amp;quot;/applicationContext.xml&amp;quot;);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;(1). 根据id 获取对象&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;UserService userService = (UserService)act.getBean(&amp;quot;userService&amp;quot;);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(2). 根据id 和类名获取对象&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;UserService userService = (UserService)act.getBean(&amp;quot;userService&amp;quot;,UserService.class);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(3). 只根据类名获取对象&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;UserService userService = (UserService)act.getBean(UserService.class);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(4). 获取配置文件中所有 bean 标签的 id 值&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;String[] beanDefinitionNames = act.getBeanDefinitionNames();
+for (String beanDefinitionName : beanDefinitionNames) {
+    System.out.println(beanDefinitionName);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(5). 判断是否存在指定id 或者name 的bean&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;act.containsBean(&amp;quot;userService&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(6). 判断是否存在指定id 的bean&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;act.containsBeanDefinition(&amp;quot;userService&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;5&#34;&gt;
+&lt;li&gt;Spring 是如何创建对象的?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;​	工厂和反射&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Spring 配置文件中 bean 标签的 id 和类的全限定名一一对应，所以 Spring 工厂的 getBean 方法其实就是先根据 bean 的 id ==获取该类的全限定名==，然后再利用==反射==根据类的全限定名创建对象并返回。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;4-di-依赖注入&#34;&gt;4. DI 依赖注入
+&lt;/h1&gt;&lt;p&gt;DI 全称 Dependency Injection，意思是&lt;strong&gt;依赖注入&lt;/strong&gt;，它是 IOC 的具体实现。&lt;/p&gt;
+&lt;p&gt;依赖就是说我需要你，比如 Service 层依赖 Dao 层，注入就是&lt;strong&gt;赋值&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Spring 的依赖注入包含两种方式：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;set 注入：Spring 调用 Set 方法通过配置文件为成员变量赋值。&lt;/strong&gt;&lt;/p&gt;
+&lt;h2 id=&#34;1-set-注入&#34;&gt;1. set 注入
+&lt;/h2&gt;&lt;p&gt;Set 注入就是在 property 标签中为属性赋值&lt;/p&gt;
+&lt;p&gt;(1) 创建对象&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class User {
+    private String name;
+    private int age;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;(2) 修改配置文件&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot;&amp;gt;
+  &amp;lt;property name=&amp;quot;name&amp;quot; value=&amp;quot;mike&amp;quot; /&amp;gt;
+  &amp;lt;property name=&amp;quot;age&amp;quot; value=&amp;quot;18&amp;quot; /&amp;gt;
+&amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-构造注入&#34;&gt;2. 构造注入
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;Spring 调用构造方法通过配置文件为成员变量赋值。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;为类添加构造方法&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class User {
+    private String name;
+    private int age;
+
+    public User(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;bean 标签中使用 constructor-arg&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean class=&amp;quot;com.xxl.model.User&amp;quot;&amp;gt;
+    &amp;lt;constructor-arg value=&amp;quot;张三&amp;quot;/&amp;gt;
+    &amp;lt;constructor-arg value=&amp;quot;18&amp;quot;/&amp;gt;
+&amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;5-bean-的生命周期&#34;&gt;5. Bean 的生命周期
+&lt;/h1&gt;&lt;h2 id=&#34;1-创建阶段&#34;&gt;1. 创建阶段
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;singleton 模式, 创建 Spring 工厂的同时创建所有单例对象&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class User {
+    String name;
+    int age;
+
+    public User() {
+        System.out.println(&amp;quot;调用User的构造方法&amp;quot;);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return &amp;quot;User{&amp;quot; +
+                &amp;quot;name=&#39;&amp;quot; + name + &#39;&#39;&#39; +
+                &amp;quot;, age=&amp;quot; + age +
+                &#39;}&#39;;
+    }
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;spring 配置文件注册bean&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot;&amp;gt;
+    &amp;lt;property name=&amp;quot;name&amp;quot; value=&amp;quot;知否君&amp;quot;/&amp;gt;
+    &amp;lt;property name=&amp;quot;age&amp;quot; value=&amp;quot;23&amp;quot;/&amp;gt;
+&amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;测试&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test
+  public void testSpring(){
+    ApplicationContext act = new ClassPathXmlApplicationContext(&amp;quot;/applicationContext.xml&amp;quot;);
+  }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E5%9F%BA%E7%A1%80/images/image-20220920104640120.png&#34;
+	width=&#34;546&#34;
+	height=&#34;184&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220920104640120&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;296&#34;
+		data-flex-basis=&#34;712px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;获取的时候才创建&lt;/strong&gt;, 只需要在 bean 标签上面添加如下属性  &amp;mdash;&amp;gt; lazy-init=&amp;ldquo;true&amp;rdquo;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot; lazy-init=&amp;quot;true&amp;quot;&amp;gt;
+    &amp;lt;property name=&amp;quot;name&amp;quot; value=&amp;quot;知否君&amp;quot;/&amp;gt;
+    &amp;lt;property name=&amp;quot;age&amp;quot; value=&amp;quot;23&amp;quot;/&amp;gt;
+&amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-初始化阶段&#34;&gt;2. 初始化阶段
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;==&lt;strong&gt;初始化方法修改了注入的值，所以初始化方法一定在注入之后执行&lt;/strong&gt;==&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;​	spring 中 bean 的初始化操作指的是在==创建对象的时候完成一些附加的功能==。bean 的初始化操作有两种实现方式：&lt;/p&gt;
+&lt;h3 id=&#34;1-实现-initializingbean-接口&#34;&gt;1. &lt;strong&gt;实现 InitializingBean 接口&lt;/strong&gt;
+&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;public class 类名 implements InitializingBean {
+    public void afterPropertiesSet(){
+       // 初始化方法操作
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;例如&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class User implements InitializingBean {
+    String name;
+    int age;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return &amp;quot;User{&amp;quot; +
+                &amp;quot;name=&#39;&amp;quot; + name + &#39;&#39;&#39; +
+                &amp;quot;, age=&amp;quot; + age +
+                &#39;}&#39;;
+    }
+
+    // 初始化操作
+    @Override
+    public void afterPropertiesSet(){
+            this.name = &amp;quot;张无忌&amp;quot;;
+            this.age = 30;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test
+    public void testSpring(){
+        ApplicationContext act = new ClassPathXmlApplicationContext(&amp;quot;/applicationContext.xml&amp;quot;);
+        Object user = act.getBean(&amp;quot;user&amp;quot;);
+        System.out.println(user);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E5%9F%BA%E7%A1%80/images/image-20220920105214213.png&#34;
+	width=&#34;386&#34;
+	height=&#34;112&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220920105214213&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;344&#34;
+		data-flex-basis=&#34;827px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;2--通过创建普通方法完成初始化&#34;&gt;2.  通过创建普通方法完成初始化
+&lt;/h3&gt;&lt;p&gt;User 类中创建一个方法&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// 初始化方法
+  public void initMethod() {
+      this.name = &amp;quot;张无忌&amp;quot;;
+  }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;在配置文件中配置 init-method 属性&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot; init-method=&amp;quot;initMethod&amp;quot; &amp;gt;
+    &amp;lt;property name=&amp;quot;name&amp;quot; value=&amp;quot;知否君&amp;quot;/&amp;gt;
+    &amp;lt;property name=&amp;quot;age&amp;quot; value=&amp;quot;23&amp;quot;/&amp;gt;
+&amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;测试&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Test
+    public void testSpring(){
+        ApplicationContext act = new ClassPathXmlApplicationContext(&amp;quot;/applicationContext.xml&amp;quot;);
+        Object user = act.getBean(&amp;quot;user&amp;quot;);
+        System.out.println(user);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;https://mikeLing-qx.github.io/p/spring%E5%9F%BA%E7%A1%80/images/image-20220920105411727.png&#34;
+	width=&#34;480&#34;
+	height=&#34;124&#34;
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;image-20220920105411727&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;387&#34;
+		data-flex-basis=&#34;929px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;3-销毁阶段&#34;&gt;3. 销毁阶段
+&lt;/h2&gt;&lt;p&gt;Spring 销毁对象前，会调用对象的销毁方法，完成销毁操作。&lt;/p&gt;
+&lt;p&gt;Spring 什么时候销毁所创建的对象？当 Spring 工厂关闭时，Spring 工厂会调用我们自定义的销毁方法。&lt;/p&gt;
+&lt;p&gt;两种方式:&lt;/p&gt;
+&lt;h3 id=&#34;1-disposablebean接口&#34;&gt;1. DisposableBean接口
+&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class 类名 implements DisposableBean {
+    // 销毁操作
+    @Override
+    public void destroy(){
+        // 销毁操作业务
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;2-创建普通方法&#34;&gt;2. 创建普通方法
+&lt;/h3&gt;&lt;pre&gt;&lt;code&gt;// 销毁方法
+  public void destroyMethod() {
+     // 销毁操作业务
+  }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;配置文件中配置 destroy-method 属性&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;user&amp;quot; class=&amp;quot;com.xxl.model.User&amp;quot; destroy-method=&amp;quot;destroyMethod&amp;quot;&amp;gt;
+      &amp;lt;property name=&amp;quot;name&amp;quot; value=&amp;quot;知否君&amp;quot;/&amp;gt;
+      &amp;lt;property name=&amp;quot;age&amp;quot; value=&amp;quot;23&amp;quot;/&amp;gt;
+  &amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;6-bean-的后置处理&#34;&gt;6. Bean 的后置处理
+&lt;/h1&gt;&lt;p&gt;后置处理的流程&lt;/p&gt;
+&lt;h2 id=&#34;1实现-beanpostprocessor-接口&#34;&gt;1.实现 BeanPostProcessor 接口
+&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;public class BeanProcessor implements BeanPostProcessor {
+
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println(&amp;quot;后置bean：before 方法&amp;quot;);
+        return bean;
+    }
+    
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println(&amp;quot;后置bean：after 方法&amp;quot;);
+        if (bean instanceof User) {
+            User user = (User) bean;
+            user.setName(&amp;quot;亚里士多德&amp;quot;);
+            return user;
+        }
+        return bean;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;2-配置文件添加bean&#34;&gt;2. 配置文件添加bean
+&lt;/h2&gt;&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;bean id=&amp;quot;beanProcessor&amp;quot; class=&amp;quot;com.xxl.config.BeanProcessor&amp;quot;/&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;7-spring-aop&#34;&gt;7. Spring Aop
+&lt;/h1&gt;&lt;pre&gt;&lt;code&gt;Spring 的动态代理，通过代理类为原始类增加一些 额外功能
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;​	AOP思想的实现一般都是基于代理模式，在JAVA中一般采用JDK动态代理模式，但是我们都知道，JDK动态代理模式只能代理接口，如果要代理类那么就不行了。因此，Spring AOP 会这样子来进行切换，==因为Spring AOP 同时支持 CGLIB、ASPECTJ、JDK动态代理，当你的真实对象有实现接口时，Spring AOP会默认采用JDK动态代理，否则采用cglib代理==。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果目标对象的实现类实现了接口，Spring AOP 将会采用 JDK 动态代理来生成 AOP 代理类；&lt;/li&gt;
+&lt;li&gt;如果目标对象的实现类没有实现接口，Spring AOP 将会采用 CGLIB 来生成 AOP 代理类——不过这个选择过程对开发者完全透明、开发者也无需关心。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;1-aop基本概念&#34;&gt;1. Aop基本概念
+&lt;/h2&gt;&lt;h3 id=&#34;1-advice-通知&#34;&gt;1. advice 通知
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Before&lt;/code&gt; 在方法被调用之前调用&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;After&lt;/code&gt; 在方法完成后调用通知，无论方法是否执行成功&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;After-returning&lt;/code&gt; ==在方法成功执行之后调用通知==&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;After-throwing&lt;/code&gt; 在方法抛出异常后调用通知&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Around&lt;/code&gt; 方法调用之==前后调用之后执行自定义的行为==&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2-切点-pointcut&#34;&gt;2. 切点 Pointcut
+&lt;/h3&gt;&lt;p&gt;​	切点在Spring AOP中确实是==对应系统中的方法==。但是这个方法是定义在切面中的方法，一般和通知一起使用，一起组成了切面。&lt;/p&gt;
+&lt;h3 id=&#34;3-连接点-joinpoint&#34;&gt;3. 连接点 JoinPoint
+&lt;/h3&gt;&lt;p&gt;比如: 方法调用、方法执行、字段设置/获取、异常处理执行、类初始化、甚至是 for 循环中的某个点&lt;/p&gt;
+&lt;p&gt;==程序执行过程中的任何时点都可以作为作为织入点, 而所有这些执行时点都是 Joint point==&lt;/p&gt;
+&lt;p&gt;Spring AOP 目前==仅支持方法执行 (method execution)==&lt;/p&gt;
+&lt;h3 id=&#34;4-切面-aspect&#34;&gt;4. 切面 Aspect
+&lt;/h3&gt;&lt;p&gt;切面就是切点和通知的集合, 一般单独作为一个类; 通知和切点共同定义了关于切面的全部内容，它是什么时候，在何时和何处完成功能。&lt;/p&gt;
+&lt;h3 id=&#34;5-引入-introduction&#34;&gt;5. 引入 introduction
+&lt;/h3&gt;&lt;p&gt;引用允许我们向现有的类添加新的方法或者属性&lt;/p&gt;
+&lt;h3 id=&#34;6-织入-weaving&#34;&gt;6. 织入 weaving
+&lt;/h3&gt;&lt;h2 id=&#34;2-使用&#34;&gt;2. 使用
+&lt;/h2&gt;&lt;p&gt;Spring 2.0 之后，Spring AOP有了两种配置方式。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;schema-based&lt;/strong&gt;：Spring 2.0 以后使用 XML 的方式来配置，使用 命名空间 &lt;code&gt;&amp;lt;aop /&amp;gt;&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;@AspectJ 配置&lt;/strong&gt;：Spring 2.0 以后提供的注解方式。这里虽然叫做 @AspectJ，但是这个和 AspectJ 其实没啥关系。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;1-enableaspectjautoproxy&#34;&gt;1. EnableAspectJAutoProxy
+&lt;/h3&gt;&lt;p&gt;开启配置之后，所有&lt;strong&gt;在容器中&lt;/strong&gt;，&lt;strong&gt;被&lt;code&gt;@AspectJ&lt;/code&gt;注解的 bean&lt;/strong&gt; 都会被 Spring 当做是 AOP 配置类，称为一个 Aspect。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;注意: AspectJ 注解只能作用于Spring Bean 上面&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;2-配置pointcut&#34;&gt;2. 配置Pointcut
+&lt;/h3&gt;&lt;p&gt;在Spring 中, Pointcut 是用来匹配Spring 容器中所有满足指定条件的bean的方法&lt;/p&gt;
+&lt;p&gt;例如&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;execution&lt;/strong&gt;：匹配方法名&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;    // 表示的是匹配名为testExecution的方法，*代表任意返回值，(..)表示零个或多个任意参数
+    @Pointcut(&amp;quot;execution(* testExecution(..))&amp;quot;)
+    public void anyTestMethod() {}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;within&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// &amp;quot;..&amp;quot; 代表包及其子包
+	@Pointcut(&amp;quot;within(ric.study.demo.aop.svc..*)&amp;quot;)
+    public void inSvcLayer() {}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;annotation&lt;/strong&gt;：方法上具有特定的注解&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// 指定注解
+    @Pointcut(&amp;quot;@annotation(ric.study.demo.aop.HaveAop)&amp;quot;)
+    public void withAnnotation() {}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;bean(idOrNameOfBean)：匹配 bean 的名字&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// controller 层
+    @Pointcut(&amp;quot;bean(testController)&amp;quot;)
+    public void inControllerLayer() {}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;关于 Pointcut 的配置&lt;/strong&gt;, 开发企业级应用，Spring 建议你使用 &lt;code&gt;SystemArchitecture&lt;/code&gt;这种切面配置方式，即将一些公共的PointCut 配置全部写在这个一个类里面维护&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Aspect
+public class SystemArchitecture {
+
+  /**
+   * A join point is in the web layer if the method is defined
+   * in a type in the com.xyz.someapp.web package or any sub-package
+   * under that.
+   */
+  @Pointcut(&amp;quot;within(com.xyz.someapp.web..*)&amp;quot;)
+  public void inWebLayer() {}
+  
+  @Pointcut(&amp;quot;execution(* com.xyz.someapp.dao.*.*(..))&amp;quot;)
+  public void dataAccessOperation() {}
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;3-配置-advice&#34;&gt;3. 配置 Advice
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;实际开发过程当中，Aspect 类应该遵守单一职责原则，不要把所有的Advice配置全部写在一个Aspect类里面。&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Aspect
+@Component
+public class GlobalAopAdvice {
+
+    @Before(&amp;quot;ric.study.demo.aop.SystemArchitecture.dataAccessOperation()&amp;quot;)
+    public void doAccessCheck() {
+        // ... 实现代码
+    }
+
+    // 实际使用过程当中 可以像这样把Advice 和 Pointcut 合在一起，直接在Advice上面定义切入点
+    @Before(&amp;quot;execution(* ric.study.demo.dao.*.*(..))&amp;quot;)
+    public void doAccessCheck() {
+        // ... 实现代码
+    }
+
+    // 在方法
+    @AfterReturning(&amp;quot;ric.study.demo.aop.SystemArchitecture.dataAccessOperation()&amp;quot;)
+    public void doAccessCheck() {
+        // ... 实现代码
+    }
+
+    // returnVal 就是相应方法的返回值
+    @AfterReturning(
+        pointcut=&amp;quot;ric.study.demo.aop.SystemArchitecture.dataAccessOperation()&amp;quot;,
+        returning=&amp;quot;returnVal&amp;quot;)
+    public void doAccessCheck(Object returnVal) {
+        //  ... 实现代码
+    }
+
+    // 异常返回的时候
+    @AfterThrowing(&amp;quot;ric.study.demo.aop.SystemArchitecture.dataAccessOperation()&amp;quot;)
+    public void doRecoveryActions() {
+        // ... 实现代码
+    }
+
+    // 注意理解它和 @AfterReturning 之间的区别，这里会拦截正常返回和异常的情况
+    @After(&amp;quot;ric.study.demo.aop.SystemArchitecture.dataAccessOperation()&amp;quot;)
+    public void doReleaseLock() {
+        // 通常就像 finally 块一样使用，用来释放资源。
+        // 无论正常返回还是异常退出，都会被拦截到
+    }
+
+    // 这种最灵活，既能做 @Before 的事情，也可以做 @AfterReturning 的事情
+    @Around(&amp;quot;ric.study.demo.aop.SystemArchitecture.businessService()&amp;quot;)
+    public Object doBasicProfiling(ProceedingJoinPoint pjp) throws Throwable {
+       	//  target 方法执行前... 实现代码
+        Object retVal = pjp.proceed();
+        //  target 方法执行后... 实现代码
+        return retVal;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;strong&gt;@Before的时候，去获取方法的入参，比如进行一些日志的记录&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;可以通过 &lt;code&gt;org.aspectj.lang.JoinPoint&lt;/code&gt;来实现。上文中的&lt;code&gt;ProceedingJoinPoint&lt;/code&gt;就是其子类&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@Before(&amp;quot;...&amp;quot;)
+public void logArgs(JoinPoint joinPoint) {
+    System.out.println(&amp;quot;方法执行前，打印入参：&amp;quot; + Arrays.toString(joinPoint.getArgs()));
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;方法返回参数打印&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;@AfterReturning( pointcut=&amp;quot;...&amp;quot;, returning=&amp;quot;returnVal&amp;quot;)
+public void logReturnVal(Object returnVal) {
+    System.out.println(&amp;quot;方法执行后，打印返参：&amp;quot; + returnVal));
+}
 &lt;/code&gt;&lt;/pre&gt;
 </description>
         </item>
